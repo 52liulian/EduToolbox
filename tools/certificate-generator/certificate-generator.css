@@ -1,0 +1,294 @@
+/* ============================================================================
+ * 在线奖状生成器 · certificate-generator.css
+ * 仅包含本工具特有样式：双栏布局 / 模板选择网格 / 奖状纸张 / 6 套主题 / 印章
+ * 公共底座（field、row、actions、btn、input、select）见 tool-common.css
+ * 高度策略：所有容器 height:auto，纸张按 A4 横向比例自然向下撑开
+ * ========================================================================== */
+
+/* ---------------------------------------------------------------------------
+ * 一、双栏布局：左设置面板 / 右预览
+ * ------------------------------------------------------------------------- */
+.app {
+  display: grid;
+  grid-template-columns: minmax(320px, 380px) minmax(0, 1fr);
+  gap: 22px;
+  align-items: start;
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 28px 24px 56px;
+}
+
+.form-panel {
+  padding: 24px;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow-sm);
+}
+
+.form-panel h2 {
+  margin-bottom: 4px;
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--text-1);
+}
+
+.form-panel .sub {
+  margin-bottom: 18px;
+  font-size: 13px;
+  color: var(--text-3);
+}
+
+/* field 内 label */
+.form-panel .field { margin-bottom: 14px; }
+.form-panel .field > label {
+  display: block;
+  margin-bottom: 7px;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--text-1);
+}
+
+.form-panel .row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+/* ---------------------------------------------------------------------------
+ * 二、模板选择网格
+ * ------------------------------------------------------------------------- */
+.template-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.tpl {
+  display: grid;
+  place-items: center;
+  padding: 12px 6px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-2);
+  background: var(--card-bg-2);
+  border: 1.5px solid var(--border);
+  border-radius: var(--r-sm);
+  cursor: pointer;
+  transition: all var(--t-fast) var(--ease);
+  user-select: none;
+}
+
+.tpl:hover {
+  color: var(--primary);
+  border-color: var(--primary-soft-2);
+  background: var(--primary-soft);
+}
+
+.tpl.active {
+  color: #fff;
+  background: var(--primary-grad);
+  border-color: transparent;
+  box-shadow: var(--shadow-primary);
+}
+
+/* ---------------------------------------------------------------------------
+ * 三、预览面板
+ * ------------------------------------------------------------------------- */
+.preview-panel {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  min-height: 420px;
+  padding: 32px 24px;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow);
+}
+
+/* ---------------------------------------------------------------------------
+ * 四、奖状纸张（A4 横向比例 297:210）
+ * ------------------------------------------------------------------------- */
+.cert {
+  position: relative;
+  width: 100%;
+  max-width: 900px;
+  aspect-ratio: 297 / 210;
+  padding: 14px;
+  font-family: "STKaiti", "KaiTi", "STZhongsong", "FangSong", serif;
+  background: #fffdf5;
+  border-radius: 8px;
+  box-shadow: 0 14px 36px rgba(31, 45, 80, 0.16);
+}
+
+/* 装饰边框（双线金边） */
+.cert-border {
+  width: 100%;
+  height: 100%;
+  padding: 18px;
+  border: 4px double #c79a36;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cert-inner {
+  position: relative;
+  width: 100%;
+  padding: 18px 28px;
+  text-align: center;
+  color: #2a1c08;
+}
+
+.cert-title {
+  font-size: clamp(34px, 4.6vw, 56px);
+  font-weight: 800;
+  letter-spacing: 0.4em;
+  margin-bottom: 14px;
+  color: #b8860b;
+  text-shadow: 0 2px 0 rgba(199, 154, 54, 0.18);
+}
+
+.cert-body {
+  font-size: clamp(14px, 1.6vw, 19px);
+  line-height: 2.1;
+  color: #2a1c08;
+}
+
+.c-name {
+  font-size: 1.6em;
+  font-weight: 800;
+  color: #b8860b;
+  padding: 0 6px;
+}
+
+.c-year, .c-sem, .c-reason {
+  font-weight: 700;
+  color: #b8860b;
+  padding: 0 4px;
+}
+
+.c-award {
+  display: inline-block;
+  margin: 8px 0;
+  padding: 6px 28px;
+  font-size: 1.5em;
+  font-weight: 800;
+  color: #b00;
+  border: 2px solid #b00;
+  border-radius: 6px;
+  letter-spacing: 0.16em;
+}
+
+.cert-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 18px;
+  padding-top: 14px;
+  font-size: clamp(13px, 1.4vw, 16px);
+  color: #2a1c08;
+  border-top: 1px dashed rgba(199, 154, 54, 0.5);
+}
+
+.c-org { font-weight: 700; }
+.c-date { font-weight: 600; color: #5a4a2a; }
+
+/* ---------------------------------------------------------------------------
+ * 五、印章（圆形红章）
+ * ------------------------------------------------------------------------- */
+.seal {
+  position: absolute;
+  right: 8%;
+  bottom: 14%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 92px;
+  height: 92px;
+  font-size: 14px;
+  font-weight: 800;
+  line-height: 1.2;
+  text-align: center;
+  color: #c0392b;
+  border: 3px solid #c0392b;
+  border-radius: 50%;
+  background: rgba(192, 57, 43, 0.08);
+  transform: rotate(-12deg);
+  filter: drop-shadow(0 2px 4px rgba(192, 57, 43, 0.25));
+  opacity: 0.92;
+}
+
+/* ---------------------------------------------------------------------------
+ * 六、6 套模板主题色（仅覆盖边框/标题/奖项色，结构保持一致）
+ * ------------------------------------------------------------------------- */
+.tpl-default { background: #fffdf5; }
+.tpl-default .cert-title,
+.tpl-default .c-name,
+.tpl-default .c-year,
+.tpl-default .c-sem,
+.tpl-default .c-reason { color: #b8860b; }
+
+.tpl-award { background: #fdf6ec; }
+.tpl-award .cert-border { border-color: #d9534f; }
+.tpl-award .cert-title,
+.tpl-award .c-name { color: #d9534f; }
+
+.tpl-honor { background: #f4f8ff; }
+.tpl-honor .cert-border { border-color: #2c5dc7; }
+.tpl-honor .cert-title,
+.tpl-honor .c-name,
+.tpl-honor .c-year,
+.tpl-honor .c-sem,
+.tpl-honor .c-reason { color: #2c5dc7; }
+
+.tpl-kid { background: #fff5fb; }
+.tpl-kid .cert-border { border-color: #ff7eb6; }
+.tpl-kid .cert-title,
+.tpl-kid .c-name { color: #d63384; }
+
+.tpl-heart { background: #fff0f3; }
+.tpl-heart .cert-border { border-color: #e83e8c; }
+.tpl-heart .cert-title,
+.tpl-heart .c-name { color: #c2185b; }
+
+.tpl-hire { background: #f3f7ff; }
+.tpl-hire .cert-title { letter-spacing: 0.2em; color: #1d4ed8; }
+.tpl-hire .cert-border { border: 3px solid #1d4ed8; }
+.tpl-hire .c-name,
+.tpl-hire .c-year,
+.tpl-hire .c-sem,
+.tpl-hire .c-reason { color: #1d4ed8; }
+
+/* ---------------------------------------------------------------------------
+ * 七、小屏适配：单列堆叠
+ * ------------------------------------------------------------------------- */
+@media (max-width: 900px) {
+  .app { grid-template-columns: 1fr; }
+  .preview-panel { padding: 18px 8px; }
+  .template-grid { grid-template-columns: repeat(6, 1fr); }
+}
+
+@media (max-width: 540px) {
+  .template-grid { grid-template-columns: repeat(3, 1fr); }
+  .form-panel .row { grid-template-columns: 1fr; }
+  .seal { width: 70px; height: 70px; font-size: 12px; }
+}
+
+/* ---------------------------------------------------------------------------
+ * 八、打印：仅输出奖状纸张
+ * ------------------------------------------------------------------------- */
+@media print {
+  .form-panel { display: none !important; }
+  .app, .preview-panel {
+    display: block;
+    padding: 0;
+    border: none;
+    box-shadow: none;
+    background: #fff;
+  }
+  .cert { box-shadow: none; max-width: 100%; }
+}

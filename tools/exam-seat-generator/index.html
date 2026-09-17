@@ -1,0 +1,131 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>考试座位安排 | EduToolbox · 考场座位</title>
+<meta name="description" content="导入考生名单（支持 CSV），随机排座，支持 Z 字形 / S 字形排列，座位号 + 准考号 + 姓名展示，打印准考证/座位表，全屏展示，本地保存。">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%8E%93%3C/text%3E%3C/svg%3E">
+<link rel="stylesheet" href="exam-seat-generator.css">
+<link rel="stylesheet" href="../../assets/css/tool-common.css">
+</head>
+<body>
+<div id="app">
+
+  <main class="main">
+    <!-- 左侧：设置面板 -->
+    <section class="setup-panel">
+
+      <!-- 考生名单 -->
+      <div class="block">
+        <h2 class="block-title">📋 考生名单</h2>
+        <p class="block-hint">每行一名考生，格式：姓名 Tab/逗号/空格 准考号</p>
+        <div class="textarea-wrap">
+          <textarea id="candidates" placeholder="张三	20250001&#10;李四,20250002&#10;王五 20250003&#10;...">张三	20250001
+李四,20250002
+王五 20250003
+赵六	20250004
+钱七,20250005
+孙八	20250006
+周九,20250007
+吴十	20250008
+郑十一,20250009
+王十二	20250010
+刘十三	20250011
+陈十四,20250012
+杨十五	20250013
+朱十六	20250014
+秦十七	20250015
+尤十八	20250016</textarea>
+          <div class="textarea-toolbar">
+            <button class="btn-mini" id="exampleBtn" title="加载示例名单">示例</button>
+            <button class="btn-mini" id="importCsvBtn" title="导入 CSV/TXT 文件">📁 导入</button>
+            <button class="btn-mini" id="clearCandsBtn" title="清空名单">清空</button>
+            <input type="file" id="fileInput" accept=".csv,.txt" style="display:none">
+          </div>
+        </div>
+        <div class="count-bar">共 <span id="count">0</span> 名考生</div>
+      </div>
+
+      <!-- 考场设置 -->
+      <div class="block">
+        <h2 class="block-title">⚙️ 考场设置</h2>
+        <div class="setting-row">
+          <label for="titleText">座位表标题</label>
+          <input type="text" id="titleText" value="考试座位安排表" placeholder="如：考试座位安排表">
+        </div>
+        <div class="setting-row">
+          <label for="roomText">考场信息</label>
+          <input type="text" id="roomText" value="第七考场（0003教室）" placeholder="如：第一考场（101教室）">
+        </div>
+        <div class="setting-row">
+          <label for="invigilator">监考老师</label>
+          <input type="text" id="invigilator" placeholder="如：王老师" value="">
+        </div>
+        <div class="setting-row">
+          <label for="cols">座位列数 <span id="colsVal" class="val-tag">3</span></label>
+          <input type="range" id="cols" min="1" max="6" value="3">
+        </div>
+        <div class="setting-row">
+          <label for="perCol">每列座位数 <span id="perColVal" class="val-tag">8</span></label>
+          <input type="range" id="perCol" min="1" max="10" value="8">
+        </div>
+        <div class="setting-row">
+          <label for="arrange">排列方式</label>
+          <select id="arrange">
+            <option value="z" selected>Z 字形（蛇形）</option>
+            <option value="s">S 字形（回转）</option>
+            <option value="straight">顺序排列</option>
+          </select>
+        </div>
+        <div class="setting-row">
+          <label for="startNum">起始座位号</label>
+          <input type="number" id="startNum" min="1" value="1">
+        </div>
+        <p class="block-hint">座位容量：<span id="capacity">24</span> 个 · 当前可安排 <span id="arrangeCount">0</span> / <span id="totalSeats">24</span> 个</p>
+
+        <div class="check-stack">
+          <label class="check-line"><input type="checkbox" id="showRoom" checked><span>显示考场信息</span></label>
+          <label class="check-line"><input type="checkbox" id="showInvigilator"><span>显示监考老师</span></label>
+          <label class="check-line"><input type="checkbox" id="autoSave" checked><span>本地保存（localStorage）</span></label>
+        </div>
+      </div>
+
+      <!-- 操作按钮 -->
+      <div class="actions">
+        <button class="btn-primary" id="randomBtn">🎲 随机排座</button>
+        <button class="btn-ghost" id="clearSeatsBtn">🗑 清空座位</button>
+        <button class="btn-ghost" id="printBtn">🖨 打印座位表</button>
+        <button class="btn-ghost" id="excelBtn">📊 导出Excel</button>
+        <button class="btn-ghost" id="fullscreenBtn">⛶ 全屏</button>
+        <button class="btn-ghost" id="exitFullBtn" style="display:none">⤫ 退出</button>
+      </div>
+    </section>
+
+    <!-- 右侧：考场座位表 -->
+    <section class="stage" id="stage">
+      <div class="stage-toolbar">
+        <span class="stage-title">🏫 考场座位表</span>
+        <div class="stage-tools">
+          <span class="arrange-tip" id="arrangeTip">已安排 0 / 0 个座位</span>
+        </div>
+      </div>
+      <div class="stage-inner" id="stageInner">
+        <div class="seat-paper" id="seatPaper">
+          <h2 class="paper-title">考试座位安排表</h2>
+          <div class="paper-subtitle">第七考场（0003教室）</div>
+          <div class="paper-area" id="paperArea">
+            <div class="empty-tip">请先导入考生名单，然后点击"随机排座"</div>
+          </div>
+          <div class="paper-invigilator" id="paperInvigilator" style="display:none">监考老师：</div>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<!-- Excel 导出依赖（本地 vendor，file:// 可用） -->
+<script src="../../assets/vendor/xlsx.full.min.js"></script>
+<script src="exam-seat-generator.js"></script>
+</body>
+</html>

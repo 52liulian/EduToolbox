@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>高考倒计时 | EduToolbox · 距离高考实时倒计时</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%8E%93%3C/text%3E%3C/svg%3E">
+  <link rel="stylesheet" href="gaokao-countdown.css">
+<link rel="stylesheet" href="../../assets/css/tool-common.css">
+</head>
+<body>
+
+  <!-- 右上角工具按钮：全屏 / 设置 -->
+  <div class="toolbar">
+    <button id="btnFullscreen" class="tool-btn" title="全屏展示 (F11 / Esc 退出)">⛶ 全屏展示</button>
+    <button id="btnSettings" class="tool-btn" title="打开设置面板">⚙️ 设置</button>
+  </div>
+
+  <!-- 主显示区：标题 + 倒计时数字 + 寄语 -->
+  <main class="stage">
+    <h1 id="countdownTitle" class="countdown-title">距离 2027 年高考还有</h1>
+
+    <div class="countdown-display">
+      <div class="time-block">
+        <span id="days" class="time-value days-value">000</span>
+        <span class="time-label">天</span>
+      </div>
+      <span class="time-colon">:</span>
+      <div class="time-block">
+        <span id="hours" class="time-value">00</span>
+        <span class="time-label">时</span>
+      </div>
+      <span class="time-colon">:</span>
+      <div class="time-block">
+        <span id="minutes" class="time-value">00</span>
+        <span class="time-label">分</span>
+      </div>
+      <span class="time-colon">:</span>
+      <div class="time-block">
+        <span id="seconds" class="time-value">00</span>
+        <span class="time-label">秒</span>
+      </div>
+    </div>
+
+    <p id="slogan" class="slogan">乾坤未定，你我皆是黑马</p>
+    <p id="targetDate" class="target-date">目标日期：2027 年 6 月 7 日 09:00</p>
+  </main>
+
+  <!-- 设置面板：自定义标题 / 年份切换 / 寄语 / 主题 -->
+  <aside id="settingsPanel" class="settings-panel" hidden>
+    <div class="settings-header">
+      <span>⚙️ 设置</span>
+      <button id="btnCloseSettings" class="close-btn" title="关闭">✕</button>
+    </div>
+
+    <div class="settings-body">
+      <div class="form-row">
+        <label for="inputTitle">标题内容</label>
+        <input id="inputTitle" type="text" placeholder="距离 2027 年高考还有">
+      </div>
+
+      <div class="form-row">
+        <label>高考年份切换</label>
+        <div class="year-switch">
+          <button id="year2026" class="year-btn" type="button">2026 年高考</button>
+          <button id="year2027" class="year-btn" type="button">2027 年高考</button>
+          <button id="yearAuto" class="year-btn active" type="button">自动最近</button>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <label for="inputSlogan">励志寄语</label>
+        <input id="inputSlogan" type="text" placeholder="乾坤未定，你我皆是黑马">
+      </div>
+
+      <div class="form-row">
+        <label>UI 配色风格</label>
+        <div id="themeList" class="theme-list">
+          <button class="theme-btn active" data-theme="auto" type="button">自动渐变</button>
+          <button class="theme-btn" data-theme="gold" type="button">金色励志</button>
+          <button class="theme-btn" data-theme="crimson" type="button">暗绯红</button>
+          <button class="theme-btn" data-theme="royal" type="button">皇家紫</button>
+          <button class="theme-btn" data-theme="midnight" type="button">午夜黑</button>
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button id="btnReset" class="action-btn secondary" type="button">恢复默认</button>
+        <button id="btnSave" class="action-btn primary" type="button">保存并生效</button>
+      </div>
+    </div>
+  </aside>
+
+  <!-- 设置面板背景遮罩 -->
+  <div id="settingsMask" class="settings-mask" hidden></div>
+
+  <script src="gaokao-countdown.js"></script>
+</body>
+</html>

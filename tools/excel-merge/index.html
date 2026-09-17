@@ -1,0 +1,64 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>多表合并 - 表格数据处理</title>
+<link rel="stylesheet" href="excel-merge.css">
+<link rel="stylesheet" href="../../assets/css/tool-common.css">
+</head>
+<body data-mode="smart">
+<div class="wrap">
+  <header class="head">
+    <h1>📊 多表合并（表格数据处理）</h1>
+    <p class="sub">多个 Excel / CSV 按列名智能合并，或自定义字段映射，一键导出 XLSX</p>
+    <span class="notice">🔒 全部解析在本地完成，数据不上传</span>
+  </header>
+
+  <section class="card">
+    <div id="dropzone" class="dropzone">
+      <div class="dz-icon">📥</div>
+      <p>拖入多个 <b>.xlsx / .xls / .csv</b> 文件，或<button type="button" class="link-btn" id="pickBtn">点击选择</button></p>
+      <p class="dz-hint">可一次选择多个文件；每个文件可单独选择工作表与字段</p>
+      <input type="file" id="fileInput" accept=".xlsx,.xls,.csv" multiple hidden>
+    </div>
+
+    <div id="loading" class="loading hidden"><span class="spinner"></span><span id="loadingText">正在解析文件…</span></div>
+
+    <div id="entries" class="entries"></div>
+  </section>
+
+  <section class="card" id="optionCard" hidden>
+    <h2 class="card-title">合并设置</h2>
+    <div class="opt-group">
+      <span class="opt-label">合并模式</span>
+      <label class="radio"><input type="radio" name="mode" value="smart" checked>
+        <span><b>按列名智能合并</b>：输出表头 = 所有表列名的并集，同名列自动归并，未涉及的列留空</span></label>
+      <label class="radio"><input type="radio" name="mode" value="custom">
+        <span><b>自定义字段</b>：在上方文件列表中勾选要包含的列，并可填写「输出列名」按新名称归并</span></label>
+    </div>
+    <div class="opt-group">
+      <label class="check"><input type="checkbox" id="addSource"> 追加「来源文件」列（标记每行数据来自哪个文件）</label>
+    </div>
+    <div class="actions">
+      <button class="btn btn-primary" id="mergeBtn">🔀 生成合并预览</button>
+      <button class="btn btn-ghost" id="clearBtn">清空全部</button>
+    </div>
+  </section>
+
+  <section class="card" id="previewCard" hidden>
+    <h2 class="card-title">合并预览</h2>
+    <div id="summary" class="summary"></div>
+    <div class="table-scroll">
+      <table id="previewTable"></table>
+    </div>
+    <div class="actions">
+      <button class="btn btn-primary" id="exportBtn">💾 导出 合并表格.xlsx</button>
+    </div>
+    <p class="tip-line">仅预览前 10 行，导出时包含全部数据。</p>
+  </section>
+</div>
+<script src="../../assets/vendor/xlsx.full.min.js"></script>
+<script src="excel-merge.js"></script>
+</body>
+</html>

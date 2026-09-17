@@ -1,0 +1,176 @@
+/* ============================================================================
+ * 答题卡生成器 · answercard.css
+ * 仅包含本工具特有样式：题量设置行 / 答题卡纸张 / 题号网格 / 气泡选项
+ * 公共底座（container、tool-title、ctrl-row、btn、input）见 tool-common.css
+ * 高度策略：所有容器 height:auto，纸张自然向下撑开，无内部滚动条
+ * ========================================================================== */
+
+/* ---------------------------------------------------------------------------
+ * 一、题量设置行：标签 + 数字输入 + 生成按钮
+ * ------------------------------------------------------------------------- */
+.ctrl-row {
+  margin-bottom: 18px;
+  padding: 18px 22px;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  box-shadow: var(--shadow-sm);
+}
+
+.ctrl-row > label {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-2);
+}
+
+.ctrl-row > label input[type="number"] {
+  width: 84px;
+  padding: 8px 10px;
+  text-align: center;
+  font-weight: 700;
+}
+
+/* ---------------------------------------------------------------------------
+ * 二、答题卡纸张容器（白底、阴影、内边距，模拟机读卡）
+ * ------------------------------------------------------------------------- */
+.answer-card {
+  min-height: 200px;
+  padding: 36px 40px 28px;
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  box-shadow: var(--shadow);
+  font-family: "Times New Roman", "SimSun", "Songti SC", serif;
+}
+
+.answer-card:empty::before {
+  content: "请设置题量后点击「生成答题卡」";
+  display: block;
+  padding: 40px 0;
+  text-align: center;
+  font-size: 14px;
+  color: var(--text-3);
+  font-family: var(--font);
+}
+
+/* ---------------------------------------------------------------------------
+ * 三、答题卡标题与大题分段标题
+ * ------------------------------------------------------------------------- */
+.ac-title {
+  margin-bottom: 18px;
+  padding-bottom: 14px;
+  font-size: 20px;
+  font-weight: 800;
+  text-align: center;
+  color: var(--text-1);
+  border-bottom: 2px solid var(--text-1);
+}
+
+.ac-section {
+  margin: 20px 0 10px;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text-1);
+}
+
+/* 选项字母表头（A B C D / A B C D E） */
+.ac-options {
+  display: flex;
+  gap: 4px;
+  padding: 4px 0 6px 36px; /* 左侧 36px 与题号列对齐 */
+  border-bottom: 1px dashed var(--border-2);
+  margin-bottom: 8px;
+}
+
+.ac-key {
+  display: inline-grid;
+  place-items: center;
+  width: 28px;
+  height: 22px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-2);
+}
+
+/* ---------------------------------------------------------------------------
+ * 四、题号网格：自适应列数，气泡均匀分布
+ * ------------------------------------------------------------------------- */
+.ac-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 6px 12px;
+  margin-bottom: 16px;
+}
+
+.ac-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 0;
+}
+
+.ac-num {
+  flex-shrink: 0;
+  width: 36px;
+  font-size: 13px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-2);
+}
+
+.ac-bubble {
+  display: inline-grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-2);
+  background: #fff;
+  border: 1.5px solid #1f2733;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all var(--t-fast) var(--ease);
+  user-select: none;
+}
+
+.ac-bubble:hover {
+  background: var(--primary-soft);
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+/* 已填涂态（仅作样式预留，JS 当前未写入，便于后续扩展） */
+.ac-bubble.filled {
+  background: #1f2733;
+  color: #fff;
+  border-color: #1f2733;
+}
+
+/* ---------------------------------------------------------------------------
+ * 五、底部姓名/班级/考号信息行
+ * ------------------------------------------------------------------------- */
+.ac-info {
+  margin-top: 24px;
+  padding-top: 14px;
+  font-size: 14px;
+  color: var(--text-1);
+  border-top: 1px solid var(--border);
+  letter-spacing: 0.02em;
+}
+
+/* ---------------------------------------------------------------------------
+ * 六、打印：仅输出答题卡纸张
+ * ------------------------------------------------------------------------- */
+@media print {
+  .ctrl-row, .tool-title, .tool-sub { display: none !important; }
+  .container { padding: 0; max-width: none; }
+  .answer-card {
+    border: none;
+    box-shadow: none;
+    padding: 12px;
+  }
+}

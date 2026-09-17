@@ -1,0 +1,308 @@
+/* ============================================================================
+ * 随机抽题 · random-question.css
+ * 仅包含本工具特有样式：紫色知识舞台内景 / 流体 Canvas 层 / 题号胶囊 /
+ *                       题目滚动与定格 / 答案揭晓卡片 / stage 全屏投影
+ * 公共底座（双栏布局、面板、按钮、记录列表）见 tool-common.css
+ * 高度策略：舞台 min-height 撑开、内容自然增高，仅 body 主滚动条；深色仅限
+ *           舞台卡片内部与全屏模式，整页 body 保持浅色；仅全屏时铺满视口
+ * ========================================================================== */
+
+/* ---------------------------------------------------------------------------
+ * 一、双栏布局：窄屏回落 & 「隐藏设置」单栏态
+ * ------------------------------------------------------------------------- */
+@media (max-width: 900px) {
+  #app .main { grid-template-columns: 1fr; }
+}
+
+#app .main.setup-hidden {
+  grid-template-columns: 1fr;
+}
+.main.setup-hidden .setup-panel {
+  display: none;
+}
+
+/* 速度滑杆数值 */
+.slider-line .val {
+  min-width: 48px;
+  text-align: right;
+  font-size: 13.5px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--primary);
+}
+
+/* ---------------------------------------------------------------------------
+ * 二、抽题舞台：白色卡片包裹一块紫色深色沉浸内景（body 不变黑）
+ * ------------------------------------------------------------------------- */
+#stage {
+  min-height: 580px;
+  padding: 0;
+  overflow: hidden; /* 仅把流体背景裁切在圆角内，不产生滚动条 */
+  background:
+    radial-gradient(1100px 560px at 50% -10%, rgba(167, 139, 250, 0.28), transparent 62%),
+    linear-gradient(160deg, #2a2160 0%, #1c1648 48%, #0e0a2a 100%);
+}
+
+/* 流体光球画布：铺满整个舞台，由 JS 按 offsetWidth/Height 取尺寸 */
+.bg-canvas {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+/* 暗角聚光，让中央题目更突出 */
+#stage::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse at center, transparent 42%, rgba(8, 5, 24, 0.52) 100%);
+}
+
+/* 深色舞台内的角标按钮改为玻璃质感（覆盖公共白底 icon-btn） */
+#stage .stage-toolbar { z-index: 5; }
+#stage .stage-toolbar .icon-btn {
+  color: rgba(255, 255, 255, 0.9);
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.24);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+#stage .stage-toolbar .icon-btn:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.42);
+}
+
+/* ---------------------------------------------------------------------------
+ * 三、中央展示区（浮于流体层之上）
+ * ------------------------------------------------------------------------- */
+#stage .display {
+  position: relative;
+  z-index: 2;
+  justify-content: center;
+  gap: 16px;
+  min-height: 580px;
+  padding: 72px 24px 56px;
+}
+
+/* 题号胶囊（覆盖公共 .q-index 的纯蓝文字样式） */
+#qIndex {
+  padding: 6px 22px;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  color: #ddd3ff;
+  background: rgba(196, 181, 253, 0.14);
+  border: 1px solid rgba(196, 181, 253, 0.42);
+  border-radius: var(--r-pill);
+}
+
+/* 题目大字（覆盖公共 .q-display 的深色文字） */
+#qDisplay {
+  max-width: 100%;
+  padding: 0 10px;
+  font-size: clamp(26px, 4vw, 48px);
+  font-weight: 900;
+  line-height: 1.45;
+  color: rgba(255, 255, 255, 0.95);
+  text-shadow: 0 0 30px rgba(167, 139, 250, 0.4);
+}
+
+/* 滚动态：快速换题 + 轻微抖动与紫色辉光 */
+#qDisplay.rolling {
+  color: #fff;
+  text-shadow:
+    0 0 18px rgba(196, 181, 253, 0.9),
+    0 0 52px rgba(167, 139, 250, 0.55);
+  animation: rq-rolling 0.14s linear infinite;
+}
+
+@keyframes rq-rolling {
+  0%   { transform: translateY(-3%) scale(0.99); opacity: 0.82; }
+  50%  { transform: translateY(3%) scale(1.01);  opacity: 1; }
+  100% { transform: translateY(-3%) scale(0.99); opacity: 0.82; }
+}
+
+/* 定格态：紫白渐变大字 + 弹出动效 */
+#qDisplay.winner {
+  background: linear-gradient(180deg, #ffffff 0%, #ddd3ff 55%, #b39bff 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-shadow: none;
+  filter: drop-shadow(0 0 26px rgba(167, 139, 250, 0.55));
+  animation: rq-pop 0.55s var(--ease);
+}
+
+@keyframes rq-pop {
+  0%   { transform: scale(0.7); opacity: 0; }
+  60%  { transform: scale(1.06); opacity: 1; }
+  100% { transform: scale(1); }
+}
+
+/* ---------------------------------------------------------------------------
+ * 四、答案揭晓区（未抽中前整块隐藏；揭晓按钮 + 答案卡片）
+ * ------------------------------------------------------------------------- */
+.answer-area {
+  display: none; /* 覆盖公共 answer-area 的常显，仅 .show 时出现 */
+  width: 100%;
+  max-width: 720px;
+  text-align: center;
+}
+.answer-area.show {
+  display: block;
+  animation: rq-fade-up 0.35s var(--ease);
+}
+
+@keyframes rq-fade-up {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* 揭晓按钮：深色舞台上的紫色玻璃描边按钮（公共底座未定义 .btn-reveal） */
+.btn-reveal {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 9px 24px;
+  font-size: 14px;
+  font-weight: 700;
+  color: #e6ddff;
+  background: rgba(167, 139, 250, 0.16);
+  border: 1.5px solid rgba(196, 181, 253, 0.5);
+  border-radius: var(--r-pill);
+  cursor: pointer;
+  transition: all var(--t-fast) var(--ease);
+}
+.btn-reveal:hover {
+  color: #fff;
+  background: rgba(167, 139, 250, 0.32);
+  border-color: rgba(224, 214, 255, 0.8);
+  transform: translateY(-1px);
+}
+
+/* 答案内容卡片：揭晓后淡入 */
+.q-answer {
+  margin-top: 14px;
+  padding: 14px 22px;
+  font-size: clamp(15px, 2vw, 19px);
+  font-weight: 600;
+  line-height: 1.75;
+  color: #f4efff;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: var(--r);
+  animation: rq-fade-up 0.35s var(--ease);
+}
+.q-answer:empty { display: none; }
+
+/* ---------------------------------------------------------------------------
+ * 五、提示行 / 按键 / 开始按钮（深色背景反色）
+ * ------------------------------------------------------------------------- */
+#displayHint {
+  color: rgba(255, 255, 255, 0.66);
+  font-size: 15px;
+}
+#stage .key-hint { color: rgba(255, 255, 255, 0.42); }
+#stage .key-hint kbd {
+  color: rgba(255, 255, 255, 0.88);
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.24);
+}
+
+/* 停止态按钮：主色蓝 → 警示红 */
+#startBtn.rolling {
+  background: linear-gradient(135deg, #ff7a7a, #ef4444);
+  box-shadow: 0 10px 26px rgba(239, 68, 68, 0.45);
+}
+
+/* ---------------------------------------------------------------------------
+ * 六、抽题记录列表项（.r-num / .r-name / em / .r-time 由 JS 生成）
+ * ------------------------------------------------------------------------- */
+.record-list li {
+  align-items: flex-start;
+  justify-content: space-between;
+}
+.record-list .r-name {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  flex: 1;
+  min-width: 0;
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--text-1);
+  word-break: break-all;
+}
+.record-list .r-name .r-num {
+  display: inline-grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  margin-top: 1px;
+  flex-shrink: 0;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--primary);
+  background: var(--primary-soft);
+  border-radius: 50%;
+}
+.record-list .r-name em {
+  font-style: normal;
+  color: var(--text-3);
+}
+.r-time {
+  flex-shrink: 0;
+  margin-left: 10px;
+  margin-top: 3px;
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-3);
+}
+
+/* ---------------------------------------------------------------------------
+ * 七、全屏投影（全屏元素是 stage 本身；流体画布与题目铺满视口）
+ * ------------------------------------------------------------------------- */
+#stage:fullscreen,
+#stage:-webkit-full-screen {
+  width: 100%;
+  height: 100%;
+  min-height: 100vh;
+  border: none;
+  border-radius: 0;
+}
+
+#stage:fullscreen .display,
+#stage:-webkit-full-screen .display {
+  min-height: 100vh;
+  padding: 40px 32px;
+}
+
+#stage:fullscreen #qDisplay,
+#stage:-webkit-full-screen #qDisplay {
+  font-size: clamp(34px, 5.4vw, 68px);
+  max-width: 1100px;
+}
+#stage:fullscreen .q-answer,
+#stage:-webkit-full-screen .q-answer {
+  max-width: 900px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* ---------------------------------------------------------------------------
+ * 八、小屏微调
+ * ------------------------------------------------------------------------- */
+@media (max-width: 640px) {
+  #stage,
+  #stage .display { min-height: 480px; }
+  #stage .display { padding: 64px 14px 40px; gap: 12px; }
+  #startBtn { padding: 14px 40px; font-size: 18px; }
+}

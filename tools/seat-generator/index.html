@@ -1,0 +1,147 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>座位表生成 | EduToolbox · 课堂座位安排</title>
+<meta name="description" content="根据学生名单与行列数量自动生成座位表，支持随机排序、讲台位置切换、打印、导出 Excel 与全屏展示，数据本地保存。">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%8E%93%3C/text%3E%3C/svg%3E">
+<link rel="stylesheet" href="seat-generator.css">
+<link rel="stylesheet" href="../../assets/css/tool-common.css">
+</head>
+<body>
+<div id="app">
+
+  <main class="main">
+    <!-- 左侧：设置面板 -->
+    <section class="setup-panel">
+
+      <!-- 名单输入 -->
+      <div class="block">
+        <h2 class="block-title">📋 学生名单</h2>
+        <p class="block-hint">每行一个姓名，回车分隔</p>
+        <div class="textarea-wrap">
+          <textarea id="names" placeholder="张三&#10;李四&#10;王五&#10;赵六&#10;...">张三
+李四
+王五
+赵六
+钱七
+孙八
+周九
+吴十
+郑十一
+王十二
+刘十三
+陈十四
+杨十五
+朱十六
+秦十七
+尤十八</textarea>
+          <div class="textarea-toolbar">
+            <button class="btn-mini" id="exampleBtn" title="加载示例名单">示例</button>
+            <button class="btn-mini" id="clearNamesBtn" title="清空名单">清空</button>
+          </div>
+        </div>
+        <div class="count-bar">共 <span id="count">0</span> 人</div>
+      </div>
+
+      <!-- 排座设置 -->
+      <div class="block">
+        <h2 class="block-title">⚙️ 排座设置</h2>
+        <div class="setting-row">
+          <label for="rows">行数</label>
+          <input type="number" id="rows" min="1" max="12" value="6">
+        </div>
+        <div class="setting-row">
+          <label for="cols">列数</label>
+          <input type="number" id="cols" min="1" max="12" value="3">
+        </div>
+        <div class="setting-row">
+          <label for="podiumPos">讲台位置</label>
+          <select id="podiumPos">
+            <option value="top">前（上方）</option>
+            <option value="bottom" selected>后（下方）</option>
+          </select>
+        </div>
+        <div class="setting-row">
+          <label for="viewMode">视角模式</label>
+          <select id="viewMode">
+            <option value="teacher" selected>教师视角</option>
+            <option value="student">学生视角</option>
+          </select>
+        </div>
+        <p class="block-hint">* 教师视角：讲台在下方；学生视角：讲台在上方</p>
+      </div>
+
+      <!-- 样式设置 -->
+      <div class="block">
+        <h2 class="block-title">🎨 座位表样式</h2>
+        <div class="setting-row">
+          <label for="titleText">座位表标题</label>
+          <input type="text" id="titleText" value="三年级二班座位表" placeholder="如：三年级二班座位表">
+        </div>
+        <div class="setting-row">
+          <label for="infoText">座位表信息</label>
+          <textarea id="infoText" rows="2" placeholder="支持空格和换行">班主任：xxx   人数：xxx   班长：xxx</textarea>
+        </div>
+        <div class="setting-row color-row">
+          <label class="color-item"><span>背景</span><input type="color" id="bgColor" value="#ffffff"></label>
+          <label class="color-item"><span>座位</span><input type="color" id="seatColor" value="#eaf3ff"></label>
+          <label class="color-item"><span>边框</span><input type="color" id="borderColor" value="#7dd3fc"></label>
+        </div>
+        <div class="setting-row color-row">
+          <label class="color-item"><span>字体</span><input type="color" id="fontColor" value="#0369a1"></label>
+          <label class="color-item"><span>讲台</span><input type="color" id="podiumColor" value="#374151"></label>
+          <label class="color-item"><span>讲台文字</span><input type="color" id="podiumTextColor" value="#ffffff"></label>
+        </div>
+        <div class="setting-row">
+          <label for="nameSize">名字字号 <span id="nameSizeVal" class="val-tag">14px</span></label>
+          <input type="range" id="nameSize" min="10" max="36" value="14">
+        </div>
+        <div class="check-stack">
+          <label class="check-line"><input type="checkbox" id="nameBold" checked><span>名字加粗</span></label>
+          <label class="check-line"><input type="checkbox" id="showPodium" checked><span>显示讲台</span></label>
+          <label class="check-line"><input type="checkbox" id="showTip" checked><span>显示排/列提示</span></label>
+          <label class="check-line"><input type="checkbox" id="hideEmpty"><span>隐藏空白座位</span></label>
+          <label class="check-line"><input type="checkbox" id="autoSave" checked><span>本地保存（localStorage）</span></label>
+        </div>
+      </div>
+
+      <!-- 操作按钮 -->
+      <div class="actions">
+        <button class="btn-primary" id="randomBtn">🎲 随机排座</button>
+        <button class="btn-ghost" id="regenBtn">🔄 重新生成</button>
+        <button class="btn-ghost" id="clearSeatsBtn">🗑 清空座位</button>
+      </div>
+    </section>
+
+    <!-- 右侧：座位表展示 -->
+    <section class="stage" id="stage">
+      <div class="stage-toolbar">
+        <span class="stage-title">📐 座位表</span>
+        <div class="stage-tools">
+          <button class="btn-mini" id="printBtn" title="打印座位表">🖨 打印</button>
+          <button class="btn-mini" id="excelBtn" title="导出 Excel">📊 导出Excel</button>
+          <button class="btn-mini" id="fullscreenBtn" title="全屏展示">⛶ 全屏</button>
+          <button class="btn-mini" id="exitFullBtn" title="退出全屏" style="display:none">⤫ 退出</button>
+        </div>
+      </div>
+      <div class="stage-inner" id="stageInner">
+        <!-- 座位表渲染区 -->
+        <div class="seat-paper" id="seatPaper">
+          <h2 class="paper-title">三年级二班座位表</h2>
+          <div class="paper-info">班主任：xxx   人数：xxx   班长：xxx</div>
+          <div class="paper-area" id="paperArea">
+            <div class="empty-tip">请先导入学生名单，然后点击"随机排座"或"重新生成"</div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<!-- Excel 导出依赖（本地 vendor，file:// 可用） -->
+<script src="../../assets/vendor/xlsx.full.min.js"></script>
+<script src="seat-generator.js"></script>
+</body>
+</html>

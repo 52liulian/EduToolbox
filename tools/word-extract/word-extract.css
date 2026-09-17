@@ -1,0 +1,268 @@
+/* ============================================================================
+ * 生词提取 · word-extract.css
+ * 仅包含本工具特有样式：标题副标 / 粘贴框 / 校对编辑器 / 分组列表 / 状态提示
+ * 公共底座（容器、卡片、按钮、dropzone、check、status）见 tool-common.css
+ * 高度策略：所有容器高度自动撑开，仅 body 主滚动条
+ * ========================================================================== */
+
+/* ---------------------------------------------------------------------------
+ * 一、页头副标（.sub 不在公共底座中，本工具特有）
+ * ------------------------------------------------------------------------- */
+#app .head .sub {
+  font-size: 14px;
+  color: var(--text-2);
+  line-height: 1.7;
+  margin-top: 4px;
+}
+
+#app .head .notice {
+  display: inline-block;
+  margin-top: 10px;
+}
+
+/* ---------------------------------------------------------------------------
+ * 二、粘贴框：让 textarea 与识别按钮上下排列
+ * ------------------------------------------------------------------------- */
+.paste-box {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px dashed var(--border);
+}
+
+.paste-box .opt-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-2);
+}
+
+.paste-box textarea {
+  min-height: 100px;
+  resize: vertical;
+  line-height: 1.7;
+}
+
+/* 小号次要按钮变体（.btn-sm 公共底座未提供） */
+.btn.btn-sm {
+  align-self: flex-end;
+  padding: 7px 14px;
+  font-size: 13px;
+}
+
+/* ---------------------------------------------------------------------------
+ * 三、校对区提示：识别规则说明 + 拼音标记
+ * ------------------------------------------------------------------------- */
+.edit-hint {
+  font-size: 13.5px;
+  line-height: 1.75;
+  color: var(--text-2);
+  margin-bottom: 12px;
+  padding: 10px 14px;
+  background: var(--bg-soft);
+  border-left: 3px solid var(--primary);
+  border-radius: var(--r-sm);
+}
+
+.edit-hint b { color: var(--text-1); }
+
+/* 自动识别的「//拼音」标记行 */
+.py-mark {
+  display: inline-block;
+  padding: 1px 6px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--warning);
+  background: rgba(245, 166, 35, 0.12);
+  border-radius: 4px;
+  font-family: Consolas, Menlo, monospace;
+}
+
+/* ---------------------------------------------------------------------------
+ * 四、校对编辑器：左侧分组列表 + 右侧文本域（双栏）
+ * ------------------------------------------------------------------------- */
+.editor {
+  display: grid;
+  grid-template-columns: 220px minmax(0, 1fr);
+  gap: 14px;
+  margin-bottom: 20px;
+}
+
+/* 左侧分组列表 */
+.group-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 10px;
+  background: var(--bg-soft);
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  max-height: 460px;       /* 仅此处允许内部滚动：分组多时便于浏览 */
+  overflow-y: auto;
+}
+
+.group-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 8px 12px;
+  font-size: 13px;
+  color: var(--text-2);
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  cursor: pointer;
+  transition: all var(--t-fast) var(--ease);
+}
+
+.group-item:hover {
+  border-color: var(--primary-soft-2);
+  background: var(--primary-soft);
+}
+
+.group-item.active {
+  color: var(--primary);
+  border-color: var(--primary);
+  background: var(--primary-soft);
+  box-shadow: 0 0 0 2px rgba(59, 110, 246, 0.12);
+}
+
+.g-name {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-weight: 600;
+}
+
+.g-count {
+  flex-shrink: 0;
+  padding: 1px 8px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--primary);
+  background: var(--primary-soft);
+  border-radius: var(--r-pill);
+  font-variant-numeric: tabular-nums;
+}
+
+/* 右侧编辑文本域 */
+.edit-area {
+  width: 100%;
+  min-height: 420px;
+  padding: 14px 16px;
+  font-family: Consolas, "Microsoft YaHei", monospace;
+  font-size: 14px;
+  line-height: 1.85;
+  color: var(--text-1);
+  background: var(--card-bg-2);
+  border: 1.5px solid var(--border);
+  border-radius: var(--r-sm);
+  resize: vertical;
+  outline: none;
+  transition: border-color var(--t-fast) var(--ease), box-shadow var(--t-fast) var(--ease);
+}
+
+.edit-area:focus {
+  border-color: var(--primary);
+  background: #fff;
+  box-shadow: 0 0 0 3px rgba(59, 110, 246, 0.12);
+}
+
+/* ---------------------------------------------------------------------------
+ * 五、导出选项行：复选项横排
+ * ------------------------------------------------------------------------- */
+.opt-inline {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 18px;
+  margin-bottom: 14px;
+}
+
+.opt-inline .check {
+  padding: 6px 0;
+  font-size: 13.5px;
+}
+
+.opt-inline .check input {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--primary);
+  cursor: pointer;
+}
+
+/* ---------------------------------------------------------------------------
+ * 六、状态提示：成功 / 失败两态
+ * ------------------------------------------------------------------------- */
+#app .status {
+  margin-top: 14px;
+  padding: 10px 14px;
+  font-size: 13px;
+  line-height: 1.65;
+  border-radius: var(--r-sm);
+  background: var(--bg-soft);
+  border-left: 3px solid var(--text-3);
+  color: var(--text-2);
+}
+
+#app .status:empty { display: none; }
+
+#app .status.ok {
+  background: rgba(34, 179, 106, 0.10);
+  border-left-color: var(--success);
+  color: #15803d;
+}
+
+#app .status.err {
+  background: rgba(239, 91, 91, 0.10);
+  border-left-color: var(--danger);
+  color: #b91c1c;
+}
+
+/* ---------------------------------------------------------------------------
+ * 七、识别规则说明卡片（.card.tip 同时继承 .card 与 .tip，覆盖 .tip 让其像卡片）
+ * ------------------------------------------------------------------------- */
+#app .card.tip {
+  padding: 22px;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--primary);
+  border-radius: var(--r);
+}
+
+#app .card.tip ul {
+  margin-top: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+#app .card.tip li {
+  position: relative;
+  padding-left: 18px;
+  font-size: 13.5px;
+  line-height: 1.75;
+  color: var(--text-2);
+}
+
+#app .card.tip li::before {
+  content: "•";
+  position: absolute;
+  left: 4px;
+  color: var(--primary);
+  font-weight: 800;
+}
+
+#app .card.tip b { color: var(--text-1); }
+
+/* ---------------------------------------------------------------------------
+ * 八、小屏微调
+ * ------------------------------------------------------------------------- */
+@media (max-width: 720px) {
+  .editor { grid-template-columns: 1fr; }
+  .group-list { max-height: 240px; }
+  .edit-area { min-height: 320px; }
+}

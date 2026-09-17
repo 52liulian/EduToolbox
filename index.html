@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!--
+  动态基准路径（必须在任何相对资源之前执行）：
+  - http(s) 下 <base href="/">，让 assets/... 始终从站点根解析
+  - file:// 双击离线打开时，base 指向 index.html 所在目录
+-->
+<script>
+(function () {
+  var href;
+  if (location.protocol === "file:") {
+    href = location.href.replace(/#.*$/, "").replace(/[^/]*$/, "");
+  } else {
+    href = "/";
+  }
+  document.write('<base href="' + href + '">');
+})();
+</script>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎓</text></svg>">
+<title>EduToolbox 教师工具箱 · 1000+免费教育工具导航</title>
+<meta name="description" content="教师必备工具导航，收录1000+免费教育工具，覆盖AI教学、组卷题库、课件PPT、学科资源、课堂互动，并提供自研奖状/评语/座位表/随机点名等免费工具。">
+
+<!-- 样式层：按职责拆分，加载顺序 base -> layout -> components -> pages -> tools -->
+<link rel="stylesheet" href="assets/css/base.css">
+<link rel="stylesheet" href="assets/css/layout.css">
+<link rel="stylesheet" href="assets/css/components.css">
+<link rel="stylesheet" href="assets/css/pages.css">
+<link rel="stylesheet" href="assets/css/tools.css">
+</head>
+<body>
+<div id="app">
+  <!-- ====================================================================
+       顶栏
+       ==================================================================== -->
+  <header class="topnav" id="topnav">
+    <div class="container topnav-inner">
+      <!-- 品牌 Logo -->
+      <a class="logo" href="/" aria-label="EduToolbox 首页">
+        <span class="logo-mark">🎓</span>
+        <span class="logo-text">
+          <strong>EduToolbox</strong>
+          <small>教师工具箱</small>
+        </span>
+      </a>
+
+      <!-- 主导航 -->
+      <nav class="nav" id="mainNav">
+        <a class="nav-link active" href="/" data-route="/">首页</a>
+
+        <!-- 分类下拉 -->
+        <div class="nav-dropdown">
+          <a class="nav-link dropdown-trigger" href="/categories" data-route="/categories">
+            分类 <span class="caret" aria-hidden="true"></span>
+          </a>
+          <div class="dropdown-menu" id="catDropdown"></div>
+        </div>
+
+        <!-- 必用工具（自研工具）下拉 -->
+        <div class="nav-dropdown">
+          <a class="nav-link dropdown-trigger" href="/tools" data-route="/tools">
+            必用工具 <span class="caret" aria-hidden="true"></span>
+          </a>
+          <div class="dropdown-menu" id="selfDropdown"></div>
+        </div>
+
+        <a class="nav-link" href="/articles" data-route="/articles">教学资讯</a>
+        <a class="nav-link" href="/about" data-route="/about">关于</a>
+      </nav>
+
+      <!-- 右侧操作 -->
+      <div class="topnav-actions">
+        <a class="submit-btn" href="https://f.wps.cn/g/Ap4o8gL1/" target="_blank" rel="noopener">📲 提交收录</a>
+        <button class="theme-btn" id="themeBtn" type="button" aria-label="切换深浅色主题">🌙</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ====================================================================
+       首页 Hero（搜索框独立于此，学科快速入口 + 分类标签云）
+       ==================================================================== -->
+  <section class="hero" id="heroSection">
+    <div class="container">
+      <h1 class="hero-title">
+        <span class="hero-title-grad">EduToolbox</span>
+        <span class="hero-title-sub">教师工具箱</span>
+      </h1>
+      <p class="hero-tagline">
+        <span class="hero-tag">2026最全教育工具导航</span>
+        | <span class="hero-tag">AI备课助手</span>
+        | <span class="hero-tag">教学资源库</span>
+      </p>
+      <p class="hero-desc">
+        精选优质教育工具，从 AI 智能备课、组卷、精美课件制作到实用办公软件、在线工具，一站式满足教师备课、授课、管理全流程需求。
+      </p>
+
+      <!-- 独立大搜索框 -->
+      <div class="hero-search">
+        <span class="hero-search-icon">🔍</span>
+        <input id="searchInput" type="text" placeholder="输入名称、关键词等搜索相关教育工具…" autocomplete="off">
+        <button id="searchClear" class="hero-search-clear" hidden>✕</button>
+        <button id="searchBtn" class="hero-search-btn">搜索</button>
+      </div>
+
+      <!-- 学科快速入口（彩色圆角按钮） -->
+      <div class="subject-entry" id="subjectEntry"></div>
+
+      <!-- 分类标签云（带数量） -->
+      <div class="category-tags" id="categoryTags"></div>
+
+      <!-- 统计数据 -->
+      <div class="hero-stats">
+        <div class="stat"><b id="statTools">0</b><span>收录工具</span></div>
+        <div class="stat"><b id="statCats">0</b><span>工具分类</span></div>
+        <div class="stat"><b>100%</b><span>免费/ freemium</span></div>
+        <div class="stat"><b>⚡</b><span>本地处理 · 隐私保护</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====================================================================
+       分类页顶栏（隐藏侧栏 → 显示）—— 路由 #/section/:catId 时启用
+       ==================================================================== -->
+  <!-- 主体：工具网格（首页默认显示全部；分类页显示侧栏 + 过滤后网格） -->
+  <main class="container main" id="main">
+    <div class="layout" id="mainLayout">
+      <!-- 左侧分类导航（默认隐藏，分类页启用） -->
+      <aside class="sidebar" id="sidebar" hidden>
+        <div class="sidebar-title">工具分类</div>
+        <ul class="cat-list" id="catList"></ul>
+      </aside>
+
+      <!-- 右侧内容 -->
+      <section class="content">
+
+        <!-- ============================================================
+             首页：⭐ 精选推荐（黄色背景条）
+             ============================================================ -->
+        <section id="featuredSection" class="featured-section" hidden>
+          <h2 class="featured-title"><span class="featured-star">⭐</span> 精选推荐</h2>
+          <div id="featuredGrid" class="tool-grid featured-grid"></div>
+        </section>
+
+        <!-- ============================================================
+             首页：分类独立区块（每分类显示前4个 + "更多"链接）
+             ============================================================ -->
+        <section id="categorySections" class="category-sections" hidden></section>
+
+        <!-- ============================================================
+             分类页：完整工具网格（带侧栏时使用）
+             ============================================================ -->
+        <div id="categoryGridView">
+          <div class="content-head">
+            <h2 id="sectionTitle">全部工具</h2>
+            <span id="resultCount" class="result-count"></span>
+          </div>
+          <div id="toolGrid" class="tool-grid"></div>
+          <div id="emptyState" class="empty-state" hidden>
+            <div class="empty-icon">🤔</div>
+            <p>没有找到匹配的工具</p>
+            <button class="btn btn-ghost" id="clearSearch">清除搜索</button>
+          </div>
+        </div>
+
+      </section>
+    </div>
+  </main>
+
+  <!-- ====================================================================
+       搜索结果页：关键词搜索工具
+       ==================================================================== -->
+  <section class="page" id="searchPage" hidden>
+    <div class="container">
+      <nav class="cp-breadcrumb cp-breadcrumb-static">
+        <a href="/">首页</a>
+        <span class="sep">/</span>
+        <span class="cp-breadcrumb-cur" id="searchBreadcrumb">搜索</span>
+      </nav>
+      <h1 class="cp-title" id="searchTitle">搜索结果</h1>
+      <p class="cp-desc" id="searchCount"></p>
+      <div class="tool-grid cat-block-grid" id="searchGrid" style="margin-top:28px"></div>
+      <div class="empty-state" id="searchEmpty" hidden>
+        <div class="empty-icon">🤔</div>
+        <p>没有找到匹配的工具</p>
+        <a class="btn btn-ghost" href="/">返回首页</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====================================================================
+       分类列表页：展示所有分类卡片入口
+       ==================================================================== -->
+  <section class="page" id="categoryListPage" hidden>
+    <div class="container">
+      <nav class="cp-breadcrumb cp-breadcrumb-static">
+        <a href="/">首页</a>
+        <span class="sep">/</span>
+        <span class="cp-breadcrumb-cur">全部分类</span>
+      </nav>
+      <h1 class="page-title">📂 全部分类</h1>
+      <p class="page-desc" id="catListDesc"></p>
+      <div class="cat-list-grid" id="catListGrid"></div>
+    </div>
+  </section>
+
+  <!-- ====================================================================
+       自研工具页
+       ==================================================================== -->
+  <section class="page" id="toolsPage" hidden>
+    <div class="container">
+      <h2 class="page-title">🛠️ 自研免费小工具</h2>
+      <p class="page-desc">浏览器本地运行，数据不上传，永久免费使用。</p>
+      <div class="tool-grid" id="selfToolsGrid"></div>
+    </div>
+  </section>
+
+  <!-- ====================================================================
+       文章资讯页
+       ==================================================================== -->
+  <section class="page" id="articlesPage" hidden>
+    <div class="container">
+      <h2 class="page-title">📚 教学工具资讯</h2>
+      <div class="article-list" id="articleList"></div>
+    </div>
+  </section>
+
+  <!-- ====================================================================
+       工具详情 / 自研工具运行区
+       ==================================================================== -->
+  <section class="page" id="detailPage" hidden>
+    <div class="container">
+      <button class="back-btn" id="backBtn">← 返回</button>
+      <div id="detailContent"></div>
+    </div>
+  </section>
+
+  <!-- ====================================================================
+       页脚
+       ==================================================================== -->
+  <footer class="footer">
+    <div class="container footer-inner">
+      <div>
+        <strong>🎓 EduToolbox 教师工具箱</strong>
+        <p>本站为教师工具导航演示项目，收录工具版权归原作者所有。自建站请替换链接与内容，遵守相关版权规范。</p>
+      </div>
+      <div class="footer-links">
+        <a href="/">首页</a>
+        <a href="/categories">全部分类</a>
+        <a href="/tools">必用工具</a>
+        <a href="/articles">教学资讯</a>
+        <a href="/about">关于</a>
+      </div>
+    </div>
+  </footer>
+</div>
+
+<!-- ====================================================================
+     脚本加载顺序（务必保持，无构建依赖）
+     1. data.js        数据层（DB 全局常量）
+     2. utils.js       工具函数（$/$$/loadTemplate）
+     3. theme.js       主题切换
+     4. search.js      搜索过滤
+     5. render.js       渲染层
+     6. router.js      路由层
+     7. tools/*.js     自研工具模块（comment/rollcall/seat/answercard）
+     8. app.js         入口（最后加载，初始化所有模块）
+     ==================================================================== -->
+<script src="assets/js/data.js"></script>
+<script src="assets/js/utils.js"></script>
+<script src="assets/js/theme.js"></script>
+<script src="assets/js/search.js"></script>
+<script src="assets/js/render.js"></script>
+<script src="assets/js/router.js"></script>
+<script src="assets/js/app.js"></script>
+</body>
+</html>

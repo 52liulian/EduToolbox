@@ -1,0 +1,234 @@
+/* ============================================================================
+ * 番茄钟 · pomodoro.css
+ * 仅包含本工具特有样式：主舞台 / 模式标签 / 圆环倒计时 / 进度点 / 控制按钮 /
+ *                       设置弹层结构 / 全屏投影
+ * 公共底座（ring、ring-bg、ring-fg、mode-tab、controls、ctrl-btn、ctrl-secondary、
+ *   stats、stat-item、modal、modal-close、field、field-label、field-row、toast 等）
+ *   见 tool-common.css
+ * 高度策略：单列居中、内容自然增高，仅 body 主滚动条；仅 stage 全屏时铺满视口
+ * ========================================================================== */
+
+/* ---------------------------------------------------------------------------
+ * 一、主舞台：单列居中
+ * ------------------------------------------------------------------------- */
+.timer-stage {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 26px;
+  width: 100%;
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 36px 24px 48px;
+}
+
+/* ---------------------------------------------------------------------------
+ * 二、模式标签行
+ * ------------------------------------------------------------------------- */
+.mode-tabs {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 5px;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--r-pill);
+  box-shadow: var(--shadow-sm);
+}
+
+/* 按模式给激活标签上色（覆盖公共 .mode-tab.active 的主色渐变） */
+.mode-tab[data-mode="focus"].active {
+  background: var(--primary-grad);
+  box-shadow: var(--shadow-primary);
+}
+.mode-tab[data-mode="short"].active {
+  background: linear-gradient(135deg, #4ade80, #22b36a);
+  box-shadow: 0 10px 24px rgba(34, 179, 106, 0.28);
+}
+.mode-tab[data-mode="long"].active {
+  background: linear-gradient(135deg, #60a5fa, #38a3e8);
+  box-shadow: 0 10px 24px rgba(56, 163, 232, 0.28);
+}
+
+/* ---------------------------------------------------------------------------
+ * 三、圆形进度环 + 中心倒计时
+ * ------------------------------------------------------------------------- */
+.ring-wrap {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: min(78vw, 340px);
+  height: min(78vw, 340px);
+}
+.timer-stage .ring { width: 100%; height: 100%; }
+
+/* 进度色随模式切换 */
+#timerStage[data-mode="focus"] .ring-fg { stroke: var(--primary); }
+#timerStage[data-mode="short"] .ring-fg { stroke: var(--success); }
+#timerStage[data-mode="long"]  .ring-fg { stroke: var(--info); }
+
+.ring-center {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  pointer-events: none;
+}
+.time-text {
+  font-size: clamp(44px, 9vw, 68px);
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+  color: var(--text-1);
+}
+.phase-text {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-3);
+  transition: color var(--t-fast) var(--ease);
+}
+.phase-text.running { color: var(--primary); }
+
+/* ---------------------------------------------------------------------------
+ * 四、番茄进度点
+ * ------------------------------------------------------------------------- */
+.pomo-dots { display: inline-flex; gap: 12px; }
+.pomo-dots .dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--border-2);
+  transition: all var(--t-fast) var(--ease);
+}
+.pomo-dots .dot.done {
+  background: var(--primary);
+  box-shadow: 0 0 0 3px var(--primary-soft);
+}
+.pomo-dots .dot.current {
+  background: var(--primary);
+  animation: pomo-pulse 1.2s ease-in-out infinite;
+}
+@keyframes pomo-pulse {
+  0%, 100% { transform: scale(1);   box-shadow: 0 0 0 3px var(--primary-soft); }
+  50%      { transform: scale(1.25); box-shadow: 0 0 0 6px var(--primary-soft); }
+}
+
+/* ---------------------------------------------------------------------------
+ * 五、控制按钮
+ * ------------------------------------------------------------------------- */
+.timer-stage .controls { gap: 14px; margin-top: 0; }
+.ctrl-btn.ctrl-primary {
+  color: #fff;
+  background: var(--primary-grad);
+  border-color: transparent;
+  box-shadow: var(--shadow-primary);
+  padding: 13px 34px;
+  font-size: 16px;
+}
+.ctrl-btn.ctrl-primary:hover {
+  color: #fff;
+  filter: brightness(1.05);
+  transform: translateY(-1px);
+}
+.ctrl-btn.ctrl-danger {
+  color: var(--danger);
+  border-color: #ffd4d4;
+  background: #fff5f5;
+}
+.ctrl-btn.ctrl-danger:hover {
+  color: #fff;
+  background: var(--danger);
+  border-color: var(--danger);
+}
+
+/* ---------------------------------------------------------------------------
+ * 六、统计区分隔线
+ * ------------------------------------------------------------------------- */
+.timer-stage .stats { gap: 22px; }
+.stat-divider {
+  width: 1px;
+  align-self: stretch;
+  background: var(--border);
+}
+
+/* ---------------------------------------------------------------------------
+ * 七、设置弹层结构（公共 .modal / .modal-close 已有，这里补 head/body/foot）
+ * ------------------------------------------------------------------------- */
+.modal-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+.modal-head h3 { font-size: 18px; }
+.modal-body { display: flex; flex-direction: column; gap: 14px; }
+.modal-body .field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 0;
+}
+.modal-body .field-row {
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 0;
+}
+.modal-body input[type="number"] { width: 140px; }
+.modal-foot {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 18px;
+}
+
+/* ---------------------------------------------------------------------------
+ * 八、全屏退出提示
+ * ------------------------------------------------------------------------- */
+.fs-hint {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1100;
+  padding: 8px 18px;
+  font-size: 13px;
+  color: #fff;
+  background: rgba(20, 28, 48, 0.8);
+  border-radius: var(--r-pill);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+
+/* ---------------------------------------------------------------------------
+ * 九、全屏投影（stage 为全屏元素，铺满视口并放大）
+ * ------------------------------------------------------------------------- */
+#timerStage:fullscreen,
+#timerStage:-webkit-full-screen {
+  background: var(--bg);
+  max-width: none;
+  padding: 40px;
+  gap: 40px;
+}
+#timerStage:fullscreen .ring-wrap,
+#timerStage:-webkit-full-screen .ring-wrap {
+  width: min(60vh, 560px);
+  height: min(60vh, 560px);
+}
+#timerStage:fullscreen .time-text,
+#timerStage:-webkit-full-screen .time-text {
+  font-size: clamp(72px, 12vh, 120px);
+}
+
+/* ---------------------------------------------------------------------------
+ * 十、小屏微调
+ * ------------------------------------------------------------------------- */
+@media (max-width: 640px) {
+  .timer-stage { padding: 24px 16px 36px; gap: 22px; }
+  .timer-stage .stats { gap: 14px; }
+  .stat-item { min-width: 90px; padding: 10px 14px; }
+}

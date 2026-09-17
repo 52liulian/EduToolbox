@@ -1,0 +1,89 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>小学生字表 | EduToolbox · 1-6年级生字</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%8E%93%3C/text%3E%3C/svg%3E">
+<link rel="stylesheet" href="primary-grade-hanzi.css">
+<link rel="stylesheet" href="../../assets/css/tool-common.css">
+</head>
+<body>
+
+  <main class="container">
+    <!-- 工具说明 -->
+    <p class="tool-sub">小学语文 1-6 年级生字表（人教版），支持按册次切换、拼音标注、字号调节、点击查看拼音与笔画，适合识字教学、课堂听写与课后复习。</p>
+
+    <!-- 册次标签栏 -->
+    <section class="tabs card" id="tabs" aria-label="册次切换"></section>
+
+    <!-- 工具条：拼音开关 / 字号 / 复制 -->
+    <section class="toolbar card">
+      <label class="switch" title="开启后每个汉字上方显示拼音">
+        <input type="checkbox" id="pinyinToggle">
+        <span class="switch-track"></span>
+        <span class="switch-label">拼音标注</span>
+      </label>
+
+      <div class="field font-field" title="调节汉字字号">
+        <span class="field-label">字号</span>
+        <button type="button" class="icon-btn" id="fontMinus" aria-label="缩小字号">－</button>
+        <span class="font-value" id="fontValue">中</span>
+        <button type="button" class="icon-btn" id="fontPlus" aria-label="放大字号">＋</button>
+      </div>
+
+      <div class="field count-field">
+        <span class="field-label">字数</span>
+        <strong id="countValue">0</strong>
+      </div>
+
+      <button type="button" class="btn btn-ghost" id="copyBtn" title="复制当前册次全部生字">
+        <span class="ico">📋</span> 复制本册
+      </button>
+    </section>
+
+    <!-- 标题行 -->
+    <h2 class="grade-title" id="gradeTitle">全部生字列表（0）</h2>
+
+    <!-- 生字网格 -->
+    <section class="grid" id="grid" aria-label="生字网格"></section>
+
+    <!-- 空状态 -->
+    <div class="empty" id="empty" hidden>当前册次暂无生字。</div>
+  </main>
+
+  <!-- ===== 单字详情弹层 ===== -->
+  <div class="modal" id="modal" hidden aria-modal="true" role="dialog" aria-label="汉字详情">
+    <div class="modal-mask" data-close></div>
+    <div class="modal-panel">
+      <button type="button" class="modal-close" data-close aria-label="关闭">×</button>
+      <div class="modal-char" id="modalChar">字</div>
+      <div class="modal-pinyin" id="modalPinyin">pīn yīn</div>
+      <dl class="modal-meta">
+        <div><dt>笔画数</dt><dd id="modalStrokes">-</dd></div>
+        <div><dt>所属册次</dt><dd id="modalGrade">-</dd></div>
+        <div><dt>册内序号</dt><dd id="modalIndex">-</dd></div>
+      </dl>
+    </div>
+  </div>
+
+  <!-- ===== 全屏大字预览（课堂展示） ===== -->
+  <div class="preview" id="preview" hidden aria-label="全屏大字预览">
+    <button type="button" class="preview-close" id="previewClose" aria-label="退出预览">×</button>
+    <div class="preview-inner">
+      <div class="preview-char" id="previewChar"></div>
+      <div class="preview-pinyin" id="previewPinyin"></div>
+      <div class="preview-foot">
+        <span>册次：<b id="previewGrade"></b></span>
+        <span>序号：<b id="previewIndex"></b> / <b id="previewTotal"></b></span>
+      </div>
+    </div>
+    <button type="button" class="preview-nav prev" id="previewPrev" aria-label="上一个">‹</button>
+    <button type="button" class="preview-nav next" id="previewNext" aria-label="下一个">›</button>
+  </div>
+
+  <!-- 拼音库（file:// 离线可用，已下载到本地 vendor） -->
+  <script src="../../assets/vendor/pinyin-pro.min.js"></script>
+  <script src="primary-grade-hanzi.js"></script>
+</body>
+</html>

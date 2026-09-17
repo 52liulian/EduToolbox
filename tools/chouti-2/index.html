@@ -1,0 +1,108 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>大屏滚动抽题 | EduToolbox · 滚动抽题</title>
+<meta name="description" content="大屏滚动抽题工具：超大数字滚动动画抽号，分步揭晓题目与答案，支持自定义题库、防重复抽取、全屏大屏、Space 控制。适合课堂提问、知识竞赛、面试抽题。">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%8E%93%3C/text%3E%3C/svg%3E">
+<link rel="stylesheet" href="chouti-2.css">
+<link rel="stylesheet" href="../../assets/css/tool-common.css">
+</head>
+<body>
+<div id="app">
+
+  <main class="main" id="main">
+    <!-- 左侧：设置面板 -->
+    <section class="setup-panel" id="setupPanel">
+      <!-- 题目设置 -->
+      <div class="block">
+        <h2 class="block-title">📋 题库数据</h2>
+        <p class="block-hint">每行一题，使用 <code>题目|答案</code> 格式</p>
+        <textarea id="qList" placeholder="题目1|答案1&#10;题目2|答案2&#10;...">中国四大名著是哪些？|《水浒传》、《三国演义》、《西游记》、《红楼梦》
+太阳系中体积最大的行星是？|木星
+光的三原色是哪三种颜色？|红、绿、蓝
+"床前明月光"的下一句是？|疑是地上霜
+水在标准大气压下的沸点是多少度？|100摄氏度
+地球自转的方向是？|自西向东
+勾股定理的公式是什么？|a² + b² = c²
+中国四大发明是哪些？|造纸术、印刷术、火药、指南针</textarea>
+        <div class="count-bar">
+          共 <span id="count">0</span> 题
+          <button class="btn-mini" id="dedupBtn" title="去除重复题目">去重</button>
+          <button class="btn-mini" id="clearBtn" title="清空题库">清空</button>
+        </div>
+        <div class="button-group">
+          <button class="btn-mini" id="importBtn">📥 导入</button>
+          <input type="file" id="fileInput" accept=".txt,.csv" hidden>
+          <button class="btn-mini" id="exportBtn">📤 导出</button>
+          <button class="btn-mini" id="resetBtn" title="恢复内置示例题库">↺ 默认</button>
+        </div>
+      </div>
+
+      <!-- 抽题设置 -->
+      <div class="block">
+        <h2 class="block-title">⚙️ 抽题设置</h2>
+        <label class="check-line">
+          <input type="checkbox" id="removeAfter" checked>
+          <span>抽中后从题库移除（防重复）</span>
+        </label>
+        <div class="slider-line">
+          <label for="speed">滚动速度</label>
+          <input type="range" id="speed" min="30" max="300" value="60" step="10">
+          <span class="val" id="speedVal">60</span>ms
+        </div>
+      </div>
+
+      <!-- 抽题记录 -->
+      <div class="block">
+        <h2 class="block-title">
+          🏆 抽题记录 (<span id="recordCount">0</span>)
+        </h2>
+        <ul id="recordList" class="record-list">
+          <li class="empty">暂无记录</li>
+        </ul>
+        <div class="button-group">
+          <button class="btn-mini" id="copyRecord">📋 复制</button>
+          <button class="btn-mini" id="clearRecord">🗑 清空</button>
+          <button class="btn-mini" id="resetRecord" title="清空抽题记录并恢复全部题目">↺ 重置记录</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- 右侧：抽题舞台 -->
+    <section class="stage" id="stage">
+      <!-- 工具栏 -->
+      <div class="stage-toolbar">
+        <div class="status-bar">
+          <span class="status-item">总计 <em id="totalCount">0</em></span>
+          <span class="status-item">已抽 <em id="drawnCount">0</em></span>
+          <span class="status-item">剩余 <em id="remainCount">0</em></span>
+        </div>
+        <button class="icon-btn" id="fullscreenBtn" title="全屏">⛶</button>
+        <button class="icon-btn" id="hideSetupBtn" title="隐藏设置">⚙</button>
+      </div>
+
+      <!-- 流体背景 -->
+      <canvas id="bgCanvas" class="bg-canvas"></canvas>
+
+      <!-- 中央展示 -->
+      <div class="display">
+        <div class="q-index" id="qIndex">第 ? 题</div>
+        <div class="num-display" id="numDisplay">--</div>
+        <div class="q-display" id="qDisplay">等待抽取...</div>
+        <div class="answer-area" id="answerArea">
+          <button class="btn-reveal" id="revealBtn">👁 揭晓答案</button>
+          <div class="q-answer" id="qAnswer"></div>
+        </div>
+        <div class="display-hint" id="displayHint">点击下方按钮或按 Space 开始</div>
+        <button class="btn-start" id="startBtn">开始抽题</button>
+        <p class="key-hint">按 <kbd>Space</kbd> 或 <kbd>PageDown</kbd> 开始 / 停止</p>
+      </div>
+    </section>
+  </main>
+</div>
+
+<script src="chouti-2.js"></script>
+</body>
+</html>

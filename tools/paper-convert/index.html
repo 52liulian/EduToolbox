@@ -1,0 +1,62 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>试卷格式转换（A3 ⇄ A4）</title>
+<link rel="stylesheet" href="paper-convert.css">
+<link rel="stylesheet" href="../../assets/css/tool-common.css">
+</head>
+<body>
+<div class="wrap">
+  <header class="head">
+    <h1>📄 试卷格式转换（A3 ⇄ A4）</h1>
+    <p class="sub">批量调整 Word 试卷纸张、分栏与页边距，适合 A3 双栏试卷转 A4 打印</p>
+    <span class="notice">🔒 全程本地处理，文件不会上传</span>
+  </header>
+
+  <section class="card">
+    <div class="opt-group">
+      <span class="opt-label">转换方向</span>
+      <label class="radio"><input type="radio" name="direction" value="a3to4" checked> A3 → A4（双栏自动转单栏，页边距 ×0.707）</label>
+      <label class="radio"><input type="radio" name="direction" value="a4to3"> A4 → A3（页边距 ×1.414）</label>
+    </div>
+    <div class="opt-group" id="dualWrap">
+      <label class="check"><input type="checkbox" id="dualCol"> 转换为 A3 双栏版面（设置两栏、栏间距 425、加分隔线）</label>
+    </div>
+
+    <div id="dropzone" class="dropzone">
+      <div class="dz-icon">📥</div>
+      <p>拖入一个或多个 <b>.docx</b> 试卷文件，或<button type="button" class="link-btn" id="pickBtn">点击选择文件</button></p>
+      <p class="dz-hint">仅支持 .docx（Word 2007 及以上版本），不支持旧版 .doc</p>
+      <input type="file" id="fileInput" accept=".docx" multiple hidden>
+    </div>
+
+    <ul class="file-list" id="fileList"></ul>
+
+    <div class="actions">
+      <button class="btn btn-primary" id="convertBtn" disabled>开始转换并下载</button>
+      <button class="btn btn-ghost" id="clearBtn">清空列表</button>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2 class="card-title">转换日志</h2>
+    <div id="status" class="status">等待添加文件…</div>
+    <ul class="log" id="logList"></ul>
+  </section>
+
+  <section class="card tip">
+    <h2 class="card-title">使用说明</h2>
+    <ul>
+      <li>仅修改纸张大小、分栏与页边距设置，<b>正文内容、图片、公式不会丢失</b>。</li>
+      <li>转换后用 Word / WPS 打开会按新纸张自动重排，请检查确认后再打印。</li>
+      <li>多个文件将自动打包为「转换结果.zip」；单个文件直接下载（原名加 _A4 / _A3 后缀）。</li>
+      <li>文档包含多节且纸张不同时，各节按实际纸张分别判断；非 A3/A4 标准纸张的节保持不变。</li>
+    </ul>
+  </section>
+</div>
+<script src="../../assets/vendor/jszip.min.js"></script>
+<script src="paper-convert.js"></script>
+</body>
+</html>

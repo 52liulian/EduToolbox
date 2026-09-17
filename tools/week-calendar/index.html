@@ -1,0 +1,127 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>学期日历 | EduToolbox · 教学周周日历</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%8E%93%3C/text%3E%3C/svg%3E">
+<link rel="stylesheet" href="week-calendar.css">
+<link rel="stylesheet" href="../../assets/css/tool-common.css">
+</head>
+<body>
+
+<main class="container">
+  <!-- 顶部设置区 -->
+  <section class="settings card">
+    <div class="settings-grid">
+      <div class="setting-item">
+        <label class="setting-label" for="startDate">开学日期</label>
+        <input type="date" id="startDate" class="date-input">
+        <div class="preset-row">
+          <button type="button" class="preset-btn" data-start="2026-03-02">2026春季(3.2)</button>
+          <button type="button" class="preset-btn" data-start="2026-09-01">2026秋季(9.1)</button>
+        </div>
+      </div>
+      <div class="setting-item">
+        <label class="setting-label" for="weeks">总周数</label>
+        <select id="weeks" class="weeks-select"></select>
+        <span class="setting-hint">支持 10-30 周</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- 大屏信息展示区 -->
+  <section class="display">
+    <div class="display-grid">
+      <div class="display-card current-week-card">
+        <div class="display-label">当前教学周</div>
+        <div class="display-value primary" id="currentWeek">第 - 周</div>
+        <div class="display-sub" id="currentWeekRange"></div>
+      </div>
+      <div class="display-card today-card">
+        <div class="display-label">今天是</div>
+        <div class="display-value today-date" id="todayDate">- 月 - 日</div>
+        <div class="display-sub" id="todayWeekday">周 -</div>
+      </div>
+      <div class="display-card progress-card">
+        <div class="display-label">学期进度</div>
+        <div class="display-value" id="progressPercent">0%</div>
+        <div class="progress-bar">
+          <div class="progress-fill" id="progressFill"></div>
+        </div>
+        <div class="progress-range">
+          <span>第1周</span>
+          <span id="progressEnd">第20周</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 学期日历表格 -->
+  <section class="calendar-section card">
+    <table class="calendar-table">
+      <thead>
+        <tr>
+          <th class="col-week">周次</th>
+          <th>周一</th>
+          <th>周二</th>
+          <th>周三</th>
+          <th>周四</th>
+          <th>周五</th>
+          <th>周六</th>
+          <th class="col-sun">周日</th>
+        </tr>
+      </thead>
+      <tbody id="calendarBody"></tbody>
+    </table>
+  </section>
+
+  <!-- 功能介绍 -->
+  <section class="intro">
+    <h2 class="intro-title">学期进度日历功能介绍</h2>
+    <h3>工具介绍</h3>
+    <p>学期进度日历是一款专为教师和学生设计的在线时间管理工具。通过简单的开学日期设置，即可自动生成整个学期的周历视图。</p>
+    <p>核心功能包括：一键查看当前是第几周、今天是星期几，并在全学期日历中高亮显示当前日期和所在周次。支持自定义学期总周数，实时显示学期进度百分比，帮助师生快速定位教学进度，合理规划学习与生活安排。</p>
+    <p>主要特点：</p>
+    <ul>
+      <li><strong>自动计算周次：</strong>设置开学日期后，系统自动计算并显示当前是第几周。</li>
+      <li><strong>学期进度可视化：</strong>独立的进度条展示学期已过百分比，直观感受时间流逝。</li>
+      <li><strong>灵活设置：</strong>支持自定义学期总周数（10-30周），适应不同学制需求。</li>
+      <li><strong>智能高亮提醒：</strong>醒目展示今日日期（红色"今天"徽标），过去日期自动灰置，未来日期清晰可辨。</li>
+      <li><strong>参数分享：</strong>支持通过URL参数（start=日期&amp;weeks=周数）分享特定学期日历，方便班级统一使用。</li>
+      <li><strong>本地自动保存：</strong>所有设置自动保存在本地浏览器，下次访问无需重复配置。</li>
+    </ul>
+
+    <h3>使用说明</h3>
+    <h4>1. 设置开学日期与周数</h4>
+    <p>在工具顶部选择本学期的正式开学日期（通常为第一周的周一），并根据校历设置本学期的总周数（默认为20周）。也可以点击"2026春季/秋季"按钮快速应用预设。</p>
+    <h4>2. 查看当前进度</h4>
+    <p>设置完成后，页面会自动显示"当前教学周"、"今天是星期几"以及"学期进度条"。进度条基于实际天数计算，精确反映学期进程。</p>
+    <h4>3. 浏览学期日历</h4>
+    <p>下方表格展示了完整的学期日历。当前所在周会以蓝色背景高亮显示，过去的日期显示为灰色，今天及未来的日期显示为黑色，今天的日期右上角会有跳动的"今天"标记。</p>
+    <h4>4. 分享与收藏</h4>
+    <p>您设置好日期和周数后，浏览器地址栏会自动更新参数（如 <code>?start=2026-02-24&amp;weeks=20</code>）。您可以直接复制这个链接分享给同学或同事，他们打开后将看到相同的日历配置。</p>
+
+    <h3>常见问题解答</h3>
+    <h4>Q: 设置的开学日期会保存吗？</h4>
+    <p>A: 会的。工具会自动将您设置的日期和总周数保存在您的浏览器缓存中。此外，如果您使用带有参数的链接访问，系统会优先使用链接中的设置。</p>
+    <h4>Q: 如何计算周次？</h4>
+    <p>A: 工具以周一作为每周的开始。从您设置的开学日期（如果不是周一，会自动推算该周周一）开始计算第1周，以此类推。</p>
+    <h4>Q: 进度条是如何计算的？</h4>
+    <p>A: 进度条是基于（已过去的天数 / 学期总天数）计算的百分比，比单纯按周计算更精确。只有在学期范围内（第1周至最后一周）才会显示进度条。</p>
+
+    <h3>应用场景</h3>
+    <h4>教师教学进度把控</h4>
+    <p>快速确认当前教学周次，核对教学计划是否按时推进，安排期中、期末考试时间。</p>
+    <h4>学生学习规划</h4>
+    <p>查看距离考试周还有多少时间，通过进度条直观感受时间紧迫感，合理安排复习计划。</p>
+    <h4>班级统一管理</h4>
+    <p>班委可以将设置好的链接分享到班级群，全班同学点击即可看到统一的学期日历，无需每个人单独设置。</p>
+    <h4>行政教务管理</h4>
+    <p>教务人员快速核对校历周次，发布通知时准确引用当前教学周。</p>
+  </section>
+</main>
+
+<script src="week-calendar.js"></script>
+</body>
+</html>

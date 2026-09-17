@@ -1,0 +1,127 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>番茄钟 | EduToolbox · 专注力训练</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%8E%93%3C/text%3E%3C/svg%3E">
+<link rel="stylesheet" href="pomodoro.css">
+<link rel="stylesheet" href="../../assets/css/tool-common.css">
+</head>
+<body>
+
+<!-- ============================================================
+     主计时区：模式切换 + 圆形进度环 + 大字倒计时 + 控制按钮
+     ============================================================ -->
+<main class="timer-stage" id="timerStage" data-mode="focus">
+
+  <!-- 模式切换标签 -->
+  <div class="mode-tabs" id="modeTabs" role="tablist" aria-label="模式切换">
+    <button type="button" class="mode-tab active" data-mode="focus" role="tab" aria-selected="true">专注模式</button>
+    <button type="button" class="mode-tab" data-mode="short" role="tab" aria-selected="false">短休息</button>
+    <button type="button" class="mode-tab" data-mode="long" role="tab" aria-selected="false">长休息</button>
+  </div>
+
+  <!-- 圆形进度环 + 大字倒计时 -->
+  <div class="ring-wrap">
+    <svg class="ring" viewBox="0 0 320 320" aria-hidden="true">
+      <!-- 背景圆 -->
+      <circle class="ring-bg" cx="160" cy="160" r="140"></circle>
+      <!-- 进度圆（顺时针递减） -->
+      <circle class="ring-fg" id="ringFg" cx="160" cy="160" r="140"
+              stroke-dasharray="879.646" stroke-dashoffset="0"
+              transform="rotate(-90 160 160)"></circle>
+    </svg>
+    <div class="ring-center">
+      <div class="time-text" id="timeText">25:00</div>
+      <div class="phase-text" id="phaseText">点击开始专注</div>
+    </div>
+  </div>
+
+  <!-- 番茄进度点（4 个一组，完成后进入长休） -->
+  <div class="pomo-dots" id="pomoDots" aria-label="当前番茄进度">
+    <span class="dot" data-idx="0"></span>
+    <span class="dot" data-idx="1"></span>
+    <span class="dot" data-idx="2"></span>
+    <span class="dot" data-idx="3"></span>
+  </div>
+
+  <!-- 控制按钮组 -->
+  <div class="controls">
+    <button type="button" class="ctrl-btn ctrl-primary" id="btnStart">开始</button>
+    <button type="button" class="ctrl-btn ctrl-secondary" id="btnReset" title="重置当前阶段">↺ 重置</button>
+    <button type="button" class="ctrl-btn ctrl-secondary" id="btnSkip" title="跳过当前阶段">⏭ 跳过</button>
+  </div>
+
+  <!-- 统计区：今日 / 累计 -->
+  <div class="stats">
+    <div class="stat-item">
+      <div class="stat-num" id="statToday">0</div>
+      <div class="stat-label">今日番茄</div>
+    </div>
+    <div class="stat-divider"></div>
+    <div class="stat-item">
+      <div class="stat-num" id="statTotal">0</div>
+      <div class="stat-label">累计番茄</div>
+    </div>
+    <div class="stat-divider"></div>
+    <div class="stat-item">
+      <div class="stat-num" id="statFocusMin">0</div>
+      <div class="stat-label">累计专注分钟</div>
+    </div>
+  </div>
+
+</main>
+
+<!-- ============================================================
+     设置弹层：自定义三种模式时长 + 长休触发条件 + 音效开关
+     ============================================================ -->
+<div class="modal-mask" id="settingsModal" hidden>
+  <div class="modal" role="dialog" aria-modal="true" aria-label="番茄钟设置">
+    <div class="modal-head">
+      <h3>⚙️ 番茄钟设置</h3>
+      <button type="button" class="modal-close" id="btnCloseSettings" title="关闭">✕</button>
+    </div>
+    <div class="modal-body">
+      <label class="field">
+        <span class="field-label">专注时长（分钟）</span>
+        <input type="number" id="setFocus" min="1" max="120" value="25" inputmode="numeric">
+      </label>
+      <label class="field">
+        <span class="field-label">短休息时长（分钟）</span>
+        <input type="number" id="setShort" min="1" max="60" value="5" inputmode="numeric">
+      </label>
+      <label class="field">
+        <span class="field-label">长休息时长（分钟）</span>
+        <input type="number" id="setLong" min="1" max="60" value="15" inputmode="numeric">
+      </label>
+      <label class="field">
+        <span class="field-label">长休触发番茄数</span>
+        <input type="number" id="setRounds" min="2" max="12" value="4" inputmode="numeric">
+      </label>
+      <label class="field field-row">
+        <input type="checkbox" id="setAutoStart" checked>
+        <span class="field-label">阶段切换后自动开始下一阶段</span>
+      </label>
+      <label class="field field-row">
+        <input type="checkbox" id="setSound" checked>
+        <span class="field-label">阶段切换提示音</span>
+      </label>
+      <div class="field-row">
+        <button type="button" class="ctrl-btn ctrl-secondary" id="btnTestSound">试听提示音</button>
+        <button type="button" class="ctrl-btn ctrl-danger" id="btnClearStats">清空统计</button>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button type="button" class="ctrl-btn ctrl-secondary" id="btnCancelSettings">取消</button>
+      <button type="button" class="ctrl-btn ctrl-primary" id="btnSaveSettings">保存</button>
+    </div>
+  </div>
+</div>
+
+<!-- 全屏下方的退出提示 -->
+<div class="fs-hint" id="fsHint" hidden>按 Esc 退出全屏</div>
+
+<script src="pomodoro.js"></script>
+</body>
+</html>

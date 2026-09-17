@@ -1,0 +1,119 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PDF 与图片转换</title>
+<link rel="stylesheet" href="pdf-image-convert.css">
+<link rel="stylesheet" href="../../assets/css/tool-common.css">
+</head>
+<body>
+<div class="wrap">
+  <header class="head">
+    <h1>🖼️ PDF 与图片转换</h1>
+    <p class="sub">PDF 逐页转 PNG / JPG 图片，或多张图片合并为 PDF</p>
+    <span class="notice">🔒 全程本地处理，文件不会上传</span>
+  </header>
+
+  <div class="tabs">
+    <button class="tab active" data-tab="pdf2img">PDF 转图片</button>
+    <button class="tab" data-tab="img2pdf">图片转 PDF</button>
+  </div>
+
+  <!-- ============ Tab A：PDF 转图片 ============ -->
+  <section class="card tab-panel active" id="panel-pdf2img">
+    <div id="pdfDropzone" class="dropzone">
+      <div class="dz-icon">📄</div>
+      <p>拖入 <b>.pdf</b> 文件，或<button type="button" class="link-btn" id="pdfPickBtn">点击选择</button></p>
+      <p class="dz-hint">一次处理一个 PDF</p>
+      <input type="file" id="pdfInput" accept=".pdf,application/pdf" hidden>
+    </div>
+
+    <div id="pdfInfo" class="file-bar" hidden>
+      <span class="fb-icon">📕</span>
+      <span class="fb-name" id="pdfName"></span>
+      <span class="fb-meta" id="pdfMeta"></span>
+      <button class="fb-del" id="pdfRemove" title="移除">✕</button>
+    </div>
+
+    <div class="opts" id="pdfOpts" hidden>
+      <div class="opt-group">
+        <span class="opt-label">图片格式</span>
+        <label class="radio"><input type="radio" name="imgFmt" value="png" checked> PNG（无损，适合文字/试卷）</label>
+        <label class="radio"><input type="radio" name="imgFmt" value="jpg"> JPG（体积更小，质量 0.92）</label>
+      </div>
+      <div class="opt-group">
+        <span class="opt-label">分辨率倍数</span>
+        <label class="radio"><input type="radio" name="scale" value="1" checked> 1x（72dpi）</label>
+        <label class="radio"><input type="radio" name="scale" value="2"> 2x（144dpi，清晰）</label>
+        <label class="radio"><input type="radio" name="scale" value="3"> 3x（216dpi，高清）</label>
+      </div>
+      <div class="opt-group">
+        <span class="opt-label">页码范围</span>
+        <label class="radio"><input type="radio" name="rangeMode" value="all" checked> 全部页面</label>
+        <label class="radio range-line"><input type="radio" name="rangeMode" value="custom"> 指定页码：
+          <input type="text" id="pageRange" placeholder="如 1-3,5" disabled></label>
+      </div>
+      <div class="actions">
+        <button class="btn btn-primary" id="renderBtn">▶ 开始转换并下载</button>
+      </div>
+    </div>
+
+    <div id="renderProgress" class="progress-box" hidden>
+      <div class="progress-head"><span id="renderStatus">准备中…</span><span id="renderPct">0%</span></div>
+      <div class="progress"><div class="progress-bar" id="renderBar"></div></div>
+    </div>
+  </section>
+
+  <!-- ============ Tab B：图片转 PDF ============ -->
+  <section class="card tab-panel" id="panel-img2pdf" hidden>
+    <div id="imgDropzone" class="dropzone">
+      <div class="dz-icon">🖼️</div>
+      <p>拖入多张 <b>JPG / PNG</b> 图片，或<button type="button" class="link-btn" id="imgPickBtn">点击选择</button></p>
+      <p class="dz-hint">可多次添加；下方列表支持上移 / 下移 / 删除调整顺序</p>
+      <input type="file" id="imgInput" accept="image/jpeg,image/png,.jpg,.jpeg,.png" multiple hidden>
+    </div>
+
+    <ul class="img-list" id="imgList"></ul>
+
+    <div class="opts" id="imgOpts" hidden>
+      <div class="opt-group">
+        <span class="opt-label">页面设置</span>
+        <label class="radio"><input type="radio" name="pageMode" value="fit" checked> 适应图片尺寸（每页与图片等大，方向自动）</label>
+        <label class="radio"><input type="radio" name="pageMode" value="a4"> A4 纸（图片按比例缩放并居中，方向自动）</label>
+      </div>
+      <div class="opt-group">
+        <span class="opt-label">页边距（仅 A4 模式生效）</span>
+        <label class="radio"><input type="radio" name="margin" value="0" checked> 无边距（0mm）</label>
+        <label class="radio"><input type="radio" name="margin" value="10"> 10mm 边距</label>
+      </div>
+      <div class="actions">
+        <button class="btn btn-primary" id="buildPdfBtn">📄 生成并下载 图片合并.pdf</button>
+        <button class="btn btn-ghost" id="imgClearBtn">清空列表</button>
+      </div>
+    </div>
+
+    <div id="pdfProgress" class="progress-box" hidden>
+      <div class="progress-head"><span id="pdfStatus">准备中…</span><span id="pdfPct">0%</span></div>
+      <div class="progress"><div class="progress-bar" id="pdfBar"></div></div>
+    </div>
+  </section>
+
+  <section class="card tip">
+    <h2 class="card-title">说明</h2>
+    <ul>
+      <li>PDF 转图片：多页自动打包为「图片.zip」（页名 page_01、page_02…），单页直接下载。</li>
+      <li>图片转 PDF：按列表顺序一页一张图；PNG 透明区域在 PDF 中以白底呈现。</li>
+      <li>所有渲染与打包均在本机浏览器完成，离线可用。</li>
+    </ul>
+  </section>
+</div>
+
+<!-- pdf.worker.min.js 通过普通 script 先加载，file:// 下作为主线程兜底（pdfjsWorker） -->
+<script src="../../assets/vendor/pdf.worker.min.js"></script>
+<script src="../../assets/vendor/pdf.min.js"></script>
+<script src="../../assets/vendor/jszip.min.js"></script>
+<script src="../../assets/vendor/jspdf.umd.min.js"></script>
+<script src="pdf-image-convert.js"></script>
+</body>
+</html>

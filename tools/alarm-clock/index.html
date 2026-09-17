@@ -1,0 +1,71 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>课堂闹钟 | EduToolbox · 多闹钟提醒</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%8E%93%3C/text%3E%3C/svg%3E">
+<link rel="stylesheet" href="alarm-clock.css">
+<link rel="stylesheet" href="../../assets/css/tool-common.css">
+</head>
+<body>
+
+<main class="container">
+  <!-- 工具介绍 -->
+  <header class="hero">
+    <h1 class="title">⏰ 课堂闹钟</h1>
+    <p class="subtitle">用于课堂时间提醒的闹钟工具，可设置上课、下课、活动结束等提醒时间，到点自动响铃，帮助教师规范课堂节奏，减少人工提醒与时间遗漏。</p>
+  </header>
+
+  <!-- 快速设定预设时间 -->
+  <section class="presets" id="presets" aria-label="快速设定">
+    <span class="presets-label">快速设定：</span>
+    <button type="button" class="preset" data-time="08:00">08:00</button>
+    <button type="button" class="preset" data-time="12:00">12:00</button>
+    <button type="button" class="preset" data-time="14:00">14:00</button>
+    <button type="button" class="preset" data-time="18:00">18:00</button>
+    <button type="button" class="preset" data-time="21:30">21:30</button>
+    <button type="button" class="preset" data-time="22:00">22:00</button>
+  </section>
+
+  <!-- 当前时间大字显示 -->
+  <section class="now">
+    <div class="now-label">当前时间</div>
+    <div class="now-time" id="clock">00:00:00</div>
+    <div class="now-date" id="date">—</div>
+  </section>
+
+  <!-- 添加闹钟表单 -->
+  <section class="setter">
+    <label class="field">
+      <span class="field-label">提醒时间</span>
+      <input type="time" id="alarmTime" required>
+    </label>
+    <label class="field">
+      <span class="field-label">提醒文字</span>
+      <input type="text" id="alarmMsg" placeholder="如：第一节课开始" maxlength="20">
+    </label>
+    <button type="button" class="btn btn-primary" id="addBtn">+ 设定闹钟</button>
+    <button type="button" class="btn btn-ghost" id="fullscreenBtn" title="切换全屏模式">⛶ 全屏</button>
+  </section>
+
+  <!-- 状态提示：等待设定 / 下一闹钟倒计时 -->
+  <div class="status" id="status">等待设定...</div>
+
+  <!-- 闹钟列表 -->
+  <section class="list" id="list" aria-label="闹钟列表"></section>
+</main>
+
+<!-- 响铃弹窗 -->
+<div class="ring-modal" id="ringModal" hidden>
+  <div class="ring-box">
+    <div class="ring-icon">⏰</div>
+    <div class="ring-time" id="ringTime">00:00</div>
+    <div class="ring-msg" id="ringMsg">时间到！</div>
+    <button type="button" class="btn btn-stop" id="stopBtn">停止响铃</button>
+  </div>
+</div>
+
+<script src="alarm-clock.js"></script>
+</body>
+</html>

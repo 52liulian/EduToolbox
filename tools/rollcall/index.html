@@ -1,0 +1,42 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>随机点名器</title>
+<link rel="stylesheet" href="rollcall.css">
+<link rel="stylesheet" href="../../assets/css/tool-common.css">
+</head>
+<body>
+<div class="container">
+  <div class="display-area" id="displayArea">
+    <div class="voice-toggle">
+      <input type="checkbox" id="voiceEnabled" checked>
+      <label for="voiceEnabled">🔊 语音朗读</label>
+    </div>
+    <div class="count-badge empty" id="countBadge">0人</div>
+    <div id="nameDisplay">
+      <span class="placeholder">点击"点名"开始</span>
+    </div>
+  </div>
+  <div class="button-area">
+    <button class="btn btn-list" onclick="openListModal()">📋 名单</button>
+    <button class="btn btn-roll" id="rollBtn" onclick="toggleRoll()">🎲 点名</button>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal">
+    <h3>编辑名单</h3>
+    <textarea id="nameInput" placeholder="请输入姓名，用逗号隔开，例如：&#10;张三, 李四, 王五, 赵六"></textarea>
+    <div class="hint">姓名之间用逗号（中英文均可）或换行分隔</div>
+    <div class="modal-buttons">
+      <button class="btn-cancel" onclick="closeListModal()">取消</button>
+      <button class="btn-confirm" onclick="saveList()">确认保存</button>
+    </div>
+  </div>
+</div>
+
+<script src="rollcall.js"></script>
+</body>
+</html>

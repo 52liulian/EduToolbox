@@ -1,0 +1,66 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>多定时器 | EduToolbox · 多定时器管理</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%8E%93%3C/text%3E%3C/svg%3E">
+<link rel="stylesheet" href="multi-timer.css">
+<link rel="stylesheet" href="../../assets/css/tool-common.css">
+</head>
+<body>
+
+<!-- 工具主体 -->
+<main class="app">
+  <!-- 添加定时器面板 -->
+  <section class="panel add-panel">
+    <h2 class="panel-title">多任务定时器</h2>
+    <p class="panel-sub">为不同教学环节分别计时，到点自动提醒</p>
+
+    <div class="add-form">
+      <input type="text" id="inputLabel" class="input-label" placeholder="主题（如：第一组、讨论、阅读）" maxlength="20">
+      <div class="input-time">
+        <input type="number" id="inputMin" min="0" max="999" value="5" inputmode="numeric">
+        <span class="time-unit">分</span>
+        <input type="number" id="inputSec" min="0" max="59" value="0" inputmode="numeric">
+        <span class="time-unit">秒</span>
+      </div>
+      <button type="button" class="add-btn" id="btnAdd">+ 添加定时器</button>
+    </div>
+
+    <!-- 时长预设 chips -->
+    <div class="chips" id="chips">
+      <button type="button" class="chip" data-min="1">1 分</button>
+      <button type="button" class="chip" data-min="3">3 分</button>
+      <button type="button" class="chip" data-min="5">5 分</button>
+      <button type="button" class="chip" data-min="10">10 分</button>
+      <button type="button" class="chip" data-min="15">15 分</button>
+      <button type="button" class="chip" data-min="30">30 分</button>
+      <button type="button" class="chip" data-min="45">45 分</button>
+      <button type="button" class="chip" data-min="60">60 分</button>
+    </div>
+
+    <!-- 全局批量操作 -->
+    <div class="bulk-actions">
+      <button type="button" class="bulk-btn" id="btnStartAll">▶ 全部开始</button>
+      <button type="button" class="bulk-btn" id="btnPauseAll">⏸ 全部暂停</button>
+      <button type="button" class="bulk-btn" id="btnResetAll">↩ 全部重置</button>
+      <button type="button" class="bulk-btn danger" id="btnClearAll">🗑 清空全部</button>
+    </div>
+  </section>
+
+  <!-- 定时器卡片列表 -->
+  <section class="timers" id="timers">
+    <div class="empty">暂无定时器，请在上方添加</div>
+  </section>
+</main>
+
+<!-- 全屏专注模式覆盖层 -->
+<section class="focus-overlay hidden" id="focusOverlay">
+  <div class="focus-list" id="focusList"></div>
+  <button type="button" class="focus-exit" id="btnExitFocus"> Esc 退出全屏</button>
+</section>
+
+<script src="multi-timer.js"></script>
+</body>
+</html>

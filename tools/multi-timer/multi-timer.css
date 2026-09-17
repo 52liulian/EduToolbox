@@ -1,0 +1,497 @@
+/* ============================================================================
+ * multi-timer.css · 多任务定时器（专属样式）
+ * ----------------------------------------------------------------------------
+ * 依赖底座：../../assets/css/tool-common.css（后加载，同特异性时底座胜出，
+ *           覆盖统一使用 .app .xxx 等更具体的后代选择器）
+ * 内容分区：
+ *   1. 主题变量（6 款强调色，JS 切换 body[data-theme]，默认霓虹绿）
+ *   2. 双栏骨架（左：添加面板；右：定时器卡片网格）
+ *   3. 添加表单与批量操作
+ *   4. 定时器卡片（JS 动态渲染：运行 / 暂停 / 完成三态）
+ *   5. 卡片内时长微调与操作按钮
+ *   6. 空状态
+ *   7. 全屏专注覆盖层（JS 加 .focus-overlay + Fullscreen API）
+ *   8. 小屏适配 / 减弱动效
+ * 高度策略：卡片网格自然撑高，无内部滚动；仅专注覆盖层（投影模式）可滚动。
+ * ========================================================================== */
+
+/* ---------------------------------------------------------------------------
+ * 1. 主题变量（浅色界面用 --mt-accent 点缀，专注大屏用其霓虹态）
+ * ------------------------------------------------------------------------- */
+body {
+  --mt-accent: #34d399;
+  --mt-accent-rgb: 52, 211, 153;
+}
+body[data-theme="green"]  { --mt-accent: #34d399; --mt-accent-rgb: 52, 211, 153; }
+body[data-theme="sky"]    { --mt-accent: #38bdf8; --mt-accent-rgb: 56, 189, 248; }
+body[data-theme="orange"] { --mt-accent: #fb923c; --mt-accent-rgb: 251, 146, 60; }
+body[data-theme="pink"]   { --mt-accent: #f472b6; --mt-accent-rgb: 244, 114, 182; }
+body[data-theme="violet"] { --mt-accent: #a78bfa; --mt-accent-rgb: 167, 139, 250; }
+body[data-theme="gold"]   { --mt-accent: #eab308; --mt-accent-rgb: 234, 179, 8; }
+
+/* ---------------------------------------------------------------------------
+ * 2. 双栏骨架
+ * ------------------------------------------------------------------------- */
+.app {
+  display: grid;
+  grid-template-columns: 340px minmax(0, 1fr);
+  gap: 22px;
+  align-items: start;
+  width: 100%;
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 24px;
+}
+
+.add-panel {
+  position: relative;
+}
+
+.panel-sub {
+  margin: -4px 0 16px;
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--text-3);
+}
+
+/* ---------------------------------------------------------------------------
+ * 3. 添加表单
+ * ------------------------------------------------------------------------- */
+.add-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.add-form .input-label {
+  width: 100%;
+}
+
+/* 分 / 秒输入横排（此处 .time-unit 为“分/秒”文字单位，覆盖底座列布局） */
+.app .input-time {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.app .input-time input {
+  flex: 1 1 0;
+  min-width: 0;
+  width: 100%;
+  text-align: center;
+  font-weight: 700;
+}
+.app .input-time .time-unit {
+  flex: 0 0 auto;
+  font-size: 13px;
+  color: var(--text-3);
+}
+
+/* 添加主按钮：整行蓝色渐变 */
+.add-btn {
+  width: 100%;
+  padding: 12px 18px;
+  font-size: 14.5px;
+  font-weight: 700;
+  color: #fff;
+  background: var(--primary-grad);
+  border: none;
+  border-radius: var(--r-pill);
+  box-shadow: var(--shadow-primary);
+  cursor: pointer;
+  transition: transform var(--t-fast) var(--ease),
+              filter var(--t-fast) var(--ease);
+}
+.add-btn:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.06);
+}
+.add-btn:active {
+  transform: translateY(0);
+}
+
+/* 预设 chips 紧凑一点 */
+.add-panel .chips {
+  margin-bottom: 16px;
+  gap: 8px;
+}
+
+/* 批量操作 */
+.bulk-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding-top: 14px;
+  border-top: 1px dashed var(--border);
+}
+.bulk-actions .bulk-btn {
+  flex: 1 1 auto;
+  padding: 8px 12px;
+  font-size: 12.5px;
+}
+.bulk-actions .bulk-btn.danger {
+  color: var(--danger);
+  border-color: #ffd4d4;
+  background: #fff5f5;
+}
+.bulk-actions .bulk-btn.danger:hover {
+  color: #fff;
+  background: var(--danger);
+  border-color: var(--danger);
+}
+
+/* ---------------------------------------------------------------------------
+ * 4. 定时器卡片网格（.timer 卡片及内部结构全部由 JS 渲染）
+ * ------------------------------------------------------------------------- */
+.timers {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 16px;
+  align-items: start;
+  min-width: 0;
+}
+
+.timer {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 18px;
+  background: var(--card-bg);
+  border: 1.5px solid var(--border);
+  border-radius: var(--r);
+  box-shadow: var(--shadow-sm);
+  transition: border-color var(--t) var(--ease),
+              box-shadow var(--t) var(--ease),
+              background var(--t) var(--ease);
+}
+
+/* 运行中：强调色描边 + 柔光 */
+.timer.running {
+  border-color: rgba(var(--mt-accent-rgb), 0.55);
+  background: linear-gradient(180deg, rgba(var(--mt-accent-rgb), 0.06), #fff 40%);
+  box-shadow: 0 10px 26px rgba(var(--mt-accent-rgb), 0.16);
+}
+
+/* 中途暂停（已走过一部分）：琥珀色提示 */
+.timer.paused {
+  border-color: #f3d7a0;
+  background: #fffdf6;
+}
+
+/* 完成：红色警示卡，数字闪烁 */
+.timer.done {
+  border-color: #ffc1c1;
+  background: linear-gradient(180deg, #fff3f3, #fff 55%);
+  box-shadow: 0 10px 26px rgba(239, 91, 91, 0.16);
+}
+
+/* 卡片头部：序号 + 主题 + 删除 */
+.card-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.card-label-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.card-index {
+  display: inline-grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0;
+  font-size: 12.5px;
+  font-weight: 800;
+  color: var(--primary);
+  background: var(--primary-soft);
+  border-radius: 50%;
+  font-variant-numeric: tabular-nums;
+}
+
+.card-label {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 14.5px;
+  font-weight: 700;
+  color: var(--text-1);
+}
+
+.card-del {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  flex-shrink: 0;
+  font-size: 18px;
+  line-height: 1;
+  color: var(--text-3);
+  background: transparent;
+  border-radius: 50%;
+  transition: all var(--t-fast) var(--ease);
+}
+.card-del:hover {
+  color: #fff;
+  background: var(--danger);
+}
+
+/* 大字剩余时间 */
+.card-time {
+  text-align: center;
+  font-size: 38px;
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: -0.01em;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-1);
+  transition: color var(--t-fast) var(--ease);
+}
+.timer.running .card-time {
+  color: var(--mt-accent);
+}
+.timer.paused .card-time {
+  color: var(--warning);
+}
+.timer.done .card-time {
+  color: var(--danger);
+  animation: mt-blink 1s steps(1) infinite;
+}
+
+@keyframes mt-blink {
+  0%, 49%  { opacity: 1; }
+  50%, 100% { opacity: 0.4; }
+}
+
+/* 进度条（宽度由 JS 按剩余百分比内联设置） */
+.card-progress {
+  height: 8px;
+  background: var(--bg-soft);
+  border-radius: var(--r-pill);
+  overflow: hidden;
+}
+.card-progress-bar {
+  height: 100%;
+  width: 100%;
+  border-radius: inherit;
+  background: var(--primary-grad);
+  transition: width 0.5s var(--ease), background var(--t) var(--ease);
+}
+.timer.running .card-progress-bar {
+  background: linear-gradient(90deg, var(--mt-accent), rgba(var(--mt-accent-rgb), 0.65));
+}
+.timer.paused .card-progress-bar {
+  background: var(--warning);
+}
+.timer.done .card-progress-bar {
+  background: var(--danger);
+}
+
+/* ---------------------------------------------------------------------------
+ * 5. 卡片内微调与操作按钮（底座 .adj-btn 为 32px 方格，改为均分小胶囊）
+ * ------------------------------------------------------------------------- */
+.adjust-row {
+  display: flex;
+  gap: 6px;
+}
+.adjust-row .adj-btn {
+  flex: 1 1 0;
+  width: auto;
+  height: auto;
+  padding: 7px 0;
+  font-size: 12.5px;
+  font-weight: 600;
+  border-radius: var(--r-sm);
+}
+
+.card-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.act-btn {
+  flex: 1 1 0;
+  padding: 9px 10px;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--text-2);
+  background: var(--card-bg);
+  border: 1.5px solid var(--border);
+  border-radius: var(--r-pill);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all var(--t-fast) var(--ease);
+}
+.act-btn:hover {
+  color: var(--primary);
+  border-color: var(--primary-soft-2);
+  background: var(--primary-soft);
+}
+.act-btn.primary {
+  color: #fff;
+  background: var(--primary-grad);
+  border-color: transparent;
+  box-shadow: 0 6px 16px rgba(59, 110, 246, 0.26);
+}
+.act-btn.primary:hover {
+  color: #fff;
+  filter: brightness(1.06);
+  background: var(--primary-grad);
+}
+/* 完成态的主按钮是“重启”，用强调主题色 */
+.timer.done .act-btn.primary {
+  background: linear-gradient(135deg, #ff7a7a, #ef5b5b);
+  box-shadow: 0 6px 16px rgba(239, 91, 91, 0.3);
+}
+
+/* ---------------------------------------------------------------------------
+ * 6. 空状态（跨整行）
+ * ------------------------------------------------------------------------- */
+.timers > .empty {
+  grid-column: 1 / -1;
+  padding: 70px 20px;
+}
+
+/* ---------------------------------------------------------------------------
+ * 7. 全屏专注覆盖层（唯一允许 fixed:inset 的投影场景）
+ * ------------------------------------------------------------------------- */
+.focus-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 950;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 26px;
+  padding: clamp(24px, 5vh, 56px) 28px;
+  overflow-y: auto; /* 投影卡片过多时允许覆盖层自身滚动 */
+  color: #e8eeff;
+  background:
+    radial-gradient(900px 500px at 82% -10%, rgba(var(--mt-accent-rgb), 0.16), transparent 60%),
+    radial-gradient(720px 420px at 8% 6%, rgba(80, 120, 255, 0.14), transparent 58%),
+    #0a0f1f;
+}
+
+.focus-list {
+  width: 100%;
+  max-width: 1180px;
+  margin: auto;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 18px;
+  align-content: start;
+}
+
+.focus-card {
+  padding: 26px 20px;
+  text-align: center;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: var(--r-lg);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.28);
+}
+
+.f-label {
+  margin-bottom: 8px;
+  font-size: 14px;
+  color: rgba(232, 238, 255, 0.66);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.f-time {
+  font-size: clamp(40px, 5.5vw, 68px);
+  font-weight: 800;
+  line-height: 1.1;
+  font-variant-numeric: tabular-nums;
+  color: var(--mt-accent);
+  text-shadow: 0 0 28px rgba(var(--mt-accent-rgb), 0.5);
+}
+
+/* 已完成的专注卡片：红色提醒 */
+.focus-card.done {
+  border-color: rgba(255, 109, 109, 0.55);
+  background: rgba(255, 91, 91, 0.1);
+}
+.focus-card.done .f-time {
+  color: #ff6b6b;
+  text-shadow: 0 0 28px rgba(255, 107, 107, 0.55);
+  animation: mt-blink 1s steps(1) infinite;
+}
+.focus-card.done .f-label::after {
+  content: " · 时间到";
+  color: #ff9b9b;
+  font-weight: 700;
+}
+
+.focus-exit {
+  flex-shrink: 0;
+  padding: 11px 26px;
+  font-size: 14px;
+  font-weight: 600;
+  color: rgba(232, 238, 255, 0.88);
+  background: rgba(255, 255, 255, 0.1);
+  border: 1.5px solid rgba(255, 255, 255, 0.24);
+  border-radius: var(--r-pill);
+  cursor: pointer;
+  transition: all var(--t-fast) var(--ease);
+}
+.focus-exit:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.45);
+}
+
+/* 浏览器原生全屏时保证底色一致 */
+:fullscreen,
+:-webkit-full-screen {
+  background: #0a0f1f;
+}
+
+/* ---------------------------------------------------------------------------
+ * 8. 小屏适配 / 减弱动效
+ * ------------------------------------------------------------------------- */
+@media (max-width: 920px) {
+  .app {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .app { padding: 16px; gap: 16px; }
+  .timers { grid-template-columns: 1fr 1fr; gap: 12px; }
+  .timer { padding: 14px; gap: 10px; }
+  .card-time { font-size: 30px; }
+}
+
+@media (max-width: 420px) {
+  .timers { grid-template-columns: 1fr; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .timer,
+  .card-progress-bar,
+  .card-time,
+  .add-btn,
+  .act-btn,
+  .adj-btn,
+  .bulk-btn,
+  .card-del {
+    transition: none !important;
+  }
+  .timer.done .card-time,
+  .focus-card.done .f-time {
+    animation: none !important;
+  }
+}

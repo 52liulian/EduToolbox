@@ -1,0 +1,117 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>高中评语生成 | EduToolbox · 高中阶段评语</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%8E%93%3C/text%3E%3C/svg%3E">
+<link rel="stylesheet" href="senior-comment.css">
+<link rel="stylesheet" href="../../assets/css/tool-common.css">
+</head>
+<body>
+
+  <div class="wrap">
+
+    <!-- 顶部标题区（简短介绍） -->
+    <header class="hdr">
+      <div class="hdr-emoji">🎓</div>
+      <div class="hdr-text">
+        <h1>高中评语生成器</h1>
+        <p>面向高中班主任与任课教师的期末评语生成器，覆盖学习品质、学科表现、思维深度、学习方法、心理素质、集体责任、品德修养、特长发展、生涯规划、成长寄语十大维度，支持名单导入、维度勾选、性别选项、风格切换、一键批量生成不雷同评语，可逐条编辑，可复制并导出 Word / Excel / TXT，数据自动保存在本机。</p>
+      </div>
+    </header>
+
+    <!-- 控制面板：名单 / 维度 / 设置 -->
+    <section class="panels">
+
+      <!-- 名单管理 -->
+      <div class="panel panel-names">
+        <h3 class="panel-title">🧑‍🎓 名单管理</h3>
+        <textarea id="nameInput" placeholder="每行输入一个姓名，最多 100 人&#10;例如：&#10;李一诺&#10;王梓萱"></textarea>
+        <div class="btn-row">
+          <button type="button" class="btn btn-soft" id="btnSample">✨ 填入示例名单</button>
+          <button type="button" class="btn btn-soft" id="btnClear">🗑 清空</button>
+        </div>
+        <p class="panel-tip">提示：名单会自动保存，刷新页面不丢失。</p>
+      </div>
+
+      <!-- 评语维度 -->
+      <div class="panel panel-dims">
+        <div class="panel-head">
+          <h3 class="panel-title">🏷 评语维度（点击标签勾选）</h3>
+          <div class="dim-tools">
+            <button type="button" class="btn-mini" id="btnDimAll">全选</button>
+            <button type="button" class="btn-mini" id="btnDimNone">全不选</button>
+          </div>
+        </div>
+        <div class="chips" id="dimChips"></div>
+        <p class="panel-tip">生成时将从每个已勾选分类中随机抽取 1 条，相邻两位同学不会抽到同一条。</p>
+      </div>
+
+      <!-- 生成设置 -->
+      <div class="panel panel-settings">
+        <h3 class="panel-title">⚙️ 生成设置</h3>
+        <div class="setting-grid">
+
+          <div class="setting-item">
+            <span class="setting-label">称呼前缀</span>
+            <label class="switch-wrap">
+              <span class="switch-desc">显示「XXX同学：」前缀</span>
+              <span class="switch"><input type="checkbox" id="chkPrefix" checked><span class="slider"></span></span>
+            </label>
+          </div>
+
+          <div class="setting-item">
+            <span class="setting-label">性别选项</span>
+            <div class="seg-group" id="genderGroup">
+              <label class="seg"><input type="radio" name="gender" value="any" checked><span>🚻 不限</span></label>
+              <label class="seg"><input type="radio" name="gender" value="male"><span>👦 男生</span></label>
+              <label class="seg"><input type="radio" name="gender" value="female"><span>👧 女生</span></label>
+            </div>
+            <p class="seg-tip">影响部分寄语中的代称（他 / 她 / 你）。</p>
+          </div>
+
+          <div class="setting-item setting-full">
+            <span class="setting-label">评语风格</span>
+            <div class="seg-group" id="endingGroup">
+              <label class="seg"><input type="radio" name="ending" value="rigorous" checked><span>📖 严谨深刻</span></label>
+              <label class="seg"><input type="radio" name="ending" value="expect"><span>🎯 期望激励</span></label>
+              <label class="seg"><input type="radio" name="ending" value="specific"><span>✨ 具体细致</span></label>
+            </div>
+            <p class="seg-tip">切换结尾寄语的语气与落点。</p>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- 生成按钮 + 统计 -->
+    <div class="action-bar">
+      <button type="button" class="btn btn-primary btn-lg" id="btnGenerate">🚀 一键生成全部评语</button>
+      <div class="stats">
+        <span class="stat">共 <b id="statPeople">0</b> 人</span>
+        <span class="stat">共 <b id="statChars">0</b> 字</span>
+      </div>
+    </div>
+
+    <!-- 导出工具栏 -->
+    <div class="toolbar">
+      <button type="button" class="btn btn-ghost" id="btnCopy">📋 复制全部</button>
+      <button type="button" class="btn btn-ghost" id="btnTxt">📄 下载 TXT</button>
+      <button type="button" class="btn btn-ghost" id="btnExcel">📊 下载 Excel</button>
+      <button type="button" class="btn btn-ghost" id="btnWord">📝 下载 Word</button>
+    </div>
+
+    <!-- 评语结果区 -->
+    <section class="results">
+      <h3 class="results-title">🎁 评语结果（可直接在卡片中修改）</h3>
+      <p class="empty-tip" id="emptyTip">还没有评语，填好名单后点击「一键生成全部评语」试试吧～</p>
+      <div class="r-grid" id="resultWrap"></div>
+    </section>
+
+  </div>
+  <div class="toast" id="toast"></div>
+  <script src="../../assets/vendor/xlsx.full.min.js"></script>
+  <script src="senior-comment.js"></script>
+</body>
+</html>

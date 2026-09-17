@@ -1,0 +1,290 @@
+/* ============================================================================
+ * 转盘抽选 · turntable.css
+ * 仅包含本工具特有样式：Canvas 转盘舞台 / 指针 / GO 按钮 / 结果动效 / 全屏投影
+ * 公共底座（双栏布局、面板、按钮、表单、记录列表）见 tool-common.css
+ * 高度策略：所有容器高度自动撑开，仅 body 主滚动条；仅 stage 全屏时固定视口
+ * ========================================================================== */
+
+/* ---------------------------------------------------------------------------
+ * 一、双栏布局的窄屏回落（提高特异性以覆盖公共 .main 的固定列宽）
+ * ------------------------------------------------------------------------- */
+@media (max-width: 900px) {
+  #app .main {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* 计数条上的「重置默认」按钮靠右 */
+.count-bar .btn-mini { margin-left: auto; }
+
+/* ---------------------------------------------------------------------------
+ * 二、转盘舞台
+ * ------------------------------------------------------------------------- */
+.wheel-area {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  width: 100%;
+  padding: 48px 0 12px; /* 顶部为绝对定位的全屏按钮留位 */
+}
+
+.wheel-wrap {
+  position: relative;
+  width: min(82vw, 440px);
+}
+
+/* 转盘背后的暖色辉光，营造舞台聚光感（纯 CSS 渐变） */
+.wheel-wrap::before {
+  content: "";
+  position: absolute;
+  inset: -26px;
+  z-index: 0;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 50% 42%, rgba(251, 191, 36, 0.28) 0%,
+      rgba(59, 110, 246, 0.12) 52%, transparent 70%);
+  pointer-events: none;
+}
+
+/* 转盘底部投影 */
+.wheel-wrap::after {
+  content: "";
+  position: absolute;
+  left: 12%;
+  right: 12%;
+  bottom: -14px;
+  height: 26px;
+  border-radius: 50%;
+  background: radial-gradient(ellipse at center, rgba(31, 45, 80, 0.22), transparent 70%);
+  pointer-events: none;
+}
+
+#wheel {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  height: auto;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow:
+    0 0 0 8px #ffffff,
+    0 18px 44px rgba(36, 66, 140, 0.24),
+    0 0 56px rgba(251, 191, 36, 0.25);
+  /* JS 直接写 transform，缓动由这里的 transition 提供（约 5 秒后停下） */
+  transition: transform 5s cubic-bezier(0.17, 0.74, 0.22, 1);
+  will-change: transform;
+}
+
+/* 顶部指针：金色倒三角 + 底座圆点 */
+.pointer {
+  position: absolute;
+  top: -8px;
+  left: 50%;
+  z-index: 3;
+  width: 0;
+  height: 0;
+  margin-left: -18px;
+  border-left: 18px solid transparent;
+  border-right: 18px solid transparent;
+  border-top: 32px solid #f59e0b;
+  filter: drop-shadow(0 3px 5px rgba(180, 96, 0, 0.45));
+}
+.pointer::after {
+  content: "";
+  position: absolute;
+  top: -22px;
+  left: 50%;
+  width: 20px;
+  height: 20px;
+  transform: translateX(-50%);
+  border: 3px solid #fff;
+  border-radius: 50%;
+  background: linear-gradient(180deg, #ffe08a, #f59e0b);
+  box-shadow: 0 2px 6px rgba(180, 96, 0, 0.4);
+}
+
+/* 中心 GO 按钮：红白圆形大按钮，压在 canvas 中心金盘上 */
+.spin-btn {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 4;
+  width: 92px;
+  height: 92px;
+  transform: translate(-50%, -50%);
+  border: 5px solid #fff;
+  border-radius: 50%;
+  font-size: 28px;
+  font-weight: 900;
+  letter-spacing: 1px;
+  color: #fff;
+  background: radial-gradient(circle at 34% 28%, #ff8a8a 0%, #ef4444 42%, #c81e3a 100%);
+  box-shadow:
+    0 8px 20px rgba(200, 30, 58, 0.5),
+    inset 0 -5px 10px rgba(120, 0, 20, 0.35);
+  cursor: pointer;
+  transition: transform var(--t-fast) var(--ease), box-shadow var(--t-fast) var(--ease), filter var(--t-fast) var(--ease);
+}
+.spin-btn:hover {
+  transform: translate(-50%, -50%) scale(1.06);
+  filter: brightness(1.07);
+}
+.spin-btn:active {
+  transform: translate(-50%, -50%) scale(0.96);
+}
+.spin-btn:disabled {
+  cursor: wait;
+  opacity: 0.75;
+  transform: translate(-50%, -50%) scale(0.96);
+}
+
+/* ---------------------------------------------------------------------------
+ * 三、抽选结果文字
+ * ------------------------------------------------------------------------- */
+.result-display {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 48px;
+  padding: 6px 18px;
+  font-size: clamp(18px, 2.4vw, 24px);
+  font-weight: 700;
+  color: var(--text-3);
+  text-align: center;
+}
+
+/* 中奖瞬间：渐变大字 + 弹出动效 */
+.result-display.winner {
+  font-size: clamp(26px, 4vw, 40px);
+  font-weight: 900;
+  line-height: 1.3;
+  background: var(--primary-grad);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: tt-pop 0.5s var(--ease);
+}
+
+@keyframes tt-pop {
+  0%   { transform: scale(0.6); opacity: 0; }
+  60%  { transform: scale(1.12); opacity: 1; }
+  100% { transform: scale(1); }
+}
+
+/* ---------------------------------------------------------------------------
+ * 四、中奖记录列表项（.r-num / .r-name / .r-time 由 JS 生成）
+ * ------------------------------------------------------------------------- */
+.record-list li {
+  justify-content: space-between;
+}
+.record-list li > span:first-child {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  min-width: 0;
+}
+.r-num {
+  display: inline-grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  flex-shrink: 0;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--primary);
+  background: var(--primary-soft);
+  border-radius: 50%;
+}
+.r-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--text-1);
+  font-weight: 600;
+}
+.r-time {
+  flex-shrink: 0;
+  margin-left: 10px;
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-3);
+}
+
+/* ---------------------------------------------------------------------------
+ * 五、全屏投影（全屏元素是 stage 本身；唯一允许铺满视口的场景）
+ * ------------------------------------------------------------------------- */
+#stage:fullscreen,
+#stage:-webkit-full-screen {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 32px;
+  border: none;
+  border-radius: 0;
+  background:
+    radial-gradient(900px 500px at 50% 30%, rgba(90, 141, 255, 0.18), transparent 65%),
+    linear-gradient(160deg, #15234d 0%, #0b1330 55%, #070d1f 100%);
+}
+
+#stage:fullscreen .wheel-area,
+#stage:-webkit-full-screen .wheel-area {
+  flex: 1;
+  gap: 30px;
+  padding: 0;
+}
+
+/* 大屏时转盘放大铺满（canvas 仅在全屏时铺满） */
+#stage:fullscreen #wheel,
+#stage:-webkit-full-screen #wheel {
+  width: min(62vh, 640px);
+}
+#stage:fullscreen .wheel-wrap,
+#stage:-webkit-full-screen .wheel-wrap {
+  width: min(62vh, 640px);
+}
+
+/* 深色背景上的文字 / 结果反色 */
+#stage:fullscreen .result-display,
+#stage:-webkit-full-screen .result-display {
+  color: rgba(255, 255, 255, 0.72);
+}
+#stage:fullscreen .result-display.winner,
+#stage:-webkit-full-screen .result-display.winner {
+  background: linear-gradient(135deg, #ffe08a, #ffb02e);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+#stage:fullscreen .key-hint,
+#stage:-webkit-full-screen .key-hint {
+  color: rgba(255, 255, 255, 0.5);
+}
+#stage:fullscreen .key-hint kbd,
+#stage:-webkit-full-screen .key-hint kbd {
+  color: rgba(255, 255, 255, 0.85);
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.25);
+}
+
+/* 全屏时右上角按钮改为深色玻璃质感 */
+#stage:fullscreen .stage-toolbar .icon-btn,
+#stage:-webkit-full-screen .stage-toolbar .icon-btn {
+  color: rgba(255, 255, 255, 0.9);
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.25);
+}
+#stage:fullscreen .stage-toolbar .icon-btn:hover,
+#stage:-webkit-full-screen .stage-toolbar .icon-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+/* ---------------------------------------------------------------------------
+ * 六、小屏微调
+ * ------------------------------------------------------------------------- */
+@media (max-width: 640px) {
+  .wheel-area { gap: 14px; padding-top: 42px; }
+  .spin-btn { width: 78px; height: 78px; font-size: 24px; }
+}

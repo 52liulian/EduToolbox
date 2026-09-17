@@ -1,0 +1,174 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>凹凸工坊 · 手写文稿生成器 | EduToolbox</title>
+<meta name="description" content="上传 Word/PDF/图片/纯文字，选择手写字体、纸张背景与涂改效果，一键生成手写文稿。本地处理，隐私安全，离线可用。">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%8E%93%3C/text%3E%3C/svg%3E">
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="../../assets/css/tool-common.css">
+<link rel="stylesheet" href="fonts/handwrite-fonts.css">
+<link rel="stylesheet" href="../../assets/css/tool-common.css">
+</head>
+<body>
+<div id="app">
+  <!-- 顶栏 -->
+
+  <!-- 主体 -->
+  <main class="container main">
+    <!-- 标题区 -->
+    <section class="hero">
+      <h1 class="hero-title">手写文稿生成器</h1>
+      <p class="hero-sub">上传文档 · 选择字体与纸张 · 一键生成手写效果 · 本地处理不上传</p>
+    </section>
+
+    <div class="layout">
+      <!-- 左侧：输入与参数 -->
+      <section class="panel controls">
+        <!-- 输入方式 -->
+        <div class="block">
+          <h2 class="block-title">① 内容输入</h2>
+          <div class="tabs" id="inputTabs">
+            <button class="tab active" data-tab="text">📝 粘贴文字</button>
+            <button class="tab" data-tab="file">📄 上传文件</button>
+          </div>
+
+          <div class="tab-pane active" id="pane-text">
+            <textarea id="textInput" placeholder="在此粘贴或输入要转换的文字……&#10;支持多段、中英文混排。">床前明月光，疑是地上霜。
+举头望明月，低头思故乡。
+
+—— 李白《静夜思》</textarea>
+          </div>
+
+          <div class="tab-pane" id="pane-file">
+            <div class="dropzone" id="dropzone">
+              <div class="dz-icon">📄</div>
+              <p>拖拽文件到这里，或 <label class="dz-link" for="fileInput">点击选择</label></p>
+              <p class="dz-hint">支持 Word(.docx) · PDF(.pdf) · 纯文本(.txt) · 图片(.jpg/.png)</p>
+              <input id="fileInput" type="file" accept=".docx,.pdf,.txt,image/*">
+            </div>
+            <div class="file-info" id="fileInfo" hidden></div>
+          </div>
+        </div>
+
+        <!-- 手写字体 -->
+        <div class="block">
+          <h2 class="block-title">② 手写字体</h2>
+          <div class="font-list" id="fontList"></div>
+        </div>
+
+        <!-- 纸张背景 -->
+        <div class="block">
+          <h2 class="block-title">③ 纸张背景</h2>
+          <div class="paper-list" id="paperList"></div>
+        </div>
+
+        <!-- 基础参数 -->
+        <div class="block">
+          <h2 class="block-title">④ 基础参数</h2>
+          <div class="params">
+            <div class="field">
+              <label class="field-label">字号 <span class="val" id="v-size">22</span>px</label>
+              <input type="range" id="p-size" min="14" max="48" value="22">
+            </div>
+            <div class="field">
+              <label class="field-label">行距 <span class="val" id="v-line">1.8</span></label>
+              <input type="range" id="p-line" min="1.2" max="3.5" step="0.1" value="1.8">
+            </div>
+            <div class="field">
+              <label class="field-label">字间距 <span class="val" id="v-gap">0</span>px</label>
+              <input type="range" id="p-gap" min="-4" max="16" value="0">
+            </div>
+            <div class="field">
+              <label class="field-label">每行字数 <span class="val" id="v-cpl">24</span></label>
+              <input type="range" id="p-cpl" min="10" max="40" value="24">
+            </div>
+            <div class="field">
+              <label class="field-label">倾斜角度 <span class="val" id="v-skew">-4</span>°</label>
+              <input type="range" id="p-skew" min="-20" max="20" value="-4">
+            </div>
+            <div class="field">
+              <label class="field-label">墨水颜色</label>
+              <div class="colors" id="colors">
+                <button class="color-swatch active" data-color="#1a1a1a" style="background:#1a1a1a" title="黑色"></button>
+                <button class="color-swatch" data-color="#0b4f8a" style="background:#0b4f8a" title="蓝色"></button>
+                <button class="color-swatch" data-color="#8a2b0b" style="background:#8a2b0b" title="红色"></button>
+                <button class="color-swatch" data-color="#1e6b3a" style="background:#1e6b3a" title="绿色"></button>
+                <button class="color-swatch" data-color="#5a3a7a" style="background:#5a3a7a" title="紫色"></button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 高级设置 -->
+        <div class="block">
+          <h2 class="block-title">⑤ 高级效果</h2>
+          <div class="params">
+            <div class="field">
+              <label class="field-label">
+                随机勾画涂改概率
+                <span class="val" id="v-scrawl">3</span>% <small class="rec">推荐 3%</small>
+              </label>
+              <input type="range" id="p-scrawl" min="0" max="100" value="3">
+              <p class="field-hint">模拟手写时偶尔涂改、勾画的效果</p>
+            </div>
+            <div class="field">
+              <label class="field-label">
+                文字位置凌乱度
+                <span class="val" id="v-messy">10</span>% <small class="rec">推荐 10%</small>
+              </label>
+              <input type="range" id="p-messy" min="0" max="100" value="10">
+              <p class="field-hint">每个字上下左右偏移的随机程度</p>
+            </div>
+            <div class="field">
+              <label class="field-label">
+                字体笔画凌乱度
+                <span class="val" id="v-stroke">5</span>% <small class="rec">推荐 5%</small>
+              </label>
+              <input type="range" id="p-stroke" min="0" max="100" value="5">
+              <p class="field-hint">字号缩放、旋转的随机扰动</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- 操作按钮 -->
+        <div class="actions">
+          <button class="btn btn-primary" id="btnPreview">👁️ 重新预览</button>
+          <button class="btn" id="btnExportPng">⬇️ 下载 PNG</button>
+          <button class="btn" id="btnExportPdf">⬇️ 下载 PDF</button>
+        </div>
+        <p class="privacy">🔒 全部在浏览器本地处理，文字与文件不上传服务器</p>
+      </section>
+
+      <!-- 右侧：预览 -->
+      <section class="panel preview-panel">
+        <div class="preview-head">
+          <h2 class="block-title">📄 手写效果预览</h2>
+          <span class="hint">预览图已压缩，下载为高清版本</span>
+        </div>
+        <div class="paper" id="paper">
+          <canvas id="canvas"></canvas>
+        </div>
+        <p class="preview-tip">效果基于字体模拟，非真迹复刻。可调整参数后点击「重新预览」刷新。</p>
+      </section>
+    </div>
+  </main>
+</div>
+
+<!-- 第三方库：全部本地化 -->
+<script src="../../assets/vendor/mammoth.browser.min.js"></script>
+<script src="../../assets/vendor/pdf.worker.min.js"></script>
+<script src="../../assets/vendor/pdf.min.js"></script>
+<script src="../../assets/vendor/jspdf.umd.min.js"></script>
+<script>
+/* file:// 双击离线打开时 Worker 可能被拦截，指定本地 worker，并允许主线程兜底 */
+if (window.pdfjsLib) {
+  pdfjsLib.GlobalWorkerOptions.workerSrc = "../../assets/vendor/pdf.worker.min.js";
+  /* 兜底：Worker 创建失败时使用主线程模式（file:// 协议兼容） */
+  pdfjsLib.GlobalWorkerOptions.disableWorker = (location.protocol === "file:");
+}
+</script>
+<script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,326 @@
+/* ============================================================================
+ * recitation-screen.css · 背诵记录大屏（专属样式）
+ * ----------------------------------------------------------------------------
+ * 依赖底座：../../assets/css/tool-common.css（后加载，同特异性底座胜出，
+ *           本文件使用 .app 后代选择器与 :fullscreen 提高特异性）
+ * 内容分区：
+ *   1. 页面骨架（.app 居中限宽）
+ *   2. 顶部工具条（文件选择 / 导出 / 全屏；HTML 中为裸 button，需自行样式化）
+ *   3. 学生卡片网格（JS 生成 .card / .done / .name / .sid / .empty）
+ *   4. 已背诵状态（绿色对勾）
+ *   5. 全屏投影模式（深底大卡片，仅此模式允许 fixed/inset）
+ * 高度策略：网格随名单自动撑开，仅 body 主滚动条，无内部滚动。
+ * ========================================================================== */
+
+/* ---------------------------------------------------------------------------
+ * 1. 页面骨架
+ * ------------------------------------------------------------------------- */
+.app {
+  width: 100%;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 22px clamp(14px, 2.5vw, 30px) 44px;
+}
+
+/* ---------------------------------------------------------------------------
+ * 2. 顶部工具条
+ * ------------------------------------------------------------------------- */
+.bar {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 20px;
+  padding: 14px 18px;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  box-shadow: var(--shadow-sm);
+}
+
+.bar h2 {
+  margin-right: auto;
+  font-size: 18px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+/* 文件选择框（底座未覆盖 input[type=file]） */
+.bar input[type="file"] {
+  max-width: 260px;
+  padding: 6px;
+  font-size: 13px;
+  color: var(--text-2);
+  background: var(--card-bg-2);
+  border: 1.5px solid var(--border);
+  border-radius: var(--r-sm);
+  cursor: pointer;
+}
+
+.bar input[type="file"]::file-selector-button {
+  margin-right: 10px;
+  padding: 7px 16px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--primary);
+  background: var(--primary-soft);
+  border: none;
+  border-radius: var(--r-pill);
+  cursor: pointer;
+  transition: background var(--t-fast) var(--ease);
+}
+.bar input[type="file"]::file-selector-button:hover { background: var(--primary-soft-2); }
+.bar input[type="file"]::-webkit-file-upload-button {
+  margin-right: 10px;
+  padding: 7px 16px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--primary);
+  background: var(--primary-soft);
+  border: none;
+  border-radius: var(--r-pill);
+  cursor: pointer;
+}
+
+/* HTML 中的「导出 / 全屏」是裸 button，这里补齐按钮样式 */
+.bar button {
+  padding: 9px 20px;
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--text-2);
+  white-space: nowrap;
+  background: var(--card-bg);
+  border: 1.5px solid var(--border);
+  border-radius: var(--r-pill);
+  cursor: pointer;
+  transition: all var(--t-fast) var(--ease);
+}
+.bar button:hover {
+  color: var(--primary);
+  border-color: var(--primary-soft-2);
+  background: var(--primary-soft);
+  transform: translateY(-1px);
+}
+#fs {
+  color: #fff !important;
+  background: var(--primary-grad) !important;
+  border-color: transparent !important;
+  box-shadow: var(--shadow-primary);
+}
+#fs:hover { filter: brightness(1.06); }
+
+/* ---------------------------------------------------------------------------
+ * 3. 学生卡片网格（覆盖底座 .grid 的 260px 列宽）
+ * ------------------------------------------------------------------------- */
+.app > .grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 12px;
+}
+
+/* 覆盖底座 .card：名单卡片紧凑居中、可点击切换状态 */
+.app .grid .card {
+  position: relative;
+  padding: 18px 12px 15px;
+  text-align: center;
+  cursor: pointer;
+  user-select: none;
+  transition: transform var(--t-fast) var(--ease), box-shadow var(--t-fast) var(--ease),
+              border-color var(--t-fast) var(--ease), background var(--t-fast) var(--ease);
+}
+
+.app .grid .card:hover {
+  transform: translateY(-2px);
+  border-color: var(--primary-soft-2);
+  box-shadow: var(--shadow);
+}
+
+.app .grid .card:active { transform: scale(0.97); }
+
+.app .card .name {
+  font-size: 17px;
+  font-weight: 800;
+  line-height: 1.3;
+  color: var(--text-1);
+  word-break: break-all;
+}
+
+.app .card .sid {
+  margin-top: 4px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-3);
+  font-variant-numeric: tabular-nums;
+}
+
+/* 卡片右上角对勾（默认隐藏） */
+.app .grid .card::after {
+  content: "✓";
+  position: absolute;
+  top: 6px;
+  right: 8px;
+  display: grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  font-size: 12px;
+  font-weight: 900;
+  color: #fff;
+  background: var(--success);
+  border-radius: 50%;
+  opacity: 0;
+  transform: scale(0.4);
+  transition: opacity var(--t-fast) var(--ease), transform var(--t-fast) var(--ease);
+}
+
+/* ---------------------------------------------------------------------------
+ * 4. 已背诵状态
+ * ------------------------------------------------------------------------- */
+.app .grid .card.done {
+  background: linear-gradient(160deg, #eafff3 0%, #dcf7e9 100%);
+  border-color: #9fe2bf;
+}
+
+.app .grid .card.done::after {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.app .card.done .name { color: #178a4e; }
+.app .card.done .sid  { color: #57a879; }
+
+/* 空名单提示（JS 生成 .empty） */
+.app .grid .empty {
+  grid-column: 1 / -1;
+  margin: 30px 0;
+  padding: 46px 20px;
+  border: 2px dashed var(--border-2);
+  border-radius: var(--r);
+  background: var(--card-bg-2);
+}
+.app .grid .empty::before {
+  content: "📋";
+  font-size: 42px;
+}
+
+/* ---------------------------------------------------------------------------
+ * 5. 响应式
+ * ------------------------------------------------------------------------- */
+@media (max-width: 640px) {
+  .bar { justify-content: center; }
+  .bar h2 { flex-basis: 100%; text-align: center; margin-right: 0; }
+  .bar input[type="file"] { max-width: none; flex: 1 1 100%; }
+  .app > .grid { grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 8px; }
+  .app .grid .card { padding: 14px 8px 12px; }
+  .app .card .name { font-size: 15px; }
+}
+
+/* ---------------------------------------------------------------------------
+ * 6. 全屏投影模式（:fullscreen 时生效）
+ *    整屏深色 + 大卡片，教室后排可见；工具条悬浮顶部。
+ * ------------------------------------------------------------------------- */
+:fullscreen body,
+:-webkit-full-screen body { background: #0f1620; }
+
+:fullscreen .app,
+:-webkit-full-screen .app {
+  max-width: none;
+  padding: 88px 30px 40px;
+}
+
+:fullscreen .bar,
+:-webkit-full-screen .bar {
+  position: fixed;
+  top: 14px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 20;
+  width: auto;
+  max-width: calc(100vw - 28px);
+  margin: 0;
+  padding: 10px 16px;
+  background: rgba(24, 32, 46, 0.92);
+  border-color: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+}
+
+:fullscreen .bar h2,
+:-webkit-full-screen .bar h2 { color: #eef2fb; }
+
+:fullscreen .bar button,
+:-webkit-full-screen .bar button {
+  color: #d6deec;
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.16);
+}
+:fullscreen .bar button:hover,
+:-webkit-full-screen .bar button:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.16);
+}
+:fullscreen #fs,
+:-webkit-full-screen #fs {
+  color: #fff !important;
+  background: var(--primary-grad) !important;
+}
+
+:fullscreen .bar input[type="file"],
+:-webkit-full-screen .bar input[type="file"] {
+  color: #c6d0e0;
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.16);
+}
+
+:fullscreen .app > .grid,
+:-webkit-full-screen .app > .grid {
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 16px;
+}
+
+:fullscreen .app .grid .card,
+:-webkit-full-screen .app .grid .card {
+  padding: 26px 16px 22px;
+  background: #1b2531;
+  border-color: #2e3a4c;
+  box-shadow: none;
+}
+:fullscreen .app .grid .card:hover,
+:-webkit-full-screen .app .grid .card:hover {
+  border-color: #4a5d7c;
+  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.4);
+}
+
+:fullscreen .app .card .name,
+:-webkit-full-screen .app .card .name {
+  font-size: 24px;
+  color: #f2f6fd;
+}
+:fullscreen .app .card .sid,
+:-webkit-full-screen .app .card .sid {
+  font-size: 13.5px;
+  color: #93a0b5;
+}
+
+/* 全屏下已背诵：绿色渐变实卡 */
+:fullscreen .app .grid .card.done,
+:-webkit-full-screen .app .grid .card.done {
+  background: linear-gradient(150deg, rgba(34, 179, 106, 0.9), rgba(22, 140, 80, 0.9));
+  border-color: rgba(120, 230, 170, 0.6);
+}
+:fullscreen .app .card.done .name,
+:-webkit-full-screen .app .card.done .name { color: #fff; }
+:fullscreen .app .card.done .sid,
+:-webkit-full-screen .app .card.done .sid { color: rgba(255, 255, 255, 0.8); }
+:fullscreen .app .grid .card.done::after,
+:-webkit-full-screen .app .grid .card.done::after {
+  background: rgba(255, 255, 255, 0.25);
+  border: 1.5px solid rgba(255, 255, 255, 0.7);
+}
+
+:fullscreen .app .grid .empty,
+:-webkit-full-screen .app .grid .empty {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.18);
+  color: #93a0b5;
+}

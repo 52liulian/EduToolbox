@@ -1,0 +1,59 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>早读检测 | EduToolbox · 早读声音强度可视化</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%8E%93%3C/text%3E%3C/svg%3E">
+<link rel="stylesheet" href="morning-reading-meter.css">
+<link rel="stylesheet" href="../../assets/css/tool-common.css">
+</head>
+<body>
+
+<main class="main">
+  <section class="settings" aria-label="检测设置">
+    <div class="setting-item">
+      <label for="sensitivity">灵敏度</label>
+      <input type="range" id="sensitivity" min="1" max="10" step="0.5" value="5">
+      <span class="setting-val" id="sensitivityVal">5.0</span>
+    </div>
+    <div class="setting-item">
+      <label for="threshold">达标值</label>
+      <input type="range" id="threshold" min="0" max="100" step="5" value="60">
+      <span class="setting-val" id="thresholdVal">60</span>
+    </div>
+  </section>
+
+  <section class="display" aria-live="polite">
+    <div class="ring" id="ring"></div>
+    <div class="ring-content">
+      <div class="score" id="score">0</div>
+      <div class="score-unit">dB</div>
+    </div>
+    <div class="status" id="status">准备就绪</div>
+  </section>
+
+  <canvas id="canvas" class="canvas"></canvas>
+
+  <section class="controls">
+    <button id="startBtn" class="btn btn-primary" type="button">▶ 开始检测</button>
+    <button id="fullscreenBtn" class="btn btn-secondary" type="button">⛶ 全屏显示</button>
+  </section>
+
+  <section class="info">
+    <h2 class="info-title">工具介绍</h2>
+    <p class="info-desc">课堂早读大声检测器是一款为提升学生朗读积极性而设计的可视化教学辅助工具。它通过实时捕捉环境音量，将声音转化为炫酷的视觉动画和数值反馈，直观地展示班级朗读的响亮程度。</p>
+    <div class="info-features">
+      <div class="feature"><span class="feature-icon">📈</span><h3>实时分贝监测</h3><p>精准捕捉声音变化，毫秒级响应</p></div>
+      <div class="feature"><span class="feature-icon">🎨</span><h3>炫酷视觉特效</h3><p>随音量律动的光圈与波形效果</p></div>
+      <div class="feature"><span class="feature-icon">💬</span><h3>智能语音反馈</h3><p>根据音量自动显示激励性评价语</p></div>
+      <div class="feature"><span class="feature-icon">⚙️</span><h3>自定义设置</h3><p>调节灵敏度和达标阈值适应环境</p></div>
+      <div class="feature"><span class="feature-icon">🔒</span><h3>隐私安全</h3><p>所有音频处理均在本地浏览器完成</p></div>
+    </div>
+    <p class="info-tip">使用提示：点击「开始检测」并允许麦克风权限，圆环将随声音大小缩放变色——蓝/青色表示声音较小，紫/橙色表示适中，红色表示声音洪亮达标。</p>
+  </section>
+</main>
+
+<script src="morning-reading-meter.js"></script>
+</body>
+</html>

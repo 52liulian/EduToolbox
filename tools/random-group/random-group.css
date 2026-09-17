@@ -1,0 +1,344 @@
+/* ============================================================================
+ * 随机分组 · random-group.css
+ * 仅包含本工具特有样式：组数步进器 / 分组卡片网格 / 彩色顶边与性别配色 /
+ *                       分组闪烁揭示动画 / 深色全屏投影
+ * 公共底座（双栏布局、面板、分段按钮、按钮、舞台）见 tool-common.css
+ * 高度策略：结果容器随组数自动撑开，仅 body 主滚动条；仅 stage 全屏固定视口
+ * ========================================================================== */
+
+/* ---------------------------------------------------------------------------
+ * 一、双栏布局窄屏回落
+ * ------------------------------------------------------------------------- */
+@media (max-width: 900px) {
+  #app .main { grid-template-columns: 1fr; }
+}
+
+/* 分段按钮占满设置卡片一行 */
+.seg-bar {
+  display: flex;
+  width: 100%;
+  margin-bottom: 12px;
+}
+.seg-bar .seg-btn { flex: 1; }
+
+/* 组数 / 每组人数步进器（公共底座未定义 .num-control） */
+.num-control {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.num-control input[type="number"] {
+  width: 78px;
+  text-align: center;
+  font-size: 16px;
+  font-weight: 700;
+}
+.setting-row .num-control { flex-shrink: 0; }
+
+/* ---------------------------------------------------------------------------
+ * 二、结果舞台
+ * ------------------------------------------------------------------------- */
+#stage .stage-inner {
+  min-height: 440px;
+  gap: 22px;
+}
+
+.stage-title { flex-shrink: 0; }
+
+/* 结果容器：覆盖公共 .result 的独立卡片样式，融入白色舞台 */
+#result {
+  width: 100%;
+  padding: 0;
+  background: transparent;
+  border: none;
+  box-shadow: none;
+}
+
+/* 初始 / 空提示 */
+#result .tip {
+  width: 100%;
+  text-align: center;
+  background: var(--card-bg-2);
+  border: 1.5px dashed var(--border-2);
+  border-left: none;
+  border-radius: var(--r);
+  padding: 26px 20px;
+}
+
+/* ---------------------------------------------------------------------------
+ * 三、分组卡片网格（.group-grid / .group-card 由 JS 生成，
+ *     卡片顶边颜色由 JS 以内联 border-top-color 写入，共 12 色循环）
+ * ------------------------------------------------------------------------- */
+.group-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 14px;
+  align-items: start;
+}
+
+.group-card {
+  padding: 16px 16px 18px;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-top: 4px solid var(--primary); /* 实际颜色由内联 border-top-color 覆盖 */
+  border-radius: var(--r);
+  box-shadow: var(--shadow-sm);
+  transition: opacity var(--t) var(--ease), box-shadow var(--t-fast) var(--ease);
+  animation: rg-card-in 0.45s var(--ease) both; /* 延迟由 JS 内联 animation-delay */
+}
+.group-card:hover { box-shadow: var(--shadow); }
+
+@keyframes rg-card-in {
+  from { opacity: 0; transform: translateY(14px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* 卡片头部：组名（彩色）+ 人数胶囊 */
+.group-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding-bottom: 10px;
+  border-bottom: 1px dashed var(--border);
+}
+.gname { font-size: 16px; font-weight: 800; }
+.gcount {
+  flex-shrink: 0;
+  padding: 2px 12px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-3);
+  background: var(--bg-soft);
+  border: 1px solid var(--border);
+  border-radius: var(--r-pill);
+}
+
+/* ---------------------------------------------------------------------------
+ * 四、成员标签（.member 由 JS 生成；.male / .female 性别配色，.seq 序号）
+ * ------------------------------------------------------------------------- */
+.member-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.member {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px 5px 6px;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--text-1);
+  background: var(--card-bg-2);
+  border: 1px solid var(--border);
+  border-radius: var(--r-pill);
+  animation: rg-member-in 0.35s var(--ease) both; /* 延迟由 JS 内联 */
+}
+
+/* 标签内小圆序号 */
+.member .seq {
+  display: inline-grid;
+  place-items: center;
+  width: 19px;
+  height: 19px;
+  flex-shrink: 0;
+  font-size: 11px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-3);
+  background: #fff;
+  border: 1px solid var(--border-2);
+  border-radius: 50%;
+}
+
+/* 性别配色（浅色态） */
+.member.male {
+  color: #2b62d9;
+  background: #eef4ff;
+  border-color: #cfe0ff;
+}
+.member.male .seq { color: #2b62d9; background: #fff; border-color: #b9d0ff; }
+
+.member.female {
+  color: #d6336c;
+  background: #fff0f5;
+  border-color: #ffd9e8;
+}
+.member.female .seq { color: #d6336c; background: #fff; border-color: #ffc2db; }
+
+@keyframes rg-member-in {
+  from { opacity: 0; transform: scale(0.8); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+/* ---------------------------------------------------------------------------
+ * 五、分组动画演示：未轮到的卡片处于 .flicker 占位闪烁态，
+ *     JS 每 180ms 揭一张，移除该类后恢复正常彩色卡片
+ * ------------------------------------------------------------------------- */
+.group-card.flicker {
+  opacity: 0.6;
+  border-top-color: var(--border-2) !important;
+  animation: rg-flicker 0.9s ease-in-out infinite alternate;
+}
+.group-card.flicker .gname { color: var(--text-3) !important; }
+.group-card.flicker .member {
+  color: var(--text-3);
+  background: var(--bg-soft);
+  border-color: var(--border);
+  animation: none;
+}
+.group-card.flicker .member .seq {
+  color: var(--text-3);
+  background: #fff;
+  border-color: var(--border-2);
+}
+
+@keyframes rg-flicker {
+  from { opacity: 0.45; }
+  to   { opacity: 0.85; }
+}
+
+/* ---------------------------------------------------------------------------
+ * 六、全屏投影（全屏元素是 stage 本身；深色大屏放大展示）
+ * ------------------------------------------------------------------------- */
+#stage:fullscreen,
+#stage:-webkit-full-screen {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  min-height: 100vh;
+  padding: 36px 44px;
+  border: none;
+  border-radius: 0;
+  overflow-y: auto; /* 组很多时全屏投影允许滚动查看全部小组 */
+  background:
+    radial-gradient(1000px 500px at 50% -10%, rgba(90, 141, 255, 0.2), transparent 62%),
+    linear-gradient(160deg, #15234d 0%, #0b1330 55%, #070d1f 100%);
+}
+
+#stage:fullscreen .stage-inner,
+#stage:-webkit-full-screen .stage-inner {
+  flex: 1;
+  width: 100%;
+  max-width: 1280px;
+  min-height: 0;
+  margin: 0 auto;
+  justify-content: center;
+  gap: 30px;
+}
+
+#stage:fullscreen .stage-title,
+#stage:-webkit-full-screen .stage-title {
+  font-size: clamp(26px, 3.4vw, 40px);
+  color: #fff;
+  text-shadow: 0 0 30px rgba(120, 160, 255, 0.5);
+}
+
+/* 全屏分组卡片：深色玻璃质感（顶边彩色仍由内联色控制） */
+#stage:fullscreen .group-grid,
+#stage:-webkit-full-screen .group-grid {
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+}
+#stage:fullscreen .group-card,
+#stage:-webkit-full-screen .group-card {
+  padding: 20px 20px 22px;
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.16);
+}
+#stage:fullscreen .group-title,
+#stage:-webkit-full-screen .group-title {
+  border-bottom-color: rgba(255, 255, 255, 0.14);
+}
+#stage:fullscreen .gcount,
+#stage:-webkit-full-screen .gcount {
+  color: rgba(255, 255, 255, 0.7);
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.2);
+  font-size: 13px;
+}
+
+/* 全屏成员标签：加大 + 深底性别配色 */
+#stage:fullscreen .member,
+#stage:-webkit-full-screen .member {
+  padding: 7px 16px 7px 8px;
+  font-size: 16px;
+  color: #fff;
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+#stage:fullscreen .member .seq,
+#stage:-webkit-full-screen .member .seq {
+  width: 22px;
+  height: 22px;
+  font-size: 12px;
+  color: #fff;
+  background: rgba(255, 255, 255, 0.14);
+  border-color: rgba(255, 255, 255, 0.22);
+}
+#stage:fullscreen .member.male,
+#stage:-webkit-full-screen .member.male {
+  color: #bcd4ff;
+  background: rgba(59, 130, 246, 0.22);
+  border-color: rgba(96, 165, 250, 0.4);
+}
+#stage:fullscreen .member.male .seq,
+#stage:-webkit-full-screen .member.male .seq {
+  color: #bcd4ff;
+  background: rgba(59, 130, 246, 0.3);
+  border-color: rgba(96, 165, 250, 0.45);
+}
+#stage:fullscreen .member.female,
+#stage:-webkit-full-screen .member.female {
+  color: #ffc2db;
+  background: rgba(236, 72, 153, 0.2);
+  border-color: rgba(244, 114, 182, 0.4);
+}
+#stage:fullscreen .member.female .seq,
+#stage:-webkit-full-screen .member.female .seq {
+  color: #ffc2db;
+  background: rgba(236, 72, 153, 0.28);
+  border-color: rgba(244, 114, 182, 0.45);
+}
+
+/* 全屏闪烁态适配深底 */
+#stage:fullscreen .group-card.flicker,
+#stage:-webkit-full-screen .group-card.flicker {
+  border-top-color: rgba(255, 255, 255, 0.2) !important;
+}
+#stage:fullscreen .group-card.flicker .member,
+#stage:-webkit-full-screen .group-card.flicker .member {
+  color: rgba(255, 255, 255, 0.5);
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
+#stage:fullscreen #result .tip,
+#stage:-webkit-full-screen #result .tip {
+  color: rgba(255, 255, 255, 0.55);
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+/* 全屏时退出按钮玻璃质感（JS 进入全屏后才显示） */
+#stage:fullscreen .stage-toolbar .icon-btn,
+#stage:-webkit-full-screen .stage-toolbar .icon-btn {
+  color: rgba(255, 255, 255, 0.9);
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.25);
+}
+#stage:fullscreen .stage-toolbar .icon-btn:hover,
+#stage:-webkit-full-screen .stage-toolbar .icon-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+/* ---------------------------------------------------------------------------
+ * 七、小屏微调
+ * ------------------------------------------------------------------------- */
+@media (max-width: 640px) {
+  #stage:fullscreen,
+  #stage:-webkit-full-screen { padding: 24px 18px; }
+}

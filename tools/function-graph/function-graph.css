@@ -1,0 +1,385 @@
+/* ============================================================================
+ * 函数绘图 · function-graph.css
+ * 仅包含本工具特有样式：双栏布局 / 函数行列表 / 颜色+启用+表达式输入 /
+ *                       范围设置 / 画布容器 / 工具栏 / 实时坐标 / 表达式提示
+ * 公共底座（reset、按钮、卡片、表单、seg-group、check-inline）见 tool-common.css
+ * 高度策略：画布固定 480px 高（CSS 像素），其余容器高度自动撑开；
+ *           仅 body 主滚动条；函数列表自然向下扩展
+ * ========================================================================== */
+
+/* ---------------------------------------------------------------------------
+ * 一、覆盖 .layout：本工具需要左侧固定栏 + 右侧主区
+ * ------------------------------------------------------------------------- */
+#app .layout,
+.layout {
+  grid-template-columns: 320px minmax(0, 1fr);
+  gap: 20px;
+  max-width: 1320px;
+}
+
+@media (max-width: 900px) {
+  #app .layout,
+  .layout { grid-template-columns: 1fr; }
+}
+
+/* ---------------------------------------------------------------------------
+ * 二、左侧设置卡片
+ * ------------------------------------------------------------------------- */
+.side-card {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 18px 18px 22px;
+  min-width: 0;
+}
+
+.card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 4px;
+}
+.card-head .card-title { margin-bottom: 0; }
+
+/* 模式切换按钮组在窄面板中自适应换行 */
+.field-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
+}
+.field-row > .field-label {
+  flex-shrink: 0;
+  margin-bottom: 0;
+  min-width: 64px;
+}
+.seg-group { flex-wrap: wrap; }
+
+/* 范围输入对：min/max + 中间分隔 */
+.range-pair {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex: 1;
+  min-width: 0;
+}
+.range-pair .num-input { flex: 1; min-width: 0; }
+.range-block .range-pair { flex: 1; }
+
+.num-input {
+  width: 100%;
+  padding: 8px 12px;
+  font-size: 13.5px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+.num-input.num-wide { max-width: 110px; }
+
+/* Y 自动模式时手动行隐藏（由 JS 控制 display） */
+#yManualRow { margin-bottom: 10px; }
+
+/* 显示选项复选框网格：两列布局 */
+.check-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 6px 12px;
+  margin-top: 4px;
+}
+.check-grid .check-inline { padding: 4px 0; }
+
+/* ---------------------------------------------------------------------------
+ * 三、函数行列表（动态生成）
+ * ------------------------------------------------------------------------- */
+.func-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.func-row {
+  display: grid;
+  grid-template-columns: 32px 24px 1fr auto;
+  grid-template-rows: auto auto;
+  align-items: center;
+  gap: 6px 8px;
+  padding: 10px 12px;
+  background: var(--card-bg-2);
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  transition: border-color var(--t-fast) var(--ease), background var(--t-fast) var(--ease);
+}
+.func-row.has-error {
+  border-color: #ffd4d4;
+  background: #fff5f5;
+}
+
+/* 颜色选择圆点 */
+.func-color {
+  width: 30px;
+  height: 30px;
+  padding: 2px;
+  border-radius: 50%;
+  border: 1.5px solid var(--border-2);
+  background: var(--card-bg);
+  cursor: pointer;
+  grid-row: 1;
+  grid-column: 1;
+}
+
+/* 启用复选 */
+.func-enable {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--primary);
+  cursor: pointer;
+  grid-row: 1;
+  grid-column: 2;
+}
+
+/* 表达式输入 */
+.func-expr {
+  grid-row: 1;
+  grid-column: 3;
+  padding: 7px 12px;
+  font-family: Consolas, Menlo, "Courier New", monospace;
+  font-size: 13.5px;
+  font-weight: 500;
+  background: var(--card-bg);
+  border: 1.5px solid var(--border);
+  border-radius: var(--r-sm);
+  transition: all var(--t-fast) var(--ease);
+  min-width: 0;
+}
+.func-expr:focus {
+  border-color: var(--primary);
+  background: #fff;
+  box-shadow: 0 0 0 3px rgba(59, 110, 246, 0.12);
+}
+.func-row.has-error .func-expr {
+  border-color: #fca5a5;
+  background: #fff;
+}
+.func-row.has-error .func-expr:focus {
+  border-color: var(--danger);
+  box-shadow: 0 0 0 3px rgba(239, 91, 91, 0.16);
+}
+
+/* 删除按钮 */
+.func-del {
+  grid-row: 1;
+  grid-column: 4;
+  padding: 6px 10px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-3);
+  background: var(--card-bg);
+  border: 1.5px solid var(--border);
+  border-radius: var(--r-pill);
+  cursor: pointer;
+  transition: all var(--t-fast) var(--ease);
+  white-space: nowrap;
+}
+.func-del:hover {
+  color: var(--danger);
+  border-color: #ffd4d4;
+  background: #fff5f5;
+}
+
+/* 错误提示行 */
+.func-error {
+  grid-row: 2;
+  grid-column: 1 / -1;
+  font-size: 12.5px;
+  color: var(--danger);
+  line-height: 1.5;
+  word-break: break-word;
+}
+.func-error:empty { display: none; }
+
+/* 添加函数按钮：占满一行 */
+.btn-add {
+  width: 100%;
+  padding: 10px 16px;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--primary);
+  background: var(--primary-soft);
+  border: 1.5px dashed var(--primary-soft-2);
+  border-radius: var(--r-sm);
+  cursor: pointer;
+  transition: all var(--t-fast) var(--ease);
+}
+.btn-add:hover {
+  background: var(--primary-soft-2);
+  border-color: var(--primary);
+  transform: translateY(-1px);
+}
+.btn-add:disabled {
+  color: var(--text-3);
+  background: var(--bg-soft);
+  border-color: var(--border);
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* ---------------------------------------------------------------------------
+ * 四、右侧画布主区
+ * ------------------------------------------------------------------------- */
+.graph-card {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 18px 20px 22px;
+  min-width: 0;
+}
+
+.graph-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  flex-wrap: wrap;
+  padding: 12px 14px;
+  background: var(--card-bg-2);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+}
+.graph-toolbar .tool-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.graph-toolbar .btn-small {
+  padding: 7px 14px;
+  font-size: 12.5px;
+}
+
+.range-info {
+  font-size: 12.5px;
+  color: var(--text-3);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+/* 画布容器：白底 + 投影 + 圆角 */
+.canvas-wrap {
+  position: relative;
+  width: 100%;
+  height: 480px;
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+}
+#graphCanvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  cursor: grab;
+  touch-action: none;
+}
+#graphCanvas.dragging { cursor: grabbing; }
+
+/* 画布下方提示 */
+.canvas-wrap .hint {
+  position: absolute;
+  left: 12px;
+  bottom: 10px;
+  font-size: 12px;
+  color: var(--text-3);
+  background: rgba(255, 255, 255, 0.78);
+  padding: 4px 10px;
+  border-radius: var(--r-pill);
+  pointer-events: none;
+  -webkit-backdrop-filter: blur(4px);
+  backdrop-filter: blur(4px);
+}
+
+/* 实时坐标提示（鼠标在画布上时显示） */
+.live-coord {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  padding: 5px 12px;
+  font-family: Consolas, Menlo, monospace;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--text-1);
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid var(--border);
+  border-radius: var(--r-pill);
+  pointer-events: none;
+  -webkit-backdrop-filter: blur(4px);
+  backdrop-filter: blur(4px);
+  box-shadow: var(--shadow-sm);
+}
+
+/* ---------------------------------------------------------------------------
+ * 五、表达式提示卡片
+ * ------------------------------------------------------------------------- */
+.expr-hints {
+  padding: 12px 16px;
+  font-size: 13px;
+  line-height: 1.75;
+  color: var(--text-2);
+  background: var(--bg-soft);
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+}
+.expr-hints strong { color: var(--text-1); font-weight: 700; }
+.expr-hints code {
+  display: inline-block;
+  margin: 0 2px;
+  padding: 1px 7px;
+  font-family: Consolas, Menlo, monospace;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--primary);
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+}
+
+/* ---------------------------------------------------------------------------
+ * 六、全屏投影
+ * ------------------------------------------------------------------------- */
+.graph-card:fullscreen,
+.graph-card:-webkit-full-screen {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  padding: 24px;
+  background: var(--bg);
+  border-radius: 0;
+}
+.graph-card:fullscreen .canvas-wrap,
+.graph-card:-webkit-full-screen .canvas-wrap {
+  flex: 1;
+  height: auto;
+  min-height: 60vh;
+}
+
+/* ---------------------------------------------------------------------------
+ * 七、小屏微调
+ * ------------------------------------------------------------------------- */
+@media (max-width: 640px) {
+  .side-card, .graph-card { padding: 14px; }
+  .canvas-wrap { height: 360px; }
+  .func-row {
+    grid-template-columns: 30px 18px 1fr;
+  }
+  .func-del {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    justify-self: start;
+    margin-top: 4px;
+  }
+  .func-error { grid-row: 3; }
+  .check-grid { grid-template-columns: 1fr; }
+  .range-info { width: 100%; text-align: left; }
+}

@@ -1,0 +1,34 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>看拼音写词语</title>
+<link rel="stylesheet" href="pinyin-worksheet.css">
+<link rel="stylesheet" href="../../assets/css/tool-common.css">
+</head>
+<body>
+<div class="container">
+  <h2>📝 看拼音写词语</h2>
+  <div class="ctrl">
+    <textarea id="words" placeholder="每行一个词语…">中国
+学习
+老师
+同学
+学校</textarea>
+    <div class="opts">
+      <label><input type="checkbox" id="showHan" checked> 显示汉字</label>
+      <label><input type="checkbox" id="showPinyin" checked> 显示拼音</label>
+      <label>列数 <input type="number" id="cols" min="1" max="6" value="3"></label>
+    </div>
+    <div class="btns">
+      <button class="btn" id="gen">生成练习</button>
+      <button class="btn ghost" id="print">打印</button>
+    </div>
+  </div>
+  <div class="sheet" id="sheet"></div>
+</div>
+<script src="../../assets/vendor/pinyin-pro.min.js"></script>
+<script src="pinyin-worksheet.js"></script>
+</body>
+</html>

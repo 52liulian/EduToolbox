@@ -1,0 +1,197 @@
+/* ============================================================================
+ * 学生姓名贴 · name-sticker.css
+ * 仅包含本工具特有样式：控制面板 / 参数选项 / 姓名贴网格 / 单个姓名贴卡
+ * 公共底座（reset、按钮、textarea、input）见 tool-common.css
+ * 高度策略：所有容器高度自动撑开，仅 body 主滚动条
+ * ========================================================================== */
+
+/* ---------------------------------------------------------------------------
+ * 一、容器与标题
+ * ------------------------------------------------------------------------- */
+.container {
+  max-width: 1100px;
+  padding: 28px 24px 56px;
+}
+
+.container > h2 {
+  font-size: clamp(20px, 2.6vw, 26px);
+  font-weight: 800;
+  color: var(--text-1);
+  margin-bottom: 18px;
+  text-align: center;
+}
+
+/* ---------------------------------------------------------------------------
+ * 二、控制面板
+ * ------------------------------------------------------------------------- */
+.ctrl {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 18px 20px;
+  margin-bottom: 22px;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  box-shadow: var(--shadow-sm);
+}
+
+/* 姓名输入域 */
+#names {
+  width: 100%;
+  min-height: 110px;
+  padding: 10px 14px;
+  font-size: 14px;
+  line-height: 1.7;
+  resize: vertical;
+  font-family: -apple-system, "PingFang SC", "Microsoft YaHei", monospace;
+}
+
+/* 参数选项行 */
+.opts {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  flex-wrap: wrap;
+}
+.opts label {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--text-2);
+}
+.opts input[type="number"] {
+  width: 76px;
+  padding: 7px 10px;
+  font-size: 13.5px;
+  font-weight: 700;
+  text-align: center;
+}
+.opts input[type="color"] {
+  width: 38px;
+  height: 30px;
+  padding: 2px;
+}
+
+/* 按钮行 */
+.btns {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.btns .btn {
+  padding: 10px 22px;
+  font-size: 14px;
+}
+.btns .btn#gen {
+  color: #fff;
+  background: var(--primary-grad);
+  border-color: transparent;
+  box-shadow: var(--shadow-primary);
+}
+.btns .btn#gen:hover {
+  filter: brightness(1.06);
+  transform: translateY(-1px);
+}
+.btns .btn.ghost {
+  color: var(--text-2);
+  background: var(--card-bg);
+  border: 1.5px solid var(--border);
+}
+.btns .btn.ghost:hover {
+  color: var(--primary);
+  border-color: var(--primary-soft-2);
+  background: var(--primary-soft);
+}
+
+/* ---------------------------------------------------------------------------
+ * 三、姓名贴生成区
+ * ------------------------------------------------------------------------- */
+.sheet {
+  min-height: 200px;
+  padding: 22px 20px;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  box-shadow: var(--shadow-sm);
+}
+.sheet:empty::before {
+  content: "点击「生成姓名贴」查看效果";
+  display: block;
+  text-align: center;
+  color: var(--text-3);
+  font-size: 14px;
+  padding: 40px 0;
+}
+.sheet > p {
+  text-align: center;
+  color: var(--text-3);
+  font-size: 14px;
+  padding: 40px 0;
+}
+
+/* 网格（JS 内联设置 grid-template-columns） */
+.grid {
+  display: grid;
+  gap: 14px;
+  width: 100%;
+}
+
+/* 单个姓名贴：圆角虚线边框 + 居中文字 */
+.sticker {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 18px 12px;
+  min-height: 72px;
+  font-weight: 700;
+  text-align: center;
+  color: var(--text-1);
+  background: var(--card-bg-2);
+  border: 2px dashed #3b82f6; /* 默认色，被 JS 内联覆盖 */
+  border-radius: var(--r);
+  word-break: break-all;
+  line-height: 1.4;
+  transition: transform var(--t-fast) var(--ease), box-shadow var(--t-fast) var(--ease);
+}
+.sticker:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow);
+}
+
+/* ---------------------------------------------------------------------------
+ * 四、小屏微调
+ * ------------------------------------------------------------------------- */
+@media (max-width: 640px) {
+  .container { padding: 18px 14px 36px; }
+  .ctrl { padding: 14px; }
+  .opts { gap: 12px; }
+  .opts label { font-size: 13px; }
+  .btns .btn { flex: 1; }
+  .sheet { padding: 14px 12px; }
+  .grid { gap: 10px; }
+}
+
+/* ---------------------------------------------------------------------------
+ * 五、打印：仅打印姓名贴网格，便于剪贴使用
+ * ------------------------------------------------------------------------- */
+@media print {
+  body { background: #fff !important; }
+  .container > h2, .ctrl { display: none !important; }
+  .container { max-width: none; padding: 0; }
+  .sheet {
+    border: none;
+    box-shadow: none;
+    padding: 0;
+    background: none;
+    min-height: 0;
+  }
+  .grid { gap: 8mm; }
+  .sticker {
+    background: #fff;
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+}

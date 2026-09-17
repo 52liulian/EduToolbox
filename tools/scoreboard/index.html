@@ -1,0 +1,45 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>积分板 | EduToolbox · 课堂积分管理</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%8E%93%3C/text%3E%3C/svg%3E">
+<link rel="stylesheet" href="scoreboard.css">
+<link rel="stylesheet" href="../../assets/css/tool-common.css">
+</head>
+<body>
+
+<main class="container">
+  <!-- 工具介绍 -->
+  <header class="hero">
+    <h1 class="title">🏆 课堂积分板</h1>
+    <p class="subtitle">支持学生或小组加分与扣分，实时展示排行榜，适合课堂竞赛与互动激励。前三名自动高亮（金/银/铜），数据本地保存。</p>
+  </header>
+
+  <!-- 顶部操作栏：添加小组 + 批量操作 -->
+  <section class="toolbar">
+    <div class="add-group">
+      <input type="text" id="teamName" placeholder="输入小组名称，如 飞虎队" maxlength="12" autocomplete="off">
+      <button type="button" class="btn btn-primary" id="addBtn">+ 添加小组</button>
+    </div>
+    <div class="bulk-actions">
+      <button type="button" class="btn btn-ghost" id="resetBtn" title="所有小组分数归零">↺ 重置分数</button>
+      <button type="button" class="btn btn-danger" id="clearBtn" title="删除所有小组">🗑 清空所有</button>
+      <button type="button" class="btn btn-ghost" id="fullscreenBtn" title="全屏展示">⛶ 全屏</button>
+    </div>
+  </section>
+
+  <!-- 队伍卡片网格 -->
+  <section class="board" id="board" aria-label="积分榜"></section>
+
+  <!-- 空状态 -->
+  <div class="empty" id="empty" hidden>
+    <div class="empty-icon">🏆</div>
+    <p class="empty-text">暂无小组，点击「+ 添加小组」开始</p>
+  </div>
+</main>
+
+<script src="scoreboard.js"></script>
+</body>
+</html>

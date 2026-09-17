@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>秒表 | EduToolbox · 课堂秒表计时</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%8E%93%3C/text%3E%3C/svg%3E">
+<link rel="stylesheet" href="stopwatch.css">
+<link rel="stylesheet" href="../../assets/css/tool-common.css">
+</head>
+<body>
+
+<!-- 主体秒表区：左侧大字显示 + 右侧计次列表 -->
+<main class="container">
+  <!-- 时间显示与控制 -->
+  <section class="stage" id="stage">
+    <div class="time-display" id="display" aria-live="polite">
+      <span class="time-main">00:00</span><span class="time-ms">.000</span>
+    </div>
+    <div class="status" id="status">准备就绪</div>
+
+    <div class="controls">
+      <button class="btn btn-start" id="startBtn" type="button">开始</button>
+      <button class="btn btn-lap" id="lapBtn" type="button" disabled>🚩 计次</button>
+      <button class="btn btn-reset" id="resetBtn" type="button">↺ 重置</button>
+    </div>
+
+    <div class="key-hint">
+      <kbd>Space</kbd> 开始/暂停 · <kbd>L</kbd> 计次 · <kbd>R</kbd> 重置
+    </div>
+  </section>
+
+  <!-- 计次记录列表 -->
+  <aside class="laps-panel" id="lapsPanel">
+    <div class="laps-header">
+      <h3 class="laps-title">计次记录</h3>
+      <button class="iconbtn" id="exportBtn" type="button" disabled title="导出为 CSV 文件">⬇ 导出 CSV</button>
+    </div>
+    <ul class="laps-list" id="lapsList">
+      <li class="laps-empty">暂无计次记录</li>
+    </ul>
+  </aside>
+</main>
+
+<script src="stopwatch.js"></script>
+</body>
+</html>

@@ -1,0 +1,94 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>公式预览 | EduToolbox · 数理公式计算</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%8E%93%3C/text%3E%3C/svg%3E">
+<link rel="stylesheet" href="../../assets/vendor/katex/katex.min.css">
+<link rel="stylesheet" href="../../assets/css/tool-common.css">
+<link rel="stylesheet" href="formula-preview.css">
+<link rel="stylesheet" href="../../assets/css/tool-common.css">
+</head>
+<body>
+
+<!-- 主体容器 -->
+<main class="container">
+  <p class="tool-sub">从左侧选择公式模板，拖拽滑块或输入参数实时计算并重渲染；一次函数、二次函数等模板附带函数图像联动展示，结果可一键复制 LaTeX 或保存截图。</p>
+
+  <div class="layout">
+    <!-- 左侧：模板库 -->
+    <aside class="card side-card">
+      <div class="side-head">
+        <button type="button" class="btn btn-primary btn-block" id="btnBrowse" title="从模板库选择公式">📚 从模板库选择公式</button>
+      </div>
+      <div class="side-search">
+        <input type="text" id="searchInput" placeholder="🔍 搜索公式名称…" spellcheck="false">
+      </div>
+      <nav class="tpl-nav" id="tplNav"><!-- 模板按钮由脚本生成 --></nav>
+    </aside>
+
+    <!-- 右侧：预览与参数 -->
+    <section class="card main-card">
+      <div class="main-head">
+        <h3 class="tpl-name" id="tplName">请选择公式</h3>
+        <div class="view-tabs">
+          <button type="button" class="tab-btn active" data-view="image">图像预览</button>
+          <button type="button" class="tab-btn" data-view="text">文字预览</button>
+        </div>
+      </div>
+
+      <div class="formula-box">
+        <div id="formulaRender" class="formula-render"></div>
+        <div id="formulaText" class="formula-text" hidden></div>
+      </div>
+
+      <div class="params-head">
+        <span class="params-title">参数设置</span>
+        <span class="params-current" id="paramsCurrent"></span>
+      </div>
+      <div class="params" id="paramsBox"><!-- 参数输入由脚本生成 --></div>
+
+      <div class="result-row">
+        <span class="result-label">📊 计算结果</span>
+        <span class="result-value" id="resultValue">—</span>
+      </div>
+
+      <div class="graph-wrap" id="graphWrap">
+        <div class="graph-head">
+          <span class="graph-title" id="graphTitle">📈 函数图像</span>
+          <div class="graph-range">
+            <span>X 轴范围：</span>
+            <input type="number" class="num-mini" id="gxMin" value="-10" step="any">
+            <span class="range-sep">至</span>
+            <input type="number" class="num-mini" id="gxMax" value="10" step="any">
+            <span class="range-divider">|</span>
+            <span>Y 轴范围：</span>
+            <input type="number" class="num-mini" id="gyMin" value="-10" step="any">
+            <span class="range-sep">至</span>
+            <input type="number" class="num-mini" id="gyMax" value="10" step="any">
+          </div>
+        </div>
+        <canvas id="miniCanvas"></canvas>
+      </div>
+
+      <div class="actions">
+        <button type="button" class="btn btn-primary" id="btnRerender" title="重新渲染公式">🔄 重新渲染</button>
+        <button type="button" class="btn" id="btnScreenshot" title="保存当前公式为 PNG">📸 保存截图</button>
+        <button type="button" class="btn" id="btnCopyTex" title="复制代入数值后的 LaTeX">📋 复制 LaTeX</button>
+      </div>
+
+      <div class="op-hint">
+        <strong>操作提示：</strong>
+        1. 点击上方 <strong>“从模板库选择公式”</strong> 浏览并载入不同学科的经典数学与物理公式；
+        2. 选择公式后系统自动提取参数，可拖拽滑块或在右侧输入框自定义参数值；
+        3. 右侧面板将实时呈现代入参数后的公式排版，并动态绘制函数图像。
+      </div>
+    </section>
+  </div>
+</main>
+
+<script src="../../assets/vendor/katex/katex.min.js"></script>
+<script src="formula-preview.js"></script>
+</body>
+</html>

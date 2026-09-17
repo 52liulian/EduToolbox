@@ -1,0 +1,434 @@
+/* ============================================================================
+ * 高考倒计时 · gaokao-countdown.css
+ * 仅包含本工具特有样式：全屏舞台 / 倒计时数字 / 寄语 / 设置面板 / 主题切换
+ * 公共底座（reset、按钮、表单）见 tool-common.css
+ * 高度策略：body 全屏铺开（min-height:100vh），主舞台自然居中；
+ *           设置面板使用 max-height:86vh + overflow-y:auto
+ * ========================================================================== */
+
+/* ---------------------------------------------------------------------------
+ * 一、基础与布局：沉浸式倒计时，body 自然撑开，不强制视口高度
+ * ------------------------------------------------------------------------- */
+html, body { height: auto; min-height: 100%; }
+
+body {
+  padding: 80px 24px 40px;
+  overflow-x: hidden;
+  background:
+    radial-gradient(1200px 600px at 50% 0%, rgba(59, 110, 246, 0.18), transparent 65%),
+    radial-gradient(900px 500px at 0% 100%, rgba(91, 139, 255, 0.12), transparent 60%),
+    linear-gradient(160deg, #0d1b3d 0%, #0a1430 50%, #050a1f 100%);
+  color: #fff;
+  transition: background 0.4s var(--ease);
+}
+
+/* ---------------------------------------------------------------------------
+ * 二、右上角工具栏（覆盖公共 .toolbar 内联流式布局）
+ * ------------------------------------------------------------------------- */
+.toolbar {
+  position: fixed;
+  top: 18px;
+  right: 18px;
+  z-index: 50;
+  display: flex;
+  gap: 10px;
+  padding: 0;
+  margin: 0;
+  background: none;
+  border: none;
+  box-shadow: none;
+}
+
+.tool-btn {
+  padding: 8px 16px;
+  font-size: 13px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.92);
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  border-radius: var(--r-pill);
+  cursor: pointer;
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  transition: all var(--t-fast) var(--ease);
+}
+.tool-btn:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.4);
+  transform: translateY(-1px);
+}
+
+/* ---------------------------------------------------------------------------
+ * 三、主舞台区（覆盖公共 .stage 卡片样式，改为沉浸式居中容器）
+ * ------------------------------------------------------------------------- */
+.stage {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 28px;
+  width: 100%;
+  max-width: 1100px;
+  min-height: auto;
+  padding: 40px 20px;
+  background: none;
+  border: none;
+  box-shadow: none;
+  border-radius: 0;
+  text-align: center;
+}
+
+.countdown-title {
+  font-size: clamp(20px, 2.6vw, 28px);
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.86);
+  letter-spacing: 0.04em;
+  text-shadow: 0 2px 16px rgba(0, 0, 0, 0.3);
+}
+
+/* ---------------------------------------------------------------------------
+ * 四、倒计时数字组（天 / 时 / 分 / 秒）
+ * ------------------------------------------------------------------------- */
+.countdown-display {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(8px, 1.5vw, 20px);
+  flex-wrap: wrap;
+}
+
+.time-block {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 6px;
+  padding: 14px 18px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: var(--r);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+}
+
+.time-value {
+  font-size: clamp(40px, 7vw, 80px);
+  font-weight: 900;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+  color: #ffffff;
+  line-height: 1;
+  min-width: 1.6em;
+  text-align: center;
+  text-shadow: 0 0 24px rgba(255, 255, 255, 0.35),
+               0 2px 8px rgba(0, 0, 0, 0.4);
+}
+
+/* 天数（三位数）略放大，用醒目金色 */
+.days-value {
+  font-size: clamp(48px, 8.5vw, 96px);
+  color: #ffd34d;
+  text-shadow: 0 0 28px rgba(255, 196, 64, 0.6),
+               0 2px 8px rgba(0, 0, 0, 0.4);
+}
+
+.time-label {
+  font-size: clamp(13px, 1.6vw, 18px);
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.time-colon {
+  font-size: clamp(28px, 5vw, 56px);
+  font-weight: 900;
+  color: rgba(255, 255, 255, 0.5);
+  line-height: 1;
+  align-self: center;
+  padding: 0 2px;
+  animation: gk-blink 1s steps(2, end) infinite;
+}
+
+@keyframes gk-blink {
+  50% { opacity: 0.35; }
+}
+
+/* ---------------------------------------------------------------------------
+ * 五、寄语与目标日期
+ * ------------------------------------------------------------------------- */
+.slogan {
+  font-size: clamp(15px, 2vw, 20px);
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.92);
+  letter-spacing: 0.08em;
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.25);
+  max-width: 760px;
+}
+
+.target-date {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.55);
+  letter-spacing: 0.04em;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------------------------------------------------------------------------
+ * 六、设置面板（覆盖公共 .settings-panel，改为右侧抽屉式弹层）
+ * ------------------------------------------------------------------------- */
+.settings-panel {
+  position: fixed;
+  top: 50%;
+  right: 24px;
+  transform: translateY(-50%);
+  z-index: 200;
+  display: flex;
+  flex-direction: column;
+  width: 360px;
+  max-width: calc(100vw - 48px);
+  max-height: 86vh;
+  overflow-y: auto;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow-lg);
+  color: var(--text-1);
+  animation: gk-panel-in 0.24s var(--ease);
+}
+.settings-panel[hidden] { display: none; }
+
+@keyframes gk-panel-in {
+  from { opacity: 0; transform: translate(20px, -50%); }
+  to   { opacity: 1; transform: translate(0, -50%); }
+}
+
+.settings-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 16px 20px;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text-1);
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  background: var(--card-bg);
+  z-index: 2;
+}
+
+.close-btn {
+  width: 30px;
+  height: 30px;
+  font-size: 14px;
+  color: var(--text-3);
+  border-radius: 50%;
+  background: var(--bg-soft);
+  cursor: pointer;
+  transition: all var(--t-fast) var(--ease);
+}
+.close-btn:hover {
+  color: var(--danger);
+  background: #fff5f5;
+}
+
+.settings-body {
+  padding: 18px 20px 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.form-row {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 0;
+}
+.form-row > label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-2);
+}
+.form-row input[type="text"] {
+  width: 100%;
+  padding: 9px 12px;
+  font-size: 13.5px;
+}
+
+/* 年份切换 / 主题切换：按钮组单选 */
+.year-switch,
+.theme-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.year-btn,
+.theme-btn {
+  padding: 7px 14px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-2);
+  background: var(--card-bg);
+  border: 1.5px solid var(--border);
+  border-radius: var(--r-pill);
+  cursor: pointer;
+  transition: all var(--t-fast) var(--ease);
+  white-space: nowrap;
+}
+.year-btn:hover,
+.theme-btn:hover {
+  color: var(--primary);
+  border-color: var(--primary-soft-2);
+  background: var(--primary-soft);
+}
+.year-btn.active,
+.theme-btn.active {
+  color: #fff;
+  background: var(--primary-grad);
+  border-color: transparent;
+  box-shadow: var(--shadow-primary);
+}
+
+.form-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 6px;
+}
+.action-btn {
+  flex: 1;
+  padding: 10px 16px;
+  font-size: 13.5px;
+  font-weight: 600;
+  border-radius: var(--r-pill);
+  cursor: pointer;
+  transition: all var(--t-fast) var(--ease);
+}
+.action-btn.primary {
+  color: #fff;
+  background: var(--primary-grad);
+  border: 1.5px solid transparent;
+  box-shadow: var(--shadow-primary);
+}
+.action-btn.primary:hover { filter: brightness(1.06); transform: translateY(-1px); }
+.action-btn.secondary {
+  color: var(--text-2);
+  background: var(--card-bg);
+  border: 1.5px solid var(--border);
+}
+.action-btn.secondary:hover {
+  color: var(--primary);
+  border-color: var(--primary-soft-2);
+  background: var(--primary-soft);
+}
+
+/* 设置面板背景遮罩 */
+.settings-mask {
+  position: fixed;
+  inset: 0;
+  z-index: 150;
+  background: rgba(20, 28, 48, 0.5);
+  -webkit-backdrop-filter: blur(3px);
+  backdrop-filter: blur(3px);
+  animation: gk-mask-in 0.2s var(--ease);
+}
+.settings-mask[hidden] { display: none; }
+
+@keyframes gk-mask-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* ---------------------------------------------------------------------------
+ * 七、主题切换：data-theme 属性挂在 <html> 上
+ * ------------------------------------------------------------------------- */
+html[data-theme="gold"] body {
+  background:
+    radial-gradient(1200px 600px at 50% 0%, rgba(255, 196, 64, 0.22), transparent 65%),
+    radial-gradient(900px 500px at 0% 100%, rgba(255, 165, 0, 0.14), transparent 60%),
+    linear-gradient(160deg, #2a1d04 0%, #1a1303 50%, #0d0802 100%);
+}
+html[data-theme="gold"] .days-value {
+  color: #ffd34d;
+  text-shadow: 0 0 28px rgba(255, 196, 64, 0.6);
+}
+
+html[data-theme="crimson"] body {
+  background:
+    radial-gradient(1200px 600px at 50% 0%, rgba(239, 68, 68, 0.22), transparent 65%),
+    radial-gradient(900px 500px at 0% 100%, rgba(220, 38, 38, 0.14), transparent 60%),
+    linear-gradient(160deg, #2a0606 0%, #1a0303 50%, #0d0101 100%);
+}
+html[data-theme="crimson"] .days-value {
+  color: #ff6b6b;
+  text-shadow: 0 0 28px rgba(239, 68, 68, 0.6);
+}
+
+html[data-theme="royal"] body {
+  background:
+    radial-gradient(1200px 600px at 50% 0%, rgba(147, 51, 234, 0.22), transparent 65%),
+    radial-gradient(900px 500px at 0% 100%, rgba(109, 40, 217, 0.14), transparent 60%),
+    linear-gradient(160deg, #1a0a2e 0%, #0f0420 50%, #070115 100%);
+}
+html[data-theme="royal"] .days-value {
+  color: #c084fc;
+  text-shadow: 0 0 28px rgba(147, 51, 234, 0.6);
+}
+
+html[data-theme="midnight"] body {
+  background:
+    radial-gradient(1200px 600px at 50% 0%, rgba(255, 255, 255, 0.06), transparent 65%),
+    linear-gradient(160deg, #000000 0%, #0a0a0a 50%, #000000 100%);
+}
+html[data-theme="midnight"] .days-value {
+  color: #ffffff;
+  text-shadow: 0 0 28px rgba(255, 255, 255, 0.5);
+}
+
+/* ---------------------------------------------------------------------------
+ * 八、全屏投影（全屏元素是 html 自身；文字铺满视口）
+ * ------------------------------------------------------------------------- */
+html:fullscreen,
+html:-webkit-full-screen {
+  background:
+    radial-gradient(1200px 600px at 50% 0%, rgba(59, 110, 246, 0.18), transparent 65%),
+    linear-gradient(160deg, #0d1b3d 0%, #0a1430 50%, #050a1f 100%);
+}
+html:fullscreen body,
+html:-webkit-full-screen body {
+  padding: 24px;
+}
+
+html:fullscreen .stage,
+html:-webkit-full-screen .stage {
+  min-height: 100vh;
+  justify-content: center;
+}
+html:fullscreen .time-value,
+html:-webkit-full-screen .time-value {
+  font-size: clamp(56px, 9vw, 120px);
+}
+html:fullscreen .days-value,
+html:-webkit-full-screen .days-value {
+  font-size: clamp(64px, 11vw, 144px);
+}
+
+/* ---------------------------------------------------------------------------
+ * 九、小屏微调
+ * ------------------------------------------------------------------------- */
+@media (max-width: 640px) {
+  body { padding: 70px 14px 28px; }
+  .toolbar { top: 12px; right: 12px; gap: 6px; }
+  .tool-btn { padding: 7px 12px; font-size: 12px; }
+  .stage { gap: 18px; padding: 20px 8px; }
+  .time-block { padding: 10px 12px; }
+  .time-colon { display: none; }
+  .settings-panel {
+    right: 8px;
+    left: 8px;
+    width: auto;
+    max-width: none;
+  }
+}

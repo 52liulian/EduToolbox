@@ -1,0 +1,101 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>在线奖状生成器</title>
+<link rel="stylesheet" href="certificate-generator.css">
+<link rel="stylesheet" href="../../assets/css/tool-common.css">
+</head>
+<body>
+<div class="app">
+  <div class="form-panel">
+    <h2>🏆 奖状生成器</h2>
+    <p class="sub">多种模板 · 自定义内容 · 一键下载</p>
+
+    <div class="field">
+      <label>模板</label>
+      <div class="template-grid">
+        <div class="tpl active" data-tpl="default"><span>默认</span></div>
+        <div class="tpl" data-tpl="award"><span>获奖</span></div>
+        <div class="tpl" data-tpl="honor"><span>荣誉</span></div>
+        <div class="tpl" data-tpl="kid"><span>儿童</span></div>
+        <div class="tpl" data-tpl="heart"><span>爱心</span></div>
+        <div class="tpl" data-tpl="hire"><span>聘书</span></div>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>学生姓名</label>
+      <input type="text" id="fName" value="张三">
+    </div>
+
+    <div class="row">
+      <div class="field">
+        <label>学年度</label>
+        <select id="fYear"><option>2024-2025</option><option selected>2025-2026</option></select>
+      </div>
+      <div class="field">
+        <label>学期</label>
+        <select id="fSem"><option>一</option><option>二</option></select>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>获奖原因</label>
+      <input type="text" id="fReason" value="表现优秀">
+    </div>
+
+    <div class="field">
+      <label>奖项名称</label>
+      <input type="text" id="fAward" value="三好学生">
+    </div>
+
+    <div class="field">
+      <label>颁发单位</label>
+      <input type="text" id="fOrg" value="XX学校">
+    </div>
+
+    <div class="field">
+      <label>印章文字</label>
+      <input type="text" id="fSeal" value="教务处" placeholder="不填则不显示印章">
+    </div>
+
+    <div class="actions">
+      <button class="btn btn-primary" id="download">📥 下载 PNG</button>
+      <button class="btn btn-ghost" id="print">🖨️ 打印</button>
+    </div>
+  </div>
+
+  <div class="preview-panel">
+    <div id="cert" class="cert tpl-default">
+      <div class="cert-border">
+        <div class="cert-inner">
+          <div class="cert-title">奖 状</div>
+          <div class="cert-body">
+            <span class="c-name" id="pName">张三</span>
+            <span class="c-text">同学：</span><br>
+            <span class="c-text">在</span>
+            <span class="c-year" id="pYear">2025-2026</span>
+            <span class="c-text">学年度第</span>
+            <span class="c-sem" id="pSem">一</span>
+            <span class="c-text">学期中，</span>
+            <span class="c-reason" id="pReason">表现优秀</span>
+            <span class="c-text">，被评为：</span><br>
+            <span class="c-award" id="pAward">三好学生</span><br>
+            <span class="c-text">特发此状，以资鼓励。</span>
+          </div>
+          <div class="cert-footer">
+            <span class="c-org" id="pOrg">XX学校</span>
+            <span class="c-date" id="pDate"></span>
+          </div>
+          <div class="seal" id="seal"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="../../assets/vendor/html2canvas.min.js"></script>
+<script src="certificate-generator.js"></script>
+</body>
+</html>

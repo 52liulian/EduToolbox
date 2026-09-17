@@ -1,0 +1,154 @@
+/* ============================================================================
+ * 文本差异对比 · text-diff.css
+ * 仅包含本工具特有样式：模式切换 / 双栏输入 / 图例 / 差异结果高亮
+ * 公共底座（容器、按钮、textarea、mode-btn）见 tool-common.css
+ * 高度策略：所有容器高度自动撑开，仅 body 主滚动条
+ * ========================================================================== */
+
+/* ---------------------------------------------------------------------------
+ * 一、模式切换按钮组
+ * ------------------------------------------------------------------------- */
+.diff-mode {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 18px;
+  padding: 5px;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--r-pill);
+  box-shadow: var(--shadow-sm);
+}
+
+.diff-mode .mode-btn {
+  padding: 8px 18px;
+  font-size: 13.5px;
+}
+
+/* ---------------------------------------------------------------------------
+ * 二、双栏输入：原文本 / 新文本 左右并排
+ * ------------------------------------------------------------------------- */
+.inputs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.input-col {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.input-col > label {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--text-2);
+}
+
+.input-col textarea {
+  min-height: 220px;
+  line-height: 1.7;
+  resize: vertical;
+}
+
+/* ---------------------------------------------------------------------------
+ * 三、操作按钮组：居中布局（覆盖公共 .actions 的居中行为）
+ * ------------------------------------------------------------------------- */
+#app .actions {
+  justify-content: center;
+  margin: 18px 0;
+}
+
+/* ---------------------------------------------------------------------------
+ * 四、图例：增/删/相同三色圆点说明
+ * ------------------------------------------------------------------------- */
+.legend {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 22px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+  font-size: 13px;
+  color: var(--text-2);
+}
+
+.legend > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+
+/* 圆点（覆盖公共 .theme-dot 默认为方形小色块的行为） */
+.legend .dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: none;
+  flex-shrink: 0;
+}
+
+.legend .dot.del  { background: var(--danger); }
+.legend .dot.add  { background: var(--success); }
+.legend .dot.same { background: var(--text-3); }
+
+/* ---------------------------------------------------------------------------
+ * 五、差异结果展示区
+ * ------------------------------------------------------------------------- */
+/* 覆盖公共 .result 的卡片样式，改用纯文本展示 */
+#result.result {
+  padding: 18px 20px;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  box-shadow: var(--shadow-sm);
+  font-size: 14px;
+  line-height: 1.85;
+  white-space: pre-wrap;
+  word-break: break-word;
+  min-height: 80px;
+}
+
+/* 空状态：居中提示 */
+#result.result .empty {
+  text-align: center;
+  color: var(--text-3);
+  background: none;
+  border: none;
+  padding: 12px;
+}
+
+/* 行模式：每行独立显示，删除整行带删除线、新增整行带绿色背景 */
+#result .del {
+  display: inline;
+  padding: 2px 4px;
+  background: rgba(239, 91, 91, 0.16);
+  color: #b91c1c;
+  text-decoration: line-through;
+  border-radius: 4px;
+}
+
+#result .add {
+  display: inline;
+  padding: 2px 4px;
+  background: rgba(34, 179, 106, 0.16);
+  color: #15803d;
+  border-radius: 4px;
+}
+
+#result .same {
+  display: inline;
+  color: var(--text-2);
+}
+
+/* ---------------------------------------------------------------------------
+ * 六、小屏微调
+ * ------------------------------------------------------------------------- */
+@media (max-width: 720px) {
+  .inputs { grid-template-columns: 1fr; }
+  .input-col textarea { min-height: 160px; }
+  .legend { gap: 14px; }
+}

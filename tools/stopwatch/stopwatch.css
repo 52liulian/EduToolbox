@@ -1,0 +1,379 @@
+/* ============================================================================
+ * stopwatch.css · 课堂秒表（专属样式）
+ * ----------------------------------------------------------------------------
+ * 依赖底座：../../assets/css/tool-common.css（后加载，同特异性时底座胜出，
+ *           故覆盖统一使用 main.container / #stage 等更高特异性选择器）
+ * 内容分区：
+ *   1. 双栏骨架（左：秒表舞台；右：计次面板，小屏自动单栏）
+ *   2. 大字毫秒时间显示
+ *   3. 状态药丸（运行中 / 已暂停）
+ *   4. 控制按钮（开始渐变大钮 / 计次 / 重置 / 禁用态）
+ *   5. 计次面板（JS 动态生成 .lap-item，自动标注最快 / 最慢）
+ *   6. 全屏投影（Fullscreen API，仅此场景固定视口）
+ *   7. 小屏适配 / 减弱动效
+ * 高度策略：列表随记录自然撑高、绝不内部滚动，页面仅由 body 主滚动条滚动。
+ * ========================================================================== */
+
+/* ---------------------------------------------------------------------------
+ * 1. 双栏骨架（覆盖底座单容器，改为 1fr + 360px 双栏）
+ * ------------------------------------------------------------------------- */
+main.container {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 360px;
+  gap: 22px;
+  align-items: start;
+  padding-top: 26px;
+}
+
+/* 秒表舞台 */
+#stage {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  min-height: 480px;
+  padding: 48px 28px 42px;
+}
+
+/* ---------------------------------------------------------------------------
+ * 2. 大字毫秒时间显示（.time-main + .time-ms 基线对齐）
+ * ------------------------------------------------------------------------- */
+#stage .time-display {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 4px;
+  line-height: 1.05;
+}
+
+#stage .time-main {
+  font-size: clamp(58px, 9.5vw, 112px);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+  background: var(--primary-grad);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: var(--primary);
+}
+
+#stage .time-ms {
+  font-size: clamp(24px, 3.2vw, 40px);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-3);
+}
+
+/* ---------------------------------------------------------------------------
+ * 3. 状态药丸（JS 在运行 / 暂停时切换 .status 类名）
+ * ------------------------------------------------------------------------- */
+#stage .status {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 18px;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--text-3);
+  background: var(--bg-soft);
+  border: 1px solid var(--border);
+  border-radius: var(--r-pill);
+}
+
+#stage .status::before {
+  content: "";
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--text-3);
+  flex-shrink: 0;
+}
+
+/* 运行中：绿色呼吸点 */
+#stage .status.running {
+  color: var(--success);
+  background: #eafaf2;
+  border-color: #bfe8d2;
+}
+#stage .status.running::before {
+  background: var(--success);
+  animation: sw-dot 1.1s var(--ease) infinite;
+}
+
+/* 已暂停：琥珀色 */
+#stage .status.paused {
+  color: #c47e0c;
+  background: #fff6e5;
+  border-color: #f6dca6;
+}
+#stage .status.paused::before {
+  background: var(--warning);
+}
+
+@keyframes sw-dot {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50%      { transform: scale(1.45); opacity: 0.55; }
+}
+
+/* ---------------------------------------------------------------------------
+ * 4. 控制按钮
+ *    .btn-start 底座已有渐变主钮样式；.is-running（JS 添加）切换为暂停红
+ * ------------------------------------------------------------------------- */
+#stage .controls {
+  gap: 12px;
+  margin-top: 6px;
+}
+
+/* 运行中主钮变为“暂停”红色渐变（id 选择器覆盖底座 .btn-start） */
+#stage .btn-start.is-running {
+  color: #fff;
+  background: linear-gradient(135deg, #ff7a7a, #ef5b5b 55%, #d93a3a);
+  box-shadow: 0 10px 24px rgba(239, 91, 91, 0.32);
+}
+#stage .btn-start.is-running:hover {
+  filter: brightness(1.05);
+}
+
+/* 计次按钮：蓝色软底（.btn 底座负责边框与尺寸） */
+#stage .btn-lap {
+  color: var(--primary);
+  background: var(--primary-soft);
+  border-color: var(--primary-soft-2);
+}
+#stage .btn-lap:hover {
+  color: #fff;
+  background: var(--primary-grad);
+  border-color: transparent;
+}
+
+/* 禁用态：所有控制按钮通用 */
+#stage .btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+#stage .btn:disabled:hover {
+  color: var(--text-2);
+  background: var(--card-bg);
+  border-color: var(--border);
+}
+#stage .btn-lap:disabled:hover {
+  color: var(--primary);
+  background: var(--primary-soft);
+  border-color: var(--primary-soft-2);
+}
+
+/* 快捷键提示（底座已给 kbd 样式，补间距） */
+#stage .key-hint {
+  margin-top: 2px;
+}
+
+/* ---------------------------------------------------------------------------
+ * 5. 计次面板（.lap-item 全部由 JS 渲染）
+ * ------------------------------------------------------------------------- */
+.laps-panel {
+  padding: 20px;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow-sm);
+}
+
+.laps-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.laps-title {
+  font-size: 16px;
+  font-weight: 700;
+}
+
+/* 导出按钮（HTML 中类名为 .iconbtn，非底座 .icon-btn） */
+.iconbtn {
+  padding: 7px 14px;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--text-2);
+  background: var(--card-bg);
+  border: 1.5px solid var(--border);
+  border-radius: var(--r-pill);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all var(--t-fast) var(--ease);
+}
+.iconbtn:hover:not(:disabled) {
+  color: var(--primary);
+  border-color: var(--primary-soft-2);
+  background: var(--primary-soft);
+}
+.iconbtn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+/* 计次列表：自然撑高，无 max-height、无内部滚动条 */
+.laps-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.lap-item {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  background: var(--card-bg-2);
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  transition: border-color var(--t-fast) var(--ease),
+              background var(--t-fast) var(--ease);
+  /* 新计次插入顶部时的轻微入场 */
+  animation: sw-lap-in 0.3s var(--ease);
+}
+
+@keyframes sw-lap-in {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.lap-idx {
+  display: inline-grid;
+  place-items: center;
+  min-width: 30px;
+  height: 22px;
+  padding: 0 8px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-3);
+  background: var(--bg-soft);
+  border-radius: var(--r-pill);
+}
+
+.lap-time {
+  font-size: 16px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-1);
+}
+
+.lap-diff {
+  font-size: 12.5px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-3);
+}
+
+/* 最快一圈：绿色边条 */
+.lap-item.fastest {
+  background: #f1fbf6;
+  border-color: #b5e6cd;
+}
+.lap-item.fastest .lap-idx {
+  color: var(--success);
+  background: #ddf5e8;
+}
+.lap-item.fastest .lap-diff::after {
+  content: " 最快";
+  font-weight: 700;
+  color: var(--success);
+}
+
+/* 最慢一圈：红色边条 */
+.lap-item.slowest {
+  background: #fff6f6;
+  border-color: #f6c9c9;
+}
+.lap-item.slowest .lap-idx {
+  color: var(--danger);
+  background: #ffe7e7;
+}
+.lap-item.slowest .lap-diff::after {
+  content: " 最慢";
+  font-weight: 700;
+  color: var(--danger);
+}
+
+/* 空态：虚线占位 */
+.laps-empty {
+  padding: 30px 16px;
+  text-align: center;
+  font-size: 13.5px;
+  color: var(--text-3);
+  border: 1.5px dashed var(--border-2);
+  border-radius: var(--r-sm);
+  background: none;
+}
+
+/* ---------------------------------------------------------------------------
+ * 6. 全屏投影（JS 内置 Fullscreen 切换；预置投影样式，隐藏计次侧栏）
+ * ------------------------------------------------------------------------- */
+:fullscreen main.container,
+:-webkit-full-screen main.container {
+  grid-template-columns: minmax(0, 1fr);
+  max-width: none;
+  min-height: 100vh;
+  align-content: center;
+}
+
+:fullscreen .laps-panel,
+:-webkit-full-screen .laps-panel {
+  display: none;
+}
+
+:fullscreen #stage,
+:-webkit-full-screen #stage {
+  min-height: 0;
+  border: none;
+  box-shadow: none;
+  background: transparent;
+}
+
+:fullscreen #stage .time-main,
+:-webkit-full-screen #stage .time-main {
+  font-size: clamp(96px, 20vh, 220px);
+}
+:fullscreen #stage .time-ms,
+:-webkit-full-screen #stage .time-ms {
+  font-size: clamp(36px, 6vh, 72px);
+}
+
+/* ---------------------------------------------------------------------------
+ * 7. 小屏适配 / 减弱动效
+ * ------------------------------------------------------------------------- */
+@media (max-width: 900px) {
+  main.container {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  #stage {
+    min-height: 420px;
+  }
+}
+
+@media (max-width: 640px) {
+  #stage {
+    padding: 38px 16px 34px;
+  }
+  #stage .time-main {
+    font-size: clamp(48px, 17vw, 72px);
+  }
+  #stage .btn-start {
+    padding: 14px 40px;
+    font-size: 18px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #stage .status.running::before,
+  .lap-item {
+    animation: none !important;
+  }
+}

@@ -1,0 +1,77 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>倒计时 | EduToolbox · 极简倒计时工具</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%8E%93%3C/text%3E%3C/svg%3E">
+<link rel="stylesheet" href="countdown-timer.css">
+<link rel="stylesheet" href="../../assets/css/tool-common.css">
+</head>
+<body>
+
+<!-- 设置页 -->
+<section class="screen setup-screen" id="setupScreen">
+  <h2 class="title">⏳ 极简倒计时</h2>
+  <p class="subtitle">深色大屏 · 每秒提示音 · 全屏专注</p>
+
+  <div class="big-input">
+    <input type="number" id="inputMin" min="0" max="999" value="5" inputmode="numeric">
+    <span class="colon">:</span>
+    <input type="number" id="inputSec" min="0" max="59" value="0" inputmode="numeric">
+  </div>
+  <div class="field-hint"><span id="minLabel">分</span><span id="secLabel">秒</span></div>
+
+  <!-- 时间微调按钮：±1分 / ±10秒 -->
+  <div class="adjust" id="adjust">
+    <button type="button" class="adj-btn" data-delta="-60000" title="-1 分钟">−1 分</button>
+    <button type="button" class="adj-btn" data-delta="-10000" title="-10 秒">−10 秒</button>
+    <span class="adj-current" id="adjCurrent">5 分</span>
+    <button type="button" class="adj-btn" data-delta="10000" title="+10 秒">+10 秒</button>
+    <button type="button" class="adj-btn" data-delta="60000" title="+1 分钟">+1 分</button>
+  </div>
+
+  <div class="chips" id="chips">
+    <button type="button" class="chip" data-min="1">1 分钟</button>
+    <button type="button" class="chip" data-min="3">3 分钟</button>
+    <button type="button" class="chip" data-min="5">5 分钟</button>
+    <button type="button" class="chip" data-min="10">10 分钟</button>
+    <button type="button" class="chip" data-min="15">15 分钟</button>
+    <button type="button" class="chip" data-min="30">30 分钟</button>
+    <button type="button" class="chip" data-min="45">45 分钟</button>
+    <button type="button" class="chip" data-min="60">60 分钟</button>
+    <button type="button" class="chip" data-min="90">90 分钟</button>
+    <button type="button" class="chip" data-min="120">120 分钟</button>
+  </div>
+
+  <!-- 主题色切换 -->
+  <div class="themes" id="themes">
+    <button type="button" class="theme-dot active" data-theme="green"  style="--c:#34ffb0" title="霓虹绿"></button>
+    <button type="button" class="theme-dot"        data-theme="sky"    style="--c:#38bdf8" title="天空蓝"></button>
+    <button type="button" class="theme-dot"        data-theme="orange" style="--c:#fb923c" title="活力橙"></button>
+    <button type="button" class="theme-dot"        data-theme="pink"   style="--c:#f472b6" title="樱花粉"></button>
+    <button type="button" class="theme-dot"        data-theme="violet" style="--c:#a78bfa" title="紫罗兰"></button>
+    <button type="button" class="theme-dot"        data-theme="gold"   style="--c:#fbbf24" title="琥珀金"></button>
+  </div>
+
+  <button type="button" class="start-btn" id="btnStart">▶ 开始</button>
+</section>
+
+<!-- 倒计时页 -->
+<section class="screen run-screen hidden" id="runScreen">
+  <div class="time-text" id="timeText" title="点击暂停 / 继续">05:00</div>
+  <div class="finish-text hidden" id="finishText">⏰ 时间到</div>
+  <div class="run-actions">
+    <button type="button" class="neon-btn" id="btnPause">⏸ 暂停</button>
+    <button type="button" class="neon-btn ghost" id="btnReset">↩ 重置</button>
+    <button type="button" class="neon-btn ghost" id="btnFullscreen">⛶ 全屏</button>
+  </div>
+  <p class="run-hint">空格 = 暂停 / 继续 · R = 重置 · Esc = 退出全屏</p>
+</section>
+
+<!-- 底部细线进度条 -->
+<div class="progress-track" id="progressTrack"><div class="progress-bar" id="progressBar"></div></div>
+
+<script src="countdown-timer.js"></script>
+</body>
+</html>

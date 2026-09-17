@@ -1,0 +1,336 @@
+/* ============================================================================
+ * 手写文稿生成器 · style.css
+ * 仅包含本工具特有样式：双栏布局 / 字体卡片 / 纸张卡片 / 滑块参数 /
+ *                       颜色选择 / 预览画布 / 隐私提示
+ * 公共底座（reset、按钮、卡片、表单、tabs、dropzone）见 tool-common.css
+ * 高度策略：所有容器高度自动撑开，仅 body 主滚动条；
+ *           预览画布按内容自适应高度
+ * ========================================================================== */
+
+/* ---------------------------------------------------------------------------
+ * 一、布局：本工具使用 .container + .main 复合；标题区为自定义 hero 变体
+ * ------------------------------------------------------------------------- */
+.container.main {
+  display: block;
+  padding: 24px 24px 48px;
+  max-width: 1320px;
+}
+
+/* 标题区变体（覆盖公共 .hero 居中卡片样式） */
+.hero {
+  margin-bottom: 22px;
+  padding: 28px 32px;
+  background: var(--primary-grad);
+  color: #fff;
+  border: none;
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow-primary);
+  text-align: left;
+}
+.hero-title {
+  font-size: clamp(24px, 3vw, 32px);
+  font-weight: 800;
+  color: #fff;
+  margin-bottom: 8px;
+  letter-spacing: 0.02em;
+}
+.hero-sub {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.92);
+  line-height: 1.75;
+}
+
+/* 双栏布局：左侧控制面板 + 右侧预览 */
+#app .layout,
+.layout {
+  grid-template-columns: minmax(320px, 420px) minmax(0, 1fr);
+  gap: 20px;
+}
+
+@media (max-width: 960px) {
+  #app .layout,
+  .layout { grid-template-columns: 1fr; }
+}
+
+/* ---------------------------------------------------------------------------
+ * 二、面板（左右两栏）
+ * ------------------------------------------------------------------------- */
+.panel.controls,
+.panel.preview-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 18px;
+  min-width: 0;
+}
+
+.block { margin-top: 0; padding: 16px 18px; }
+.block + .block { margin-top: 0; }
+.block-title {
+  font-size: 15px;
+  font-weight: 700;
+  margin-bottom: 12px;
+  color: var(--text-1);
+}
+
+/* tabs：覆盖公共 .tabs 间距 */
+.tabs { gap: 6px; margin-bottom: 12px; }
+.tab {
+  padding: 7px 14px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+/* 文本输入域 */
+#textInput {
+  width: 100%;
+  min-height: 130px;
+  padding: 10px 14px;
+  font-size: 13.5px;
+  line-height: 1.7;
+  resize: vertical;
+  font-family: -apple-system, "PingFang SC", "Microsoft YaHei", monospace;
+}
+
+/* 文件信息行 */
+.file-info {
+  margin-top: 10px;
+  padding: 10px 14px;
+  font-size: 13px;
+  color: var(--text-2);
+  background: var(--primary-soft);
+  border: 1px solid var(--primary-soft-2);
+  border-radius: var(--r-sm);
+}
+.file-info:empty { display: none; }
+
+/* ---------------------------------------------------------------------------
+ * 三、字体卡片网格
+ * ------------------------------------------------------------------------- */
+.font-list,
+.paper-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 10px;
+}
+
+.font-card,
+.paper-card {
+  padding: 10px 12px;
+  background: var(--card-bg);
+  border: 1.5px solid var(--border);
+  border-radius: var(--r-sm);
+  cursor: pointer;
+  transition: all var(--t-fast) var(--ease);
+  text-align: center;
+}
+.font-card:hover,
+.paper-card:hover {
+  border-color: var(--primary-soft-2);
+  background: var(--primary-soft);
+  transform: translateY(-1px);
+}
+.font-card.active,
+.paper-card.active {
+  border-color: var(--primary);
+  background: var(--primary-soft);
+  box-shadow: 0 0 0 3px rgba(59, 110, 246, 0.12);
+}
+
+.fc-name {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--text-2);
+  margin-bottom: 6px;
+}
+.fc-sample {
+  font-size: 20px;
+  line-height: 1.4;
+  color: var(--text-1);
+  word-break: break-all;
+}
+
+.paper-card .pc-thumb {
+  width: 100%;
+  height: 36px;
+  margin-bottom: 6px;
+  border-radius: 4px;
+  border: 1px solid var(--border);
+  background-size: cover;
+  background-position: center;
+}
+.paper-card > div:last-child {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--text-2);
+}
+
+/* ---------------------------------------------------------------------------
+ * 四、参数滑块组
+ * ------------------------------------------------------------------------- */
+.params {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px 16px;
+}
+.params .field { margin-bottom: 0; }
+.field-label {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-2);
+  margin-bottom: 6px;
+}
+.field-label .val {
+  display: inline-block;
+  margin-left: auto;
+  padding: 1px 9px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--primary);
+  background: var(--primary-soft);
+  border-radius: var(--r-pill);
+  font-variant-numeric: tabular-nums;
+}
+.field-label .rec {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text-3);
+  margin-left: 4px;
+}
+.field-hint {
+  margin-top: 4px;
+  font-size: 11.5px;
+  color: var(--text-3);
+  line-height: 1.5;
+}
+
+/* 颜色选择圆点 */
+.colors {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.color-swatch {
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  border: 2px solid var(--border-2);
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all var(--t-fast) var(--ease);
+}
+.color-swatch:hover {
+  transform: scale(1.1);
+  border-color: var(--primary-soft-2);
+}
+.color-swatch.active {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px var(--primary-soft);
+}
+
+/* ---------------------------------------------------------------------------
+ * 五、操作按钮与隐私提示
+ * ------------------------------------------------------------------------- */
+.controls .actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 6px;
+}
+.controls .actions .btn {
+  flex: 1;
+  min-width: 120px;
+  padding: 10px 16px;
+  font-size: 13.5px;
+}
+
+.privacy {
+  margin-top: 4px;
+  padding: 8px 12px;
+  font-size: 12px;
+  color: var(--text-3);
+  background: var(--bg-soft);
+  border: 1px dashed var(--border-2);
+  border-radius: var(--r-sm);
+  text-align: center;
+}
+
+/* ---------------------------------------------------------------------------
+ * 六、预览面板
+ * ------------------------------------------------------------------------- */
+.preview-panel {
+  position: relative;
+  min-height: 480px;
+}
+.preview-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 4px;
+}
+.preview-head .block-title { margin-bottom: 0; }
+.preview-head .hint {
+  font-size: 12px;
+  color: var(--text-3);
+  background: none;
+  border: none;
+  padding: 0;
+}
+
+/* 纸张容器：背景与画布 */
+.paper {
+  position: relative;
+  width: 100%;
+  min-height: 420px;
+  padding: 18px;
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+#canvas {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: none;
+}
+
+.preview-tip {
+  margin-top: 4px;
+  padding: 8px 12px;
+  font-size: 12px;
+  color: var(--text-3);
+  background: var(--bg-soft);
+  border-left: 3px solid var(--primary);
+  border-radius: var(--r-sm);
+  line-height: 1.6;
+}
+
+/* ---------------------------------------------------------------------------
+ * 七、小屏微调
+ * ------------------------------------------------------------------------- */
+@media (max-width: 640px) {
+  .container.main { padding: 14px 12px 32px; }
+  .hero { padding: 20px 18px; }
+  .panel.controls, .panel.preview-panel { padding: 14px; }
+  .font-list, .paper-list { grid-template-columns: repeat(2, 1fr); }
+  .params { grid-template-columns: 1fr; }
+  .controls .actions .btn { flex: 1 1 100%; min-width: 0; }
+  .preview-head { flex-direction: column; align-items: flex-start; }
+}
+
+/* ---------------------------------------------------------------------------
+ * 八、打印：仅打印预览纸张与画布
+ * ------------------------------------------------------------------------- */
+@media print {
+  body { background: #fff !important; }
+  .toolbar, .controls, .preview-head, .preview-tip, .hero { display: none !important; }
+  .layout { display: block; padding: 0; }
+  .preview-panel { border: none; padding: 0; }
+  .paper { box-shadow: none; border: none; }
+}

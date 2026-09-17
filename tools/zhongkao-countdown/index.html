@@ -1,0 +1,118 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>中考倒计时 | EduToolbox · 距离中考实时倒计时</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%8E%93%3C/text%3E%3C/svg%3E">
+<link rel="stylesheet" href="zhongkao-countdown.css">
+<link rel="stylesheet" href="../../assets/css/tool-common.css">
+</head>
+<body>
+  <!-- 顶栏导航 -->
+
+  <!-- 倒计时主屏 -->
+  <main class="screen" id="screen">
+    <div class="toolbar">
+      <button class="tool-btn" id="settings-btn" title="打开设置面板">⚙ 设置</button>
+      <button class="tool-btn" id="fullscreen-btn" title="全屏沉浸展示">⛶ 全屏</button>
+    </div>
+
+    <div class="countdown">
+      <div class="label" id="title-label">距离2027年中考还有</div>
+
+      <div class="time-row">
+        <div class="time-block">
+          <div class="num num-days" id="days">0</div>
+          <div class="unit">天</div>
+        </div>
+        <div class="sep">:</div>
+        <div class="time-block">
+          <div class="num" id="hours">00</div>
+          <div class="unit">时</div>
+        </div>
+        <div class="sep">:</div>
+        <div class="time-block">
+          <div class="num" id="minutes">00</div>
+          <div class="unit">分</div>
+        </div>
+        <div class="sep">:</div>
+        <div class="time-block">
+          <div class="num" id="seconds">00</div>
+          <div class="unit">秒</div>
+        </div>
+      </div>
+
+      <div class="slogan" id="slogan">长风破浪会有时，直挂云帆济沧海</div>
+    </div>
+  </main>
+
+  <!-- 设置面板 -->
+  <div class="settings-overlay" id="settings-overlay">
+    <div class="settings-panel">
+      <div class="settings-header">
+        <h2>⚙ 设置</h2>
+        <button class="close-btn" id="close-settings" title="关闭设置">✕</button>
+      </div>
+      <div class="settings-body">
+        <div class="field">
+          <label for="set-title">标题内容</label>
+          <input type="text" id="set-title" maxlength="30" placeholder="距离2027年中考还有">
+        </div>
+
+        <div class="field-row">
+          <div class="field">
+            <label>目标日期</label>
+            <div class="date-input">
+              <input type="number" id="set-month" min="1" max="12" value="6">
+              <span>/</span>
+              <input type="number" id="set-day" min="1" max="31" value="20">
+              <span>/</span>
+              <input type="number" id="set-year" min="2026" max="2099" value="2027">
+            </div>
+          </div>
+          <div class="field">
+            <label>目标时间</label>
+            <div class="time-input">
+              <input type="number" id="set-hour" min="1" max="12" value="9">
+              <span>:</span>
+              <input type="number" id="set-minute" min="0" max="59" value="0">
+              <select id="set-ampm">
+                <option value="AM">AM</option>
+                <option value="PM">PM</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="set-theme">UI 配色风格</label>
+          <select id="set-theme">
+            <option value="auto">自动渐变 (默认)</option>
+            <option value="deepblue">深海蓝</option>
+            <option value="forest">森林夜</option>
+            <option value="crimson">暗绯红</option>
+            <option value="purple">皇家紫</option>
+            <option value="midnight">午夜黑</option>
+            <option value="charcoal">深炭灰</option>
+            <option value="ocean">深洋蓝</option>
+            <option value="coffee">咖啡醇</option>
+            <option value="slate">岩板蓝</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="set-slogan">励志标语</label>
+          <input type="text" id="set-slogan" maxlength="40" placeholder="长风破浪会有时，直挂云帆济沧海">
+        </div>
+      </div>
+      <div class="settings-footer">
+        <button class="action-btn primary" id="save-settings">保存设置</button>
+        <button class="action-btn" id="reset-settings">恢复默认</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="zhongkao-countdown.js"></script>
+</body>
+</html>

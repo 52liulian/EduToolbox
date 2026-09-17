@@ -1,0 +1,329 @@
+/* ============================================================================
+ * chouti-2.css · 大屏滚动抽题（单题 + 答案分步揭晓）
+ * ----------------------------------------------------------------------------
+ * 本文件只写本工具特有样式；公共底座见 ../../assets/css/tool-common.css
+ * （工具 CSS 先加载、tool-common 后加载，故覆盖一律使用 #app / #id 提高特异性）
+ * 高度策略：所有容器自动撑开，仅 body 出现主滚动条；
+ *           只有 #stage:fullscreen 投影时允许固定视口。
+ * ========================================================================== */
+
+/* ===================== 1. 双栏布局与设置面板 ===================== */
+
+/* 左面板题库文本域：给足书写高度（仅 min-height，可继续拖拽撑开） */
+#app #qList {
+  min-height: 220px;
+}
+
+/* 区块内的行内代码：题目|答案 格式说明 */
+#app .block-hint code {
+  padding: 1px 7px;
+  font-family: Consolas, Menlo, monospace;
+  font-size: 12px;
+  color: var(--primary);
+  background: var(--primary-soft);
+  border-radius: 6px;
+}
+
+/* 隐藏设置面板（工具栏 ⚙ 按钮）：右舞台占满整行 */
+#app .main.setup-hidden {
+  grid-template-columns: minmax(0, 1fr);
+}
+#app .main.setup-hidden .setup-panel {
+  display: none;
+}
+
+/* ===================== 2. 右侧深色大屏舞台 ===================== */
+
+#app .stage {
+  /* 深色仅出现在舞台内部，整页 body 仍保持浅色 */
+  overflow: hidden;
+  border-color: rgba(255, 255, 255, 0.08);
+  background:
+    radial-gradient(900px 520px at 82% -12%, rgba(96, 165, 250, 0.24), transparent 60%),
+    radial-gradient(760px 480px at 6% 112%, rgba(167, 139, 250, 0.20), transparent 60%),
+    linear-gradient(160deg, #1d2544 0%, #161d36 55%, #111728 100%);
+}
+
+/* 舞台工具栏：覆盖 tool-common 的绝对定位，改为顶部通栏 */
+#app .stage .stage-toolbar {
+  position: static;
+  inset: auto;
+  z-index: 2;
+  width: 100%;
+  margin: 0 0 8px;
+  justify-content: space-between;
+}
+
+/* 总计 / 已抽 / 剩余：深色玻璃药丸 */
+#app .stage .status-bar {
+  justify-content: flex-start;
+  gap: 10px;
+  margin-right: auto;
+}
+#app .stage .status-item {
+  padding: 6px 15px;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.68);
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.13);
+  border-radius: var(--r-pill);
+}
+#app .stage .status-item em {
+  font-style: normal;
+  font-weight: 800;
+  color: #fff;
+}
+
+/* 全屏 / 设置按钮：深色玻璃圆形钮 */
+#app .stage .icon-btn {
+  color: rgba(255, 255, 255, 0.85);
+  background: rgba(255, 255, 255, 0.10);
+  border-color: rgba(255, 255, 255, 0.18);
+}
+#app .stage .icon-btn:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.20);
+  border-color: rgba(255, 255, 255, 0.35);
+}
+
+/* 流体光球画布：铺满舞台、位于内容之下、不接管鼠标 */
+#app .bg-canvas {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+/* ===================== 3. 中央抽题展示区 ===================== */
+
+#app .stage .display {
+  position: relative;
+  z-index: 1;
+  justify-content: center;
+  min-height: 520px;
+  gap: 16px;
+  padding: 12px 0;
+}
+
+/* “第 ? 题”：玻璃小胶囊 */
+#app .q-index {
+  padding: 6px 20px;
+  font-size: 14px;
+  letter-spacing: 0.14em;
+  color: rgba(255, 255, 255, 0.72);
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: var(--r-pill);
+}
+
+/* 超大题号：蓝紫渐变描边字 */
+#app .num-display {
+  font-size: clamp(96px, 13vw, 210px);
+  line-height: 1.04;
+  color: transparent;
+  background: linear-gradient(180deg, #cfe0ff 0%, #7aa5ff 46%, #5a7cf0 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 12px 32px rgba(90, 124, 240, 0.38));
+}
+
+/* 滚动中：轻微抖动 + 半透明，营造高速翻号感 */
+#app .num-display.rolling {
+  animation: ct2-num-flicker 0.12s steps(2, jump-none) infinite;
+}
+@keyframes ct2-num-flicker {
+  from { opacity: 0.72; transform: translateY(-2px) scale(0.985); }
+  to   { opacity: 1;    transform: translateY(2px)  scale(1.015); }
+}
+
+/* 锁定中奖号：弹性放大 */
+#app .num-display.winner {
+  animation: ct2-num-pop 0.6s var(--ease);
+}
+@keyframes ct2-num-pop {
+  0%   { transform: scale(0.78); }
+  42%  { transform: scale(1.16); }
+  72%  { transform: scale(0.97); }
+  100% { transform: scale(1); }
+}
+
+/* 题面文字 */
+#app .q-display {
+  max-width: 900px;
+  padding: 0 12px;
+  font-size: clamp(22px, 2.8vw, 38px);
+  line-height: 1.45;
+  color: rgba(255, 255, 255, 0.94);
+  text-shadow: 0 4px 22px rgba(0, 0, 0, 0.32);
+}
+#app .q-display.rolling { opacity: 0.62; }
+#app .q-display.winner {
+  animation: ct2-q-pop 0.55s var(--ease);
+}
+@keyframes ct2-q-pop {
+  0%   { opacity: 0; transform: translateY(14px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+/* ===================== 4. 答案分步揭晓 ===================== */
+
+/* 答案区默认收起（JS 锁定题目后加 .show 再出现），不占位不滚动 */
+#app .answer-area {
+  display: none;
+  width: 100%;
+  max-width: 760px;
+}
+#app .answer-area.show {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  animation: ct2-fade-up 0.32s var(--ease);
+}
+@keyframes ct2-fade-up {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* 揭晓按钮：深色舞台上的玻璃描边钮 */
+#app .stage .btn-reveal {
+  padding: 11px 30px;
+  font-size: 15px;
+  color: #fff;
+  background: rgba(255, 255, 255, 0.12);
+  border: 1.5px solid rgba(255, 255, 255, 0.28);
+  backdrop-filter: blur(4px);
+}
+#app .stage .btn-reveal:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.22);
+  border-color: rgba(255, 255, 255, 0.45);
+  transform: translateY(-1px);
+}
+#app .btn-reveal.disabled {
+  opacity: 0.42;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* 答案文字条 */
+#app .q-answer {
+  display: none;
+  padding: 14px 30px;
+  font-size: clamp(18px, 2vw, 26px);
+  font-weight: 700;
+  line-height: 1.6;
+  color: #fff;
+  background: rgba(255, 255, 255, 0.10);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: var(--r-pill);
+  box-shadow: 0 8px 26px rgba(0, 0, 0, 0.22);
+}
+#app .q-answer.show {
+  display: block;
+  animation: ct2-fade-up 0.32s var(--ease);
+}
+
+/* ===================== 5. 提示语与开始按钮 ===================== */
+
+#app .stage .display-hint {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.62);
+}
+#app .stage .key-hint {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.48);
+}
+#app .stage .key-hint kbd {
+  color: rgba(255, 255, 255, 0.85);
+  background: rgba(255, 255, 255, 0.10);
+  border-color: rgba(255, 255, 255, 0.25);
+}
+
+/* 开始 / 停止 大按钮：深色舞台中加发光，滚动中变红 */
+#app .stage .btn-start {
+  margin-top: 4px;
+}
+#app .stage .btn-start.rolling {
+  background: linear-gradient(135deg, #ff8a8a 0%, #ef5b5b 55%, #d63c3c 100%);
+  box-shadow: 0 12px 28px rgba(239, 91, 91, 0.42);
+}
+
+/* ===================== 6. 抽题记录列表（自动撑高） ===================== */
+
+.record-list .r-num {
+  display: inline-grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 26px;
+  height: 26px;
+  font-size: 12px;
+  font-weight: 800;
+  color: var(--primary);
+  background: var(--primary-soft);
+  border-radius: 50%;
+}
+.record-list .r-name {
+  flex: 1;
+  min-width: 0;
+  word-break: break-word;
+}
+.record-list .r-name em {
+  font-style: normal;
+  color: var(--text-3);
+}
+.record-list .r-time {
+  margin-left: auto;
+  flex-shrink: 0;
+  font-size: 12px;
+  color: var(--text-3);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ===================== 7. 全屏投影模式 ===================== */
+
+#stage:fullscreen,
+#stage:-webkit-full-screen {
+  width: 100vw;
+  height: 100vh;
+  padding: 30px 44px;
+  border: 0;
+  border-radius: 0;
+  overflow: auto;
+  background:
+    radial-gradient(1000px 600px at 82% -12%, rgba(96, 165, 250, 0.28), transparent 60%),
+    radial-gradient(900px 560px at 6% 112%, rgba(167, 139, 250, 0.24), transparent 60%),
+    linear-gradient(160deg, #1d2544 0%, #161d36 55%, #111728 100%);
+}
+#stage:fullscreen .display,
+#stage:-webkit-full-screen .display {
+  min-height: calc(100vh - 150px);
+}
+#stage:fullscreen .num-display,
+#stage:-webkit-full-screen .num-display {
+  font-size: clamp(120px, 20vh, 260px);
+}
+#stage:fullscreen .q-display,
+#stage:-webkit-full-screen .q-display {
+  font-size: clamp(26px, 3.6vh, 46px);
+}
+
+/* ===================== 8. 窄屏适配 ===================== */
+
+@media (max-width: 960px) {
+  #app .main {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  #app .stage .display {
+    min-height: 420px;
+  }
+  #app .num-display {
+    font-size: clamp(84px, 22vw, 150px);
+  }
+  #app .stage-toolbar {
+    flex-wrap: wrap;
+  }
+}

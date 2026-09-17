@@ -1,0 +1,30 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>答题卡生成器</title>
+<link rel="stylesheet" href="answercard.css">
+<link rel="stylesheet" href="../../assets/css/tool-common.css">
+</head>
+<body>
+<div class="container">
+  <h2 class="tool-title">📄 答题卡生成器</h2>
+  <p class="tool-sub">设置选择题数量，生成标准机读答题卡，打印即用</p>
+
+  <div class="ctrl-row">
+    <label>单选题数
+      <input type="number" id="ac-single" value="20" min="0" max="60">
+    </label>
+    <label>多选题数
+      <input type="number" id="ac-multi" value="5" min="0" max="30">
+    </label>
+    <button class="btn" id="ac-gen">生成答题卡</button>
+  </div>
+
+  <div id="ac-canvas" class="answer-card"></div>
+</div>
+
+<script src="answercard.js"></script>
+</body>
+</html>

@@ -1,0 +1,145 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>早读滚动 | EduToolbox · 课堂朗读滚动</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%8E%93%3C/text%3E%3C/svg%3E">
+<link rel="stylesheet" href="scrolling-text.css">
+<link rel="stylesheet" href="../../assets/css/tool-common.css">
+</head>
+<body>
+
+<main class="app">
+  <!-- 左侧设置面板 -->
+  <aside class="panel" id="panel">
+    <section class="panel-block">
+      <h3 class="block-title">滚动内容</h3>
+      <textarea id="text" class="text-area" placeholder="在此粘贴需要朗读或跟读的文本，多段内容用空行分隔…">朝辞白帝彩云间，
+千里江陵一日还。
+两岸猿声啼不住，
+轻舟已过万重山。
+
+日照香炉生紫烟，
+遥看瀑布挂前川。
+飞流直下三千尺，
+疑是银河落九天。
+
+鹅鹅鹅，
+曲项向天歌。
+白毛浮绿水，
+红掌拨清波。</textarea>
+      <div class="text-tools">
+        <button type="button" class="btn-mini" id="clearBtn">清空</button>
+        <button type="button" class="btn-mini" id="defaultBtn">恢复默认</button>
+      </div>
+    </section>
+
+    <section class="panel-block">
+      <h3 class="block-title">播放控制</h3>
+      <div class="ctrl-row">
+        <button type="button" class="btn btn-primary" id="startBtn">▶ 开始滚动 (空格)</button>
+      </div>
+      <div class="ctrl-row">
+        <button type="button" class="btn btn-ghost" id="resetBtn">↺ 重置</button>
+        <button type="button" class="btn btn-ghost" id="fullBtn">⛶ 全屏</button>
+      </div>
+      <div class="speed-row">
+        <label class="speed-label">滚动速度 (Ctrl+↑/↓)</label>
+        <input type="range" id="speed" class="range" min="1" max="5" value="2" step="1">
+        <div class="speed-marks">
+          <span data-speed="1">慢</span>
+          <span data-speed="2">中</span>
+          <span data-speed="3">快</span>
+          <span data-speed="4">极快</span>
+          <span data-speed="5">极速</span>
+        </div>
+        <div class="duration-tip">预计时长: <span id="duration">--</span></div>
+      </div>
+    </section>
+
+    <section class="panel-block">
+      <h3 class="block-title">外观设置</h3>
+      <div class="theme-row" id="themeRow">
+        <button type="button" class="theme-chip" data-theme="white">白底黑字</button>
+        <button type="button" class="theme-chip" data-theme="black">黑底白字</button>
+        <button type="button" class="theme-chip" data-theme="green">绿板</button>
+        <button type="button" class="theme-chip" data-theme="warm">暖阳护眼</button>
+        <button type="button" class="theme-chip" data-theme="vintage">复古</button>
+      </div>
+
+      <div class="field">
+        <label class="field-label">字号 (px)</label>
+        <div class="num-ctrl">
+          <button type="button" class="num-btn" id="fontMinus">-</button>
+          <span class="num-val" id="fontVal">80</span>
+          <button type="button" class="num-btn" id="fontPlus">+</button>
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="field-label">行高</label>
+        <div class="num-ctrl">
+          <button type="button" class="num-btn" id="lhMinus">-</button>
+          <span class="num-val" id="lhVal">1.6</span>
+          <button type="button" class="num-btn" id="lhPlus">+</button>
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="field-label" for="fontFamily">字体</label>
+        <select id="fontFamily" class="select">
+          <option value='"Microsoft YaHei", sans-serif'>微软雅黑</option>
+          <option value='SimSun, serif'>宋体</option>
+          <option value='SimHei, sans-serif'>黑体</option>
+          <option value='KaiTi, "楷体", serif'>楷体</option>
+          <option value='LiSu, "隶书", serif'>隶书</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label class="field-label">对齐</label>
+        <div class="seg" id="alignSeg">
+          <button type="button" class="seg-btn" data-align="left">左</button>
+          <button type="button" class="seg-btn active" data-align="center">中</button>
+          <button type="button" class="seg-btn" data-align="right">右</button>
+        </div>
+      </div>
+
+      <div class="field-row">
+        <div class="field">
+          <label class="field-label" for="color">字色</label>
+          <input type="color" id="color" class="color" value="#1a1a1a">
+        </div>
+        <div class="field">
+          <label class="field-label" for="bgColor">背景</label>
+          <input type="color" id="bgColor" class="color" value="#ffffff">
+        </div>
+      </div>
+
+      <div class="field-row">
+        <label class="check">
+          <input type="checkbox" id="loop" checked>
+          <span>循环滚动 (到底后重头开始)</span>
+        </label>
+        <label class="check">
+          <input type="checkbox" id="reverse">
+          <span>反向滚动 (从上向下)</span>
+        </label>
+      </div>
+    </section>
+  </aside>
+
+  <!-- 右侧滚动展示舞台 -->
+  <section class="stage" id="stage">
+    <div class="stage-inner" id="stageInner">
+      <div class="scroll-text" id="scrollText"></div>
+    </div>
+    <button type="button" class="panel-toggle" id="panelToggle" title="隐藏/显示设置面板">⚙</button>
+    <div class="stage-hint" id="stageHint">按空格键开始/暂停 · 点击屏幕也可控制</div>
+  </section>
+</main>
+
+<script src="scrolling-text.js"></script>
+</body>
+</html>

@@ -1,0 +1,32 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>学生姓名贴</title>
+<link rel="stylesheet" href="name-sticker.css">
+<link rel="stylesheet" href="../../assets/css/tool-common.css">
+</head>
+<body>
+<div class="container">
+  <h2>🏷️ 学生姓名贴</h2>
+  <div class="ctrl">
+    <textarea id="names" placeholder="每行一个姓名…">张三
+李四
+王五
+赵六</textarea>
+    <div class="opts">
+      <label>每行数量 <input type="number" id="cols" min="1" max="8" value="4"></label>
+      <label>字号 <input type="number" id="size" min="12" max="40" value="20"></label>
+      <label>边框颜色 <input type="color" id="color" value="#3b82f6"></label>
+    </div>
+    <div class="btns">
+      <button class="btn" id="gen">生成姓名贴</button>
+      <button class="btn ghost" id="print">打印</button>
+    </div>
+  </div>
+  <div class="sheet" id="sheet"></div>
+</div>
+<script src="name-sticker.js"></script>
+</body>
+</html>

@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>课堂计时 | EduToolbox · 课堂计时工具</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%8E%93%3C/text%3E%3C/svg%3E">
+<link rel="stylesheet" href="timer.css">
+<link rel="stylesheet" href="../../assets/css/tool-common.css">
+</head>
+<body>
+
+<!-- 主体计时区 -->
+<main class="container" id="app">
+  <!-- 模式切换 -->
+  <div class="mode-switch" role="tablist" aria-label="计时模式">
+    <button class="mode-btn active" id="modeCountdown" type="button" role="tab" aria-selected="true">倒计时</button>
+    <button class="mode-btn" id="modeStopwatch" type="button" role="tab" aria-selected="false">正计时</button>
+  </div>
+
+  <!-- 快速预设 -->
+  <section class="presets" aria-label="快速预设">
+    <span class="presets__label">快速设定：</span>
+    <button class="preset" data-sec="60">1 分钟</button>
+    <button class="preset" data-sec="180">3 分钟</button>
+    <button class="preset" data-sec="300">5 分钟</button>
+    <button class="preset" data-sec="600">10 分钟</button>
+    <button class="preset" data-sec="900">15 分钟</button>
+    <button class="preset" data-sec="1800">30 分钟</button>
+    <button class="preset" data-sec="2700">45 分钟</button>
+    <button class="preset" data-sec="3600">60 分钟</button>
+  </section>
+
+  <!-- 大字时间显示 -->
+  <section class="stage" id="stage">
+    <div class="time-display" id="display" aria-live="polite">05:00</div>
+    <div class="status" id="status">准备就绪</div>
+    <!-- 进度环（仅倒计时模式显示） -->
+    <svg class="progress-ring" id="ringWrap" width="240" height="240" viewBox="0 0 240 240" aria-hidden="true">
+      <circle class="ring-bg" cx="120" cy="120" r="108"></circle>
+      <circle class="ring-fg" cx="120" cy="120" r="108" id="ring"></circle>
+    </svg>
+  </section>
+
+  <!-- 自定义时长 + 控制按钮 -->
+  <section class="controls">
+    <div class="custom" id="custom">
+      <span class="custom__label">自定义</span>
+      <div class="time-input">
+        <div class="time-unit">
+          <input type="number" id="min" min="0" max="999" value="5" inputmode="numeric">
+          <label for="min">分</label>
+        </div>
+        <span class="colon">:</span>
+        <div class="time-unit">
+          <input type="number" id="sec" min="0" max="59" value="0" inputmode="numeric">
+          <label for="sec">秒</label>
+        </div>
+      </div>
+      <button class="btn btn-ghost" id="setBtn" type="button">设定</button>
+    </div>
+
+    <div class="actions">
+      <button class="btn btn-primary btn-lg" id="startBtn" type="button">开始计时</button>
+      <button class="btn btn-ghost" id="resetBtn" type="button">重置</button>
+    </div>
+
+    <!-- 结束提醒（默认隐藏，到点后显示） -->
+    <button class="btn btn-stop hidden" id="stopAlertBtn" type="button">停止提醒</button>
+  </section>
+</main>
+
+<script src="timer.js"></script>
+</body>
+</html>

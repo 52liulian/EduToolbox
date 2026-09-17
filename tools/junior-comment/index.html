@@ -1,0 +1,111 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>初中评语生成 | EduToolbox · 初中阶段评语</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%8D%93%3C/text%3E%3C/svg%3E">
+<link rel="stylesheet" href="junior-comment.css">
+<link rel="stylesheet" href="../../assets/css/tool-common.css">
+</head>
+<body>
+
+  <div class="wrap">
+
+    <!-- 顶部标题区 -->
+    <header class="hdr">
+      <div class="hdr-emoji">📘</div>
+      <div class="hdr-text">
+        <h1>初中评语生成</h1>
+        <p>面向初中班主任与任课教师的期末评语生成器，覆盖学科表现、思维方法、学习态度、集体责任、品德修养、劳动卫生、特长发展等 10 个维度，支持名单导入、性别选择、风格切换、一键生成不雷同评语，可复制并导出 Word / Excel / TXT，数据自动保存在本机。</p>
+      </div>
+    </header>
+
+    <!-- 控制面板：名单 / 维度 / 设置 -->
+    <section class="panels">
+
+      <!-- 名单管理 -->
+      <div class="panel panel-names">
+        <h3 class="panel-title">🧑‍🎓 名单管理</h3>
+        <textarea id="nameInput" placeholder="每行输入一个姓名，最多 100 人&#10;例如：&#10;陈思远&#10;赵子涵"></textarea>
+        <div class="btn-row">
+          <button type="button" class="btn btn-soft" id="btnSample">✨ 填入示例名单</button>
+          <button type="button" class="btn btn-soft" id="btnClear">🗑 清空</button>
+        </div>
+        <p class="panel-tip">提示：名单会自动保存，刷新页面不丢失。</p>
+      </div>
+
+      <!-- 评语维度 -->
+      <div class="panel panel-dims">
+        <div class="panel-head">
+          <h3 class="panel-title">🏷 评语维度（点击标签勾选）</h3>
+          <div class="dim-tools">
+            <button type="button" class="btn-mini" id="btnDimAll">全选</button>
+            <button type="button" class="btn-mini" id="btnDimNone">全不选</button>
+          </div>
+        </div>
+        <div class="chips" id="dimChips"></div>
+        <p class="panel-tip">生成时将从每个已勾选分类中随机抽取 1 条，相邻两位同学不会抽到同一条。</p>
+      </div>
+
+      <!-- 生成设置 -->
+      <div class="panel panel-settings">
+        <h3 class="panel-title">⚙️ 生成设置</h3>
+        <div class="setting-grid">
+          <div class="setting-item">
+            <span class="setting-label">称呼前缀</span>
+            <label class="switch-wrap">
+              <span class="switch-desc">显示「XXX同学：」前缀</span>
+              <span class="switch"><input type="checkbox" id="chkPrefix" checked><span class="slider"></span></span>
+            </label>
+          </div>
+          <div class="setting-item">
+            <span class="setting-label">学生性别</span>
+            <div class="seg-group" id="genderGroup">
+              <label class="seg"><input type="radio" name="gender" value="any" checked><span>👤 不限</span></label>
+              <label class="seg"><input type="radio" name="gender" value="male"><span>👦 男生</span></label>
+              <label class="seg"><input type="radio" name="gender" value="female"><span>👧 女生</span></label>
+            </div>
+          </div>
+          <div class="setting-item setting-item--full">
+            <span class="setting-label">评语风格</span>
+            <div class="seg-group" id="styleGroup">
+              <label class="seg"><input type="radio" name="style" value="objective" checked><span>📐 客观严谨</span></label>
+              <label class="seg"><input type="radio" name="style" value="encourage"><span>💪 鼓励激励</span></label>
+              <label class="seg"><input type="radio" name="style" value="detailed"><span>🔍 具体细致</span></label>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 生成按钮 + 统计 -->
+    <div class="action-bar">
+      <button type="button" class="btn btn-primary btn-lg" id="btnGenerate">🚀 一键生成全部评语</button>
+      <div class="stats">
+        <span class="stat">共 <b id="statPeople">0</b> 人</span>
+        <span class="stat">共 <b id="statChars">0</b> 字</span>
+      </div>
+    </div>
+
+    <!-- 导出工具栏 -->
+    <div class="toolbar">
+      <button type="button" class="btn btn-ghost" id="btnCopy">📋 复制全部</button>
+      <button type="button" class="btn btn-ghost" id="btnTxt">📄 下载 TXT</button>
+      <button type="button" class="btn btn-ghost" id="btnExcel">📊 下载 Excel</button>
+      <button type="button" class="btn btn-ghost" id="btnWord">📝 下载 Word</button>
+    </div>
+
+    <!-- 评语结果区 -->
+    <section class="results">
+      <h3 class="results-title">🎁 评语结果（可直接在卡片中修改）</h3>
+      <p class="empty-tip" id="emptyTip">还没有评语，填好名单后点击「一键生成全部评语」试试吧～</p>
+      <div class="r-grid" id="resultWrap"></div>
+    </section>
+
+  </div>
+  <div class="toast" id="toast"></div>
+  <script src="../../assets/vendor/xlsx.full.min.js"></script>
+  <script src="junior-comment.js"></script>
+</body>
+</html>

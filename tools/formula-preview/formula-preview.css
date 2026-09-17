@@ -1,0 +1,374 @@
+/* ============================================================================
+ * 公式预览 · formula-preview.css
+ * 仅包含本工具特有样式：双栏布局 / 模板库侧栏 / 公式渲染区 / 参数滑块组 /
+ *                       计算结果行 / 内嵌函数图像 / 操作提示
+ * 公共底座（reset、按钮、卡片、表单、stage、modal、toast）见 tool-common.css
+ * 高度策略：所有容器高度自动撑开，仅 body 主滚动条；侧栏模板列表自然撑开
+ * ========================================================================== */
+
+/* ---------------------------------------------------------------------------
+ * 一、覆盖 .layout：本工具需要左侧固定栏 + 右侧主区
+ * ------------------------------------------------------------------------- */
+#app .layout,
+.layout {
+  grid-template-columns: 280px minmax(0, 1fr);
+  gap: 20px;
+  max-width: 1280px;
+}
+
+@media (max-width: 900px) {
+  #app .layout,
+  .layout { grid-template-columns: 1fr; }
+}
+
+/* ---------------------------------------------------------------------------
+ * 二、左侧模板库侧栏
+ * ------------------------------------------------------------------------- */
+.side-card {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 18px 16px;
+  min-width: 0;
+}
+
+.side-head .btn-block {
+  display: flex;
+  width: 100%;
+  justify-content: center;
+  padding: 11px 16px;
+  font-size: 14px;
+}
+
+.side-search input { font-size: 13.5px; }
+
+/* 模板分类标题 */
+.tpl-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.cat-title {
+  margin: 12px 0 4px;
+  padding: 4px 6px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-3);
+  letter-spacing: 0.04em;
+}
+.cat-title:first-child { margin-top: 0; }
+
+/* 单个模板按钮：左对齐文字、悬停高亮、选中态主色 */
+.tpl-btn {
+  width: 100%;
+  padding: 9px 12px;
+  font-size: 13.5px;
+  font-weight: 500;
+  text-align: left;
+  color: var(--text-2);
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  cursor: pointer;
+  transition: all var(--t-fast) var(--ease);
+  white-space: normal;
+  word-break: break-word;
+}
+.tpl-btn:hover {
+  color: var(--primary);
+  border-color: var(--primary-soft-2);
+  background: var(--primary-soft);
+  transform: translateX(2px);
+}
+.tpl-btn.active {
+  color: #fff;
+  background: var(--primary-grad);
+  border-color: transparent;
+  box-shadow: var(--shadow-primary);
+}
+
+/* ---------------------------------------------------------------------------
+ * 三、右侧主区
+ * ------------------------------------------------------------------------- */
+.main-card {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding: 22px 24px;
+  min-width: 0;
+}
+
+.main-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.tpl-name {
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text-1);
+}
+
+/* 视图切换标签 */
+.view-tabs {
+  display: inline-flex;
+  gap: 4px;
+  padding: 4px;
+  background: var(--bg-soft);
+  border: 1px solid var(--border);
+  border-radius: var(--r-pill);
+}
+.tab-btn {
+  padding: 7px 16px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-2);
+  background: transparent;
+  border: none;
+  border-radius: var(--r-pill);
+  cursor: pointer;
+  transition: all var(--t-fast) var(--ease);
+}
+.tab-btn:hover { color: var(--primary); background: var(--card-bg); }
+.tab-btn.active {
+  color: #fff;
+  background: var(--primary-grad);
+  box-shadow: var(--shadow-primary);
+}
+
+/* ---------------------------------------------------------------------------
+ * 四、公式渲染区
+ * ------------------------------------------------------------------------- */
+.formula-box {
+  position: relative;
+  padding: 32px 24px;
+  background: linear-gradient(180deg, #fbfcff 0%, #f5f8ff 100%);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.6);
+  min-height: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow-x: auto;     /* 公式过宽时允许横向滚动，不撑破布局 */
+  overflow-y: visible;
+}
+
+.formula-render {
+  width: 100%;
+  text-align: center;
+  font-size: 24px;
+  color: var(--text-1);
+  line-height: 1.6;
+}
+.formula-render:empty::before {
+  content: "请从左侧选择公式模板";
+  color: var(--text-3);
+  font-size: 14px;
+}
+
+.formula-text {
+  width: 100%;
+  text-align: center;
+  font-family: Consolas, Menlo, monospace;
+  font-size: 16px;
+  color: var(--text-2);
+  line-height: 1.7;
+  word-break: break-word;
+  white-space: pre-wrap;
+}
+
+/* ---------------------------------------------------------------------------
+ * 五、参数设置区
+ * ------------------------------------------------------------------------- */
+.params-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding-bottom: 8px;
+  border-bottom: 1px dashed var(--border);
+}
+.params-title {
+  font-size: 14.5px;
+  font-weight: 700;
+  color: var(--text-1);
+}
+.params-current {
+  font-size: 12.5px;
+  color: var(--text-3);
+  font-variant-numeric: tabular-nums;
+  word-break: break-all;
+  text-align: right;
+  max-width: 70%;
+}
+
+/* 参数网格：自动适配列数 */
+.params {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 12px;
+}
+
+.param-item {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 12px 14px;
+  background: var(--card-bg-2);
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+}
+.param-item label {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-2);
+}
+.param-item input[type="range"] { width: 100%; }
+.param-item input[type="number"] {
+  width: 100%;
+  padding: 7px 10px;
+  font-size: 13.5px;
+  font-weight: 700;
+  text-align: center;
+}
+
+/* ---------------------------------------------------------------------------
+ * 六、计算结果行
+ * ------------------------------------------------------------------------- */
+.result-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  flex-wrap: wrap;
+  padding: 14px 18px;
+  background: linear-gradient(135deg, rgba(59, 110, 246, 0.06), rgba(56, 163, 232, 0.04));
+  border: 1px solid var(--primary-soft-2);
+  border-radius: var(--r);
+}
+.result-label {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-2);
+  flex-shrink: 0;
+}
+.result-value {
+  font-size: clamp(18px, 2.4vw, 24px);
+  font-weight: 800;
+  color: var(--primary);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
+  text-align: right;
+  word-break: break-all;
+  flex: 1;
+  min-width: 0;
+}
+.result-value .unit {
+  display: inline-block;
+  margin-left: 6px;
+  padding: 2px 9px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--primary);
+  background: var(--primary-soft);
+  border-radius: var(--r-pill);
+  vertical-align: middle;
+}
+
+/* ---------------------------------------------------------------------------
+ * 七、函数图像区（仅 graph 模板显示）
+ * ------------------------------------------------------------------------- */
+.graph-wrap {
+  display: none;
+  flex-direction: column;
+  gap: 10px;
+  padding: 16px;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  box-shadow: var(--shadow-sm);
+}
+.graph-wrap.show { display: flex; }
+
+.graph-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.graph-title {
+  font-size: 14.5px;
+  font-weight: 700;
+  color: var(--text-1);
+}
+.graph-range {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  font-size: 12.5px;
+  color: var(--text-3);
+}
+.graph-range input.num-mini {
+  width: 60px;
+  padding: 5px 8px;
+  font-size: 12.5px;
+  font-weight: 600;
+  text-align: center;
+}
+.range-divider {
+  color: var(--border-2);
+  padding: 0 4px;
+}
+
+#miniCanvas {
+  width: 100%;
+  height: 280px;
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+}
+
+/* ---------------------------------------------------------------------------
+ * 八、操作按钮区与提示
+ * ------------------------------------------------------------------------- */
+.main-card .actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+  margin-top: 4px;
+}
+
+.op-hint {
+  padding: 12px 16px;
+  font-size: 13px;
+  line-height: 1.8;
+  color: var(--text-2);
+  background: var(--bg-soft);
+  border-left: 3px solid var(--primary);
+  border-radius: var(--r-sm);
+}
+.op-hint strong { color: var(--text-1); font-weight: 700; }
+
+/* ---------------------------------------------------------------------------
+ * 九、小屏微调
+ * ------------------------------------------------------------------------- */
+@media (max-width: 640px) {
+  .main-card { padding: 16px; }
+  .formula-box { padding: 20px 12px; }
+  .params { grid-template-columns: 1fr; }
+  .params-current { max-width: 100%; text-align: left; }
+}

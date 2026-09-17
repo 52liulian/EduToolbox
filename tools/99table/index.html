@@ -1,0 +1,63 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN" data-theme="amber">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>九九乘法表 | EduToolbox · 乘法口诀</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%8E%93%3C/text%3E%3C/svg%3E">
+<link rel="stylesheet" href="99table.css">
+<link rel="stylesheet" href="../../assets/css/tool-common.css">
+</head>
+<body>
+
+  <header class="hero">
+    <h1>九九乘法表</h1>
+    <p class="subtitle">适合小学数学课堂、乘法口诀教学和课后复习。支持完整表与三角形布局切换、字号调节、颜色主题切换、打印友好、全屏展示。</p>
+  </header>
+
+  <section class="controls" id="controls">
+    <div class="ctrl-group">
+      <span class="ctrl-label">布局</span>
+      <div class="seg" data-name="layout" role="group" aria-label="布局切换">
+        <button class="seg-btn" data-value="full" type="button">完整表</button>
+        <button class="seg-btn" data-value="triangle" type="button">三角形</button>
+      </div>
+    </div>
+
+    <div class="ctrl-group">
+      <span class="ctrl-label">字号</span>
+      <div class="seg" data-name="size" role="group" aria-label="字号调节">
+        <button class="seg-btn" data-value="s" type="button">紧凑</button>
+        <button class="seg-btn" data-value="m" type="button">标准</button>
+        <button class="seg-btn" data-value="l" type="button">大号</button>
+        <button class="seg-btn" data-value="xl" type="button">超大</button>
+      </div>
+    </div>
+
+    <div class="ctrl-group">
+      <span class="ctrl-label">主题</span>
+      <div class="seg" data-name="theme" role="group" aria-label="主题切换">
+        <button class="seg-btn" data-value="amber" type="button">米黄</button>
+        <button class="seg-btn" data-value="sky" type="button">蓝白</button>
+        <button class="seg-btn" data-value="green" type="button">绿白</button>
+        <button class="seg-btn" data-value="dark" type="button">暗黑</button>
+      </div>
+    </div>
+
+    <div class="ctrl-group ctrl-actions">
+      <button class="action-btn" id="fullscreen-btn" type="button" title="全屏展示">⛶ 全屏</button>
+      <button class="action-btn" id="print-btn" type="button" title="打印乘法表">🖨 打印</button>
+    </div>
+  </section>
+
+  <section class="table-area" id="table-area">
+    <div class="table-grid" id="table-grid" data-size="m" data-layout="full"></div>
+  </section>
+
+  <footer class="footer">
+    <p>九九乘法表 · 教学辅助工具 · 单文件本地运行，无需联网</p>
+  </footer>
+
+  <script src="99table.js"></script>
+</body>
+</html>
