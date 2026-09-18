@@ -41,7 +41,8 @@
    * 返回值: number，范围 [MIN_SIZE, MAX_SIZE]
    */
   function loadFontSize() {
-    const raw = parseInt(localStorage.getItem("tempBoard.fontSize"), 10);
+    let raw = NaN;
+    try { raw = parseInt(localStorage.getItem("tempBoard.fontSize"), 10); } catch (e) { /* 忽略（隐私模式） */ }
     if (Number.isNaN(raw)) return DEFAULT_SIZE;
     return Math.min(MAX_SIZE, Math.max(MIN_SIZE, raw));
   }
@@ -50,7 +51,8 @@
    * 返回值: string（white / black / green），默认 white
    */
   function loadTheme() {
-    const t = localStorage.getItem("tempBoard.theme") || "white";
+    let t = "white";
+    try { t = localStorage.getItem("tempBoard.theme") || "white"; } catch (e) { /* 忽略（隐私模式） */ }
     return ["white", "black", "green"].indexOf(t) >= 0 ? t : "white";
   }
 
@@ -58,7 +60,7 @@
    * 返回值: string（HTML 字符串，可为空）
    */
   function loadContent() {
-    return localStorage.getItem("tempBoard.content") || "";
+    try { return localStorage.getItem("tempBoard.content") || ""; } catch (e) { return ""; }
   }
 
   /* ---------- 应用字号到 DOM 与显示 ----------

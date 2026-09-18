@@ -1,9 +1,10 @@
 /** 背诵记录大屏：导入学号姓名，点击切换已背诵状态，支持导出 */
 (function () {
   const $ = (id) => document.getElementById(id);
-  let students = JSON.parse(localStorage.getItem("recitation") || "[]");
+  let students = [];
+  try { students = JSON.parse(localStorage.getItem("recitation") || "[]"); } catch (e) { /* 忽略（隐私模式） */ }
 
-  function save() { localStorage.setItem("recitation", JSON.stringify(students)); }
+  function save() { try { localStorage.setItem("recitation", JSON.stringify(students)); } catch (e) { /* 忽略 */ } }
   function render() {
     if (!students.length) { $("grid").innerHTML = '<div class="empty">请导入名单（CSV 格式：学号,姓名，每行一个）</div>'; return; }
     const done = students.filter(s => s.done).length;

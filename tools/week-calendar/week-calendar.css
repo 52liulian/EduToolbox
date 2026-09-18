@@ -442,3 +442,16 @@ section.display {
   .today-badge { font-size: 9.5px; padding: 0 5px; }
   .intro { padding: 20px 16px; }
 }
+
+/* ---------- 顶部工具栏：右对齐胶囊按钮行 ---------- */
+.tool-topbar {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  flex-wrap: wrap;
+  padding: 10px 12px;
+  margin-bottom: 12px;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+}

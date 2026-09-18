@@ -3,12 +3,12 @@ const { JSDOM } = require("jsdom");
 const fs = require("fs");
 const path = require("path");
 
-const APP = fs.readFileSync(path.join(__dirname, "app.js"), "utf8");
+const APP = fs.readFileSync(path.join(__dirname, "handwrite.js"), "utf8");
 
 // 加载完整 index.html，剥离 CDN 外链 script（jsdom 不联网，避免卡顿/报错）
 let HTML = fs.readFileSync(path.join(__dirname, "index.html"), "utf8");
 HTML = HTML.replace(/<script src="https:\/\/[^"]*"><\/script>/g, "");
-HTML = HTML.replace(/<script src="app\.js"><\/script>/, "");
+HTML = HTML.replace(/<script src="handwrite\.js"><\/script>/, "");
 
 // Canvas mock —— 记录 fillText 调用以验证渲染
 let fillTextCalls = 0;

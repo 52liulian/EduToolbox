@@ -232,3 +232,16 @@
   .timer-stage .stats { gap: 14px; }
   .stat-item { min-width: 90px; padding: 10px 14px; }
 }
+
+/* ---------- 顶部工具栏：右对齐胶囊按钮行 ---------- */
+.tool-topbar {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  flex-wrap: wrap;
+  padding: 10px 12px;
+  margin-bottom: 12px;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+}

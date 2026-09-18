@@ -26,13 +26,15 @@
       html += `<div class="week ${isCur ? 'cur' : ''}"><div class="no">第 ${w+1} 周${isCur ? ' · 本周' : ''}</div><div class="range">${fmt(ws)} - ${fmt(we)}</div><div class="days">${days}</div></div>`;
     }
     $("cal").innerHTML = html;
-    localStorage.setItem("tcStart", $("start").value);
-    localStorage.setItem("tcWeeks", weeks);
+    try { localStorage.setItem("tcStart", $("start").value); } catch (e) { /* 忽略（隐私模式） */ }
+    try { localStorage.setItem("tcWeeks", weeks); } catch (e) { /* 忽略 */ }
   }
 
   $("gen").addEventListener("click", gen);
   $("print").addEventListener("click", () => window.print());
-  const s = localStorage.getItem("tcStart");
-  if (s) { $("start").value = s; $("weeks").value = localStorage.getItem("tcWeeks") || 20; gen(); }
+  /* 兼容 file:// 或隐私模式下 localStorage 不可用 */
+  let saved = null, savedWeeks = null;
+  try { saved = localStorage.getItem("tcStart"); savedWeeks = localStorage.getItem("tcWeeks"); } catch (e) { /* 忽略 */ }
+  if (saved) { $("start").value = saved; $("weeks").value = savedWeeks || 20; gen(); }
   else $("start").value = "2026-02-23";
 })();

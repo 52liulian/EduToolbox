@@ -178,10 +178,17 @@
 /* ---------------------------------------------------------------------------
  * 五、单字详情弹层（#modal 为覆盖层，.modal-panel 为对话框）
  *   公共 .modal 是对话框盒，本工具把 #modal 用作覆盖层，故用 id 覆盖
+ *   定位策略：position:absolute + JS 动态设置 top/height，仅覆盖「当前屏幕」
+ *   原因：本工具在 iframe 内被父页撑开到全文档高度，position:fixed 会相对
+ *        整个 iframe 文档视口居中（即整个生字表高度中心），而非当前可见屏幕；
+ *        改为 absolute 后由 JS 在 openModal 时按 scrollY/innerHeight 定位
  * ------------------------------------------------------------------------- */
 #modal {
-  position: fixed;
-  inset: 0;
+  position: absolute;
+  left: 0;
+  top: 0;            /* 由 JS 在 openModal 时动态写入 = window.scrollY */
+  width: 100%;
+  height: 100vh;     /* 由 JS 在 openModal 时动态写入 = window.innerHeight */
   z-index: 1000;
   display: flex;
   align-items: center;
@@ -350,4 +357,17 @@
 @media (max-width: 720px) {
   .toolbar.card { padding: 14px 16px; }
   .toolbar { gap: 14px; }
+}
+
+/* ---------- 顶部工具栏：右对齐胶囊按钮行 ---------- */
+.tool-topbar {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  flex-wrap: wrap;
+  padding: 10px 12px;
+  margin-bottom: 12px;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
 }

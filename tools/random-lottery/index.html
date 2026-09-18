@@ -1,4 +1,4 @@
-﻿
+
 <!DOCTYPE html>
 <html lang="zh-Hans">
 <head>
@@ -234,14 +234,6 @@ footer a:hover {
     overflow: hidden;
 }
 
-.search-results .result-title {
-    font-weight: 600;
-    margin-bottom: 4px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
 .search-results .result-url {
     font-size: 12px;
     color: #888;
@@ -339,12 +331,6 @@ footer a:hover {
 .tool-card:hover .tool-icon {
     color: white;
     transform: scale(1.1) rotate(5deg);
-}
-
-.title h1 {
-    text-align: center;
-    font-size: 26px;
-    color: var(--text-color-dark);
 }
 
 .weizhi {
@@ -671,10 +657,6 @@ th {
         margin-left: 5px;
     }
 
-    .title h1 {
-        font-size: 22px;
-    }
-
     .menu-icon {
         display: block;
     }
@@ -772,16 +754,6 @@ th {
     --placeholder-text-color: #bdc3c7;
     --border-radius: 12px;
     --shadow: 0 5px 20px rgba(44, 62, 80, 0.1);
-}
-
-.main-title {
-    grid-column: 1 / -1;
-    text-align: center;
-    color: var(--dark-color);
-    margin: 0 0 20px 0;
-    font-size: 2.8em;
-    font-weight: 300;
-    letter-spacing: 1px;
 }
 
 .mainbox {
@@ -896,9 +868,6 @@ button:disabled:hover {
 
 #edit-btn,
 #import-btn,
-#change-title-btn {
-    background-color: var(--gray-color);
-}
 
 .preset-btn {
     background-color: var(--preset-color);
@@ -1038,7 +1007,6 @@ button:disabled:hover {
 </head>
 <body>
 <div class="container main">
-<div class="title"><h1 id="main-title">线上抽签程式｜随机抽签系统工具</h1></div>
 <div class="mainbox">
        <div class="setup-panel panel">
             <h2>1. 编辑选项</h2>
@@ -1046,7 +1014,6 @@ button:disabled:hover {
             <div class="button-group">
                 <button id="import-btn">导入</button>
                 <button id="edit-btn">编辑</button>
-                <button id="change-title-btn">标题</button>
             </div>
 
             <h3>或选择预设</h3>
@@ -1094,13 +1061,11 @@ button:disabled:hover {
 
 <script>
     document.addEventListener('DOMContentLoaded', () => {
-        const mainTitle = document.getElementById('main-title');
         const participantsTextarea = document.getElementById('participants');
         const startBtn = document.getElementById('start-btn');
         const editBtn = document.getElementById('edit-btn');
         const importBtn = document.getElementById('import-btn');
         const fileInput = document.getElementById('file-input');
-        const changeTitleBtn = document.getElementById('change-title-btn');
         const showAllBtn = document.getElementById('show-all-btn');
         const resetBtn = document.getElementById('reset-btn');
         const placeholder = document.getElementById('placeholder');
@@ -1142,7 +1107,6 @@ button:disabled:hover {
             startBtn.disabled = false;
             editBtn.style.display = 'inline-block';
             importBtn.style.display = 'inline-block';
-            changeTitleBtn.style.display = 'inline-block';
             presetButtonsContainer.style.display = 'flex';
             placeholder.style.display = 'flex';
             placeholder.style.opacity = '1';
@@ -1169,7 +1133,6 @@ button:disabled:hover {
             //participantsTextarea.disabled = true;
             //editBtn.style.display = 'none';
             //importBtn.style.display = 'none';
-            //changeTitleBtn.style.display = 'none';
             //presetButtonsContainer.style.display = 'none';
             placeholder.style.opacity = '0';
             setTimeout(() => {
@@ -1225,12 +1188,6 @@ button:disabled:hover {
                 reader.readAsText(file);
             }
             event.target.value = '';
-        });
-        changeTitleBtn.addEventListener('click', () => {
-            const newTitle = prompt('请输入新的标题：', mainTitle.textContent);
-            if (newTitle && newTitle.trim()) {
-                mainTitle.textContent = newTitle.trim();
-            }
         });
         showAllBtn.addEventListener('click', () => {
             document.querySelectorAll('.lot-inner:not(.revealed)').forEach(lot => lot.classList.add('revealed'));

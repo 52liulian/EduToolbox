@@ -217,7 +217,15 @@
     $("modalStrokes").textContent = strokesOf(ch) || "—";
     $("modalGrade").textContent = activeGrade;
     $("modalIndex").textContent = (i + 1) + " / " + list.length;
-    $("modal").hidden = false;
+
+    // 弹层定位：本工具在 iframe 内被父页撑开到全文档高度，
+    // position:absolute（见 .css #modal）按当前可见屏幕居中，
+    // 避免 fixed 在 iframe 文档视口（=全文档）中心显示的问题
+    var modal = $("modal");
+    modal.style.top = window.scrollY + "px";
+    modal.style.height = window.innerHeight + "px";
+
+    modal.hidden = false;
     // 记录当前索引供「全屏展示」使用
     previewIndex = i;
   }

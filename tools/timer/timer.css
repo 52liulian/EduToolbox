@@ -290,3 +290,16 @@ body.alerting::after {
     animation: none !important;
   }
 }
+
+/* ---------- 顶部工具栏：右对齐胶囊按钮行 ---------- */
+.tool-topbar {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  flex-wrap: wrap;
+  padding: 10px 12px;
+  margin-bottom: 12px;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+}

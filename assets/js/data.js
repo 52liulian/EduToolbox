@@ -333,7 +333,6 @@ const DB = {
     {id:"group-maker", slug:"random-group", name:"随机分组工具", icon:"👥", desc:"一键快速分组，支持按组数或人数分配，适合小组讨论", features:["🎲 随机分组","👫 按组/按人数","⚖️ 性别平衡","📋 复制结果"]},
     {id:"timer", slug:"timer", name:"课堂倒计时", icon:"⏱️", desc:"专为课堂设计的倒计时工具，全屏显示、多种提示音效", features:["⏱️ 自定义时长","📊 进度圆环","🔔 结束提示","🖥️ 全屏模式"]},
     {id:"pinyin-annotator", slug:"pinyin-annotator", name:"拼音标注", icon:"🔤", desc:"自动为汉字标注拼音，支持声调符号/数字/无声调多种样式", features:["🔤 自动注音","🎵 多种声调","📐 上方/侧注","📋 复制 HTML"]},
-    {id:"certificate-generator", slug:"certificate-generator", name:"在线奖状生成器", icon:"🏆", desc:"多种精美模板，支持自定义内容与电子印章，一键下载 PNG", features:["🎨 6 种模板","✏️ 自定义内容","🔴 电子印章","⬇️ PNG 下载"]},
     {id:"scrolling-text", slug:"scrolling-text", name:"早读滚动", icon:"📖", desc:"文本从下往上滚动展示，适合课堂投影和学生跟读", features:["📜 滚动文字","🎨 字号/颜色","⚡ 调速","🖥️ 全屏"]},
     {id:"paragraph-scroll", slug:"paragraph-scroll", name:"段落滚动", icon:"📜", desc:"逐段切换展示，类似歌词提词，适合朗读和演讲", features:["📝 逐段切换","⏱️ 停留时长","🎨 字号/颜色","🖥️ 全屏"]},
     {id:"temp-board", slug:"temp-board", name:"课堂记录板", icon:"📋", desc:"快速记录课堂要点、作业安排，支持清空与全屏", features:["✏️ 快速记录","💾 本地保存","🗑️ 一键清空","🖥️ 全屏展示"]},

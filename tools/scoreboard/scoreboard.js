@@ -26,8 +26,14 @@
    * teams: Array<{ id: number, name: string, score: number }>
    * 持久化到 localStorage.scoreboardTeams
    */
+  /* ---------- 生成唯一自增 id ----------
+   * 返回值: number（基于时间戳 + 随机数，足够唯一）
+   * 注意：必须在 loadTeams() 调用前声明，避免 TDZ 引用错误
+   */
+  let _idSeed = Date.now();
+  function nextId() { return ++_idSeed; }
+
   const STORAGE_KEY = "scoreboardTeams";
-  let teams = loadTeams();
 
   /* ---------- 加载持久化数据 ----------
    * 返回值: Array<{id,name,score}>；解析失败或为空返回默认 4 队
@@ -48,11 +54,7 @@
     ];
   }
 
-  /* ---------- 生成唯一自增 id ----------
-   * 返回值: number（基于时间戳 + 随机数，足够唯一）
-   */
-  let _idSeed = Date.now();
-  function nextId() { return ++_idSeed; }
+  let teams = loadTeams();
 
   /* ---------- 持久化保存 ---------- */
   function save() {

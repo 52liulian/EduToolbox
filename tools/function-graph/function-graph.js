@@ -697,7 +697,7 @@
     } else {
       var ymin = parseFloat(document.getElementById("yMin").value);
       var ymax = parseFloat(document.getElementById("yMax").value);
-      if (isFinite(ymin) && isFinite(ymax) && ymax > ymin)) {
+      if (isFinite(ymin) && isFinite(ymax) && ymax > ymin) {
         view.cy = (ymin + ymax) / 2;
         var yScale = cssH / (ymax - ymin);
         view.scale = Math.min(view.scale, yScale);

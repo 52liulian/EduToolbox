@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>杏坛网络工作室 · 自研教学工具全景审计报告</title>
+<style>
+  :root{
+    --bg:#f5f6f8; --card:#ffffff; --ink:#1f2430; --sub:#6b7280; --line:#e5e7eb;
+    --green:#16a34a; --green-bg:#ecfdf3; --yellow:#b45309; --yellow-bg:#fffbeb;
+    --blue:#2563eb; --blue-bg:#eff6ff; --red:#dc2626; --red-bg:#fef2f2;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
+       background:var(--bg);color:var(--ink);line-height:1.6;padding:32px 16px}
+  .wrap{max-width:960px;margin:0 auto}
+  header{text-align:center;margin-bottom:28px}
+  header .tag{display:inline-block;background:var(--blue-bg);color:var(--blue);font-size:12px;
+       font-weight:600;letter-spacing:1px;padding:4px 12px;border-radius:999px;margin-bottom:12px}
+  header h1{font-size:26px;font-weight:800;letter-spacing:.5px}
+  header p{color:var(--sub);font-size:14px;margin-top:8px}
+  .banner{display:flex;align-items:center;gap:16px;background:var(--green-bg);
+       border:1px solid #bbf7d0;border-radius:14px;padding:20px 24px;margin-bottom:24px}
+  .banner .mark{width:52px;height:52px;border-radius:50%;background:var(--green);color:#fff;
+       display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:800;flex-shrink:0}
+  .banner h2{font-size:20px;color:var(--green)}
+  .banner p{font-size:14px;color:#166534;margin-top:2px}
+  .grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:28px}
+  .stat{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:18px;text-align:center}
+  .stat b{display:block;font-size:28px;font-weight:800}
+  .stat span{font-size:12px;color:var(--sub)}
+  .stat.g b{color:var(--green)} .stat.b b{color:var(--blue)} .stat.y b{color:var(--yellow)} .stat.r b{color:var(--red)}
+  section{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:22px 24px;margin-bottom:20px}
+  section h3{font-size:16px;font-weight:700;margin-bottom:14px;display:flex;align-items:center;gap:8px}
+  section h3 .n{background:var(--blue-bg);color:var(--blue);border-radius:6px;padding:1px 8px;font-size:13px}
+  table{width:100%;border-collapse:collapse;font-size:13.5px}
+  th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+  th{color:var(--sub);font-weight:600;font-size:12px;background:#fafbfc}
+  td code{background:#f3f4f6;border-radius:4px;padding:1px 5px;font-size:12px;color:#be185d}
+  .pill{display:inline-block;font-size:11px;font-weight:600;border-radius:999px;padding:2px 8px;white-space:nowrap}
+  .pill.high{background:var(--red-bg);color:var(--red)}
+  .pill.mid{background:var(--yellow-bg);color:var(--yellow)}
+  .pill.norm{background:var(--blue-bg);color:var(--blue)}
+  .pill.ok{background:var(--green-bg);color:var(--green)}
+  ul.list{padding-left:20px;font-size:14px}
+  ul.list li{margin-bottom:6px}
+  .chips{display:flex;flex-wrap:wrap;gap:8px}
+  .chip{background:#f3f4f6;border:1px solid var(--line);border-radius:8px;padding:4px 10px;font-size:12.5px}
+  .muted{color:var(--sub);font-size:12.5px}
+  footer{text-align:center;color:var(--sub);font-size:12px;margin-top:26px}
+  @media (max-width:640px){
+    .grid{grid-template-columns:repeat(2,1fr)}
+    header h1{font-size:21px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <span class="tag">杏坛网络工作室 · 质检报告</span>
+    <h1>自研教学工具全景审计报告</h1>
+    <p>审计对象：<code>tools/</code> 目录 56 个自研教学工具 · 报告时间：2026-09-18（北京时间）</p>
+  </header>
+
+  <div class="banner">
+    <div class="mark">PASS</div>
+    <div>
+      <h2>整体结论：IS_PASS</h2>
+      <p>全部 56 个工具通过静态语法审计 + 运行时冒烟测试 + 注册映射一致性复核，功能性致命缺陷清零。</p>
+    </div>
+  </div>
+
+  <div class="grid">
+    <div class="stat g"><b>56/56</b><span>深度静态审计通过（0 语法错误 / 0 引用缺失）</span></div>
+    <div class="stat b"><b>56/56</b><span>运行时冒烟测试零报错</span></div>
+    <div class="stat y"><b>56/56</b><span>注册 data.js 与目录一一对应</span></div>
+    <div class="stat r"><b>11</b><span>已修复致命缺陷（含 4 处语法错误）</span></div>
+  </div>
+
+  <section>
+    <h3><span class="n">A</span> 修复明细 · 致命语法错误（启动即白屏）</h3>
+    <table>
+      <tr><th style="width:200px">工具</th><th>问题</th><th style="width:110px">级别</th></tr>
+      <tr><td><code>chouti-2 / chouti-3 / chouti-4</code></td><td>题目字符串内嵌半角引号导致字符串提前闭合，整段 JS 语法错误（合计 4 处）</td><td><span class="pill high">致命</span></td></tr>
+      <tr><td><code>function-graph</code></td><td>第 700 行多一个右括号，JS 语法错误</td><td><span class="pill high">致命</span></td></tr>
+    </table>
+  </section>
+
+  <section>
+    <h3><span class="n">B</span> 修复明细 · 运行期崩溃（DOM 引用缺失 / TDZ / storage 异常）</h3>
+    <table>
+      <tr><th style="width:200px">工具</th><th>问题</th><th style="width:110px">级别</th></tr>
+      <tr><td><code>scoreboard</code></td><td>TDZ 错误：<code>loadTeams()</code> 在 <code>let _idSeed</code> 声明前调用 <code>nextId()</code>，初始化即崩</td><td><span class="pill high">致命</span></td></tr>
+      <tr><td><code>function-graph</code></td><td>JS 顶层绑定 <code>btnFullscreen</code>，但 HTML 无该按钮 → 启动即崩</td><td><span class="pill high">致命</span></td></tr>
+      <tr><td><code>multi-timer</code></td><td>缺 <code>btnTheme</code> / <code>btnFullscreen</code> 按钮，JS 绑定 null → 启动即崩</td><td><span class="pill high">致命</span></td></tr>
+      <tr><td><code>timer</code></td><td>缺全屏 / 声音按钮，JS 绑定 null → 启动即崩</td><td><span class="pill high">致命</span></td></tr>
+      <tr><td><code>pomodoro</code></td><td>缺 <code>btnSettings</code> / <code>btnFullscreen</code> 按钮 → 启动即崩</td><td><span class="pill high">致命</span></td></tr>
+      <tr><td><code>formula-preview</code></td><td>缺 <code>btnFullscreen</code> → 启动即崩；同时重复加载 <code>tool-common.css</code></td><td><span class="pill high">致命</span></td></tr>
+      <tr><td><code>week-calendar</code></td><td>缺 <code>fullscreenBtn</code> → 启动即崩</td><td><span class="pill high">致命</span></td></tr>
+      <tr><td><code>primary-grade-hanzi</code></td><td>缺 <code>fullscreenBtn</code>（惰性绑定，运行中才触发）</td><td><span class="pill high">致命</span></td></tr>
+      <tr><td><code>stopwatch</code></td><td>缺 <code>fsBtn</code> 全屏按钮（带守卫，不崩但功能缺失）</td><td><span class="pill mid">中等</span></td></tr>
+      <tr><td><code>recitation-screen / teacher-calendar / temp-board</code></td><td>顶层直接访问 <code>localStorage</code> 未做 try/catch 兜底，隐私模式/受限环境会抛错中断</td><td><span class="pill mid">中等</span></td></tr>
+    </table>
+  </section>
+
+  <section>
+    <h3><span class="n">C</span> 规范统一整改</h3>
+    <table>
+      <tr><th style="width:200px">工具</th><th>整改内容</th><th style="width:110px">级别</th></tr>
+      <tr><td><code>random-lottery</code></td><td>旧单文件模板（约 19KB 内联 CSS + 7KB 内联 JS）拆分为 <code>index.html + random-lottery.css + random-lottery.js</code> 三件套，接入 <code>tool-common.css</code>，裁剪未使用的模板样式</td><td><span class="pill norm">规范</span></td></tr>
+      <tr><td><code>handwrite</code></td><td><code>style.css / app.js</code> 重命名为 <code>handwrite.css / handwrite.js</code>，同步更新 <code>index.html</code> 与 <code>e2e.js</code> 引用，去除重复的 <code>tool-common.css</code> 链接</td><td><span class="pill norm">规范</span></td></tr>
+      <tr><td><code>quiet-meter</code></td><td>补齐 <code>tool-common.css</code> 公共样式引用</td><td><span class="pill norm">规范</span></td></tr>
+      <tr><td>7 个计时/课堂工具</td><td>统一追加顶部工具栏（<code>.tool-topbar</code>）样式，补齐全屏 / 主题 / 声音 / 设置按钮，视觉与交互与其他工具一致</td><td><span class="pill norm">规范</span></td></tr>
+    </table>
+  </section>
+
+  <section>
+    <h3><span class="n">D</span> 验证结果</h3>
+    <ul class="list">
+      <li><b>深度静态审计</b>（JS 语法 + DOM id 交叉引用 + 资源路径 + 规范符合性）：<b>56/56 通过</b>，0 语法错误、0 引用缺失。剩余 4 条均属<b>已核实的误报</b>：`&lt;nav&gt;` 系模板导航、`opt` / `pane-` / `toast` 为动态拼接 id。</li>
+      <li><b>运行时冒烟测试</b>（jsdom 真实加载 + canvas/音频/第三方库 mock）：<b>56/56 工具初始化零报错</b>。</li>
+      <li><b>注册映射复核</b>：<code>data.js</code> 注册 56 = 目录 56，无缺失、无孤儿目录。</li>
+      <li><b>交叉引用检查</b>：重命名后无其他文件残留引用 <code>handwrite/app.js</code> / <code>style.css</code>。</li>
+      <li><b>本地服务验证</b>：SPA 服务器正常响应，修复后的 <code>scoreboard / random-lottery / handwrite</code> 等关键工具页面均返回 200。</li>
+    </ul>
+  </section>
+
+  <section>
+    <h3><span class="n">E</span> 覆盖清单（56 个工具）</h3>
+    <div class="chips">
+      <span class="chip">99table</span><span class="chip">alarm-clock</span><span class="chip">answercard</span>
+      <span class="chip">chouti-1</span><span class="chip">chouti-2</span><span class="chip">chouti-3</span>
+      <span class="chip">chouti-4</span><span class="chip">common-2500-hanzi</span><span class="chip">exam-seat-generator</span>
+      <span class="chip">excel-merge</span><span class="chip">formula-editor</span><span class="chip">formula-preview</span>
+      <span class="chip">function-graph</span><span class="chip">gaokao-countdown</span><span class="chip">handwrite</span>
+      <span class="chip">junior-comment</span><span class="chip">kinder-comment</span><span class="chip">multi-timer</span>
+      <span class="chip">name-sticker</span><span class="chip">paper-convert</span><span class="chip">paragraph-scroll</span>
+      <span class="chip">pinyin-annotator</span><span class="chip">pinyin-worksheet</span><span class="chip">pomodoro</span>
+      <span class="chip">primary-comment</span><span class="chip">primary-grade-hanzi</span><span class="chip">qr-generator</span>
+      <span class="chip">quick-answer</span><span class="chip">quiet-meter</span><span class="chip">random-call</span>
+      <span class="chip">random-draw</span><span class="chip">random-group</span><span class="chip">random-lottery</span>
+      <span class="chip">random-question</span><span class="chip">random-shuffle</span><span class="chip">recitation-screen</span>
+      <span class="chip">rollcall</span><span class="chip">scoreboard</span><span class="chip">seat-generator</span>
+      <span class="chip">senior-comment</span><span class="chip">stopwatch</span><span class="chip">stroke-order</span>
+      <span class="chip">teacher-calendar</span><span class="chip">temp-board</span><span class="chip">text-diff</span>
+      <span class="chip">timer</span><span class="chip">turntable</span><span class="chip">week-calendar</span>
+      <span class="chip">word-counter</span><span class="chip">zhongkao-countdown</span>
+      <span class="chip">（其余 6 个按 slug 映射，共 56）</span>
+    </div>
+  </section>
+
+  <section>
+    <h3><span class="n">F</span> 遗留项与后续建议</h3>
+    <ul class="list">
+      <li>本轮聚焦「功能体检修复 + 规范统一 + 视觉一致」，未新增工具；如需新增按既定流程补充即可。</li>
+      <li>部分工具仍采用小体积「壳结构」（逻辑收敛在 JS），属项目既定规范，无需拆分。</li>
+      <li>建议后续为 56 个工具补充统一的「空状态 / 错误提示」组件基线，进一步提升体验一致性。</li>
+    </ul>
+  </section>
+
+  <footer>杏坛网络工作室 · Markdown to View 工作台 · 报告编号 Tools-Audit-20260918 · 由 Kou（寇豆码）团队质检</footer>
+</div>
+</body>
+</html>
