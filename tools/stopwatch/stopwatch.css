@@ -302,16 +302,7 @@ main.container {
   color: var(--danger);
 }
 
-/* 空态：虚线占位 */
-.laps-empty {
-  padding: 30px 16px;
-  text-align: center;
-  font-size: 13.5px;
-  color: var(--text-3);
-  border: 1.5px dashed var(--border-2);
-  border-radius: var(--r-sm);
-  background: none;
-}
+/* 空态：已迁移到 tool-common.css 的 .state 系列，此处保留兼容位 */
 
 /* ---------------------------------------------------------------------------
  * 6. 全屏投影（JS 内置 Fullscreen 切换；预置投影样式，隐藏计次侧栏）

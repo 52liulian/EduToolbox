@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
@@ -11,12 +11,6 @@
 <body>
 
 <main class="container">
-  <!-- 工具介绍 -->
-  <header class="hero">
-    <h1 class="title">🔊 课堂噪音计</h1>
-    <p class="subtitle">通过麦克风实时检测课堂音量，并以可视化的圆环、动态色彩直观展示噪音水平。超阈值自动变红 + 提示音 + 文字提醒，支持全屏投屏，帮助学生直观感受课堂纪律状况。</p>
-  </header>
-
   <!-- 主显示区：圆环 + 分贝大字 -->
   <section class="meter-panel" id="meterPanel" aria-label="音量检测主显示区">
     <div class="ring-wrap">
@@ -66,7 +60,7 @@
       <button type="button" class="btn btn-mini" id="clearRecords">清空</button>
     </div>
     <div class="records-list" id="recordsList">
-      <div class="empty">暂无超标记录</div>
+      <div class="state state--compact state--empty"><div class="state-icon">🔊</div><div class="state-title">暂无超标记录</div></div>
     </div>
   </section>
 

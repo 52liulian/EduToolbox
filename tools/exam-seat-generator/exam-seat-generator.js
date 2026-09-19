@@ -259,7 +259,7 @@
     var total = cols * perCol;
 
     if (!state.candidates.length) {
-      area.innerHTML = '<div class="empty-tip">请先导入考生名单，然后点击"随机排座"</div>';
+      area.innerHTML = '<div class="state state--compact state--empty"><div class="state-icon">📋</div><div class="state-title">请先导入考生名单</div><div class="state-desc">然后点击"随机排座"</div></div>';
       updateArrangeTip(0, total);
       return;
     }

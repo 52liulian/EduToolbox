@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
@@ -16,9 +16,6 @@
   </div>
 
   <main class="container">
-    <!-- 工具说明 -->
-    <p class="tool-sub">小学语文 1-6 年级生字表（人教版），支持按册次切换、拼音标注、字号调节、点击查看拼音与笔画，适合识字教学、课堂听写与课后复习。</p>
-
     <!-- 册次标签栏 -->
     <section class="tabs card" id="tabs" aria-label="册次切换"></section>
 
@@ -54,7 +51,7 @@
     <section class="grid" id="grid" aria-label="生字网格"></section>
 
     <!-- 空状态 -->
-    <div class="empty" id="empty" hidden>当前册次暂无生字。</div>
+    <div class="state state--compact state--empty" id="empty" hidden><div class="state-icon">📚</div><div class="state-title">当前册次暂无生字</div></div>
   </main>
 
   <!-- ===== 单字详情弹层 ===== -->

@@ -192,7 +192,7 @@
     var body = $("calendarBody");
     var start = parseDate(state.startDate);
     if (!start) {
-      body.innerHTML = '<tr><td colspan="8" class="empty-tip">请先在上方设置开学日期</td></tr>';
+      body.innerHTML = '<tr><td colspan="8"><div class="state state--compact state--empty" style="margin:8px auto"><div class="state-icon">📅</div><div class="state-title">请先在上方设置开学日期</div></div></td></tr>';
       return;
     }
     var today = new Date();

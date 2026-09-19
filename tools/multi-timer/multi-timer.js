@@ -303,7 +303,7 @@
     if (!box) return;
 
     if (!timers.length) {
-      box.innerHTML = '<div class="empty">暂无定时器，请在上方添加</div>';
+      box.innerHTML = '<div class="state state--compact state--empty"><div class="state-icon">⏱️</div><div class="state-title">暂无定时器</div><div class="state-desc">请在上方添加</div></div>';
       renderFocus();
       return;
     }
@@ -374,7 +374,7 @@
         <div class="f-label">${esc(t.label)}</div>
         <div class="f-time">${fmt(t.remaining)}</div>
       </div>`;
-    }).join('') || '<div class="empty">暂无定时器</div>';
+    }).join('') || '<div class="state state--compact state--empty"><div class="state-icon">⏱️</div><div class="state-title">暂无定时器</div></div>';
   }
 
   /* ============== 全屏专注模式 ============== */

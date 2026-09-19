@@ -236,7 +236,7 @@
    */
   function renderRecords() {
     if (!records.length) {
-      recordsList.innerHTML = '<div class="empty">暂无超标记录</div>';
+      recordsList.innerHTML = '<div class="state state--compact state--empty"><div class="state-icon">🔊</div><div class="state-title">暂无超标记录</div></div>';
       return;
     }
     recordsList.innerHTML = records.map(function (r) {

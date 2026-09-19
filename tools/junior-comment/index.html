@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
@@ -11,16 +11,6 @@
 <body>
 
   <div class="wrap">
-
-    <!-- 顶部标题区 -->
-    <header class="hdr">
-      <div class="hdr-emoji">📘</div>
-      <div class="hdr-text">
-        <h1>初中评语生成</h1>
-        <p>面向初中班主任与任课教师的期末评语生成器，覆盖学科表现、思维方法、学习态度、集体责任、品德修养、劳动卫生、特长发展等 10 个维度，支持名单导入、性别选择、风格切换、一键生成不雷同评语，可复制并导出 Word / Excel / TXT，数据自动保存在本机。</p>
-      </div>
-    </header>
-
     <!-- 控制面板：名单 / 维度 / 设置 -->
     <section class="panels">
 
@@ -99,7 +89,7 @@
     <!-- 评语结果区 -->
     <section class="results">
       <h3 class="results-title">🎁 评语结果（可直接在卡片中修改）</h3>
-      <p class="empty-tip" id="emptyTip">还没有评语，填好名单后点击「一键生成全部评语」试试吧～</p>
+      <div class="state state--compact state--empty" id="emptyTip"><div class="state-icon">📝</div><div class="state-title">还没有评语</div><div class="state-desc">填好名单后点击「一键生成全部评语」试试吧～</div></div>
       <div class="r-grid" id="resultWrap"></div>
     </section>
 

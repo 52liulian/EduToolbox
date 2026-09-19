@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
@@ -12,13 +12,6 @@
 <body>
 
 <main class="wrap">
-
-  <!-- 简介 hero -->
-  <section class="hero">
-    <h1 class="hero-title">幼儿园期末评语生成器</h1>
-    <p class="hero-desc">软萌温馨的童化评语词库，覆盖在园表现、生活自理、活动参与等 10 大维度，支持名单导入、风格切换、性别适配，一键生成不雷同评语，可复制并导出 Word / Excel / TXT，数据自动保存在本机。</p>
-  </section>
-
   <!-- 控制面板：名单 / 维度 / 设置 -->
   <section class="panels">
 
@@ -97,7 +90,7 @@
   <!-- 评语结果区 -->
   <section class="results">
     <h3 class="results-title">🎁 评语结果（可直接在卡片中修改）</h3>
-    <p class="empty-tip" id="emptyTip">还没有评语，填好名单后点击「一键生成全部评语」试试吧～</p>
+    <div class="state state--compact state--empty" id="emptyTip"><div class="state-icon">📝</div><div class="state-title">还没有评语</div><div class="state-desc">填好名单后点击「一键生成全部评语」试试吧～</div></div>
     <div class="r-grid" id="resultWrap"></div>
   </section>
 

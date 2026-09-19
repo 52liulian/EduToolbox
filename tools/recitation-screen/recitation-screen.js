@@ -6,7 +6,7 @@
 
   function save() { try { localStorage.setItem("recitation", JSON.stringify(students)); } catch (e) { /* 忽略 */ } }
   function render() {
-    if (!students.length) { $("grid").innerHTML = '<div class="empty">请导入名单（CSV 格式：学号,姓名，每行一个）</div>'; return; }
+    if (!students.length) { $("grid").innerHTML = '<div class="state state--compact state--empty"><div class="state-icon">🎤</div><div class="state-title">请导入名单</div><div class="state-desc">CSV 格式：学号,姓名，每行一个</div></div>'; return; }
     const done = students.filter(s => s.done).length;
     $("grid").innerHTML = students.map((s, i) =>
       `<div class="card ${s.done ? 'done' : ''}" data-i="${i}"><div class="name">${s.name}</div><div class="sid">${s.id}</div></div>`

@@ -70,7 +70,7 @@
   function doDiff() {
     const a = $("orig").value, b = $("edit").value;
     const result = $("result");
-    if (!a && !b) { result.innerHTML = '<div class="empty">请输入两段文本后点击「开始对比」</div>'; return; }
+    if (!a && !b) { result.innerHTML = '<div class="state state--compact state--empty"><div class="state-icon">📝</div><div class="state-title">请输入两段文本</div><div class="state-desc">后点击「开始对比」</div></div>'; return; }
     const items = diff(a, b);
     const sep = mode === "line" ? "\n" : (mode === "word" ? "" : "");
     result.innerHTML = items.map(it => {
@@ -84,6 +84,6 @@
   $("btn-diff").addEventListener("click", doDiff);
   $("btn-clear").addEventListener("click", () => {
     $("orig").value = ""; $("edit").value = "";
-    $("result").innerHTML = '<div class="empty">请输入两段文本后点击「开始对比」</div>';
+    $("result").innerHTML = '<div class="state state--compact state--empty"><div class="state-icon">📝</div><div class="state-title">请输入两段文本</div><div class="state-desc">后点击「开始对比」</div></div>';
   });
 })();

@@ -201,7 +201,7 @@
     area.style.setProperty("--seat-fg", state.fontColor);
 
     if (!state.names.length) {
-      area.innerHTML = '<div class="empty-tip">请先导入学生名单，然后点击"随机排座"或"重新生成"</div>';
+      area.innerHTML = '<div class="state state--compact state--empty"><div class="state-icon">📋</div><div class="state-title">请先导入学生名单</div><div class="state-desc">然后点击"随机排座"或"重新生成"</div></div>';
       return;
     }
 

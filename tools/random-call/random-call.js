@@ -67,7 +67,7 @@
     const ul = $("#recordList");
     $("#recordCount").textContent = state.records.length;
     if (state.records.length === 0) {
-      ul.innerHTML = '<li class="empty">暂无记录</li>';
+      ul.innerHTML = '<li class="state state--list-item state--empty"><div class="state-icon">🎲</div><div class="state-title">暂无记录</div></li>';
       return;
     }
     ul.innerHTML = state.records.map((r, i) => `

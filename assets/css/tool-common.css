@@ -1375,6 +1375,342 @@ input[type="range"]::-moz-range-thumb {
 .empty-icon { font-size: 48px; line-height: 1; }
 .empty-text { font-size: 14px; color: var(--text-2); }
 
+/* ---------------------------------------------------------------------------
+ * 10.5 统一状态组件基线（空状态 / 信息 / 错误 / 加载中）
+ *   现有 .empty / .empty-tip 保留兼容；新工具优先使用 .state 系列
+ *   设计目标：跨工具统一的"无数据/异常/加载"展示，提升体验一致性
+ *   用法：
+ *     <div class="state state--empty">
+ *       <div class="state-icon">📭</div>
+ *       <div class="state-title">暂无名单</div>
+ *       <div class="state-desc">请先导入学生名单后再使用</div>
+ *       <button class="state-action" onclick="...">去添加</button>
+ *     </div>
+ *   语义变体（必选其一）：
+ *     state--empty | state--info | state--success | state--warning
+ *     | state--error | state--loading
+ *   尺寸/布局修饰（可叠加）：
+ *     state--compact    紧凑变体（小区域/卡片内嵌）
+ *     state--list-item  列表项内嵌（消除 li 默认样式，水平占满）
+ *     state--inline     行内变体（pill 形，水平排列，按钮旁/表头用）
+ *     state--plain      无框变体（去掉虚线边框与背景，融入父容器）
+ *     state--hero       超大变体（整页空状态，初始未导入数据用）
+ *     state--closable   可关闭变体（右上角 ✕，可消除临时提示，配合 data-close）
+ *   按钮修饰：
+ *     state-action--ghost（次要按钮：重试/取消）
+ *   loading 动效：state--loading 的 .state-title 自动叠加省略号动画
+ * ------------------------------------------------------------------------- */
+.state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 48px 24px;
+  text-align: center;
+  border: 1.5px dashed var(--border-2);
+  border-radius: var(--r);
+  background: var(--bg-soft);
+  color: var(--text-2);
+}
+
+.state-icon {
+  display: grid;
+  place-items: center;
+  width: 64px;
+  height: 64px;
+  font-size: 36px;
+  line-height: 1;
+  background: var(--card-bg);
+  border-radius: 50%;
+  box-shadow: var(--shadow-sm);
+}
+
+.state-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text-1);
+}
+
+.state-desc {
+  font-size: 13.5px;
+  color: var(--text-3);
+  max-width: 420px;
+  line-height: 1.7;
+}
+
+.state-action {
+  margin-top: 4px;
+  padding: 8px 20px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #fff;
+  background: var(--primary-grad);
+  border: none;
+  border-radius: var(--r-pill);
+  box-shadow: var(--shadow-primary);
+  cursor: pointer;
+  transition: transform var(--t-fast) var(--ease),
+              box-shadow var(--t-fast) var(--ease);
+}
+.state-action:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 12px 28px rgba(59, 110, 246, 0.36);
+}
+.state-action:active { transform: translateY(0); }
+.state-action:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* 次要按钮（重试 / 取消），用于错误状态下的次要操作 */
+.state-action--ghost {
+  background: transparent;
+  color: var(--primary);
+  border: 1px solid var(--primary);
+  box-shadow: none;
+}
+.state-action--ghost:hover {
+  background: var(--primary-soft);
+  box-shadow: none;
+}
+
+/* 变体：通过边框色 + 图标色区分语义 */
+.state--empty  { border-color: var(--border-2); }
+.state--info   { border-color: rgba(56, 163, 232, 0.35); background: #f0f9ff; }
+.state--info   .state-icon { color: var(--info); }
+.state--success { border-color: rgba(34, 179, 106, 0.35); background: #f0fdf4; }
+.state--success .state-icon { color: var(--success); }
+.state--warning { border-color: rgba(245, 166, 35, 0.38); background: #fffbf0; }
+.state--warning .state-icon { color: var(--warning); }
+.state--error  { border-color: rgba(239, 91, 91, 0.42); background: #fef2f2; }
+.state--error  .state-icon { color: var(--danger); }
+
+/* 加载中变体：内置旋转 spinner，不依赖外部图标库 */
+.state--loading {
+  border-style: solid;
+  border-color: var(--border);
+  background: var(--card-bg);
+}
+.state--loading .state-icon {
+  width: 40px;
+  height: 40px;
+  font-size: 0;
+  border: 3px solid var(--border-2);
+  border-top-color: var(--primary);
+  border-radius: 50%;
+  animation: state-spin 0.8s linear infinite;
+}
+@keyframes state-spin { to { transform: rotate(360deg); } }
+
+/* 紧凑变体：用于列表/卡片内嵌的局部空状态或错误提示 */
+.state--compact { padding: 24px 16px; }
+.state--compact .state-icon { width: 48px; height: 48px; font-size: 28px; }
+.state--compact .state-title { font-size: 14px; }
+.state--compact .state-desc  { font-size: 12.5px; }
+
+/* 列表项内嵌变体：消除 li 默认样式干扰，让 .state 占满列表项宽度
+   用法：<li class="state state--list-item state--empty">...</li> 或
+        <li><div class="state state--list-item state--empty">...</div></li> */
+.state--list-item,
+li.state--list-item {
+  width: 100%;
+  list-style: none;
+  margin: 0;
+  padding: 20px 12px;
+  border-left: none;
+  border-right: none;
+  border-top: none;
+  border-radius: 0;
+  background: transparent;
+}
+.state--list-item + .state--list-item { border-top: 1px solid var(--border); }
+.state--list-item .state-icon { width: 40px; height: 40px; font-size: 22px; }
+.state--list-item .state-title { font-size: 13.5px; }
+.state--list-item .state-desc  { font-size: 12px; }
+
+/* list-item 的语义色锚点：因 border 已被去除，改用左侧 4px 色条 + 图标色区分
+   原 .state--info/-success/-warning/-error 的 background 在 list-item 下被覆盖为透明 */
+.state--list-item.state--info,
+.state--list-item.state--success,
+.state--list-item.state--warning,
+.state--list-item.state--error {
+  border-left: 4px solid currentColor;
+  padding-left: 16px;
+  background: transparent;
+}
+.state--list-item.state--info    { color: var(--info); }
+.state--list-item.state--info    .state-title { color: var(--info); }
+.state--list-item.state--success { color: var(--success); }
+.state--list-item.state--success .state-title { color: var(--success); }
+.state--list-item.state--warning { color: var(--warning); }
+.state--list-item.state--warning .state-title { color: var(--warning); }
+.state--list-item.state--error   { color: var(--danger); }
+.state--list-item.state--error   .state-title { color: var(--danger); }
+/* empty 变体无色条（默认中性），保持简洁 */
+
+/* list-item hover 态：轻微背景高亮，提示该项可点击/可操作 */
+.state--list-item.state--closable,
+.state--list-item[data-close] {
+  cursor: default;
+  transition: background var(--t-fast) var(--ease);
+}
+.state--list-item.state--closable:hover,
+.state--list-item[data-close]:hover {
+  background: var(--bg-soft);
+}
+
+/* list-item + closable 组合：关闭按钮位置调整（避开 4px 色条） */
+.state--list-item.state--closable { padding-right: 40px; }
+.state--list-item.state--closable::before { top: 14px; right: 12px; }
+
+/* list-item 在父容器 ul/ol 内的兼容：去默认 list-style 与 padding
+   兼容性：:has() 需 Firefox 121+ / Safari 15.4+ / Chrome 105+，
+   旧浏览器兜底：给 ul/ol 显式加 class="clean-list" 即可 */
+ul:has(> .state--list-item),
+ol:has(> .state--list-item),
+ul.clean-list,
+ol.clean-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+/* 嵌套容器适配：带背景的容器内不加分割线，改用卡片背景；多列网格中等高撑满 */
+.record-list .state--list-item,
+.results .state--list-item,
+.grid .state--list-item,
+.r-grid .state--list-item {
+  border-top: none;
+  border-radius: var(--r-sm);
+  background: var(--card-bg);
+}
+.record-list .state--list-item,
+.results .state--list-item { margin-bottom: 6px; }
+.grid .state--list-item,
+.r-grid .state--list-item { width: 100%; height: 100%; }
+
+/* list-item + loading 组合：spinner 与标题水平排列，避免竖向占用过多行高 */
+.state--list-item.state--loading {
+  flex-direction: row;
+  justify-content: center;
+  gap: 12px;
+  padding: 14px 12px;
+}
+.state--list-item.state--loading .state-icon {
+  width: 18px;
+  height: 18px;
+  border-width: 2px;
+}
+
+/* list-item + inline 组合：行内 pill 在列表项内自动占满 */
+.state--list-item.state--inline {
+  width: 100%;
+  justify-content: flex-start;
+  border-radius: var(--r-sm);
+  padding: 8px 12px;
+}
+
+/* 行内变体：水平排列，用于按钮组旁、表格单元格内、卡片头部的轻量提示
+   用法：<span class="state state--inline state--info"><span class="state-icon">ℹ️</span><span class="state-title">已保存</span></span> */
+.state--inline {
+  display: inline-flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+  width: auto;
+  max-width: 100%;
+  padding: 6px 12px;
+  border-width: 1px;
+  border-style: solid;
+  border-radius: var(--r-pill);
+  background: var(--card-bg);
+}
+.state--inline .state-icon {
+  width: 20px;
+  height: 20px;
+  font-size: 14px;
+  background: none;
+  box-shadow: none;
+  border-radius: 0;
+}
+.state--inline .state-title { font-size: 13px; font-weight: 600; }
+.state--inline .state-desc  { font-size: 12px; max-width: none; }
+.state--inline .state-action { margin-top: 0; padding: 4px 10px; font-size: 12px; }
+
+/* 无框变体：去掉虚线边框与背景，融入父容器
+   用法：卡片头部小提示、分割区段内的轻提示 */
+.state--plain {
+  border: none;
+  background: none;
+  padding: 16px 8px;
+}
+
+/* 超大变体：用于整页空状态（如初始未导入任何数据）
+   用法：<div class="state state--hero state--empty">...</div> */
+.state--hero {
+  padding: 80px 24px;
+  gap: 18px;
+}
+.state--hero .state-icon { width: 96px; height: 96px; font-size: 52px; }
+.state--hero .state-title { font-size: 20px; }
+.state--hero .state-desc  { font-size: 14.5px; max-width: 540px; }
+
+/* loading 文字动效：在 state--loading 内 .state-title 上叠加省略号动画
+   实现：::after content="..." + width 0→3ch 阶梯动画（step-end）
+   原因：content 不是 animatable property，旧方案在 Firefox 等浏览器失效；
+        改用 width 动画是 CSS Animations Level 1 标准做法，跨浏览器一致 */
+.state--loading .state-title::after {
+  content: "...";
+  display: inline-block;
+  width: 0;
+  overflow: hidden;
+  vertical-align: baseline;
+  font-family: ui-monospace, Menlo, Consolas, monospace;
+  animation: state-dots 1.4s step-end infinite;
+}
+@keyframes state-dots {
+  0%   { width: 0ch; }
+  25%  { width: 1ch; }
+  50%  { width: 2ch; }
+  75%  { width: 3ch; }
+  100% { width: 0ch; }
+}
+
+/* 可关闭变体：右上角关闭按钮，用于可消除的临时提示
+   用法：<div class="state state--info state--closable" data-close>...</div>
+        JS 中监听 [data-close] 点击事件隐藏整块 */
+.state--closable { position: relative; padding-right: 40px; }
+.state--closable::before {
+  content: "✕";
+  position: absolute;
+  top: 10px;
+  right: 12px;
+  width: 22px;
+  height: 22px;
+  display: grid;
+  place-items: center;
+  font-size: 13px;
+  color: var(--text-3);
+  cursor: pointer;
+  border-radius: 50%;
+  transition: background var(--t-fast) var(--ease), color var(--t-fast) var(--ease);
+}
+.state--closable::before:hover {
+  background: var(--bg-soft);
+  color: var(--text-1);
+}
+
+/* 行内轻量错误提示：用于表单字段下方的小字提示 */
+.field-error {
+  margin-top: 6px;
+  font-size: 12.5px;
+  color: var(--danger);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.field-error::before { content: "⚠"; font-size: 13px; }
+
 .tip,
 .hint,
 .notice {

@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
@@ -11,12 +11,6 @@
 <body>
 
 <main class="container">
-  <!-- 工具介绍 -->
-  <header class="hero">
-    <h1 class="title">🏆 课堂积分板</h1>
-    <p class="subtitle">支持学生或小组加分与扣分，实时展示排行榜，适合课堂竞赛与互动激励。前三名自动高亮（金/银/铜），数据本地保存。</p>
-  </header>
-
   <!-- 顶部操作栏：添加小组 + 批量操作 -->
   <section class="toolbar">
     <div class="add-group">
@@ -34,9 +28,10 @@
   <section class="board" id="board" aria-label="积分榜"></section>
 
   <!-- 空状态 -->
-  <div class="empty" id="empty" hidden>
-    <div class="empty-icon">🏆</div>
-    <p class="empty-text">暂无小组，点击「+ 添加小组」开始</p>
+  <div class="state state--empty" id="empty" hidden>
+    <div class="state-icon">🏆</div>
+    <div class="state-title">暂无小组</div>
+    <div class="state-desc">点击「+ 添加小组」开始</div>
   </div>
 </main>
 

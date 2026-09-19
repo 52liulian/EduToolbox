@@ -112,7 +112,7 @@
    */
   function render() {
     if (!alarms.length) {
-      dom.list.innerHTML = '<div class="empty">未设置闹钟</div>';
+      dom.list.innerHTML = '<div class="state state--compact state--empty"><div class="state-icon">⏰</div><div class="state-title">未设置闹钟</div></div>';
       updateStatus();
       return;
     }

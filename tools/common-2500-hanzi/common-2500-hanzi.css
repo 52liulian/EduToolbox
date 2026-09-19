@@ -202,14 +202,7 @@
 .char.no-pinyin { aspect-ratio: 1 / 1; }
 .char.no-pinyin .py { display: none; }
 
-/* 空状态 */
-.empty-state {
-  padding: 40px 20px;
-  text-align: center;
-  color: var(--text-3);
-  font-size: 14px;
-}
-.empty-state[hidden] { display: none !important; }
+/* 空状态：已迁移到 tool-common.css 的 .state 系列，此处保留兼容位 */
 
 /* ---------------------------------------------------------------------------
  * 四、分页控件

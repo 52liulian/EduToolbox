@@ -263,7 +263,7 @@
    */
   function renderLaps() {
     if (laps.length === 0) {
-      lapsList.innerHTML = '<li class="laps-empty">暂无计次记录</li>';
+      lapsList.innerHTML = '<li class="state state--list-item state--empty"><div class="state-icon">⏱️</div><div class="state-title">暂无计次记录</div></li>';
       lapsPanel.classList.remove('has-laps');
       return;
     }
