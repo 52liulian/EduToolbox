@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>EduToolbox</title>
+<!--
+  ==========================================================================
+  SPA 深链接兜底页（GitHub Pages / nginx 等纯静态托管专用）
+  --------------------------------------------------------------------------
+  背景：静态托管遇到未知路径会返回 404 页面，导致 /categories、/onlinetools/xxx
+        这类「无 # 干净 URL」深链接直接打不开（本项目本地 server.py 有 SPA
+        fallback，线上纯托管环境没有）。
+  做法：404 页面是当前地址唯一的「被告知者」，因此：
+        1) 把用户实际想访问的路径存进 sessionStorage
+           （key: edutoolbox-spa-redirect）
+        2) location.replace 回站点根 index.html（不产生历史记录，
+           否则浏览器后退会退回到 404 页）
+        3) index.html 顶部脚本读到该 key 后，用 history.replaceState 把地址还原
+           成原样，再由路由层正常渲染 —— 对用户而言等于直接打开了深链接。
+  ==========================================================================
+-->
+<script>
+(function () {
+  try {
+    var path = location.pathname + location.search + location.hash;
+    if (!path) path = "/";
+    try { sessionStorage.setItem("edutoolbox-spa-redirect", path); } catch (e) { /* 隐私模式忽略 */ }
+  } catch (e) { /* 兜底：即便存储失败也要跳回首页 */ }
+  location.replace("/");
+})();
+</script>
+</head>
+<body>
+<p>正在跳转…</p>
+</body>
+</html>

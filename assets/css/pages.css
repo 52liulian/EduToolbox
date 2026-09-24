@@ -1,0 +1,330 @@
+/* ============================================================================
+ * EduToolbox · pages.css
+ * 职责：首页 Hero（渐变标题/标语/独立大搜索框/学科快速入口/分类标签云/统计）
+ * 依赖：base.css, layout.css, components.css
+ * ========================================================================== */
+
+/* ---------------------------------------------------------------------------
+ * 1. Hero 区
+ * ------------------------------------------------------------------------- */
+.hero {
+  position: relative;
+  padding: 72px 0 56px;
+  overflow: hidden;
+  background:
+    radial-gradient(1100px 480px at 12% -10%, rgba(33, 150, 243, 0.10), transparent 60%),
+    radial-gradient(900px 420px at 95% 0%, rgba(50, 165, 131, 0.10), transparent 55%),
+    linear-gradient(to bottom, #EEF5FF 0%, #F5F9FF 50%, #ffffff 100%);
+}
+
+.hero .container {
+  position: relative;
+  text-align: center;
+}
+
+.hero-title {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 14px;
+  flex-wrap: wrap;
+  margin-bottom: 14px;
+}
+
+.hero-title-grad {
+  font-size: clamp(40px, 6.4vw, 64px);
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  background: linear-gradient(to right, #2196F3 0%, #32A583 50%, #2196F3 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
+
+.hero-title-sub {
+  font-size: clamp(20px, 2.6vw, 28px);
+  font-weight: 700;
+  color: var(--text-2);
+}
+
+.hero-tagline {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  font-size: 14px;
+  color: var(--text-3);
+  margin-bottom: 14px;
+}
+
+.hero-tag {
+  padding: 4px 14px;
+  font-weight: 600;
+  color: var(--primary);
+  background: var(--primary-soft);
+  border-radius: var(--r-pill);
+}
+
+.hero-desc {
+  max-width: 720px;
+  margin: 0 auto 30px;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.85;
+  background: linear-gradient(to right, #2563eb, #14b8a6);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
+
+/* ---------------------------------------------------------------------------
+ * 2. Hero 独立大搜索框
+ * ------------------------------------------------------------------------- */
+.hero-search {
+  position: relative;
+  display: flex;
+  align-items: center;
+  max-width: 680px;
+  margin: 0 auto 26px;
+  padding: 6px 6px 6px 20px;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--r-pill);
+  box-shadow: var(--shadow);
+  transition: all var(--t) var(--ease);
+}
+
+.hero-search:focus-within {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 4px rgba(59, 110, 246, 0.12), var(--shadow);
+}
+
+.hero-search-icon {
+  font-size: 17px;
+  color: var(--text-3);
+  margin-right: 8px;
+}
+
+.hero-search input {
+  flex: 1;
+  min-width: 0;
+  height: 44px;
+  font-size: 15px;
+  border: none;
+  outline: none;
+  background: transparent;
+  color: var(--text-1);
+}
+
+.hero-search input::placeholder { color: var(--text-3); }
+
+.hero-search-clear {
+  width: 30px;
+  height: 30px;
+  margin-right: 6px;
+  font-size: 13px;
+  color: var(--text-3);
+  border-radius: 50%;
+  transition: all var(--t-fast) var(--ease);
+}
+
+.hero-search-clear:hover {
+  color: var(--danger);
+  background: var(--bg-soft);
+}
+
+.hero-search-btn {
+  height: 44px;
+  padding: 0 30px;
+  font-size: 15px;
+  font-weight: 700;
+  color: #fff;
+  background: var(--primary-grad);
+  border-radius: var(--r-pill);
+  box-shadow: var(--shadow-primary);
+  transition: all var(--t-fast) var(--ease);
+  white-space: nowrap;
+}
+
+.hero-search-btn:hover {
+  filter: brightness(1.06);
+  transform: translateY(-1px);
+  box-shadow: 0 12px 26px rgba(59, 110, 246, 0.38);
+}
+
+/* ---------------------------------------------------------------------------
+ * 3. 学科快速入口（彩色圆角按钮）
+ * ------------------------------------------------------------------------- */
+.subject-entry {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: 30px;
+}
+
+.subject-btn {
+  /* 每个学科只需覆盖 --c 一个变量：文字取本色，描边/底色由 color-mix 派生，
+     浅色/深色主题自动适配，无需为每个学科写两套十六进制。 */
+  --c: var(--text-2);
+  --c-mix-bg: 8%;
+  --c-mix-bd: 30%;
+  padding: 10px 22px;
+  font-size: 14.5px;
+  font-weight: 600;
+  color: var(--c);
+  /* 旧写法：底色/描边写死十六进制，配色只在 :hover 生效 → 静止态看着全是灰按钮。
+     现改为静止态即带学科色（浅色底 + 同色描边），hover 时加深。 */
+  background: color-mix(in srgb, var(--c) var(--c-mix-bg), var(--card-bg));
+  border: 1.5px solid color-mix(in srgb, var(--c) var(--c-mix-bd), transparent);
+  border-radius: var(--r-pill);
+  box-shadow: var(--shadow-sm);
+  transition: all var(--t-fast) var(--ease);
+}
+
+.subject-btn:hover {
+  --c-mix-bg: 16%;
+  --c-mix-bd: 55%;
+  transform: translateY(-3px);
+  box-shadow: var(--shadow);
+}
+
+/* 九科：每科一套主色 */
+.subject-btn.cat-chinese   { --c: #e84545; }  /* 语文 · 红 */
+.subject-btn.cat-math      { --c: #2f6df6; }  /* 数学 · 蓝 */
+.subject-btn.cat-english   { --c: #12a05c; }  /* 英语 · 绿 */
+.subject-btn.cat-physics   { --c: #6d4df2; }  /* 物理 · 紫 */
+.subject-btn.cat-chemistry { --c: #0ea5a0; }  /* 化学 · 青 */
+.subject-btn.cat-biology   { --c: #65a30d; }  /* 生物 · 黄绿 */
+.subject-btn.cat-politics  { --c: #d6336c; }  /* 政治 · 玫红 */
+.subject-btn.cat-history   { --c: #b06a2c; }  /* 历史 · 棕 */
+.subject-btn.cat-geo       { --c: #e08b00; }  /* 地理 · 橙 */
+
+/* 深色主题：文字提亮保证对比度，底色加深使彩色块在暗背景上依然可辨 */
+body.dark .subject-btn {
+  color: color-mix(in srgb, var(--c) 68%, #ffffff);
+  background: color-mix(in srgb, var(--c) 18%, var(--card-bg));
+  border-color: color-mix(in srgb, var(--c) 45%, transparent);
+}
+body.dark .subject-btn:hover {
+  color: color-mix(in srgb, var(--c) 40%, #ffffff);
+  background: color-mix(in srgb, var(--c) 30%, var(--card-bg));
+  border-color: color-mix(in srgb, var(--c) 65%, transparent);
+}
+
+/* ---------------------------------------------------------------------------
+ * 4. 分类标签云（三行无缝滚动）
+ * ------------------------------------------------------------------------- */
+.category-tags {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-width: 1000px;
+  margin: 0 auto 36px;
+  overflow: hidden; /* 轨道平移，外框无滚动条 */
+  mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent);
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent);
+}
+
+.cat-tag-row {
+  display: flex;
+  width: max-content;
+}
+
+.cat-tag-row--left  { animation: tags-scroll-left 60s linear infinite; }
+.cat-tag-row--right { animation: tags-scroll-right 66s linear infinite; }
+.cat-tag-row--tags  { animation: tags-scroll-left 80s linear infinite; margin-top: 2px; }
+
+.category-tags:hover .cat-tag-row { animation-play-state: paused; }
+
+@keyframes tags-scroll-left {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+
+@keyframes tags-scroll-right {
+  from { transform: translateX(-50%); }
+  to   { transform: translateX(0); }
+}
+
+.cat-tag-track {
+  display: flex;
+  gap: 10px;
+  padding-right: 10px;
+  flex-shrink: 0;
+}
+
+.cat-tag,
+.tpl-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 18px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-2);
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--r-pill);
+  white-space: nowrap;
+  transition: all var(--t-fast) var(--ease);
+}
+
+.cat-tag:hover,
+.tpl-tag:hover {
+  color: var(--primary);
+  border-color: var(--primary-soft-2);
+  background: var(--primary-soft);
+}
+
+.cat-tag-count {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-3);
+  padding: 0 7px;
+  background: var(--bg-soft);
+  border-radius: var(--r-pill);
+}
+
+.cat-tag:hover .cat-tag-count {
+  color: var(--primary);
+  background: #fff;
+}
+
+/* ---------------------------------------------------------------------------
+ * 5. Hero 统计数据
+ * ------------------------------------------------------------------------- */
+.hero-stats {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 14px;
+}
+
+.stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  min-width: 132px;
+  padding: 14px 24px;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  box-shadow: var(--shadow-sm);
+}
+
+.stat b {
+  font-size: 24px;
+  font-weight: 800;
+  color: var(--primary);
+  line-height: 1.2;
+}
+
+.stat span {
+  font-size: 12.5px;
+  color: var(--text-3);
+}

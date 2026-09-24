@@ -1,0 +1,337 @@
+/* ============================================================================
+ * scrolling-text.css · 早读滚动字幕（专属样式）
+ * ----------------------------------------------------------------------------
+ * 依赖底座：../../assets/css/tool-common.css（后加载，同特异性底座胜出，
+ *           本文件使用 #id / 属性选择器 / :fullscreen 提高特异性）
+ * 内容分区：
+ *   1. 双栏布局（设置面板 + 滚动舞台）
+ *   2. 左侧面板：文本框 / 播放控制 / 速度档 / 外观设置
+ *   3. 右侧舞台：滚动字幕块（transform 位移，overflow:hidden 裁剪非滚动条）
+ *   4. 深色舞台主题（仅舞台，整页保持浅色）
+ *   5. 设置面板折叠
+ *   6. 全屏投影模式（全屏元素即 #stage 本身，铺满视口并保留主题背景）
+ *   7. 响应式
+ * 高度策略：舞台用 min-height 自动撑开，常规流无固定高度、无滚动条；
+ *           仅全屏投影时由 UA 样式把 #stage 铺满视口。
+ * ========================================================================== */
+
+/* ---------------------------------------------------------------------------
+ * 1. 双栏布局
+ * ------------------------------------------------------------------------- */
+.app {
+  display: grid;
+  grid-template-columns: 350px minmax(0, 1fr);
+  align-items: start;
+  gap: 20px;
+  width: 100%;
+  max-width: 1500px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+/* 左侧面板（底座 .panel 提供卡片外观，这里只控布局） */
+#panel {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding: 20px;
+}
+
+#panel .panel-block { margin-top: 0; }
+
+#panel .panel-block + .panel-block {
+  padding-top: 18px;
+  border-top: 1px dashed var(--border);
+}
+
+/* 面板折叠（JS 切换 .hide），舞台占满整行 */
+.app:has(#panel.hide) {
+  grid-template-columns: minmax(0, 1fr);
+}
+#panel.hide { display: none; }
+
+/* ---------------------------------------------------------------------------
+ * 2. 左侧面板
+ * ------------------------------------------------------------------------- */
+
+/* 滚动内容文本框 */
+#text.text-area {
+  min-height: 240px;
+  font-size: 14px;
+  line-height: 1.8;
+}
+
+.text-tools { margin-top: 10px; }
+
+/* 播放按钮行 */
+.ctrl-row { gap: 8px; }
+.ctrl-row .btn { flex: 1 1 0; }
+
+/* ---- 速度设置 ---- */
+.speed-row {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 14px;
+}
+
+.speed-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-2);
+}
+
+/* 覆盖底座 .range（inline-flex）对 input 元素的影响 */
+.speed-row input[type="range"] {
+  display: block;
+  width: 100%;
+  margin: 4px 0 0;
+}
+
+.speed-marks {
+  display: flex;
+  justify-content: space-between;
+  padding: 0 2px;
+}
+
+.speed-marks span {
+  font-size: 12px;
+  color: var(--text-3);
+  cursor: pointer;
+  user-select: none;
+  transition: color var(--t-fast) var(--ease), transform var(--t-fast) var(--ease);
+}
+.speed-marks span:hover { color: var(--primary); }
+.speed-marks span.on {
+  color: var(--primary);
+  font-weight: 800;
+  transform: scale(1.08);
+}
+
+.duration-tip {
+  margin-top: 2px;
+  font-size: 12.5px;
+  color: var(--text-3);
+  text-align: center;
+}
+.duration-tip span {
+  font-weight: 800;
+  color: var(--primary);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---- 外观设置 ---- */
+.theme-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+/* 数字步进行：label 与控件同一行 */
+#panel .field:has(.num-ctrl) {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+#panel .field:has(.num-ctrl) .field-label { margin-bottom: 0; }
+#panel .num-ctrl { flex-shrink: 0; }
+.num-val { min-width: 52px; }
+
+/* 字体选择 */
+#fontFamily.select { width: 100%; }
+
+/* 对齐分段（本页 .seg 是按钮容器，覆盖底座 label 单选结构） */
+#alignSeg.seg {
+  display: inline-flex;
+  gap: 4px;
+  padding: 4px;
+  background: var(--bg-soft);
+  border: 1px solid var(--border);
+  border-radius: var(--r-pill);
+  cursor: default;
+}
+#alignSeg.seg .seg-btn {
+  padding: 7px 18px;
+  border-color: transparent;
+  background: transparent;
+}
+
+/* 颜色行：色块铺满可点区域 */
+.field-row .field { flex: 1 1 120px; }
+.field-row .field .color { width: 100%; height: 36px; }
+
+/* ---------------------------------------------------------------------------
+ * 3. 右侧滚动舞台
+ *    文字通过 JS transform translateY 移动；inner 用 overflow:hidden 把
+ *    视口外的文字裁掉（这是裁剪不是滚动条，不产生内部滚动）。
+ * ------------------------------------------------------------------------- */
+#stage {
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+  overflow: hidden;                                        /* 圆角裁切 */
+  border-radius: var(--r-lg);
+  transition: background var(--t) var(--ease), border-color var(--t) var(--ease);
+}
+
+#stageInner {
+  position: relative;
+  flex: 1 1 auto;
+  display: block;
+  width: 100%;
+  min-height: clamp(520px, calc(100vh - 64px), 1080px);
+  padding: 0;
+  gap: 0;
+  overflow: hidden;                                       /* 舞台视口裁剪 */
+  border-radius: inherit;
+  cursor: pointer;
+}
+
+/* 滚动字幕文本（字号 / 行高 / 字体 / 颜色均由 JS 内联控制） */
+#scrollText {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  padding: 0 clamp(24px, 5vw, 90px);
+  margin: 0;
+  font-size: 80px;
+  font-weight: 700;
+  line-height: 1.6;
+  text-align: center;
+  white-space: pre-wrap;
+  word-break: break-word;
+  overflow-wrap: break-word;
+  will-change: transform;
+}
+
+/* 舞台右上角工具栏（.stage-toolbar / .icon-btn 样式来自 tool-common.css，
+ * 与 random-call 完全一致；此处只做深色主题下的反色微调） */
+#stage.dark-theme .stage-toolbar .icon-btn {
+  color: #e8edf7;
+  background: rgba(30, 34, 44, 0.78);
+  border-color: rgba(255, 255, 255, 0.16);
+}
+#stage.dark-theme .stage-toolbar .icon-btn:hover {
+  color: #fff;
+  background: rgba(50, 56, 70, 0.92);
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+/* 底部操作提示 */
+#stage.stage .stage-hint {
+  position: absolute;
+  left: 50%;
+  bottom: 14px;
+  z-index: 7;
+  transform: translateX(-50%);
+  padding: 6px 16px;
+  font-size: 12.5px;
+  color: var(--text-3);
+  white-space: nowrap;
+  background: rgba(255, 255, 255, 0.82);
+  border: 1px solid var(--border);
+  border-radius: var(--r-pill);
+  backdrop-filter: blur(6px);
+  transition: opacity var(--t) var(--ease);
+  pointer-events: none;
+}
+
+/* 播放中淡出提示 */
+#stage.running #stageHint { opacity: 0; }
+
+/* 点击舞台时的轻微反馈 */
+#stageInner:active { cursor: pointer; }
+
+/* ---------------------------------------------------------------------------
+ * 4. 深色舞台主题（JS 加 .dark-theme；仅作用于舞台，页面保持浅色）
+ * ------------------------------------------------------------------------- */
+#stage.dark-theme .stage-hint {
+  color: #c2cbdb;
+  background: rgba(20, 24, 32, 0.72);
+  border-color: rgba(255, 255, 255, 0.14);
+}
+
+#stage.dark-theme #scrollText {
+  text-shadow: 0 2px 22px rgba(0, 0, 0, 0.4);
+}
+
+/* ---------------------------------------------------------------------------
+ * 5. 响应式：窄屏改为上下堆叠
+ * ------------------------------------------------------------------------- */
+@media (max-width: 960px) {
+  .app {
+    grid-template-columns: minmax(0, 1fr);
+    padding: 14px;
+  }
+  #panel { order: 2; }
+  #stage { order: 1; }
+  #stageInner { min-height: 56vh; }
+  #scrollText { font-size: 40px !important; padding: 0 20px; }
+}
+
+/* ---------------------------------------------------------------------------
+ * 6. 全屏投影模式（浏览器 Fullscreen API）
+ *    全屏元素就是 #stage 本身（与 random-call 一致）：不再全屏整页 html/body，
+ *    因此不再需要 body 黑底规则，舞台沿用自身主题背景色（JS 内联写入）。
+ * ------------------------------------------------------------------------- */
+#stage:fullscreen,
+#stage:-webkit-full-screen,
+#stage.edutf-solo{
+  width: 100%;
+  height: 100%;
+  min-height: 100vh;
+  padding: 0;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+#stage:fullscreen #stageInner,
+#stage:-webkit-full-screen #stageInner,
+#stage.edutf-solo #stageInner{
+  flex: 1 1 auto;
+  min-height: 100vh;
+  border-radius: 0;
+}
+
+#stage:fullscreen #scrollText,
+#stage:-webkit-full-screen #scrollText,
+#stage.edutf-solo #scrollText{
+  padding: 0 clamp(40px, 7vw, 160px);
+}
+
+/* 全屏下工具栏贴边半透明悬浮，鼠标移入恢复，不挡字幕 */
+#stage:fullscreen .stage-toolbar,
+#stage:-webkit-full-screen .stage-toolbar,
+#stage.edutf-solo .stage-toolbar{
+  top: 20px;
+  right: 20px;
+  opacity: 0.55;
+}
+#stage:fullscreen .stage-toolbar:hover,
+#stage:-webkit-full-screen .stage-toolbar:hover,
+#stage.edutf-solo .stage-toolbar:hover{ opacity: 1; }
+/* 深色主题下按钮反色（浅色主题沿用底座 .icon-btn 配色） */
+#stage:fullscreen.dark-theme .stage-toolbar .icon-btn,
+#stage:-webkit-full-screen.dark-theme .stage-toolbar .icon-btn,
+#stage.edutf-solo.dark-theme .stage-toolbar .icon-btn{
+  color: #e8edf7;
+  background: rgba(30, 34, 44, 0.78);
+  border-color: rgba(255, 255, 255, 0.16);
+}
+#stage:fullscreen.dark-theme .stage-toolbar .icon-btn:hover,
+#stage:-webkit-full-screen.dark-theme .stage-toolbar .icon-btn:hover,
+#stage.edutf-solo.dark-theme .stage-toolbar .icon-btn:hover{
+  color: #fff;
+  background: rgba(50, 56, 70, 0.92);
+}
+
+#stage:fullscreen .stage-hint,
+#stage:-webkit-full-screen .stage-hint,
+#stage.edutf-solo .stage-hint{
+  bottom: 22px;
+  font-size: 13px;
+}

@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>学科常识速查表 | EduToolbox · 中小学常用知识点检索</title>
+<meta name="description" content="学科常识速查表：单位换算、数学公式、物理常数与公式、化学元素与化合价、语文常识、英语不规则动词，支持关键词检索与一键复制。">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%8C%8F%3C/text%3E">
+<link rel="stylesheet" href="../../assets/css/tool-common.css">
+<link rel="stylesheet" href="quick-ref.css">
+</head>
+<body>
+
+<div class="container">
+  <div class="workbench">
+    <!-- ======================= 左侧筛选面板 ======================= -->
+    <aside class="panel setup-panel">
+      <div class="block">
+        <h2 class="block-title">① 选择分类</h2>
+        <div class="chips chips-mini" id="catChips">
+          <button type="button" class="chip active" data-cat="all">全部</button>
+          <button type="button" class="chip" data-cat="unit">📏 单位换算</button>
+          <button type="button" class="chip" data-cat="math">📐 数学公式</button>
+          <button type="button" class="chip" data-cat="phys">🔭 物理常数</button>
+          <button type="button" class="chip" data-cat="chem">⚗️ 化学常识</button>
+          <button type="button" class="chip" data-cat="chn">📖 语文常识</button>
+          <button type="button" class="chip" data-cat="eng">🔤 英语动词</button>
+        </div>
+      </div>
+
+      <div class="block">
+        <h2 class="block-title">② 关键词速查</h2>
+        <div class="setting-row">
+          <label for="searchInput">搜索</label>
+          <input type="text" id="searchInput" placeholder="如：勾股 / 浮力 / take / 化合价">
+        </div>
+        <p class="hint-line">支持中英文关键词，命中字会高亮显示；搜索时命中的小节自动展开。</p>
+        <div class="actions">
+          <div class="btn-row">
+            <button type="button" class="btn btn-small btn-ghost" id="btnExpand">🔽 展开全部</button>
+            <button type="button" class="btn btn-small btn-ghost" id="btnCollapse">🔼 折叠全部</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="block">
+        <h2 class="block-title">③ 导出</h2>
+        <div class="actions">
+          <div class="btn-row">
+            <button type="button" class="btn btn-small" id="btnCopy">📋 复制命中结果</button>
+            <button type="button" class="btn btn-small" id="btnDownload">📥 导出 TXT</button>
+          </div>
+          <div class="btn-row">
+            <button type="button" class="btn btn-small btn-ghost" id="btnPrint">🖨️ 打印速查表</button>
+            <button type="button" class="btn btn-small btn-ghost" id="btnReset">↺ 重置筛选</button>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- ======================= 右侧内容 ======================= -->
+    <main class="stage-panel">
+      <div class="stage-toolbar">
+        <button type="button" class="icon-btn" id="fullscreenBtn" title="全屏展示">⛶</button>
+        <button type="button" class="icon-btn" id="hideSetupBtn" title="隐藏设置栏">⚙</button>
+      </div>
+      <div class="stage-head">
+        <h2 class="panel-title">📚 知识条目</h2>
+        <span class="stage-ok" id="stageOk">—</span>
+      </div>
+
+      <div class="stat-grid qr-stats">
+        <div class="stat-card"><span class="stat-num" id="statTotal">0</span><span class="stat-label">收录条目</span></div>
+        <div class="stat-card"><span class="stat-num" id="statHit">0</span><span class="stat-label">当前命中</span></div>
+        <div class="stat-card"><span class="stat-num" id="statCats">0</span><span class="stat-label">学科分类</span></div>
+        <div class="stat-card"><span class="stat-num" id="statGroups">0</span><span class="stat-label">知识小节</span></div>
+      </div>
+
+      <div class="state state--empty" id="emptyState">
+        <div class="state-icon">🔍</div>
+        <div class="state-title">没有找到匹配的知识点</div>
+        <div class="state-desc">换个关键词试试，或点击左侧「重置筛选」查看全部条目</div>
+      </div>
+
+      <div class="qr-list" id="listWrap"></div>
+    </main>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="../../assets/js/frame-bridge.js"></script>
+<script src="../../assets/js/tool-stage-toolbar.js"></script>
+<script src="quick-ref.js"></script>
+</body>
+</html>

@@ -1,0 +1,103 @@
+/* ============================================================================
+ * 拼音标注 · pinyin-annotator.css
+ * 仅包含本工具特有样式：设置行横排 / 输入输出双栏 / 标注结果区 / ruby 注音
+ * 公共底座（container、tool-title、tool-sub、settings、field、layout、actions、btn、
+ *   textarea、select 等）见 tool-common.css
+ * 高度策略：双栏随内容自然增高，textarea 可纵向拖拽，仅 body 主滚动条
+ * ========================================================================== */
+
+/* ---------------------------------------------------------------------------
+ * 一、标题与副标题间距
+ * ------------------------------------------------------------------------- */
+.container .tool-title { margin-bottom: 4px; }
+.container .tool-sub { margin-bottom: 22px; }
+
+/* ---------------------------------------------------------------------------
+ * 二、设置行：3 个下拉横排（覆盖公共 .settings 的纵向栈）
+ * ------------------------------------------------------------------------- */
+.container .settings {
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin-bottom: 18px;
+}
+.container .settings .field { flex: 1; min-width: 180px; margin-bottom: 0; }
+.container .settings .field > label {
+  display: block;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--text-1);
+  margin-bottom: 7px;
+}
+
+/* ---------------------------------------------------------------------------
+ * 三、双栏布局：输入 / 输出（覆盖公共 .layout 的单列与外边距）
+ * ------------------------------------------------------------------------- */
+.container .layout {
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+  padding: 0;
+  max-width: none;
+  margin: 0;
+}
+
+.col {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+.col > label {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--text-1);
+}
+.col textarea {
+  flex: 1;
+  min-height: 240px;
+  resize: vertical;
+}
+
+/* ---------------------------------------------------------------------------
+ * 四、标注结果输出区
+ * ------------------------------------------------------------------------- */
+.output {
+  flex: 1;
+  min-height: 240px;
+  padding: 18px 20px;
+  background: var(--card-bg-2);
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  font-size: 20px;          /* JS 按设置改写 */
+  line-height: 2;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+}
+
+/* ruby 注音（top / line 布局）：拼音字号缩小、主色着色 */
+.output rt {
+  font-size: 0.5em;
+  font-weight: 600;
+  color: var(--primary);
+  letter-spacing: 1px;
+}
+
+/* 右侧注音（side 布局，JS 输出 .py-side 内联在汉字之后） */
+.py-side {
+  display: inline-block;
+  margin-left: 3px;
+  font-size: 0.5em;
+  font-weight: 600;
+  color: var(--primary);
+  vertical-align: super;
+  letter-spacing: 1px;
+}
+
+/* ---------------------------------------------------------------------------
+ * 五、小屏回落单栏
+ * ------------------------------------------------------------------------- */
+@media (max-width: 760px) {
+  .container .layout { grid-template-columns: 1fr; }
+  .col textarea,
+  .output { min-height: 180px; }
+}

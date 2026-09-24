@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>课堂即时投票 | EduToolbox · 举手统计·实时结果</title>
+<meta name="description" content="课堂即时投票工具：自定义题目与选项、单选/多选、生成参与口令与链接，实时条形图统计票数与百分比，支持学生端模拟投票、结果复制与 CSV 导出。">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%97%B3%3C/text%3E">
+<link rel="stylesheet" href="../../assets/css/tool-common.css">
+<link rel="stylesheet" href="class-vote.css">
+</head>
+<body>
+
+<div class="container">
+  <div class="workbench">
+    <!-- ======================= 左侧设置面板 ======================= -->
+    <aside class="panel setup-panel">
+      <div class="block">
+        <h2 class="block-title">① 投票设置</h2>
+        <div class="setting-row">
+          <label for="pollTitle">题目</label>
+          <input type="text" id="pollTitle" value="这节课你最喜欢哪个环节？" maxlength="60" placeholder="输入投票题目">
+        </div>
+
+        <div class="setting-row opt-head">
+          <span>选项（最多 8 个）</span>
+          <button type="button" class="btn btn-small btn-ghost" id="btnAddOpt">＋ 添加</button>
+        </div>
+        <div id="optList" class="opt-list"></div>
+
+        <div class="chips chips-mini" id="modeChips">
+          <button type="button" class="chip active" data-mode="single">🔘 单选</button>
+          <button type="button" class="chip" data-mode="multi">☑️ 多选</button>
+        </div>
+
+        <div class="actions">
+          <button type="button" class="btn btn-primary" id="btnStart">▶ 开始投票</button>
+          <div class="btn-row">
+            <button type="button" class="btn btn-small" id="btnEnd">⏹ 结束投票</button>
+            <button type="button" class="btn btn-small btn-ghost" id="btnReset">🔄 重置投票</button>
+          </div>
+        </div>
+
+        <div class="status-line">
+          <span class="status-badge" id="statusBadge">未开始</span>
+          <span class="timer" id="timerText">00:00</span>
+        </div>
+      </div>
+
+      <div class="block">
+        <h2 class="block-title">② 学生参与</h2>
+        <div class="code-box">
+          <span class="code-label">参与口令</span>
+          <span class="code-value" id="roomCode">—</span>
+        </div>
+        <div class="btn-row">
+          <button type="button" class="btn btn-small btn-ghost" id="btnCopyCode">📋 复制口令</button>
+          <button type="button" class="btn btn-small btn-ghost" id="btnCopyLink">🔗 复制链接</button>
+        </div>
+        <p class="block-hint">单机版：学生可在同一台设备轮流提交；联网版接入后端后，用口令进入即可远程投票。</p>
+
+        <div class="setting-row" style="margin-top:12px">
+          <label for="stuName">姓名</label>
+          <input type="text" id="stuName" maxlength="20" placeholder="可留空，匿名投票">
+        </div>
+        <div class="stu-choices" id="stuChoices"></div>
+        <div class="actions">
+          <button type="button" class="btn btn-primary" id="btnSubmit">✅ 提交投票</button>
+          <button type="button" class="btn btn-small btn-ghost" id="btnSimulate">🎲 随机模拟 10 票</button>
+        </div>
+      </div>
+    </aside>
+
+    <!-- ======================= 右侧结果区 ======================= -->
+    <main class="stage-panel">
+      <!-- 舞台右上角工具栏：⛶ 舞台全屏（自动隐藏设置栏） / ⚙ 切换设置栏显隐 -->
+      <div class="stage-toolbar">
+        <button type="button" class="icon-btn" id="fullscreenBtn" title="全屏">⛶</button>
+        <button type="button" class="icon-btn" id="hideSetupBtn" title="隐藏设置">⚙</button>
+      </div>
+      <div class="stage-head">
+        <h2 class="panel-title">📊 实时结果</h2>
+        <span class="stage-ok" id="stageOk">等待投票</span>
+      </div>
+
+      <div class="state state--empty" id="emptyState">
+        <div class="state-icon">🗳️</div>
+        <div class="state-title">还没有收到投票</div>
+        <div class="state-desc">点击「开始投票」后，让学生用口令参与，或点「随机模拟 10 票」预览效果</div>
+      </div>
+
+      <div id="resultArea" hidden>
+        <div class="poll-question" id="pollQuestion">—</div>
+
+        <div class="stat-grid vote-stats">
+          <div class="stat-card"><span class="stat-num" id="statTotal">0</span><span class="stat-label">累计票数</span></div>
+          <div class="stat-card"><span class="stat-num" id="statPeople">0</span><span class="stat-label">参与人数</span></div>
+          <div class="stat-card"><span class="stat-num" id="statLead">—</span><span class="stat-label">当前领先</span></div>
+          <div class="stat-card"><span class="stat-num" id="statMode">单选</span><span class="stat-label">投票方式</span></div>
+        </div>
+
+        <div class="chart-block">
+          <div class="chart-head">
+            <span class="chart-title">📈 选项得票</span>
+            <span class="chart-sub" id="chartSub">共 0 票</span>
+          </div>
+          <div class="vote-rows" id="voteRows"></div>
+        </div>
+
+        <div class="history-block">
+          <div class="chart-head">
+            <span class="chart-title">🧾 投票明细</span>
+            <span class="chart-sub" id="detailCount">0 条</span>
+          </div>
+          <ul class="record-list" id="voteList"></ul>
+          <div class="btn-row" style="margin-top:12px">
+            <button type="button" class="btn btn-small" id="btnCopyResult">📋 复制结果</button>
+            <button type="button" class="btn btn-small btn-ghost" id="btnExport">📥 导出 CSV</button>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="../../assets/js/frame-bridge.js"></script>
+<script src="../../assets/js/tool-stage-toolbar.js"></script>
+<script src="class-vote.js"></script>
+</body>
+</html>

@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>滚动抽题(多题) | EduToolbox · 滚动抽题</title>
+<meta name="description" content="滚动抽题多题版：一次随机抽取多道题目，不重复。支持自定义题号、抽取数量设置、滚动题号动画、多题卡片结果展示、全屏大屏、Space 控制、localStorage 持久化。适合小组作答、连抽挑战、分轮互动。">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%8E%93%3C/text%3E%3C/svg%3E">
+<link rel="stylesheet" href="chouti-4.css">
+<link rel="stylesheet" href="../../assets/css/tool-common.css">
+</head>
+<body>
+<div id="app">
+
+  <main class="main" id="main">
+    <!-- 左侧：设置面板 -->
+    <section class="setup-panel" id="setupPanel">
+      <!-- 标题列表 -->
+      <div class="block">
+        <h2 class="block-title">📋 标题列表</h2>
+        <p class="block-hint">每行一条标题，支持 <code>#001 标题</code> 自定义题号；多行标题可连续换行</p>
+        <textarea id="qList" placeholder="#001 标题一&#10;标题二&#10;...">001 中国四大名著是哪些？
+太阳系中体积最大的行星是？
+Z-03 光的三原色是哪三种颜色？
+"床前明月光"的下一句是？ 水在标准大气压下的沸点是多少度？
+008 请用一句话概括你心中理想的课堂应该是什么样子。
+这是一个较长的标题示例：请结合你最近一次课堂展示或小组合作的经历，分享你在准备过程、临场表达以及与同伴协作方面最值得总结的一点经验。
+010 下面是一条多段标题示例：
+第一段，请说明你认为阅读习惯对学习能力提升有哪些帮助。
+第二段，请结合自己的实际经历，说说你是如何坚持每天阅读并逐步形成稳定习惯的。
+第三段，请再补充一个你最想推荐给同学的阅读方法或阅读工具。
+04 请围绕"如果让你为班级设计一次主题活动，你会怎么策划"这个主题，分别从活动目标、流程安排、人员分工和展示方式四个角度，进行完整说明。</textarea>
+        <div class="count-bar">
+          共 <span id="count">0</span> 条
+          <button class="btn-mini" id="dedupBtn" title="去除重复标题">去重</button>
+          <button class="btn-mini" id="clearBtn" title="清空标题列表">清空</button>
+        </div>
+        <div class="button-group">
+          <button class="btn-mini" id="importBtn">📥 导入</button>
+          <input type="file" id="fileInput" accept=".txt,.csv" hidden>
+          <button class="btn-mini" id="exportBtn">📤 导出</button>
+          <button class="btn-mini" id="resetBtn" title="恢复内置示例标题列表">↺ 默认</button>
+        </div>
+      </div>
+
+      <!-- 抽题设置 -->
+      <div class="block">
+        <h2 class="block-title">⚙️ 抽题设置</h2>
+        <label class="check-line">
+          <input type="checkbox" id="removeAfter" checked>
+          <span>抽中后从列表移除（防重复）</span>
+        </label>
+        <div class="slider-line">
+          <label for="speed">滚动速度</label>
+          <input type="range" id="speed" min="30" max="300" value="60" step="10">
+          <span class="val" id="speedVal">60</span>ms
+        </div>
+        <div class="slider-line">
+          <label for="drawCount">每次抽取</label>
+          <input type="number" id="drawCount" min="1" max="20" value="3" step="1">
+          <span class="val-unit">题 / 轮</span>
+        </div>
+      </div>
+
+      <!-- 抽题记录 -->
+      <div class="block">
+        <h2 class="block-title">
+          🏆 抽题记录 (<span id="recordCount">0</span>)
+        </h2>
+        <ul id="recordList" class="record-list">
+          <li class="state state--list-item state--empty"><div class="state-icon">📋</div><div class="state-title">暂无记录</div></li>
+        </ul>
+        <div class="button-group">
+          <button class="btn-mini" id="copyRecord">📋 复制</button>
+          <button class="btn-mini" id="clearRecord">🗑 清空</button>
+          <button class="btn-mini" id="resetRecord" title="清空抽题记录并恢复全部标题">↺ 重置记录</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- 右侧：抽题舞台 -->
+    <section class="stage" id="stage">
+      <!-- 工具栏 -->
+      <div class="stage-toolbar">
+        <div class="status-bar">
+          <span class="status-item">总计 <em id="totalCount">0</em></span>
+          <span class="status-item">已抽 <em id="drawnCount">0</em></span>
+          <span class="status-item">剩余 <em id="remainCount">0</em></span>
+          <span class="status-item">本轮 <em id="roundCount">3</em> 题</span>
+        </div>
+        <button class="icon-btn" id="fullscreenBtn" title="全屏">⛶</button>
+        <button class="icon-btn" id="hideSetupBtn" title="隐藏设置">⚙</button>
+      </div>
+
+      <!-- 流体背景 -->
+      <canvas id="bgCanvas" class="bg-canvas"></canvas>
+
+      <!-- 中央展示区：含滚动预览 + 结果列表 + 抽题按钮 -->
+      <div class="display">
+        <!-- 滚动预览区（仅滚动时可见） -->
+        <div class="preview-area" id="previewArea">
+          <div class="q-index" id="qIndex">准备抽取</div>
+          <div class="num-display" id="numDisplay">--</div>
+          <div class="q-display" id="qDisplay">等待开始...</div>
+        </div>
+
+        <!-- 结果列表区 -->
+        <div class="results-area" id="resultsArea">
+          <div class="results-empty" id="resultsEmpty">点击下方按钮或按 Space 开始一轮多题抽取</div>
+          <ul class="results-list" id="resultsList"></ul>
+        </div>
+
+        <!-- 底部按钮区（固定不被遮挡） -->
+        <div class="action-bar">
+          <button class="btn-start" id="startBtn">开始抽题</button>
+          <p class="key-hint">按 <kbd>Space</kbd> 或 <kbd>PageDown</kbd> 开始 / 停止</p>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<script src="../../assets/js/frame-bridge.js"></script>
+<script src="../../assets/js/tool-stage-toolbar.js"></script>
+<script src="chouti-4.js"></script>
+</body>
+</html>

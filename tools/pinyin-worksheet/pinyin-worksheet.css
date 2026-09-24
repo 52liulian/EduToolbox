@@ -1,0 +1,134 @@
+/* ============================================================================
+ * 看拼音写词语 · pinyin-worksheet.css
+ * 仅包含本工具特有样式：控制区 / 选项行 / 练习纸 / 词语格 / 打印
+ * 公共底座（container、sheet、grid、btn、btns、textarea、number 等）见 tool-common.css
+ * 高度策略：练习纸随词语数量自然增高，仅 body 主滚动条
+ * ========================================================================== */
+
+/* ---------------------------------------------------------------------------
+ * 一、标题
+ * ------------------------------------------------------------------------- */
+.container h2 { font-size: 22px; margin-bottom: 18px; }
+
+/* ---------------------------------------------------------------------------
+ * 二、控制区（输入 + 选项 + 按钮）
+ * ------------------------------------------------------------------------- */
+.ctrl {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-bottom: 22px;
+  padding: 22px;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  box-shadow: var(--shadow-sm);
+}
+.ctrl textarea { min-height: 140px; }
+
+/* 选项行：复选 + 列数 */
+.opts {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 16px;
+  font-size: 14px;
+  color: var(--text-2);
+}
+.opts label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  user-select: none;
+}
+.opts input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--primary);
+  cursor: pointer;
+}
+.opts input[type="number"] {
+  width: 64px;
+  margin-left: 4px;
+  text-align: center;
+}
+
+/* ---------------------------------------------------------------------------
+ * 三、练习纸（白纸感，覆盖公共 .sheet 的灰底卡片样式）
+ * ------------------------------------------------------------------------- */
+#sheet {
+  padding: 32px 28px;
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  box-shadow: var(--shadow-sm);
+  min-height: 200px;
+}
+
+/* 词语网格：行/列间距加大，便于书写 */
+#sheet .grid { gap: 28px 18px; }
+
+/* ---------------------------------------------------------------------------
+ * 四、每个词语格
+ * ------------------------------------------------------------------------- */
+.item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 16px 8px 24px;
+  background: var(--card-bg-2);
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+}
+
+.pinyin {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--primary);
+  letter-spacing: 2px;
+  min-height: 1.5em;
+  text-align: center;
+}
+
+.hanzi {
+  font-size: 30px;
+  font-weight: 700;
+  color: var(--text-1);
+  letter-spacing: 6px;
+  font-family: "SimSun", "宋体", serif;
+  min-height: 1.2em;
+  line-height: 1.2;
+  text-align: center;
+}
+
+/* 隐藏汉字时保留书写空间（学生填写） */
+.hanzi.hidden { visibility: hidden; }
+
+/* ---------------------------------------------------------------------------
+ * 五、打印：隐藏控制区，练习纸干净输出
+ * ------------------------------------------------------------------------- */
+@media print {
+  .ctrl,
+  .container h2 { display: none !important; }
+  #sheet {
+    border: none;
+    box-shadow: none;
+    padding: 0;
+    background: #fff;
+  }
+  .item {
+    background: #fff;
+    border: 1px solid #ccc;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+ * 六、小屏微调
+ * ------------------------------------------------------------------------- */
+@media (max-width: 640px) {
+  #sheet { padding: 20px 14px; }
+  .hanzi { font-size: 26px; letter-spacing: 4px; }
+  .pinyin { font-size: 16px; }
+}

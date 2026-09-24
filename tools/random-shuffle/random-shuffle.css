@@ -1,0 +1,275 @@
+/* ============================================================================
+ * 随机打乱 · random-shuffle.css
+ * 仅包含本工具特有样式：分隔符设置行 / 字符串结果 / 带序号入场的结果列表 /
+ *                       深色全屏投影
+ * 公共底座（双栏布局、面板、分段按钮、按钮、舞台）见 tool-common.css
+ * 高度策略：结果容器高度自动撑开，仅 body 主滚动条；仅 stage 全屏时固定视口
+ * ========================================================================== */
+
+/* ---------------------------------------------------------------------------
+ * 一、双栏布局窄屏回落
+ * ------------------------------------------------------------------------- */
+@media (max-width: 900px) {
+  #app .main { grid-template-columns: 1fr; }
+}
+
+/* 「隐藏设置栏」（⚙）：双栏 → 单栏，与 random-call 同构
+   class 由共享模块 tool-stage-toolbar.js 加在 .main 上 */
+#app .main.setup-hidden { grid-template-columns: minmax(0, 1fr); }
+.main.setup-hidden .setup-panel { display: none; }
+
+/* 「自定义分隔符」输入框在设置行中的宽度（JS 控制显示/隐藏） */
+.setting-row .custom-input {
+  max-width: 120px;
+}
+
+/* 分段按钮占满设置卡片一行 */
+.seg-bar {
+  display: flex;
+  width: 100%;
+  margin-bottom: 12px;
+}
+.seg-bar .seg-btn { flex: 1; }
+
+/* ---------------------------------------------------------------------------
+ * 二、结果舞台
+ * ------------------------------------------------------------------------- */
+#stage .stage-inner {
+  min-height: 440px;
+  gap: 22px;
+}
+
+.stage-title {
+  flex-shrink: 0;
+}
+
+/* 结果容器：覆盖公共 .result 的独立卡片样式，融入白色舞台 */
+#result {
+  width: 100%;
+  padding: 0;
+  background: transparent;
+  border: none;
+  box-shadow: none;
+}
+
+/* 初始提示在舞台中居中淡色展示 */
+#result .tip {
+  width: 100%;
+  text-align: center;
+  background: var(--card-bg-2);
+  border: 1.5px dashed var(--border-2);
+  border-left: none;
+  border-radius: var(--r);
+  padding: 26px 20px;
+}
+
+/* ---------------------------------------------------------------------------
+ * 三、表格视图：结果列表（ul.item-list > li > .num + .name，JS 生成）
+ * ------------------------------------------------------------------------- */
+.item-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 10px;
+}
+
+.item-list li {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 12px 16px;
+  background: var(--card-bg-2);
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  animation: rs-item-in 0.4s var(--ease) both; /* 延迟由 JS 内联 animation-delay */
+  transition: transform var(--t-fast) var(--ease), box-shadow var(--t-fast) var(--ease);
+}
+.item-list li:hover {
+  transform: translateY(-2px);
+  background: #fff;
+  box-shadow: var(--shadow-sm);
+  border-color: var(--primary-soft-2);
+}
+
+/* 序号徽标 */
+.item-list .num {
+  display: inline-grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  flex-shrink: 0;
+  font-size: 13px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  color: #fff;
+  background: var(--primary-grad);
+  border-radius: 50%;
+  box-shadow: 0 3px 8px rgba(59, 110, 246, 0.3);
+}
+
+.item-list .name {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text-1);
+}
+
+@keyframes rs-item-in {
+  from { opacity: 0; transform: translateY(12px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* ---------------------------------------------------------------------------
+ * 四、字符串视图：整段文本（保留分隔符换行/空白，自然撑开多行）
+ * ------------------------------------------------------------------------- */
+.string-text {
+  width: 100%;
+  padding: 26px 28px;
+  font-size: clamp(17px, 2vw, 23px);
+  font-weight: 700;
+  line-height: 2.1;
+  text-align: center;
+  word-break: break-all;
+  white-space: pre-wrap; /* 输出分隔符为换行时正确折行 */
+  color: var(--text-1);
+  background:
+    radial-gradient(600px 200px at 50% 0%, rgba(90, 141, 255, 0.1), transparent 70%),
+    var(--card-bg-2);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+}
+
+/* ---------------------------------------------------------------------------
+ * 五、全屏投影（全屏元素是 stage 本身；深色大屏放大展示）
+ * ------------------------------------------------------------------------- */
+#stage:fullscreen,
+#stage:-webkit-full-screen,
+#stage.edutf-solo{
+  display: flex;
+  width: 100%;
+  height: 100%;
+  min-height: 100vh;
+  padding: 40px 48px;
+  border: none;
+  border-radius: 0;
+  background:
+    radial-gradient(1000px 500px at 50% -10%, rgba(90, 141, 255, 0.2), transparent 62%),
+    linear-gradient(160deg, #15234d 0%, #0b1330 55%, #070d1f 100%);
+}
+
+#stage:fullscreen .stage-inner,
+#stage:-webkit-full-screen .stage-inner,
+#stage.edutf-solo .stage-inner{
+  flex: 1;
+  width: 100%;
+  max-width: 1200px;
+  min-height: 0;
+  margin: 0 auto;
+  justify-content: center;
+  gap: 34px;
+}
+
+#stage:fullscreen .stage-title,
+#stage:-webkit-full-screen .stage-title,
+#stage.edutf-solo .stage-title{
+  font-size: clamp(26px, 3.4vw, 40px);
+  color: #fff;
+  text-shadow: 0 0 30px rgba(120, 160, 255, 0.5);
+}
+
+/* 全屏列表：更大卡片 + 玻璃质感 */
+#stage:fullscreen .item-list,
+#stage:-webkit-full-screen .item-list,
+#stage.edutf-solo .item-list{
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 14px;
+}
+#stage:fullscreen .item-list li,
+#stage:-webkit-full-screen .item-list li,
+#stage.edutf-solo .item-list li{
+  padding: 18px 22px;
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.18);
+}
+#stage:fullscreen .item-list li:hover,
+#stage:-webkit-full-screen .item-list li:hover,
+#stage.edutf-solo .item-list li:hover{
+  background: rgba(255, 255, 255, 0.14);
+  box-shadow: none;
+}
+#stage:fullscreen .item-list .num,
+#stage:-webkit-full-screen .item-list .num,
+#stage.edutf-solo .item-list .num{
+  width: 38px;
+  height: 38px;
+  font-size: 16px;
+}
+#stage:fullscreen .item-list .name,
+#stage:-webkit-full-screen .item-list .name,
+#stage.edutf-solo .item-list .name{
+  font-size: 21px;
+  color: #fff;
+}
+
+/* 全屏字符串：超大白字 */
+#stage:fullscreen .string-text,
+#stage:-webkit-full-screen .string-text,
+#stage.edutf-solo .string-text{
+  padding: 40px 44px;
+  font-size: clamp(26px, 3.6vw, 44px);
+  line-height: 2;
+  color: #fff;
+  background: rgba(255, 255, 255, 0.07);
+  border-color: rgba(255, 255, 255, 0.16);
+}
+
+#stage:fullscreen #result .tip,
+#stage:-webkit-full-screen #result .tip,
+#stage.edutf-solo #result .tip{
+  color: rgba(255, 255, 255, 0.55);
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+/* 全屏时退出按钮玻璃质感（JS 进入全屏后才显示） */
+#stage:fullscreen .stage-toolbar .icon-btn,
+#stage:-webkit-full-screen .stage-toolbar .icon-btn,
+#stage.edutf-solo .stage-toolbar .icon-btn{
+  color: rgba(255, 255, 255, 0.9);
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.25);
+}
+#stage:fullscreen .stage-toolbar .icon-btn:hover,
+#stage:-webkit-full-screen .stage-toolbar .icon-btn:hover,
+#stage.edutf-solo .stage-toolbar .icon-btn:hover{
+  background: rgba(255, 255, 255, 0.2);
+}
+
+/* 全屏下工具栏仍可见：贴边 + 半透明，hover 恢复不透明（同 dictation-chinese） */
+#stage:fullscreen .stage-toolbar,
+#stage:-webkit-full-screen .stage-toolbar,
+#stage.edutf-solo .stage-toolbar{
+  position: fixed;
+  top: 18px;
+  right: 22px;
+  z-index: 30;
+  opacity: 0.55;
+  transition: opacity 0.18s var(--ease);
+}
+#stage:fullscreen .stage-toolbar:hover,
+#stage:-webkit-full-screen .stage-toolbar:hover,
+#stage.edutf-solo .stage-toolbar:hover{
+  opacity: 1;
+}
+
+/* ---------------------------------------------------------------------------
+ * 六、小屏微调
+ * ------------------------------------------------------------------------- */
+@media (max-width: 640px) {
+  .string-text { padding: 20px 16px; }
+  #stage:fullscreen,
+#stage:-webkit-full-screen,
+#stage.edutf-solo{ padding: 24px 18px; }
+}

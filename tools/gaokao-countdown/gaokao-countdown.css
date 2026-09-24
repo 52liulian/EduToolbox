@@ -1,0 +1,491 @@
+/* ============================================================================
+ * 高考倒计时 · gaokao-countdown.css
+ * 仅包含本工具特有样式：全屏舞台 / 倒计时数字 / 寄语 / 设置面板 / 业务配色
+ * 公共底座（reset、按钮、表单）见 tool-common.css
+ *
+ * ⚠️ 层叠约定（2026-09-22 重写，血的教训，别再退回裸选择器）
+ *   1) index.html 里本文件【先于】tool-common.css 加载，且 tool-common.css
+ *      头部明确约定「工具覆盖须用更高特异性」。所以本文件凡是覆盖底座的样式，
+ *      一律用「元素 + class」把特异性抬到 0-1-1 以上（main.stage 压 .stage、
+ *      main.stage .days-value 压 .time-value 等）。
+ *   2) 站点适配器会把 html|body 重基成 :host，而「外层文档对影子宿主的普通声明」
+ *      按 CSS Cascade Context 规则无条件压过影子树内 :host 的普通声明（与特异
+ *      性无关）—— 写在 body 上的盒模型/背景在挂载态一律失效。
+ *      因此视觉一律写在影子树内的真实容器 main.stage 上，body 上什么都不写。
+ *   3) 业务配色走 data-skin 属性（挂在 main.stage 上），不用 data-theme：
+ *      data-theme 是站点全局六色配色的令牌空间，两边抢同一个属性会互相污染。
+ * ========================================================================== */
+
+/* ---------------------------------------------------------------------------
+ * 〇、影子宿主外框接管（挂载态专属，独立页自然空转）
+ *   挂载态下影子宿主就是站点级的 .tool-iframe-wrap，它是一张「圆角 20px +
+ *   1px 浅色描边」的卡片外框（assets/css/layout.css:504-512）。深色舞台铺满
+ *   宿主后，四角仍会被这张卡片的圆角裁掉、露出浅色卡底，四周还留一圈 1px
+ *   浅线 —— 即挂载态残留的「白环」。
+ *   常规写法够不到它：CSS Cascade Context 规定「外层文档的普通声明」无条件
+ *   压过影子树内 :host 的普通声明，与特异性无关。但 Cascade 的排序是
+ *   「来源与重要性」先于「上下文」——影子树内的 !important 声明能赢外层文档
+ *   的普通声明。所以用 :host + !important 做「仅本工具生效」的满幅接管：
+ *   不动站点 CSS（零外溢），独立页 / iframe 降级模式没有影子根、:host 不
+ *   匹配，规则自动空转。
+ * ------------------------------------------------------------------------- */
+:host {
+  border-radius: 0 !important;
+  border-width: 0 !important;
+}
+
+/* ---------------------------------------------------------------------------
+ * 一、沉浸式舞台
+ *   背景 / 内边距 / 文字色全部挂在 main.stage 上：
+ *   独立页与挂载态命中的是同一个真实元素，两种加载方式都生效。
+ * ------------------------------------------------------------------------- */
+main.stage {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 28px;
+  width: 100%;
+  /* 满幅沉浸：不留外边距、不限最大宽度、不要圆角。
+     ⚠️ 旧版 `margin:20px auto` + `max-width:1100px` 会在挂载态露出宿主白色卡片
+        的一圈浅色环（独立页则是左右各一条浅色边），破坏沉浸式深色观感。
+        横向铺满后舞台宽度 == 宿主内容宽，四边无缝（实测见 verify_countdown_fix14.py）。 */
+  max-width: none;
+  /* 铺满视口高：独立双击打开（file://）与 iframe 兜底模式下，深色舞台应占满
+     整屏，否则下半屏露出 body 浅色底，看起来「页面显示不完整」。
+     挂载态（站点 Shadow DOM）由下方 :host main.stage 收回内容高。 */
+  min-height: 100vh;
+  margin: 0;
+  padding: 64px 24px 40px;
+  background:
+    radial-gradient(1200px 600px at 50% 0%, rgba(59, 110, 246, 0.18), transparent 65%),
+    radial-gradient(900px 500px at 0% 100%, rgba(91, 139, 255, 0.12), transparent 60%),
+    linear-gradient(160deg, #0d1b3d 0%, #0a1430 50%, #050a1f 100%);
+  border: none;
+  border-radius: 0;
+  box-shadow: var(--shadow-lg);
+  color: #fff;
+  overflow: hidden;
+  text-align: center;
+  transition: background 0.4s var(--ease);
+}
+
+/* 挂载态收窄：站点适配器把工具装进 Shadow DOM 卡片容器（.tool-iframe-wrap），
+   容器高按内容自适应 —— 此时 100vh 会把工具区撑成整屏高、上下留大片空白。
+   用 :host 后代选择器（仅影子树内生效，独立页/iframe 无影子根自动空转）
+   把舞台高度收回卡片自然高。特异性 0-2-1 > 上方 main.stage 的 0-1-1，稳定覆盖。 */
+:host main.stage {
+  min-height: 460px;
+}
+
+/* ---------------------------------------------------------------------------
+ * 二、舞台右上角工具栏
+ *   .stage-toolbar 的绝对定位（top/right 14px）与 .icon-btn 的圆形 40×40 基础
+ *   样式都由 tool-common.css 提供；这里只叠加深色舞台内需要的玻璃质感。
+ *   ⚠️ 早期把工具栏做成 body 下 position:fixed 的浮层，挂载态与站点顶栏
+ *   （z-index:100）空间重叠，下半截点不到 —— 改为舞台内绝对定位后自然消失。
+ * ------------------------------------------------------------------------- */
+main.stage .stage-toolbar {
+  z-index: 5;
+}
+
+main.stage .stage-toolbar .icon-btn {
+  color: rgba(255, 255, 255, 0.9);
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.24);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+}
+main.stage .stage-toolbar .icon-btn:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.42);
+  transform: translateY(-1px);
+}
+
+/* ---------------------------------------------------------------------------
+ * 三、舞台内文字（统一 main.stage 前缀提特异性，保持深色背景上的白字可读）
+ * ------------------------------------------------------------------------- */
+main.stage .countdown-title {
+  font-size: clamp(20px, 2.6vw, 28px);
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.86);
+  letter-spacing: 0.04em;
+  text-shadow: 0 2px 16px rgba(0, 0, 0, 0.3);
+}
+
+/* ---------------------------------------------------------------------------
+ * 四、倒计时数字组（天 / 时 / 分 / 秒）
+ * ------------------------------------------------------------------------- */
+.countdown-display {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(8px, 1.5vw, 20px);
+  flex-wrap: wrap;
+}
+
+main.stage .time-block {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 6px;
+  padding: 14px 18px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: var(--r);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+}
+
+main.stage .time-value {
+  font-size: clamp(40px, 7vw, 80px);
+  font-weight: 900;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+  color: #ffffff;
+  line-height: 1;
+  min-width: 1.6em;
+  text-align: center;
+  text-shadow: 0 0 24px rgba(255, 255, 255, 0.35),
+               0 2px 8px rgba(0, 0, 0, 0.4);
+}
+
+/* 天数（三位数）略放大，用醒目金色
+   ⚠️ 必须 main.stage 前缀：tool-common.css 的 .time-value{color:var(--text-1)}
+   是后加载的，裸 .days-value（同为 0-1-0）会被它压掉 —— 旧版天数实测是深灰。 */
+main.stage .days-value {
+  font-size: clamp(48px, 8.5vw, 96px);
+  color: #ffd34d;
+  text-shadow: 0 0 28px rgba(255, 196, 64, 0.6),
+               0 2px 8px rgba(0, 0, 0, 0.4);
+}
+
+main.stage .time-label {
+  font-size: clamp(13px, 1.6vw, 18px);
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+main.stage .time-colon {
+  font-size: clamp(28px, 5vw, 56px);
+  font-weight: 900;
+  color: rgba(255, 255, 255, 0.5);
+  line-height: 1;
+  align-self: center;
+  padding: 0 2px;
+  animation: gk-blink 1s steps(2, end) infinite;
+}
+
+@keyframes gk-blink {
+  50% { opacity: 0.35; }
+}
+
+/* ---------------------------------------------------------------------------
+ * 五、寄语与目标日期
+ * ------------------------------------------------------------------------- */
+main.stage .slogan {
+  font-size: clamp(15px, 2vw, 20px);
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.92);
+  letter-spacing: 0.08em;
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.25);
+  max-width: 760px;
+}
+
+main.stage .target-date {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.55);
+  letter-spacing: 0.04em;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------------------------------------------------------------------------
+ * 六、设置面板（覆盖公共 .settings-panel，改为屏幕居中模态弹层）
+ *   ⚠️ fixed 相对视口定位：独立页 / iframe / 挂载态（Shadow 内无 transform
+ *      祖先）三种模式下都命中「当前屏幕」中心 —— top/left 各 50% 平移回中。
+ * ------------------------------------------------------------------------- */
+.settings-panel {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 200;
+  display: flex;
+  flex-direction: column;
+  width: 360px;
+  max-width: calc(100vw - 48px);
+  max-height: 86vh;
+  overflow-y: auto;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow-lg);
+  color: var(--text-1);
+  animation: gk-panel-in 0.24s var(--ease);
+}
+.settings-panel[hidden] { display: none; }
+
+@keyframes gk-panel-in {
+  from { opacity: 0; transform: translate(-50%, calc(-50% + 14px)); }
+  to   { opacity: 1; transform: translate(-50%, -50%); }
+}
+
+.settings-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 16px 20px;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text-1);
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  background: var(--card-bg);
+  z-index: 2;
+}
+
+.close-btn {
+  width: 30px;
+  height: 30px;
+  font-size: 14px;
+  color: var(--text-3);
+  border-radius: 50%;
+  background: var(--bg-soft);
+  cursor: pointer;
+  transition: all var(--t-fast) var(--ease);
+}
+.close-btn:hover {
+  color: var(--danger);
+  background: #fff5f5;
+}
+
+.settings-body {
+  padding: 18px 20px 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.form-row {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 0;
+}
+.form-row > label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-2);
+}
+.form-row input[type="text"] {
+  width: 100%;
+  padding: 9px 12px;
+  font-size: 13.5px;
+}
+
+/* 年份切换 / 配色切换：按钮组单选 */
+.year-switch,
+.theme-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.year-btn,
+.theme-btn {
+  padding: 7px 14px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-2);
+  background: var(--card-bg);
+  border: 1.5px solid var(--border);
+  border-radius: var(--r-pill);
+  cursor: pointer;
+  transition: all var(--t-fast) var(--ease);
+  white-space: nowrap;
+}
+.year-btn:hover,
+.theme-btn:hover {
+  color: var(--primary);
+  border-color: var(--primary-soft-2);
+  background: var(--primary-soft);
+}
+.year-btn.active,
+.theme-btn.active {
+  color: #fff;
+  background: var(--primary-grad);
+  border-color: transparent;
+  box-shadow: var(--shadow-primary);
+}
+
+.form-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 6px;
+}
+.action-btn {
+  flex: 1;
+  padding: 10px 16px;
+  font-size: 13.5px;
+  font-weight: 600;
+  border-radius: var(--r-pill);
+  cursor: pointer;
+  transition: all var(--t-fast) var(--ease);
+}
+.action-btn.primary {
+  color: #fff;
+  background: var(--primary-grad);
+  border: 1.5px solid transparent;
+  box-shadow: var(--shadow-primary);
+}
+.action-btn.primary:hover { filter: brightness(1.06); transform: translateY(-1px); }
+.action-btn.secondary {
+  color: var(--text-2);
+  background: var(--card-bg);
+  border: 1.5px solid var(--border);
+}
+.action-btn.secondary:hover {
+  color: var(--primary);
+  border-color: var(--primary-soft-2);
+  background: var(--primary-soft);
+}
+
+/* 设置面板背景遮罩 */
+.settings-mask {
+  position: fixed;
+  inset: 0;
+  z-index: 150;
+  background: rgba(20, 28, 48, 0.5);
+  -webkit-backdrop-filter: blur(3px);
+  backdrop-filter: blur(3px);
+  animation: gk-mask-in 0.2s var(--ease);
+}
+.settings-mask[hidden] { display: none; }
+
+@keyframes gk-mask-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* ---------------------------------------------------------------------------
+ * 七、业务配色（data-skin 挂在 main.stage 上，由 JS 写入）
+ *
+ * ⚠️ 旧版写 `html[data-theme="gold"] body`：
+ *    ① 经适配器重基后变成 `:host[data-theme="gold"] :host`，复合选择器里出现
+ *       第二个 :host，永不匹配 → 挂载态切换 100% 失效；
+ *    ② 与站点全局六色配色抢同一个 data-theme 属性，顶栏配色会静默覆盖倒计时
+ *       的业务配色，倒计时也会往宿主泄漏 crimson/royal/midnight 脏值。
+ *    改用 data-skin 后两种模式命中的都是 main.stage 这个真实元素，全局配色
+ *    与业务配色彻底解耦。
+ * ------------------------------------------------------------------------- */
+main.stage[data-skin="gold"] {
+  background:
+    radial-gradient(1200px 600px at 50% 0%, rgba(255, 196, 64, 0.22), transparent 65%),
+    radial-gradient(900px 500px at 0% 100%, rgba(255, 165, 0, 0.14), transparent 60%),
+    linear-gradient(160deg, #2a1d04 0%, #1a1303 50%, #0d0802 100%);
+}
+main.stage[data-skin="gold"] .days-value {
+  color: #ffd34d;
+  text-shadow: 0 0 28px rgba(255, 196, 64, 0.6);
+}
+
+main.stage[data-skin="crimson"] {
+  background:
+    radial-gradient(1200px 600px at 50% 0%, rgba(239, 68, 68, 0.22), transparent 65%),
+    radial-gradient(900px 500px at 0% 100%, rgba(220, 38, 38, 0.14), transparent 60%),
+    linear-gradient(160deg, #2a0606 0%, #1a0303 50%, #0d0101 100%);
+}
+main.stage[data-skin="crimson"] .days-value {
+  color: #ff6b6b;
+  text-shadow: 0 0 28px rgba(239, 68, 68, 0.6);
+}
+
+main.stage[data-skin="royal"] {
+  background:
+    radial-gradient(1200px 600px at 50% 0%, rgba(147, 51, 234, 0.22), transparent 65%),
+    radial-gradient(900px 500px at 0% 100%, rgba(109, 40, 217, 0.14), transparent 60%),
+    linear-gradient(160deg, #1a0a2e 0%, #0f0420 50%, #070115 100%);
+}
+main.stage[data-skin="royal"] .days-value {
+  color: #c084fc;
+  text-shadow: 0 0 28px rgba(147, 51, 234, 0.6);
+}
+
+main.stage[data-skin="midnight"] {
+  background:
+    radial-gradient(1200px 600px at 50% 0%, rgba(255, 255, 255, 0.06), transparent 65%),
+    linear-gradient(160deg, #000000 0%, #0a0a0a 50%, #000000 100%);
+}
+main.stage[data-skin="midnight"] .days-value {
+  color: #ffffff;
+  text-shadow: 0 0 28px rgba(255, 255, 255, 0.5);
+}
+
+/* ---------------------------------------------------------------------------
+ * 八、全屏投影（全屏元素是舞台 main.stage 本身）
+ *
+ * ⚠️ 两条铁律：
+ *   1) 不要写 min-height —— 舞台自身全屏时 UA 样式表已经用 height:100% 把它
+ *      铺满视口（且带 min-height:0 !important，探针实测在这里读回 0px）。
+ *   2) 选择器必须是 .stage:fullscreen 而不是 html:fullscreen —— 后者经适配器
+ *      重基成 :host:fullscreen，全屏的是影子宿主（白色容器），挂载态全废。
+ * ------------------------------------------------------------------------- */
+.stage:fullscreen,
+.stage:-webkit-full-screen,
+.stage.edutf-solo{
+  max-width: none;
+  margin: 0;
+  padding: 64px 32px 40px;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.stage:fullscreen .time-value,
+.stage:-webkit-full-screen .time-value,
+.stage.edutf-solo .time-value{
+  font-size: clamp(56px, 9vw, 120px);
+}
+.stage:fullscreen .days-value,
+.stage:-webkit-full-screen .days-value,
+.stage.edutf-solo .days-value{
+  font-size: clamp(64px, 11vw, 144px);
+}
+.stage:fullscreen .countdown-title,
+.stage:-webkit-full-screen .countdown-title,
+.stage.edutf-solo .countdown-title{
+  font-size: clamp(24px, 3.2vw, 38px);
+}
+.stage:fullscreen .slogan,
+.stage:-webkit-full-screen .slogan,
+.stage.edutf-solo .slogan{
+  font-size: clamp(17px, 2.4vw, 26px);
+}
+
+/* ---------------------------------------------------------------------------
+ * 九、小屏微调
+ * ------------------------------------------------------------------------- */
+@media (max-width: 640px) {
+  main.stage {
+    /* 窄屏依旧铺满视口（100vh 恒大于旧下限 380px，无需另设下限） */
+    min-height: 100vh;
+    margin: 0;
+    padding: 58px 12px 28px;
+    gap: 18px;
+  }
+  :host main.stage {
+    min-height: 380px;
+  }
+  main.stage .time-block { padding: 10px 12px; }
+  main.stage .time-colon { display: none; }
+  .settings-panel {
+    /* 小屏保持屏幕居中：仅放宽宽度（max-width 兜底防溢出） */
+    width: calc(100vw - 32px);
+    max-width: none;
+  }
+}

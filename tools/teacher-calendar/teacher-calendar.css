@@ -1,0 +1,217 @@
+/* ============================================================================
+ * teacher-calendar.css · 教师工作日历（专属样式）
+ * ----------------------------------------------------------------------------
+ * 依赖底座：../../assets/css/tool-common.css（后加载，同特异性底座胜出，
+ *           本文件使用 .cal 等更具体后代选择器覆盖）
+ * 内容分区：
+ *   1. 页头标题
+ *   2. 控制条（开学日期 / 学期周数 / 生成 / 打印）
+ *   3. 周历卡片（JS 生成：周次标题 + 起止日期 + 星期×7 日格）
+ *   4. 本周高亮 / 周末区隔
+ *   5. 响应式 + 打印
+ * 高度策略：周历列表随周数自然向下撑开，不设固定高度与内部滚动条。
+ * ========================================================================== */
+
+/* ---------------------------------------------------------------------------
+ * 1. 页头
+ * ------------------------------------------------------------------------- */
+.container h2 {
+  margin: 4px 0 18px;
+  font-size: clamp(20px, 2.4vw, 26px);
+  font-weight: 800;
+}
+
+/* ---------------------------------------------------------------------------
+ * 2. 控制条
+ * ------------------------------------------------------------------------- */
+.ctrl {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px 16px;
+  margin-bottom: 20px;
+  padding: 14px 18px;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  box-shadow: var(--shadow-sm);
+}
+
+.ctrl label {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--text-2);
+  white-space: nowrap;
+}
+
+/* .ctrl label input 提高特异性，覆盖底座 input[type=date] 的 width:100% */
+.ctrl label input {
+  width: auto;
+  min-width: 0;
+  padding: 8px 12px;
+  font-size: 13.5px;
+}
+
+.ctrl label input#weeks { width: 84px; text-align: center; }
+
+.ctrl .btn { margin-left: auto; }
+.ctrl .btn.ghost { margin-left: 0; }
+
+/* 底座未提供 .ghost 变体，此处补浅色描边风格 */
+.ctrl .btn.ghost {
+  color: var(--primary);
+  background: var(--primary-soft);
+  border-color: var(--primary-soft-2);
+}
+.ctrl .btn.ghost:hover {
+  color: #fff;
+  background: var(--primary-grad);
+  border-color: transparent;
+}
+
+/* ---------------------------------------------------------------------------
+ * 3. 周历卡片列表（JS 生成 .week）
+ * ------------------------------------------------------------------------- */
+.cal {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.week {
+  padding: 14px 16px;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-left: 4px solid transparent;
+  border-radius: var(--r);
+  box-shadow: var(--shadow-sm);
+  transition: border-color var(--t-fast) var(--ease), box-shadow var(--t-fast) var(--ease),
+              transform var(--t-fast) var(--ease);
+}
+
+.week:hover {
+  border-color: var(--primary-soft-2);
+  border-left-color: var(--primary);
+  box-shadow: var(--shadow);
+  transform: translateX(2px);
+}
+
+/* 周次 + 起止日期行 */
+.week .no {
+  display: inline-block;
+  margin-right: 12px;
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--text-1);
+}
+
+.week .range {
+  font-size: 12.5px;
+  font-weight: 500;
+  color: var(--text-3);
+  font-variant-numeric: tabular-nums;
+}
+
+/* 星期 × 7 日格 */
+.week .days {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.week .days > div {
+  padding: 10px 8px;
+  font-size: 13.5px;
+  font-weight: 600;
+  text-align: center;
+  color: var(--text-2);
+  background: var(--card-bg-2);
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+  transition: background var(--t-fast) var(--ease), border-color var(--t-fast) var(--ease);
+}
+
+/* 周六 / 周日（按位置：6=周六，7=周日）淡暖色区隔 */
+.week .days > div:nth-child(6),
+.week .days > div:nth-child(7) {
+  background: #fff7f5;
+  border-color: #f3deda;
+  color: #c2685f;
+}
+
+/* ---------------------------------------------------------------------------
+ * 4. 本周高亮（JS 在当周卡片加 .cur）
+ * ------------------------------------------------------------------------- */
+.week.cur {
+  border-color: var(--primary-soft-2);
+  border-left: 4px solid var(--primary);
+  background: linear-gradient(180deg, #f6f9ff 0%, #ffffff 60%);
+  box-shadow: var(--shadow);
+}
+
+.week.cur:hover { border-left-color: var(--primary); }
+
+.week.cur .no { color: var(--primary); }
+
+.week.cur .days > div {
+  background: var(--primary-soft);
+  border-color: var(--primary-soft-2);
+  color: var(--primary-active);
+  font-weight: 800;
+}
+
+.week.cur .days > div:nth-child(6),
+.week.cur .days > div:nth-child(7) {
+  background: #ffe9e5;
+  border-color: #f7cbc2;
+  color: #d15a4e;
+}
+
+/* ---------------------------------------------------------------------------
+ * 5. 响应式
+ * ------------------------------------------------------------------------- */
+@media (max-width: 760px) {
+  .ctrl .btn { margin-left: 0; width: 100%; }
+  .ctrl .btn.ghost { width: 100%; }
+  .week { padding: 12px; }
+  .week .days {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 6px;
+  }
+  .week .days > div { font-size: 12.5px; padding: 8px 4px; }
+}
+
+/* ---------------------------------------------------------------------------
+ * 6. 打印：仅输出周历
+ * ------------------------------------------------------------------------- */
+@media print {
+  .ctrl { display: none !important; }
+  /* 打印态重置：必须留在 @media print 内，无需 !important（适配器已做媒体查询感知重定位） */
+  .container { padding: 0; max-width: none; }
+  .week {
+    break-inside: avoid;
+    box-shadow: none;
+    border-color: #ccc;
+  }
+}
+
+/* ============================================================================
+ * 六色主题覆盖（自动追加）
+ * ----------------------------------------------------------------------------
+ * tool-common.css 只给默认强调色，六色 data-theme 覆盖需由工具自身声明
+ * （项目既有规范）。此前本文件缺失该段，切换主题无视觉反馈；组件化挂载后
+ * 站点主题变量不会穿透 Shadow DOM，问题更明显。
+ * ========================================================================== */
+
+body[data-theme="sky"]   { --primary:#0ea5e9; --primary-soft:#e0f2fe; --primary-soft-2:#ccecfc; --primary-grad:linear-gradient(135deg,#38bdf8,#0ea5e9,#0284c7); }
+body[data-theme="violet"]{ --primary:#7c3aed; --primary-soft:#f0e9fe; --primary-soft-2:#e2d5fc; --primary-grad:linear-gradient(135deg,#8b5cf6,#7c3aed,#6d28d9); }
+body[data-theme="green"] { --primary:#16a34a; --primary-soft:#e7f6ec; --primary-soft-2:#d3f0dc; --primary-grad:linear-gradient(135deg,#22c55e,#16a34a,#15803d); }
+body[data-theme="gold"]  { --primary:#d97706; --primary-soft:#fdf1dc; --primary-soft-2:#fbe3bc; --primary-grad:linear-gradient(135deg,#f59e0b,#d97706,#b45309); }
+body[data-theme="orange"]{ --primary:#ea580c; --primary-soft:#ffefe4; --primary-soft-2:#ffdec9; --primary-grad:linear-gradient(135deg,#fb923c,#ea580c,#c2410c); }
+body[data-theme="pink"]  { --primary:#db2777; --primary-soft:#fce7f0; --primary-soft-2:#f9cfe1; --primary-grad:linear-gradient(135deg,#f472b6,#db2777,#be185d); }

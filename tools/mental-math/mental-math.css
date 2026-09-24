@@ -1,0 +1,129 @@
+/* ============================================================
+ * EduToolbox · 口算竞技场 mental-math.css
+ * 依赖公共底座 tool-common.css（本文件应在其后加载）
+ * ============================================================ */
+
+/* ---------- 主题变量（JS 轮换主色） ---------- */
+body[data-theme="sky"]   { --primary:#0ea5e9; --primary-soft:#e0f2fe; --primary-soft-2:#ccecfc; --primary-grad:linear-gradient(135deg,#38bdf8,#0ea5e9,#0284c7); }
+body[data-theme="violet"]{ --primary:#7c3aed; --primary-soft:#f0e9fe; --primary-soft-2:#e2d5fc; --primary-grad:linear-gradient(135deg,#8b5cf6,#7c3aed,#6d28d9); }
+body[data-theme="green"]{ --primary:#16a34a; --primary-soft:#e7f6ec; --primary-soft-2:#d3f0dc; --primary-grad:linear-gradient(135deg,#22c55e,#16a34a,#15803d); }
+body[data-theme="gold"] { --primary:#d97706; --primary-soft:#fdf1dc; --primary-soft-2:#fbe3bc; --primary-grad:linear-gradient(135deg,#f59e0b,#d97706,#b45309); }
+body[data-theme="orange"]{ --primary:#ea580c; --primary-soft:#ffefe4; --primary-soft-2:#ffdec9; --primary-grad:linear-gradient(135deg,#fb923c,#ea580c,#c2410c); }
+body[data-theme="pink"] { --primary:#db2777; --primary-soft:#fce7f0; --primary-soft-2:#f9cfe1; --primary-grad:linear-gradient(135deg,#f472b6,#db2777,#be185d); }
+
+/* ---------- 工作台两栏 ---------- */
+.workbench{ display:grid; grid-template-columns:minmax(280px,340px) minmax(0,1fr); gap:18px; margin-top:18px; align-items:start; }
+/* position:relative —— 舞台右上角 .stage-toolbar 的绝对定位基准 */
+.stage-panel{
+  position:relative;
+  background:var(--card-bg); border:1px solid var(--border);
+  border-radius:var(--r-lg); box-shadow:var(--shadow); padding:20px; min-width:0;
+}
+.stage-head{ display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:14px; padding-right:96px; }
+.stage-head .panel-title{ margin-bottom:0; }
+.stage-ok{ font-size:12px; padding:3px 12px; border-radius:99px; background:var(--primary-soft); color:var(--primary); font-weight:600; }
+
+/* ---------- 面板细节 ---------- */
+.text-input{
+  width:100%; font-family:inherit; font-size:14px; padding:9px 12px;
+  border:1.5px solid var(--border); border-radius:10px;
+  background:#fafbfe; color:var(--text-1); margin-bottom:8px; transition:.15s;
+}
+.text-input:focus{ outline:none; border-color:var(--primary); box-shadow:0 0 0 3px var(--primary-soft); }
+.field.row{ display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:8px; }
+.field label{ font-size:13px; color:var(--text-2); font-weight:600; }
+.field .text-input{ width:110px; flex-shrink:0; }
+.team-setup{ margin-top:10px; }
+.setup-panel .actions{ margin-top:16px; }
+.setup-panel .actions .btn{ width:100%; }
+
+/* ---------- 舞台状态 ---------- */
+.stage-ready,.stage-done{ text-align:center; padding:48px 20px; }
+.ready-icon,.done-icon{ font-size:54px; }
+.ready-title,.done-title{ font-size:22px; font-weight:800; margin:10px 0 4px; }
+.ready-desc,.done-desc{ font-size:14px; color:var(--text-3); }
+.stage-done .done-desc{ margin-bottom:16px; }
+.done-actions{ display:flex; gap:10px; justify-content:center; margin-top:16px; }
+
+.stage-running{ text-align:center; padding:10px 10px 22px; }
+
+/* 对战队伍条 */
+.team-bar{ display:flex; gap:8px; flex-wrap:wrap; justify-content:center; margin-bottom:16px; }
+.team-tag{
+  padding:7px 16px; border-radius:999px; font-size:14px; font-weight:700;
+  background:var(--line-2,#f0f2f8); color:var(--text-2); border:2px solid transparent; cursor:pointer; transition:.18s;
+}
+.team-tag.on{ background:var(--primary-soft); color:var(--primary); border-color:var(--primary); }
+.team-tag .ts{ font-weight:400; font-size:12px; margin-left:6px; }
+
+/* 竞技顶部：题号 / 计时 / 得分 */
+.arena-top{ display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:8px; }
+.q-index{ font-size:14px; color:var(--text-3); font-weight:600; }
+.big-timer{
+  font-size:clamp(34px,6vw,58px); font-weight:900; font-variant-numeric:tabular-nums;
+  color:var(--primary); line-height:1;
+}
+.big-timer.warn{ color:#dc2626; animation:pulse .6s var(--ease) infinite alternate; }
+@keyframes pulse{ from{ transform:scale(1);} to{ transform:scale(1.12);} }
+.score-flash{ font-size:15px; font-weight:800; color:var(--text-2); }
+
+/* 题目大字 */
+.question{
+  font-size:clamp(40px,8vw,82px); font-weight:900; color:var(--text-1);
+  margin:18px 0 22px; letter-spacing:.02em; font-variant-numeric:tabular-nums;
+  min-height:1.2em;
+}
+
+.answer-box{ display:flex; gap:10px; width:min(100%,520px); margin:0 auto; }
+.answer-box .text-input{
+  flex:1; text-align:center; font-size:clamp(24px,4vw,34px); height:58px; margin:0; font-weight:700;
+}
+.answer-box .btn{ height:58px; padding:0 26px; font-size:16px; }
+
+.stats-line{ margin-top:16px; font-size:15px; color:var(--text-3); }
+.stats-line b{ color:var(--text-1); }
+
+/* 排行/错题列表 */
+.rank-list{ width:min(100%,560px); margin:6px auto 0; text-align:left; }
+.rank-item{ display:flex; align-items:center; gap:12px; padding:10px 14px; border:1px solid var(--line-2); border-radius:12px; margin-bottom:8px; font-size:14.5px; }
+.rank-item .rk{ font-weight:900; color:var(--text-3); width:34px; text-align:center; }
+.rank-item.r1{ border-color:#e8b93a; background:linear-gradient(90deg,#fffaf0,#fff); } .rank-item.r1 .rk{ color:#b8860b; }
+.rank-item.r2{ border-color:#ccd8e8; background:#fafcff; } .rank-item.r2 .rk{ color:#64748b; }
+.rank-item.r3{ border-color:#e3c9a8; background:#fffaf6; } .rank-item.r3 .rk{ color:#a16207; }
+.rank-item .nm{ font-weight:700; flex:1; }
+.rank-item .sc{ font-weight:900; color:var(--primary); }
+.rank-item .st{ font-size:12.5px; color:var(--text-3); }
+
+/* 错题 */
+.wrong-box{ margin-top:6px; }
+.wrong-box .wb{ display:flex; gap:8px; align-items:center; font-size:13.5px; padding:6px 8px; color:var(--text-2); border-bottom:1px solid var(--line-2); }
+.wrong-box .eq{ font-weight:700; min-width:130px; }
+.wrong-box .bad{ color:#dc2626; font-weight:700; }
+
+/* ---------- 响应式 ---------- */
+@media (max-width:880px){ .workbench{ grid-template-columns:1fr; } }
+
+/* ---------- 隐藏设置栏（⚙）：双栏 → 单栏，与 random-call 同构 ---------- */
+.workbench.setup-hidden{ grid-template-columns:minmax(0,1fr); }
+.workbench.setup-hidden .setup-panel{ display:none; }
+
+/* ---------- 舞台全屏（⛶）：全屏目标是 .stage-panel 自身，不是整页 ---------- */
+.stage-panel:fullscreen,
+.stage-panel:-webkit-full-screen,
+.stage-panel.edutf-solo{
+  display:flex; flex-direction:column; justify-content:center; align-items:stretch;
+  min-height:100vh; padding:36px 30px;
+  border-radius:0; border-color:transparent; box-shadow:none;
+  background:var(--card-bg); overflow:auto;
+}
+/* 全屏下工具栏仍可见：贴边 + 半透明，hover 恢复不透明 */
+.stage-panel:fullscreen .stage-toolbar,
+.stage-panel:-webkit-full-screen .stage-toolbar,
+.stage-panel.edutf-solo .stage-toolbar{
+  position:fixed; top:18px; right:22px; z-index:30;
+  opacity:.55; transition:opacity .18s var(--ease);
+}
+.stage-panel:fullscreen .stage-toolbar:hover,
+.stage-panel:-webkit-full-screen .stage-toolbar:hover,
+.stage-panel.edutf-solo .stage-toolbar:hover{ opacity:1; }
+@media print{ .stage-toolbar{ display:none; } }

@@ -1,0 +1,161 @@
+/* ============================================================================
+ * EduToolbox · tools.css
+ * 职责：自研工具运行页补充样式 + 全站响应式断点（@media 统一集中在本文件）
+ * 依赖：base.css, layout.css, components.css, pages.css
+ * 说明：工具本体页面（tools/<slug>/）使用各自 css + assets/css/tool-common.css
+ * ========================================================================== */
+
+/* ---------------------------------------------------------------------------
+ * 1. 自研工具运行页补充
+ * ------------------------------------------------------------------------- */
+
+/* 详情页容器与上下页边距 */
+#detailPage .container { padding-top: 24px; }
+
+/* iframe 在极小宽度下去掉边框圆角，贴边显示 */
+@media (max-width: 640px) {
+  .tool-iframe-wrap {
+    border-radius: var(--r);
+  }
+  #toolIframe { min-height: 60vh; }
+}
+
+/* 工具运行页加载前的占位体感（iframe 背景与工具页底色一致） */
+.tool-iframe-wrap::before { content: none; }
+
+/* ---------------------------------------------------------------------------
+ * 2. 响应式：≤ 1080px —— 顶栏收紧、网格降列
+ * ------------------------------------------------------------------------- */
+@media (max-width: 1080px) {
+  .topnav-inner { gap: 16px; }
+  .nav-link { padding: 8px 12px; font-size: 14px; }
+  .submit-btn { padding: 8px 14px; }
+
+  .layout { grid-template-columns: 200px minmax(0, 1fr); gap: 20px; }
+
+  .tool-grid { grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); }
+}
+
+/* ---------------------------------------------------------------------------
+ * 3. 响应式：≤ 900px —— 侧栏转为横向、Hero 缩距
+ * ------------------------------------------------------------------------- */
+@media (max-width: 900px) {
+  .hero { padding: 44px 0 36px; }
+
+  .layout,
+  .layout.no-sidebar { grid-template-columns: minmax(0, 1fr); }
+
+  .sidebar {
+    position: static;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    padding: 10px;
+  }
+  .sidebar-title { width: 100%; padding-bottom: 4px; }
+  .cat-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .cat-list li + li { margin-top: 0; }
+  .cat-item { padding: 7px 14px; }
+  .cat-count { display: none; }
+
+  .tool-run-header { padding: 22px 20px; }
+}
+
+/* ---------------------------------------------------------------------------
+ * 4. 响应式：≤ 760px —— 顶栏折叠为两行
+ * ------------------------------------------------------------------------- */
+@media (max-width: 760px) {
+  :root { --topnav-h: 108px; }
+
+  .topnav-inner {
+    flex-wrap: wrap;
+    height: auto;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    gap: 8px 14px;
+  }
+
+  .nav {
+    order: 3;
+    width: 100%;
+    justify-content: flex-start;
+    overflow-x: auto;
+    flex-wrap: nowrap;
+    padding-bottom: 2px;
+    scrollbar-width: none;
+  }
+  .nav::-webkit-scrollbar { display: none; }
+  .nav-link { flex-shrink: 0; }
+
+  /* 下拉菜单在窄屏贴左展开 */
+  .dropdown-menu {
+    left: 0;
+    transform: translateX(0) translateY(-6px);
+    max-width: 80vw;
+  }
+  .nav-dropdown:hover .dropdown-menu,
+  .nav-dropdown.open .dropdown-menu { transform: translateX(0) translateY(0); }
+
+  .topnav-actions { margin-left: auto; }
+  .submit-btn { display: none; } /* 空间紧张时隐藏次要操作 */
+
+  .hero-title { gap: 8px; }
+  .hero-desc { font-size: 14.5px; }
+
+  .hero-search { padding-left: 16px; }
+  .hero-search-btn { padding: 0 20px; }
+
+  .tool-grid { grid-template-columns: 1fr 1fr; gap: 12px; }
+  .tool-card { padding: 16px; }
+
+  .featured-grid .tool-card { width: 250px; flex-basis: 250px; }
+
+  .cat-block { padding: 18px; }
+
+  .article-list { grid-template-columns: 1fr; }
+
+  .footer-inner { flex-direction: column; gap: 20px; }
+}
+
+/* ---------------------------------------------------------------------------
+ * 5. 响应式：≤ 480px —— 手机单列
+ * ------------------------------------------------------------------------- */
+@media (max-width: 480px) {
+  .container { padding: 0 16px; }
+
+  .logo-text small { display: none; }
+  .logo-mark { width: 36px; height: 36px; font-size: 19px; }
+
+  .hero { padding: 32px 0 28px; }
+  .hero-stats { gap: 10px; }
+  .stat { min-width: calc(50% - 5px); padding: 12px 10px; }
+
+  .tool-grid { grid-template-columns: 1fr; }
+
+  .subject-btn { padding: 8px 16px; font-size: 13.5px; }
+
+  .cat-list-grid { grid-template-columns: 1fr; }
+
+  .tool-run-sub { font-size: 13.5px; }
+  .tool-feature { padding: 5px 12px; font-size: 12.5px; }
+
+  .content-head { flex-direction: column; align-items: flex-start; gap: 4px; }
+}
+
+/* ---------------------------------------------------------------------------
+ * 6. 用户偏好：减少动效
+ * ------------------------------------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}

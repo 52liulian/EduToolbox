@@ -1,0 +1,92 @@
+/* ============================================================
+ * EduToolbox · 随机数生成器 random-number.css
+ * 依赖公共底座 tool-common.css（本文件应在其后加载）
+ * ============================================================ */
+
+body[data-theme="sky"]   { --primary:#0ea5e9; --primary-soft:#e0f2fe; --primary-soft-2:#ccecfc; --primary-grad:linear-gradient(135deg,#38bdf8,#0ea5e9,#0284c7); }
+body[data-theme="violet"]{ --primary:#7c3aed; --primary-soft:#f0e9fe; --primary-soft-2:#e2d5fc; --primary-grad:linear-gradient(135deg,#8b5cf6,#7c3aed,#6d28d9); }
+body[data-theme="green"] { --primary:#16a34a; --primary-soft:#e7f6ec; --primary-soft-2:#d3f0dc; --primary-grad:linear-gradient(135deg,#22c55e,#16a34a,#15803d); }
+body[data-theme="gold"]  { --primary:#d97706; --primary-soft:#fdf1dc; --primary-soft-2:#fbe3bc; --primary-grad:linear-gradient(135deg,#f59e0b,#d97706,#b45309); }
+body[data-theme="orange"]{ --primary:#ea580c; --primary-soft:#ffefe4; --primary-soft-2:#ffdec9; --primary-grad:linear-gradient(135deg,#fb923c,#ea580c,#c2410c); }
+body[data-theme="pink"]  { --primary:#db2777; --primary-soft:#fce7f0; --primary-soft-2:#f9cfe1; --primary-grad:linear-gradient(135deg,#f472b6,#db2777,#be185d); }
+
+.workbench { display:grid; grid-template-columns:340px minmax(0,1fr); gap:20px; align-items:start; }
+
+.stat-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; }
+.stat-grid .stat-card { padding:12px 10px; min-width:0; }
+.stat-grid .stat-num { font-size:19px; }
+
+/* ---------- 结果区 ---------- */
+/* position:relative —— 舞台右上角 .stage-toolbar 的绝对定位基准 */
+.stage-panel { position:relative; min-width:0; }
+/* padding-right 为右上角 ⛶⚙ 工具栏（40+8+40=88px）留出避让空间 */
+.stage-head { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:14px; padding-right:96px; }
+.stage-head .panel-title { margin-bottom:0; }
+.stage-ok { font-size:13px; font-weight:600; color:var(--primary); }
+
+.big-number {
+  display:grid; place-items:center; min-height:150px; padding:24px;
+  font-size:clamp(46px,9vw,92px); font-weight:900; font-variant-numeric:tabular-nums; letter-spacing:-.02em;
+  background:linear-gradient(160deg,#ffffff,var(--card-bg-2));
+  border:1px solid var(--border); border-radius:var(--r-lg); box-shadow:var(--shadow);
+  background-clip:padding-box;
+}
+.big-number.pop { animation:numPop .4s var(--ease); }
+@keyframes numPop { 0%{ transform:scale(.86); opacity:.3 } 60%{ transform:scale(1.06) } 100%{ transform:scale(1); opacity:1 } }
+
+.num-list { display:flex; flex-wrap:wrap; gap:8px; justify-content:center; margin-top:14px; }
+.num-pill {
+  padding:7px 15px; font-size:15px; font-weight:700; font-variant-numeric:tabular-nums;
+  color:var(--primary); background:var(--primary-soft); border:1.5px solid var(--primary-soft-2); border-radius:var(--r-pill);
+}
+
+/* ---------- 直方图 ---------- */
+.chart-block, .history-block {
+  margin-top:18px; padding:18px 20px; background:var(--card-bg);
+  border:1px solid var(--border); border-radius:var(--r); box-shadow:var(--shadow-sm);
+}
+.chart-head { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:12px; }
+.chart-title { font-size:15px; font-weight:700; }
+.chart-sub { font-size:12.5px; color:var(--text-3); }
+
+.histogram { display:flex; align-items:flex-end; gap:4px; height:170px; padding:6px 2px 0; }
+.hist-col { flex:1 1 0; min-width:6px; display:flex; flex-direction:column; justify-content:flex-end; align-items:center; gap:4px; height:100%; }
+.hist-bar {
+  width:100%; background:var(--primary-grad); border-radius:5px 5px 0 0;
+  min-height:3px; transition:height .3s var(--ease);
+}
+.hist-bar.zero { background:var(--primary-soft-2); }
+.hist-tag { font-size:10px; color:var(--text-3); white-space:nowrap; overflow:hidden; max-width:100%; text-overflow:ellipsis; }
+
+/* ---------- 历史 ---------- */
+.history-block .record-list { gap:6px; }
+.history-block .record-list li { justify-content:space-between; }
+.hist-time { font-size:12px; color:var(--text-3); flex-shrink:0; }
+.hist-vals { font-size:13px; color:var(--text-2); word-break:break-all; }
+
+@media (max-width:900px){ .workbench { grid-template-columns:1fr; } }
+@media print { .history-block, .stage-toolbar { display:none; } }
+
+/* ---------- 隐藏设置栏（⚙）：双栏 → 单栏，与 random-call 同构 ---------- */
+.workbench.setup-hidden { grid-template-columns:minmax(0,1fr); }
+.workbench.setup-hidden .setup-panel { display:none; }
+
+/* ---------- 舞台全屏（⛶）：全屏目标是 .stage-panel 自身，不是整页 ---------- */
+.stage-panel:fullscreen,
+.stage-panel:-webkit-full-screen,
+.stage-panel.edutf-solo{
+  display:flex; flex-direction:column; justify-content:center; align-items:stretch;
+  min-height:100vh; padding:36px 30px;
+  border-radius:0; border-color:transparent; box-shadow:none;
+  background:var(--bg); overflow:auto;
+}
+/* 全屏下工具栏仍可见：贴边 + 半透明，hover 恢复不透明 */
+.stage-panel:fullscreen .stage-toolbar,
+.stage-panel:-webkit-full-screen .stage-toolbar,
+.stage-panel.edutf-solo .stage-toolbar{
+  position:fixed; top:18px; right:22px; z-index:30;
+  opacity:.55; transition:opacity .18s var(--ease);
+}
+.stage-panel:fullscreen .stage-toolbar:hover,
+.stage-panel:-webkit-full-screen .stage-toolbar:hover,
+.stage-panel.edutf-solo .stage-toolbar:hover{ opacity:1; }

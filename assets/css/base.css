@@ -1,0 +1,298 @@
+/* ============================================================================
+ * EduToolbox · base.css
+ * 职责：CSS 变量（明/暗主题）、现代 reset、基础排版、.container、.btn、.tag
+ * 依赖：无（最底层样式，禁止引用其他层的类）
+ * ========================================================================== */
+
+/* ---------------------------------------------------------------------------
+ * 1. 设计令牌（CSS 变量）
+ * ------------------------------------------------------------------------- */
+:root {
+  /* 品牌色 */
+  --primary:        #3b6ef6;
+  --primary-hover:  #2f5ee0;
+  --primary-active: #274fc2;
+  --primary-soft:   #e8edff;
+  --primary-soft-2: #dbe4ff;
+  --primary-grad:   linear-gradient(135deg, #5a8dff 0%, #3b6ef6 55%, #2f5bd9 100%);
+
+  /* 功能色 */
+  --success: #22b36a;
+  --warning: #f5a623;
+  --danger:  #ef5b5b;
+  --info:    #38a3e8;
+
+  /* 文字 */
+  --text-1: #1f2733;
+  --text-2: #515b6b;
+  --text-3: #8a93a3;
+  --text-inverse: #ffffff;
+
+  /* 面与线 */
+  --bg:        #eef2fa;
+  --bg-soft:   #f4f7fd;
+  --card-bg:   #ffffff;
+  --card-bg-2: #f8faff;
+  --border:    #e4e9f2;
+  --border-2:  #d6deec;
+
+  /* 阴影 */
+  --shadow-sm: 0 2px 8px rgba(31, 45, 80, 0.05);
+  --shadow:    0 6px 22px rgba(31, 45, 80, 0.07);
+  --shadow-lg: 0 16px 40px rgba(36, 66, 140, 0.14);
+  --shadow-primary: 0 10px 24px rgba(59, 110, 246, 0.28);
+
+  /* 圆角 */
+  --r-sm: 8px;
+  --r:    14px;
+  --r-lg: 20px;
+  --r-pill: 999px;
+
+  /* 尺寸 */
+  --topnav-h: 64px;
+  --container: 1240px;
+  --gap: 24px;
+
+  /* 动效 */
+  --ease: cubic-bezier(0.4, 0, 0.2, 1);
+  --t-fast: 0.16s;
+  --t:      0.26s;
+
+  /* 字体 */
+  --font: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC",
+          "Hiragino Sans GB", "Microsoft YaHei", "Helvetica Neue", Arial,
+          sans-serif;
+}
+
+/* 暗色主题 */
+body.dark {
+  --primary:        #5b8bff;
+  --primary-hover:  #7098ff;
+  --primary-active: #4a7af0;
+  --primary-soft:   #23304f;
+  --primary-soft-2: #2a3a60;
+  --primary-grad:   linear-gradient(135deg, #5b8bff 0%, #4a7af0 100%);
+
+  --text-1: #e7ecf5;
+  --text-2: #aeb8c9;
+  --text-3: #7e8899;
+
+  --bg:        #141821;
+  --bg-soft:   #191e2a;
+  --card-bg:   #1e2433;
+  --card-bg-2: #232a3b;
+  --border:    #2d3548;
+  --border-2:  #39425a;
+
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
+  --shadow:    0 6px 22px rgba(0, 0, 0, 0.35);
+  --shadow-lg: 0 16px 40px rgba(0, 0, 0, 0.5);
+}
+
+/* ---------------------------------------------------------------------------
+ * 2. 现代 Reset
+ * ------------------------------------------------------------------------- */
+*,
+*::before,
+*::after { box-sizing: border-box; }
+
+* { margin: 0; padding: 0; }
+
+html {
+  -webkit-text-size-adjust: 100%;
+  -webkit-tap-highlight-color: transparent;
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font);
+  font-size: 15px;
+  line-height: 1.65;
+  color: var(--text-1);
+  background: var(--bg);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  min-height: 100vh;
+  transition: background-color var(--t) var(--ease),
+              color var(--t) var(--ease);
+}
+
+/* 页面唯一纵向滚动：body（浏览器原生滚动条），内部容器不制造独立滚动 */
+html, body { height: auto; }
+
+img, picture, svg, video, canvas {
+  display: block;
+  max-width: 100%;
+}
+
+input, button, textarea, select {
+  font: inherit;
+  color: inherit;
+}
+
+button { background: none; border: none; cursor: pointer; }
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+a:hover { color: var(--primary); }
+
+ul, ol { list-style: none; }
+
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 700;
+  line-height: 1.3;
+  color: var(--text-1);
+}
+
+table { border-collapse: collapse; width: 100%; }
+
+code {
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+  font-size: 0.9em;
+  background: var(--primary-soft);
+  color: var(--primary);
+  padding: 0.1em 0.4em;
+  border-radius: 6px;
+}
+
+::selection {
+  background: var(--primary);
+  color: #fff;
+}
+
+/* 自定义滚动条（仅浏览器主滚动条与表单控件可见时生效） */
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-thumb {
+  background: var(--border-2);
+  border-radius: 999px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+::-webkit-scrollbar-thumb:hover { background: var(--text-3); background-clip: content-box; }
+::-webkit-scrollbar-track { background: transparent; }
+
+/* ---------------------------------------------------------------------------
+ * 3. 布局容器
+ * ------------------------------------------------------------------------- */
+.container {
+  width: 100%;
+  max-width: var(--container);
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+/* ---------------------------------------------------------------------------
+ * 4. 通用按钮 .btn
+ * ------------------------------------------------------------------------- */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 10px 22px;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.2;
+  white-space: nowrap;
+  color: var(--text-2);
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--r-pill);
+  cursor: pointer;
+  transition: all var(--t-fast) var(--ease);
+  user-select: none;
+}
+
+.btn:hover {
+  color: var(--primary);
+  border-color: var(--primary-soft-2);
+  background: var(--primary-soft);
+  transform: translateY(-1px);
+}
+
+.btn:active { transform: translateY(0); }
+
+.btn-primary {
+  color: #fff;
+  background: var(--primary-grad);
+  border-color: transparent;
+  box-shadow: var(--shadow-primary);
+}
+
+.btn-primary:hover {
+  color: #fff;
+  background: var(--primary-grad);
+  filter: brightness(1.05);
+  box-shadow: 0 12px 28px rgba(59, 110, 246, 0.36);
+}
+
+.btn-ghost {
+  color: var(--text-2);
+  background: transparent;
+  border-color: var(--border-2);
+}
+
+.btn-ghost:hover {
+  color: var(--primary);
+  background: var(--primary-soft);
+  border-color: var(--primary-soft-2);
+}
+
+.btn-lg { padding: 13px 30px; font-size: 16px; }
+.btn-sm,
+.btn-small { padding: 7px 16px; font-size: 13px; }
+
+/* ---------------------------------------------------------------------------
+ * 5. 通用标签 .tag
+ * ------------------------------------------------------------------------- */
+.tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 10px;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.5;
+  color: var(--text-3);
+  background: var(--bg-soft);
+  border: 1px solid var(--border);
+  border-radius: var(--r-pill);
+  white-space: nowrap;
+}
+
+a.tag:hover {
+  color: var(--primary);
+  border-color: var(--primary-soft-2);
+  background: var(--primary-soft);
+}
+
+/* ---------------------------------------------------------------------------
+ * 6. 辅助类
+ * ------------------------------------------------------------------------- */
+[hidden] { display: none !important; }
+
+.text-primary { color: var(--primary); }
+.text-center  { text-align: center; }
+.mt-16 { margin-top: 16px; }
+.mt-24 { margin-top: 24px; }
+
+/* ---------------------------------------------------------------------------
+ * 7. 打印：整页刷白（站点级）
+ * -------------------------------------------------------------------------
+ * 背景：自研工具的 CSS 原先是「独立页面」写法，靠自己的
+ *       `@media print { body { background:#fff !important } }` 把整页刷白。
+ *       2026-09-21 把工具 CSS 作用域化到 .tool-root 之后，这条规则变成
+ *       `.tool-root { background:#fff }` —— 只有工具区是白的，打印时外层
+ *       <body> 仍是站点底色 #eef2fa（深色模式下更深），出现「白卡片 + 灰底」。
+ * 做法：在站点级补这一条，打印态把 html/body 刷白，与改造前观感一致。
+ * 约束（踩过坑，别改宽）：**只允许写 background** —— 早期给打印重置加
+ *       `!important` 的 max-width / padding 反而压制了底座的容器宽度约束，
+ *       导致工具打印排版崩掉。宽度与内边距仍交给工具内 .tool-root 的打印重置
+ *       （tool-common.css @media print）与 @page 纸张几何。 */
+@media print {
+  html, body {
+    background: #fff !important;
+  }
+}

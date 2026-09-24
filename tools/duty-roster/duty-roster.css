@@ -1,0 +1,74 @@
+/* ============================================================
+ * EduToolbox · 值日安排表 duty-roster.css
+ * 依赖公共底座 tool-common.css（本文件应在其后加载）
+ * ============================================================ */
+
+body[data-theme="sky"]   { --primary:#0ea5e9; --primary-soft:#e0f2fe; --primary-soft-2:#ccecfc; --primary-grad:linear-gradient(135deg,#38bdf8,#0ea5e9,#0284c7); }
+body[data-theme="violet"]{ --primary:#7c3aed; --primary-soft:#f0e9fe; --primary-soft-2:#e2d5fc; --primary-grad:linear-gradient(135deg,#8b5cf6,#7c3aed,#6d28d9); }
+body[data-theme="green"] { --primary:#16a34a; --primary-soft:#e7f6ec; --primary-soft-2:#d3f0dc; --primary-grad:linear-gradient(135deg,#22c55e,#16a34a,#15803d); }
+body[data-theme="gold"]  { --primary:#d97706; --primary-soft:#fdf1dc; --primary-soft-2:#fbe3bc; --primary-grad:linear-gradient(135deg,#f59e0b,#d97706,#b45309); }
+body[data-theme="orange"]{ --primary:#ea580c; --primary-soft:#ffefe4; --primary-soft-2:#ffdec9; --primary-grad:linear-gradient(135deg,#fb923c,#ea580c,#c2410c); }
+body[data-theme="pink"]  { --primary:#db2777; --primary-soft:#fce7f0; --primary-soft-2:#f9cfe1; --primary-grad:linear-gradient(135deg,#f472b6,#db2777,#be185d); }
+
+.workbench { display:grid; grid-template-columns:350px minmax(0,1fr); gap:20px; align-items:start; }
+
+.stage-panel { position:relative; min-width:0; }
+.stage-head { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:14px; padding-right:96px; }
+.stage-head .panel-title { margin-bottom:0; }
+.stage-ok { font-size:13px; font-weight:600; color:var(--primary); }
+
+/* ---------- 表格 ---------- */
+.table-wrap {
+  overflow-x:auto; padding:6px 2px 2px;
+  background:var(--card-bg); border:1px solid var(--border); border-radius:var(--r); box-shadow:var(--shadow-sm);
+}
+.duty-table { width:100%; border-collapse:collapse; font-size:14px; }
+.duty-table th, .duty-table td {
+  padding:11px 12px; text-align:center; border:1px solid var(--border); white-space:nowrap;
+}
+.duty-table thead th {
+  color:#fff; background:var(--primary-grad); font-weight:700; font-size:13.5px;
+}
+.duty-table thead th:first-child { border-radius:0; }
+.duty-table tbody th {
+  font-weight:700; color:var(--text-1); background:var(--card-bg-2); font-size:13.5px;
+}
+.duty-table tbody tr:nth-child(even) td { background:#fbfcff; }
+.duty-table td .who { display:inline-block; margin:2px 3px; padding:3px 11px; font-weight:700; color:var(--primary); background:var(--primary-soft); border-radius:var(--r-pill); }
+.duty-table .weekend th, .duty-table .weekend td { background:var(--bg-soft); color:var(--text-3); }
+.duty-table .weekend .who { color:var(--text-3); background:transparent; border:1px dashed var(--border-2); }
+
+.table-tip { margin-top:12px; font-size:12.5px; color:var(--text-3); line-height:1.7; }
+
+@media (max-width:900px){ .workbench { grid-template-columns:1fr; } }
+
+@media print {
+  .table-wrap { border:none; box-shadow:none; overflow:visible; }
+  .duty-table th, .duty-table td { padding:8px 6px; font-size:12px; border:1px solid #999; }
+  .duty-table thead th { background:#e8edff !important; color:#000; -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+}
+
+/* ---------- 隐藏设置栏（⚙）：双栏 → 单栏，与 random-call 同构 ---------- */
+.workbench.setup-hidden{ grid-template-columns:minmax(0,1fr); }
+.workbench.setup-hidden .setup-panel{ display:none; }
+
+/* ---------- 舞台全屏（⛶）：全屏目标是 .stage-panel 自身，不是整页 ---------- */
+.stage-panel:fullscreen,
+.stage-panel:-webkit-full-screen,
+.stage-panel.edutf-solo{
+  display:flex; flex-direction:column; justify-content:center; align-items:stretch;
+  min-height:100vh; padding:36px 30px;
+  border-radius:0; border-color:transparent; box-shadow:none;
+  background:var(--card-bg); overflow:auto;
+}
+/* 全屏下工具栏仍可见：贴边 + 半透明，hover 恢复不透明 */
+.stage-panel:fullscreen .stage-toolbar,
+.stage-panel:-webkit-full-screen .stage-toolbar,
+.stage-panel.edutf-solo .stage-toolbar{
+  position:fixed; top:18px; right:22px; z-index:30;
+  opacity:.55; transition:opacity .18s var(--ease);
+}
+.stage-panel:fullscreen .stage-toolbar:hover,
+.stage-panel:-webkit-full-screen .stage-toolbar:hover,
+.stage-panel.edutf-solo .stage-toolbar:hover{ opacity:1; }
+@media print{ .stage-toolbar{ display:none; } }

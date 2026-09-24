@@ -1,0 +1,115 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>随机打乱 | EduToolbox · 名单打乱</title>
+<meta name="description" content="一键随机打乱名单顺序，支持自定义分隔符、字符串/表格切换、全屏展示、本地保存。适用于课堂点名、轮流发言、随机座位。本地处理，隐私安全，离线可用。">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%8E%93%3C/text%3E%3C/svg%3E">
+<link rel="stylesheet" href="random-shuffle.css">
+<link rel="stylesheet" href="../../assets/css/tool-common.css">
+</head>
+<body>
+<div id="app">
+  <!-- 顶栏 -->
+
+  <main class="main">
+    <!-- 左侧：名单输入 -->
+    <section class="setup-panel">
+      <div class="block">
+        <h2 class="block-title">📋 输入名单</h2>
+        <p class="block-hint">在此粘贴需要打乱的名单，默认按行分割</p>
+        <div class="textarea-wrap">
+          <textarea id="names" placeholder="张三&#10;李四&#10;王五&#10;赵六&#10;...">张三
+李四
+王五
+赵六
+钱七
+孙八
+周九
+吴十
+郑十一
+王十二
+刘十三
+陈十四
+杨十五</textarea>
+          <div class="textarea-toolbar">
+            <button class="btn-mini" id="exampleBtn" title="加载示例">示例</button>
+            <button class="btn-mini" id="clearBtn" title="清空">清空</button>
+          </div>
+        </div>
+        <div class="count-bar">共 <span id="count">13</span> 条</div>
+      </div>
+
+      <!-- 分隔符设置 -->
+      <div class="block">
+        <h2 class="block-title">⚙️ 分隔设置</h2>
+        <div class="setting-row">
+          <label for="inSep">输入分隔符</label>
+          <select id="inSep">
+            <option value="line">换行符 (Enter)</option>
+            <option value="comma">逗号 (,)</option>
+            <option value="space">空格 ( )</option>
+            <option value="custom">自定义</option>
+          </select>
+          <input type="text" id="inCustom" class="custom-input" placeholder="如 /" style="display:none">
+        </div>
+        <div class="setting-row">
+          <label for="outSep">输出分隔符</label>
+          <select id="outSep">
+            <option value="auto">同输入一致</option>
+            <option value="line">换行符 (Enter)</option>
+            <option value="comma">逗号 (,)</option>
+            <option value="space">空格 ( )</option>
+            <option value="custom">自定义</option>
+          </select>
+          <input type="text" id="outCustom" class="custom-input" placeholder="如 /" style="display:none">
+        </div>
+      </div>
+
+      <!-- 展示方式 -->
+      <div class="block">
+        <h2 class="block-title">🎨 展示方式</h2>
+        <div class="seg-bar">
+          <button class="seg-btn active" data-view="string">打乱为字符串</button>
+          <button class="seg-btn" data-view="table">打乱为表格</button>
+        </div>
+        <label class="check-line">
+          <input type="checkbox" id="showNum" checked>
+          <span>显示序号 (1. 2. 3. ...)</span>
+        </label>
+        <label class="check-line">
+          <input type="checkbox" id="autoSave" checked>
+          <span>本地保存名单 (localStorage)</span>
+        </label>
+      </div>
+
+      <!-- 操作按钮 -->
+      <div class="actions">
+        <button class="btn-primary" id="shuffleBtn">⚡ 随机打乱</button>
+        <button class="btn-ghost" id="copyBtn">📋 复制结果</button>
+      </div>
+    </section>
+
+    <!-- 右侧：结果展示 -->
+    <section class="stage" id="stage">
+      <!-- 舞台工具栏：⛶ 全屏 / ⚙ 隐藏设置（交互由共享模块 tool-stage-toolbar.js 提供） -->
+      <div class="stage-toolbar">
+        <button type="button" class="icon-btn" id="fullscreenBtn" title="全屏">⛶</button>
+        <button type="button" class="icon-btn" id="hideSetupBtn" title="隐藏设置">⚙</button>
+      </div>
+      <div class="stage-inner">
+        <h2 class="stage-title">🎲 打乱结果</h2>
+        <div class="result" id="result">
+          <div class="tip">点击"随机打乱"按钮，结果将显示在此处</div>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<script src="../../assets/js/frame-bridge.js"></script>
+<script src="../../assets/js/tool-stage-toolbar.js"></script>
+<script src="random-shuffle.js"></script>
+</body>
+</html>

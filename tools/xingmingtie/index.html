@@ -1,0 +1,803 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>姓名贴生成器</title>
+<link href="../../assets/vendor/fonts/xingmingtie.css" rel="stylesheet">
+<style>
+    @page{size:A4 portrait;margin:6mm 9mm}
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:"Microsoft YaHei","PingFang SC",sans-serif;background:#f5f2ec}
+
+    /* ===== 控制面板 ===== */
+    .controls{
+        position:sticky;top:0;z-index:100;
+        padding:12px 20px 8px;
+        background:linear-gradient(145deg,#1a1a1a 0%,#252018 100%);
+        color:#ddd8ce;font-size:13px;
+        box-shadow:0 4px 24px rgba(0,0,0,0.3);border-bottom:1px solid #3a3530;
+    }
+    .row{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:7px}
+    .row:last-child{margin-bottom:0}
+    .row-title{font-size:17px;font-weight:700;color:#fff;letter-spacing:0.06em}
+    .divider{width:1px;height:18px;background:#4a4540;flex-shrink:0}
+    label{font-weight:500;white-space:nowrap;font-size:12px;color:#bbb5a8}
+    .label-sm{font-size:11px;color:#999;white-space:nowrap}
+
+    input[type="text"],select{
+        padding:5px 8px;font-size:13px;border:1px solid #555;
+        border-radius:5px;background:#2e2e2e;color:#eee;outline:none;transition:border-color .2s;
+    }
+    input[type="text"]:focus,select:focus{border-color:#c8a951}
+    select{cursor:pointer}
+    .inp-name{width:78px}.inp-class{width:68px}.inp-num{width:42px}.inp-add-subj{width:60px}
+    .inp-icon{width:52px;text-align:center;font-size:15px}
+    .inp-pt{width:40px;text-align:center}
+
+    input[type="range"]{
+        -webkit-appearance:none;height:5px;border-radius:3px;background:#444;outline:none;cursor:pointer;
+    }
+    input[type="range"]::-webkit-slider-thumb{
+        -webkit-appearance:none;width:15px;height:15px;border-radius:50%;
+        background:#c8a951;cursor:pointer;box-shadow:0 1px 4px rgba(0,0,0,0.3);
+        transition:transform .15s;
+    }
+    input[type="range"]::-webkit-slider-thumb:hover{transform:scale(1.15)}
+    .slider-size{width:56px}.slider-tag{width:82px}
+
+    .pt-badge{
+        display:inline-block;min-width:28px;text-align:center;
+        padding:1px 5px;border-radius:3px;font-size:11px;
+        font-weight:600;color:#c8a951;background:#2a2520;
+    }
+    .grid-info{
+        font-size:12px;color:#c8a951;font-weight:600;
+        background:#2a2520;padding:3px 10px;border-radius:4px;white-space:nowrap;
+    }
+
+    .bold-btn{
+        width:26px;height:26px;display:flex;align-items:center;justify-content:center;
+        border:2px solid #555;border-radius:4px;cursor:pointer;
+        font-size:13px;font-weight:900;background:#2e2a26;color:#888;
+        transition:all .15s;user-select:none;
+    }
+    .bold-btn:hover{border-color:#999;color:#bbb}
+    .bold-btn.active{border-color:#c8a951;color:#c8a951;background:#332e22}
+
+    .field-font-select{
+        padding:4px 4px;font-size:11px;border:1px solid #444;
+        border-radius:4px;background:#2a2a2a;color:#ccc;cursor:pointer;max-width:110px;
+    }
+
+    input[type="color"]{
+        -webkit-appearance:none;border:2px solid #555;border-radius:4px;
+        width:26px;height:26px;padding:0;cursor:pointer;background:#2a2a2a;transition:border-color .15s;
+    }
+    input[type="color"]:hover{border-color:#c8a951}
+    input[type="color"]::-webkit-color-swatch-wrapper{padding:1px}
+    input[type="color"]::-webkit-color-swatch{border-radius:2px;border:none}
+    .color-group{
+        display:inline-flex;align-items:center;gap:3px;
+        padding:2px 6px;background:#252220;border-radius:4px;
+    }
+    .color-reset{
+        width:18px;height:18px;display:flex;align-items:center;justify-content:center;
+        font-size:10px;color:#777;cursor:pointer;border-radius:2px;
+        background:transparent;border:1px solid #444;transition:all .15s;
+    }
+    .color-reset:hover{color:#e88;border-color:#888;background:#3a2a2a}
+
+    .btn{padding:6px 14px;border:none;border-radius:5px;cursor:pointer;font-size:12px;font-weight:600;transition:all .2s}
+    .btn-sm{padding:4px 10px;font-size:11px}
+    .btn-add{background:#4a6e3a;color:#c8e0b4}.btn-add:hover{background:#5a8248}
+    .btn-clear{background:#5a3a3a;color:#e0b4b4}.btn-clear:hover{background:#6e4848}
+    .btn-print{background:#c8a951;color:#1a1a1a;font-size:13px;padding:6px 18px}
+    .btn-print:hover{background:#d4b85e;transform:translateY(-1px)}
+    .btn-upload{background:#3a5a6e;color:#b4d4e0;position:relative;overflow:hidden}
+    .btn-upload:hover{background:#4a6e82}
+    .btn-upload input[type="file"]{position:absolute;inset:0;opacity:0;cursor:pointer;font-size:0}
+    .hint{font-size:10px;color:#666}
+    .tip{font-size:10.5px;color:#c8a951}
+
+    /* 学科标签 */
+    .subj-tags{
+        display:flex;align-items:center;gap:4px;flex-wrap:wrap;
+        padding:4px 8px;background:#242220;border-radius:5px;border:1px solid #3a3835;
+        min-height:30px;min-width:80px;
+    }
+    .subj-tag{
+        display:inline-flex;align-items:center;gap:3px;
+        padding:3px 8px;border-radius:4px;font-size:12px;
+        cursor:pointer;transition:all .15s;font-weight:500;
+    }
+    .subj-tag .st-rm{font-size:9px;opacity:0.5;margin-left:2px}
+    .subj-tag:hover .st-rm{opacity:1}
+    .subj-tag.c0{background:#2a3a2a;color:#8bc48b}
+    .subj-tag.c1{background:#2a2a3a;color:#8ba8c4}
+    .subj-tag.c2{background:#3a2a2a;color:#c48b8b}
+    .subj-tag.c3{background:#3a3a2a;color:#c4c48b}
+    .subj-tag.c4{background:#3a2a3a;color:#c48bc4}
+    .subj-tag.c5{background:#2a3a3a;color:#8bc4c4}
+    .subj-tag.c6{background:#332a2a;color:#c4a88b}
+    .subj-tag.c7{background:#2a332a;color:#8bc49b}
+    .subj-empty{color:#666;font-size:11px;font-style:italic}
+
+    /* 模式组 */
+    .mode-group{display:flex;border-radius:5px;overflow:hidden;border:1px solid #555}
+    .mode-btn{
+        padding:4px 11px;font-size:11px;font-weight:500;cursor:pointer;
+        background:#2e2e2e;color:#999;border:none;transition:all .2s;
+    }
+    .mode-btn.active{background:#c8a951;color:#1a1a1a}
+    .mode-btn:hover:not(.active){background:#3a3a3a}
+
+    /* 图标预设 */
+    .preset-icons{display:flex;gap:3px;flex-wrap:wrap}
+    .preset-btn{
+        width:28px;height:28px;display:flex;align-items:center;justify-content:center;
+        border:2px solid #4a4540;border-radius:5px;cursor:pointer;font-size:15px;
+        background:#2e2a26;transition:all .15s;user-select:none;
+    }
+    .preset-btn:hover{border-color:#c8a951;background:#3a3630;transform:scale(1.12)}
+
+    /* 图标队列 */
+    .queue-area{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+    .queue-items{
+        display:flex;gap:3px;align-items:center;flex-wrap:wrap;min-height:28px;
+        padding:3px 7px;background:#242220;border-radius:5px;border:1px solid #3a3835;
+        min-width:120px;max-width:48vw;
+    }
+    .queue-tag{
+        display:inline-flex;align-items:center;gap:2px;padding:2px 5px;
+        background:#333028;border-radius:4px;font-size:14px;cursor:pointer;transition:background .15s;
+    }
+    .queue-tag:hover{background:#5a3a3a}
+    .queue-tag img{width:16px;height:16px;object-fit:contain;border-radius:2px}
+    .queue-tag .rm{font-size:8px;color:#777;margin-left:1px}
+    .queue-tag:hover .rm{color:#e88}
+    .queue-empty{color:#666;font-size:11px;font-style:italic}
+
+    /* 预览 */
+    .preview-field{
+        display:flex;align-items:center;gap:4px;padding:4px 10px;border-radius:4px;
+    }
+    .preview-field .pf-label{font-size:10px;color:#777;white-space:nowrap}
+    .preview-field .pf-sample{white-space:nowrap;line-height:1}
+
+    /* ===== 网格 ===== */
+    .page-wrap{padding:3mm 0 10mm;display:flex;justify-content:center}
+    .grid{display:grid;justify-content:center;align-content:start}
+
+    /* 通用 field */
+    .tag .field{text-align:center;line-height:1.25;width:100%;padding:1px 0.5mm;border-radius:1px}
+
+    /* 学科版 tag：多字段堆叠 */
+    .tag-subj{
+        display:flex;flex-direction:column;align-items:center;justify-content:space-around;
+        padding:1.5mm 1mm;
+        -webkit-print-color-adjust:exact;print-color-adjust:exact;overflow:hidden;
+    }
+    .tag-subj .field.subj{
+        cursor:pointer;border-bottom:0.3mm dashed #ccc;
+        padding-bottom:0.5mm;transition:background .15s;
+    }
+    .tag-subj .field.subj:hover{background:rgba(200,169,81,0.12)!important}
+    .tag-subj .field.subj input.inline-edit{
+        width:88%;text-align:center;border:1px solid #c8a951;border-radius:2px;
+        padding:1px 3px;outline:none;background:#fff;color:#111;
+    }
+
+    /* 竖版图标 tag：图标在上，名字单字竖排 */
+    .tag-v{
+        display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0.5mm;
+        padding:1mm 0.5mm;
+        -webkit-print-color-adjust:exact;print-color-adjust:exact;overflow:hidden;
+    }
+    .tag-v .icon{font-size:10pt;line-height:1;flex-shrink:0;display:flex;align-items:center;justify-content:center}
+    .tag-v .icon img{object-fit:contain;display:block}
+    .tag-v .char{line-height:1;color:#1a1a1a;font-weight:400}
+    .tag-v .char+.char{margin-top:1.5mm}
+
+    /* 横版图标 tag：图标在左，名字横排 */
+    .tag-h{
+        display:flex;flex-direction:row;align-items:center;justify-content:center;gap:1mm;padding:0 1mm;
+        -webkit-print-color-adjust:exact;print-color-adjust:exact;overflow:hidden;
+    }
+    .tag-h .icon{
+        flex-shrink:0;line-height:1;display:flex;align-items:center;justify-content:center;
+    }
+    .tag-h .icon img{object-fit:contain;display:block}
+    .tag-h .name-text{line-height:1;color:#1a1a1a;white-space:nowrap;letter-spacing:0.08em}
+
+    .cut-hint{text-align:center;color:#bbb;font-size:11px;padding:1mm 0 0}
+    @media print{
+        .controls,.cut-hint{display:none!important}
+        body{background:#fff}
+        .tag-subj .field.subj{cursor:default!important;border-bottom:none!important}
+        .tag-subj .field.subj:hover{background:transparent!important}
+    }
+
+/* ============================================================================
+ * EduToolbox 组件化挂载兜底（自动追加）
+ * ----------------------------------------------------------------------------
+ * 本工具未引入 assets/css/tool-common.css，挂载进站点（Shadow DOM）后会缺少：
+ *   1) 六色主题变量 --primary / --primary-soft / --primary-grad
+ *   2) .container 的宽度约束（否则内容铺满并贴边）
+ * 这里补齐最小等价集，保证「独立打开」与「站点内组件化挂载」视觉一致。
+ * ========================================================================== */
+
+:root,
+:host,
+body[data-theme="sky"]   { --primary:#0ea5e9; --primary-soft:#e0f2fe; --primary-soft-2:#ccecfc; --primary-grad:linear-gradient(135deg,#38bdf8,#0ea5e9,#0284c7); }
+body[data-theme="violet"]{ --primary:#7c3aed; --primary-soft:#f0e9fe; --primary-soft-2:#e2d5fc; --primary-grad:linear-gradient(135deg,#8b5cf6,#7c3aed,#6d28d9); }
+body[data-theme="green"] { --primary:#16a34a; --primary-soft:#e7f6ec; --primary-soft-2:#d3f0dc; --primary-grad:linear-gradient(135deg,#22c55e,#16a34a,#15803d); }
+body[data-theme="gold"]  { --primary:#d97706; --primary-soft:#fdf1dc; --primary-soft-2:#fbe3bc; --primary-grad:linear-gradient(135deg,#f59e0b,#d97706,#b45309); }
+body[data-theme="orange"]{ --primary:#ea580c; --primary-soft:#ffefe4; --primary-soft-2:#ffdec9; --primary-grad:linear-gradient(135deg,#fb923c,#ea580c,#c2410c); }
+body[data-theme="pink"]  { --primary:#db2777; --primary-soft:#fce7f0; --primary-soft-2:#f9cfe1; --primary-grad:linear-gradient(135deg,#f472b6,#db2777,#be185d); }
+
+/* 容器宽度兜底：仅在工具自身未声明时生效（不覆盖已有 .container 规则） */
+.container:not([data-no-fallback]) {
+  width: 100%;
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 28px 24px 56px;
+}
+</style>
+</head>
+<body>
+
+<div class="controls">
+    <!-- Row 1：版式 + 基本字段 -->
+    <div class="row">
+        <span class="row-title">姓名贴</span>
+        <div class="divider"></div>
+        <label>版式：</label>
+        <div class="mode-group">
+            <button class="mode-btn" id="laySubj" onclick="setLayout('subj',this)">学科版</button>
+            <button class="mode-btn" id="layV" onclick="setLayout('v',this)">竖版图标</button>
+            <button class="mode-btn active" id="layH" onclick="setLayout('h',this)">横版图标</button>
+        </div>
+        <div class="divider"></div>
+        <label>姓名：</label>
+        <input type="text" class="inp-name" id="nameInput" value="搁得平" oninput="render()">
+        <div class="divider"></div>
+        <label class="f-class">班级：</label>
+        <input type="text" class="inp-class" id="classInput" value="一(二)班" oninput="render()">
+        <div class="divider"></div>
+        <label class="f-num">学号：</label>
+        <input type="text" class="inp-num" id="numInput" value="41" oninput="render()">
+        <div class="divider"></div>
+        <label>边框：</label>
+        <select id="borderSelect" onchange="render()">
+            <option value="0.3mm dashed #bbb">虚线</option>
+            <option value="0.3mm solid #ccc">实线</option>
+            <option value="0.3mm dotted #ccc">点线</option>
+            <option value="none">无边框</option>
+        </select>
+        <div class="divider"></div>
+        <label>标签底色：</label>
+        <input type="color" id="tagBgColor" value="#ffffff" oninput="render()">
+        <div class="color-reset" onclick="resetTagBg()" title="重置">✕</div>
+        <button class="btn btn-print" onclick="window.print()">打印 Ctrl+P</button>
+    </div>
+
+    <!-- Row 2：学科列表（学科版） -->
+    <div class="row g-subj">
+        <label>学科列表：</label>
+        <div class="subj-tags" id="subjTags"></div>
+        <input type="text" class="inp-add-subj" id="addSubjInput" placeholder="输入学科"
+               onkeydown="if(event.key==='Enter')addSubj()">
+        <button class="btn btn-sm btn-add" onclick="addSubj()">添加</button>
+        <div class="divider"></div>
+        <span class="hint">多学科循环分配 · 点标签学科可单独改</span>
+    </div>
+
+    <!-- Row 3：图标（图标版） -->
+    <div class="row g-icon">
+        <label>图标：</label>
+        <div class="preset-icons" id="presetIcons"></div>
+        <input type="text" class="inp-icon" id="customIconInput" placeholder="自选" onkeydown="if(event.key==='Enter')addCustomIcon()">
+        <div class="btn btn-sm btn-upload">上传<input type="file" accept="image/*" multiple onchange="handleFileUpload(this)"></div>
+        <div class="divider"></div>
+        <label>模式：</label>
+        <div class="mode-group">
+            <button class="mode-btn active" onclick="setIconMode('cycle',this)">循环</button>
+            <button class="mode-btn" onclick="setIconMode('same',this)">统一</button>
+            <button class="mode-btn" onclick="setIconMode('none',this)">无图标</button>
+        </div>
+        <div class="divider"></div>
+        <label>图标大小：</label>
+        <input type="text" class="inp-pt" id="iconSizeInput" value="10" maxlength="3"
+               onkeydown="if(event.key==='Enter')render()"> pt
+        <div class="divider"></div>
+        <div class="queue-area">
+            <div class="queue-items" id="queueItems"></div>
+            <button class="btn btn-sm btn-clear" onclick="clearQueue()">清空</button>
+        </div>
+    </div>
+
+    <!-- Row 4：每字段 字体 + 字号 + 加粗 -->
+    <div class="row">
+        <label class="g-subj-only">学科：</label>
+        <select class="field-font-select g-subj-only" id="fontSubj" onchange="render()"></select>
+        <input type="range" class="slider-size g-subj-only" id="sliderSubj" min="5" max="20" step="0.5" value="9" oninput="render()">
+        <span class="pt-badge g-subj-only" id="valSubj">9pt</span>
+        <div class="bold-btn g-subj-only" id="boldSubj" onclick="toggleBold('Subj')" title="加粗">B</div>
+        <div class="divider g-subj-only"></div>
+
+        <label>姓名：</label>
+        <select class="field-font-select" id="fontName" onchange="render()"></select>
+        <input type="range" class="slider-size" id="sliderName" min="6" max="24" step="0.5" value="13" oninput="render()">
+        <span class="pt-badge" id="valName">13pt</span>
+        <div class="bold-btn active" id="boldName" onclick="toggleBold('Name')" title="加粗">B</div>
+        <div class="divider g-subj-only"></div>
+
+        <label class="g-subj-only">班级：</label>
+        <select class="field-font-select g-subj-only" id="fontClass" onchange="render()"></select>
+        <input type="range" class="slider-size g-subj-only" id="sliderClass" min="5" max="20" step="0.5" value="9" oninput="render()">
+        <span class="pt-badge g-subj-only" id="valClass">9pt</span>
+        <div class="bold-btn g-subj-only" id="boldClass" onclick="toggleBold('Class')" title="加粗">B</div>
+        <div class="divider g-subj-only"></div>
+
+        <label class="g-subj-only">学号：</label>
+        <select class="field-font-select g-subj-only" id="fontNum" onchange="render()"></select>
+        <input type="range" class="slider-size g-subj-only" id="sliderNum" min="5" max="22" step="0.5" value="12" oninput="render()">
+        <span class="pt-badge g-subj-only" id="valNum">12pt</span>
+        <div class="bold-btn active g-subj-only" id="boldNum" onclick="toggleBold('Num')" title="加粗">B</div>
+    </div>
+
+    <!-- Row 5：颜色 -->
+    <div class="row">
+        <span class="label-sm" style="margin-right:4px">颜色（文字 / 背景）：</span>
+        <div class="color-group g-subj-only">
+            <label>学科</label>
+            <input type="color" id="clrSubjText" value="#111111" oninput="render()">
+            <input type="color" id="clrSubjBg" value="#ffffff" oninput="render()">
+            <div class="color-reset" onclick="resetFieldColor('Subj')" title="重置">✕</div>
+        </div>
+        <div class="color-group">
+            <label>姓名</label>
+            <input type="color" id="clrNameText" value="#111111" oninput="render()">
+            <input type="color" id="clrNameBg" value="#ffffff" oninput="render()">
+            <div class="color-reset" onclick="resetFieldColor('Name')" title="重置">✕</div>
+        </div>
+        <div class="color-group g-subj-only">
+            <label>班级</label>
+            <input type="color" id="clrClassText" value="#111111" oninput="render()">
+            <input type="color" id="clrClassBg" value="#ffffff" oninput="render()">
+            <div class="color-reset" onclick="resetFieldColor('Class')" title="重置">✕</div>
+        </div>
+        <div class="color-group g-subj-only">
+            <label>学号</label>
+            <input type="color" id="clrNumText" value="#111111" oninput="render()">
+            <input type="color" id="clrNumBg" value="#ffffff" oninput="render()">
+            <div class="color-reset" onclick="resetFieldColor('Num')" title="重置">✕</div>
+        </div>
+        <div class="divider"></div>
+        <span class="hint">左侧=文字色 右侧=背景色 · 白色背景自动透明</span>
+    </div>
+
+    <!-- Row 6：预览 + 尺寸 -->
+    <div class="row">
+        <span class="label-sm">预览：</span>
+        <div class="preview-field g-subj-only" id="pvBoxSubj"><span class="pf-label">学科</span><span class="pf-sample" id="pvSubj">语文</span></div>
+        <div class="preview-field" id="pvBoxName"><span class="pf-label">姓名</span><span class="pf-sample" id="pvName">搁得平</span></div>
+        <div class="preview-field g-subj-only" id="pvBoxClass"><span class="pf-label">班级</span><span class="pf-sample" id="pvClass">一(二)班</span></div>
+        <div class="preview-field g-subj-only" id="pvBoxNum"><span class="pf-label">学号</span><span class="pf-sample" id="pvNum">41</span></div>
+        <div class="divider"></div>
+        <label>宽：</label>
+        <input type="range" class="slider-tag" id="wSlider" min="20" max="150" step="1" value="40" oninput="render()">
+        <span class="pt-badge" id="valW">40mm</span>
+        <div class="divider"></div>
+        <label>高：</label>
+        <input type="range" class="slider-tag" id="hSlider" min="15" max="120" step="1" value="60" oninput="render()">
+        <span class="pt-badge" id="valH">60mm</span>
+        <div class="divider"></div>
+        <span class="grid-info" id="gridInfo">--</span>
+        <div class="divider"></div>
+        <span class="tip" id="customTip"></span>
+    </div>
+</div>
+
+<div class="cut-hint" id="cutHint">⬆ 沿边框裁剪 · 图标在左、名字横排 ⬆</div>
+<div class="page-wrap"><div class="grid" id="grid"></div></div>
+
+<script>
+/* ===== 常量 ===== */
+var PW=192, PH=285;                 // A4 可用区域(mm)，扣除 6mm/9mm 页边距
+var LAYOUT_FIXED_V = false;         // 是否启用"固定12×45mm / 96张"竖版模式
+var FIXED_W=12, FIXED_H=45, FIXED_TOTAL=96;
+
+/* ===== 状态 ===== */
+var layout='h';                     // 'subj' / 'v' / 'h'
+var iconMode='cycle';               // 'cycle' / 'same' / 'none'
+var boldState={Subj:false,Name:true,Class:false,Num:true};
+var subjList=['语文','数学','英语'];
+var subjOverride={};
+var iconQueue=[];
+
+var FONT_OPTIONS=[
+    ["'Microsoft YaHei','PingFang SC',sans-serif","微软雅黑"],
+    ["'SimHei','Microsoft YaHei',sans-serif","黑体"],
+    ["'SimSun','Songti SC',serif","宋体"],
+    ["'KaiTi','STKaiti','Kaiti SC',serif","楷体"],
+    ["'FangSong','STFangsong',serif","仿宋"],
+    ["'Noto Sans SC',sans-serif","思源黑体"],
+    ["'Noto Serif SC',serif","思源宋体"],
+    ["'ZCOOL XiaoWei',serif","站酷小薇"],
+    ["'Ma Shan Zheng',cursive","马善政楷"],
+    ["'ZCOOL QingKe HuangYou',sans-serif","站酷庆科黄油"],
+    ["'Long Cang',cursive","龙藏体"],
+    ["'Zhi Mang Xing',cursive","志莽行书"]
+];
+var PRESETS=['🍑','🍉','🐲','🍒','🥑','⭐','🏷️','🌸','🍀','🐻','🎀','❤️','🌻','🎵','🍓','🐼','🌈','☀️','🦋','🍭'];
+
+var DEFAULT_COLORS={
+    SubjText:'#111111',SubjBg:'#ffffff',
+    NameText:'#111111',NameBg:'#ffffff',
+    ClassText:'#111111',ClassBg:'#ffffff',
+    NumText:'#111111',NumBg:'#ffffff'
+};
+
+/* ===== 初始化 ===== */
+(function(){
+    /* 字体下拉 */
+    ['fontSubj','fontName','fontClass','fontNum'].forEach(function(id){
+        var sel=document.getElementById(id);sel.innerHTML='';
+        FONT_OPTIONS.forEach(function(f,i){
+            var o=document.createElement('option');
+            o.value=f[0];o.textContent=f[1];
+            if(i===0)o.selected=true;
+            sel.appendChild(o);
+        });
+    });
+    /* 预设图标 */
+    var box=document.getElementById('presetIcons');
+    PRESETS.forEach(function(e){
+        var d=document.createElement('div');d.className='preset-btn';d.textContent=e;
+        d.onclick=function(){addToQueue(e);};box.appendChild(d);
+    });
+    ['🍑','🍉','🐲','🍒','🥑','⭐','🏷️'].forEach(function(e){iconQueue.push(e);});
+
+    updateSubjTags();
+    updateQueue();
+    applyLayoutUI();
+    render();
+})();
+
+/* ===== 工具 ===== */
+function $(id){return document.getElementById(id)}
+function bgC(id){
+    var v=$(id).value;
+    return v.toLowerCase()==='#ffffff'?'transparent':v;
+}
+function resetTagBg(){tagBgColor.value='#ffffff';render();}
+function resetFieldColor(f){
+    $('clr'+f+'Text').value=DEFAULT_COLORS[f+'Text'];
+    $('clr'+f+'Bg').value=DEFAULT_COLORS[f+'Bg'];
+    render();
+}
+function toggleBold(key){
+    boldState[key]=!boldState[key];
+    $('bold'+key).classList.toggle('active',boldState[key]);
+    render();
+}
+
+/* ===== 版式切换 ===== */
+function setLayout(l,btn){
+    if(layout===l)return;
+    layout=l;
+    /* 切换离开学科版时清空逐张编辑残留，避免切回时显示过期内容 */
+    if(l!=='subj')subjOverride={};
+    applyLayoutUI();
+    render();
+}
+function applyLayoutUI(){
+    ['laySubj','layV','layH'].forEach(function(id){$(id).classList.remove('active');});
+    $({'subj':'laySubj','v':'layV','h':'layH'}[layout]).classList.add('active');
+
+    /* 提示文案 */
+    var tip={
+        subj:'⬆ 沿边框裁剪 · 学科按列表循环 · 点击标签学科可单独改 · 颜色实时预览 ⬆',
+        v:'⬆ 沿边框裁剪 · 图标在上、名字竖排 ⬆',
+        h:'⬆ 沿边框裁剪 · 图标在左、名字横排 ⬆'
+    }[layout];
+    $('cutHint').textContent=tip;
+
+    /* 隐藏/显示相关控件 */
+    var showIcon=(layout==='v'||layout==='h');
+    var showSubj=(layout==='subj');
+    document.querySelectorAll('.g-icon').forEach(function(el){el.style.display=showIcon?'flex':'none'});
+    document.querySelectorAll('.g-subj').forEach(function(el){el.style.display=showSubj?'flex':'none'});
+    document.querySelectorAll('.g-subj-only').forEach(function(el){el.style.display=showSubj?'':'none'});
+
+    /* 标签尺寸：学科版 / 横版图标 可拖；竖版图标默认用输入框或固定 */
+    if(LAYOUT_FIXED_V && layout==='v'){
+        /* 固定 12×45 / 96 张模式 */
+    }
+}
+
+/* ===== 学科列表管理 ===== */
+function updateSubjTags(){
+    var box=$('subjTags');
+    if(!subjList.length){box.innerHTML='<span class="subj-empty">暂无学科</span>';return}
+    var h='';
+    subjList.forEach(function(s,i){
+        h+='<span class="subj-tag c'+(i%8)+'" onclick="removeSubj('+i+')" title="点击删除">'
+            +s+'<span class="st-rm">✕</span></span>';
+    });
+    box.innerHTML=h;
+}
+function addSubj(){
+    var inp=$('addSubjInput'),v=inp.value.trim();
+    if(!v)return;subjList.push(v);inp.value='';
+    subjOverride={};updateSubjTags();render();
+}
+function removeSubj(i){
+    subjList.splice(i,1);subjOverride={};updateSubjTags();render();
+}
+function getSubjFor(idx){
+    if(subjOverride[idx]!==undefined)return subjOverride[idx];
+    if(!subjList.length)return'';
+    return subjList[idx%subjList.length];
+}
+/* 点击标签编辑学科 */
+function editSubjOnTag(idx,el){
+    var cur=getSubjFor(idx);
+    el.innerHTML='';
+    var inp=document.createElement('input');
+    inp.type='text';inp.className='inline-edit';inp.value=cur;
+    inp.style.fontSize=(parseFloat($('sliderSubj').value)||9)+'pt';
+    inp.style.fontFamily=$('fontSubj').value;
+    inp.style.fontWeight=boldState.Subj?'700':'400';
+    inp.style.color=$('clrSubjText').value;
+    inp.onblur=function(){
+        var v=this.value.trim();
+        var def=subjList.length?subjList[idx%subjList.length]:'';
+        if(v&&v!==def)subjOverride[idx]=v;
+        else delete subjOverride[idx];
+        render();
+    };
+    inp.onkeydown=function(e){if(e.key==='Enter'||e.key==='Escape')this.blur()};
+    el.appendChild(inp);inp.focus();inp.select();
+}
+
+/* ===== 图标队列 ===== */
+function addToQueue(icon){iconQueue.push(icon);updateQueue();render();}
+function addCustomIcon(){
+    var v=$('customIconInput').value.trim();
+    if(!v)return;iconQueue.push(v);
+    $('customIconInput').value='';
+    updateQueue();render();
+}
+function handleFileUpload(inp){
+    var fs=inp.files;if(!fs)return;
+    for(var i=0;i<fs.length;i++){
+        (function(f){
+            var r=new FileReader();
+            r.onload=function(e){iconQueue.push({t:'img',s:e.target.result});updateQueue();render();};
+            r.readAsDataURL(f);
+        })(fs[i]);
+    }
+    inp.value='';
+}
+function removeFromQueue(i){iconQueue.splice(i,1);updateQueue();render();}
+function clearQueue(){iconQueue=[];updateQueue();render();}
+function updateQueue(){
+    var c=$('queueItems');
+    if(!iconQueue.length){c.innerHTML='<span class="queue-empty">请从上方选择图标</span>';return;}
+    var h='';
+    iconQueue.forEach(function(it,i){
+        h+='<span class="queue-tag" onclick="removeFromQueue('+i+')" title="点击移除">';
+        if(typeof it==='string')h+=it;
+        else if(it&&it.t==='img')h+='<img src="'+it.s+'">';
+        h+='<span class="rm">✕</span></span>';
+    });
+    c.innerHTML=h;
+}
+function setIconMode(m,btn){
+    iconMode=m;
+    document.querySelectorAll('.g-icon .mode-btn').forEach(function(b){b.classList.remove('active');});
+    btn.classList.add('active');render();
+}
+function getIcon(idx){
+    if(!iconQueue.length||iconMode==='none')return null;
+    if(iconMode==='same')return iconQueue[0];
+    return iconQueue[idx%iconQueue.length];
+}
+/* 渲染单个图标节点，is=图标字号pt，tw/th=标签尺寸mm */
+function buildIconNode(icon,is,tw,th){
+    var ic=document.createElement('span');
+    ic.className='icon';
+    if(typeof icon==='string'){
+        ic.textContent=icon;
+        ic.style.fontSize=is+'pt';
+    }else if(icon&&icon.t==='img'){
+        var img=document.createElement('img');
+        img.src=icon.s;
+        /* 尺寸取 字号换算 与 标签高宽的较小值，避免溢出 */
+        var ims=Math.min(th*0.5,tw*0.3,is*0.42);
+        img.style.width=ims+'mm';img.style.height=ims+'mm';
+        ic.appendChild(img);
+    }
+    return ic;
+}
+
+/* ===== 主渲染 ===== */
+function render(){
+    var name=$('nameInput').value.trim()||'姓名';
+    var cls=$('classInput').value.trim();
+    var num=$('numInput').value.trim();
+    var bd=$('borderSelect').value;
+    var tagBg=bgC('tagBgColor');
+
+    var is=parseFloat($('iconSizeInput').value)||10;
+    var tw=Math.max(15,Math.min(150,parseFloat($('wSlider').value)||40));
+    var th=Math.max(15,Math.min(120,parseFloat($('hSlider').value)||60));
+
+    var cols=Math.max(1,Math.floor(PW/tw));
+    var rows=Math.max(1,Math.floor(PH/th));
+    var total=cols*rows;
+
+    /* 固定竖版 12×45 / 96 张模式 */
+    if(LAYOUT_FIXED_V&&layout==='v'){
+        tw=FIXED_W;th=FIXED_H;total=FIXED_TOTAL;
+        cols=Math.floor(PW/tw);rows=Math.ceil(total/cols);
+    }
+
+    /* 字号 / 加粗状态 */
+    var sfs=parseFloat($('sliderSubj').value)||9;
+    var nfs=parseFloat($('sliderName').value)||13;
+    var cfs=parseFloat($('sliderClass').value)||9;
+    var numfs=parseFloat($('sliderNum').value)||12;
+    var bwS=boldState.Subj?'700':'400',bwN=boldState.Name?'700':'400';
+    var bwC=boldState.Class?'700':'400',bwX=boldState.Num?'700':'400';
+
+    /* 学科版 UI 更新 */
+    $('valSubj').textContent=sfs+'pt';
+    $('valName').textContent=nfs+'pt';
+    $('valClass').textContent=cfs+'pt';
+    $('valNum').textContent=numfs+'pt';
+    $('valW').textContent=tw+'mm';
+    $('valH').textContent=th+'mm';
+
+    var cST=$('clrSubjText').value,cSB=bgC('clrSubjBg');
+    var cNT=$('clrNameText').value,cNB=bgC('clrNameBg');
+    var cCT=$('clrClassText').value,cCB=bgC('clrClassBg');
+    var cXT=$('clrNumText').value,cXB=bgC('clrNumBg');
+
+    /* 网格信息 */
+    if(LAYOUT_FIXED_V&&layout==='v'){
+        $('gridInfo').textContent=cols+'列×'+rows+'行='+total+'张 · 12×45mm';
+    }else{
+        $('gridInfo').textContent=cols+'列×'+rows+'行='+total+'张';
+    }
+
+    /* 预览 */
+    var pv0=subjList.length?subjList[0]:'—';
+    var pv=$('pvSubj');
+    pv.textContent=pv0;pv.style.fontFamily=$('fontSubj').value;pv.style.fontSize=sfs+'pt';
+    pv.style.fontWeight=bwS;pv.style.color=cST;$('pvBoxSubj').style.background=cSB;
+
+    var pn=$('pvName');
+    pn.textContent=name;pn.style.fontFamily=$('fontName').value;pn.style.fontSize=nfs+'pt';
+    pn.style.fontWeight=bwN;pn.style.color=cNT;$('pvBoxName').style.background=cNB;
+
+    var pc=$('pvClass');
+    pc.textContent=cls||'—';pc.style.fontFamily=$('fontClass').value;pc.style.fontSize=cfs+'pt';
+    pc.style.fontWeight=bwC;pc.style.color=cCT;$('pvBoxClass').style.background=cCB;
+
+    var px=$('pvNum');
+    px.textContent=num||'—';px.style.fontFamily=$('fontNum').value;px.style.fontSize=numfs+'pt';
+    px.style.fontWeight=bwX;px.style.color=cXT;$('pvBoxNum').style.background=cXB;
+
+    var ov=Object.keys(subjOverride).length;
+    $('customTip').textContent=ov?'单独改'+ov+'张':'';
+
+    /* 建网格 */
+    var g=$('grid');
+    g.style.gridTemplateColumns='repeat('+cols+','+tw+'mm)';
+    g.style.gridTemplateRows='repeat('+rows+','+th+'mm)';
+    g.innerHTML='';
+
+    for(var i=0;i<total;i++){
+        var tag;
+        if(layout==='subj'){
+            tag=renderSubjTag(i,name,cls,num,bd,tagBg,sfs,nfs,cfs,numfs,bwS,bwN,bwC,bwX,cST,cSB,cNT,cNB,cCT,cCB,cXT,cXB);
+        }else if(layout==='v'){
+            tag=renderVTag(i,name,bd,tagBg,$('fontName').value,nfs,bwN,cNT,cNB,is,tw,th);
+        }else{
+            tag=renderHTag(i,name,bd,tagBg,$('fontName').value,nfs,bwN,cNT,cNB,is,tw,th);
+        }
+        g.appendChild(tag);
+    }
+}
+
+/* 学科版：多字段堆叠 */
+function renderSubjTag(i,name,cls,num,bd,tagBg,sfs,nfs,cfs,numfs,bwS,bwN,bwC,bwX,cST,cSB,cNT,cNB,cCT,cCB,cXT,cXB){
+    var tag=document.createElement('div');
+    tag.className='tag-subj';tag.style.border=bd;
+    if(tagBg!=='transparent')tag.style.background=tagBg;
+
+    var subjText=getSubjFor(i);
+    if(subjText){
+        var sd=document.createElement('div');
+        sd.className='field subj';sd.textContent=subjText;
+        sd.style.fontFamily=$('fontSubj').value;sd.style.fontSize=sfs+'pt';
+        sd.style.fontWeight=bwS;sd.style.color=cST;
+        if(cSB!=='transparent')sd.style.background=cSB;
+        (function(idx){sd.onclick=function(e){e.stopPropagation();editSubjOnTag(idx,this)}})(i);
+        tag.appendChild(sd);
+    }
+    var nd=document.createElement('div');
+    nd.className='field';nd.textContent=name;
+    nd.style.fontFamily=$('fontName').value;nd.style.fontSize=nfs+'pt';
+    nd.style.fontWeight=bwN;nd.style.color=cNT;nd.style.letterSpacing='0.05em';
+    if(cNB!=='transparent')nd.style.background=cNB;
+    tag.appendChild(nd);
+
+    if(cls){
+        var cd=document.createElement('div');
+        cd.className='field';cd.textContent=cls;
+        cd.style.fontFamily=$('fontClass').value;cd.style.fontSize=cfs+'pt';
+        cd.style.fontWeight=bwC;cd.style.color=cCT;
+        if(cCB!=='transparent')cd.style.background=cCB;
+        tag.appendChild(cd);
+    }
+    if(num){
+        var xd=document.createElement('div');
+        xd.className='field';xd.textContent=num;
+        xd.style.fontFamily=$('fontNum').value;xd.style.fontSize=numfs+'pt';
+        xd.style.fontWeight=bwX;xd.style.color=cXT;
+        if(cXB!=='transparent')xd.style.background=cXB;
+        tag.appendChild(xd);
+    }
+    return tag;
+}
+
+/* 竖版图标：图标在上，名字单字竖排 */
+function renderVTag(i,name,bd,tagBg,ff,nfs,bwN,cNT,cNB,is,tw,th){
+    var tag=document.createElement('div');
+    tag.className='tag-v';tag.style.border=bd;
+    if(tagBg!=='transparent')tag.style.background=tagBg;
+
+    var icon=getIcon(i);
+    if(icon){
+        var ic=buildIconNode(icon,is,tw,th);
+        /* 竖版里文字字号不能超过行高，图标字号也需自适应 */
+        tag.appendChild(ic);
+    }
+    var chars=name.split('');
+    for(var j=0;j<chars.length;j++){
+        var span=document.createElement('span');
+        span.className='char';span.textContent=chars[j];
+        span.style.fontFamily=ff;span.style.fontSize=nfs+'pt';span.style.fontWeight=bwN;span.style.color=cNT;
+        if(cNB!=='transparent')span.style.background=cNB;
+        tag.appendChild(span);
+    }
+    return tag;
+}
+
+/* 横版图标：图标在左，名字横排 */
+function renderHTag(i,name,bd,tagBg,ff,nfs,bwN,cNT,cNB,is,tw,th){
+    var tag=document.createElement('div');
+    tag.className='tag-h';tag.style.border=bd;
+    if(tagBg!=='transparent')tag.style.background=tagBg;
+
+    var icon=getIcon(i);
+    if(icon){
+        var ic=buildIconNode(icon,is,tw,th);
+        tag.appendChild(ic);
+    }
+    var ns=document.createElement('span');
+    ns.className='name-text';ns.textContent=name;
+    ns.style.fontFamily=ff;ns.style.fontSize=nfs+'pt';ns.style.fontWeight=bwN;ns.style.color=cNT;
+    if(cNB!=='transparent')ns.style.background=cNB;
+    tag.appendChild(ns);
+    return tag;
+}
+</script>
+
+</body>
+</html>

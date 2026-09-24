@@ -1,0 +1,286 @@
+/* ============================================================================
+ * 段落滚动（朗读提词）· paragraph-scroll.css
+ * 仅包含本工具特有样式：双栏布局 / 段落舞台 / 逐段切换动画 / 主题反色 / 全屏
+ * 公共底座（按钮、表单、面板、seg、theme-chip、num-ctrl、check 等）见 tool-common.css
+ * 高度策略：舞台 min-height 撑开、内容自然增高，仅 body 主滚动条；
+ *           仅 #stage 自身进入全屏时铺满视口
+ * ========================================================================== */
+
+/* ---------------------------------------------------------------------------
+ * 一、双栏布局（.app 不在公共底座中，本工具自定义；窄屏回落 / 隐藏面板单栏）
+ * ------------------------------------------------------------------------- */
+.app {
+  display: grid;
+  grid-template-columns: 360px minmax(0, 1fr);
+  gap: 22px;
+  align-items: start;
+  width: 100%;
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 24px;
+}
+
+@media (max-width: 980px) {
+  .app { grid-template-columns: 1fr; }
+}
+
+/* 隐藏设置面板时切回单栏（:has 现代浏览器支持） */
+.app:has(.panel.hide) { grid-template-columns: 1fr; }
+.panel.hide { display: none; }
+
+/* 面板内分块分隔 */
+.panel .panel-block + .panel-block {
+  margin-top: 18px;
+  padding-top: 18px;
+  border-top: 1px dashed var(--border);
+}
+
+/* 标题行右侧计数 */
+.block-title .count {
+  margin-left: auto;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-3);
+}
+
+/* 段落文本框略高、字号略小 */
+.text-area { min-height: 180px; font-size: 13.5px; line-height: 1.7; }
+
+/* 切换模式行 */
+.mode-row { margin-top: 14px; }
+.mode-row .field-label { margin-bottom: 8px; }
+
+/* 自动模式总时长提示 */
+.duration-tip {
+  margin-top: 8px;
+  font-size: 12.5px;
+  color: var(--text-3);
+}
+.duration-tip span { color: var(--primary); font-weight: 700; }
+
+/* 主题芯片行 */
+.theme-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+/* ---------------------------------------------------------------------------
+ * 二、段落舞台：默认深色（黑底主题），JS 按主题改 bg；文字色由 JS 内联
+ * ------------------------------------------------------------------------- */
+#stage {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-height: 600px;
+  padding: 0;
+  background: #0f172a;
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow);
+  overflow: hidden;            /* 仅裁切圆角边缘，不产生内部滚动条（舞台随内容增高） */
+  transition: background var(--t) var(--ease);
+}
+
+#stage .stage-inner {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 600px;
+  padding: 48px 6% 24px;       /* 左右内边距由 JS 按设置改写 */
+}
+
+.para-list {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
+
+.para-item {
+  width: 100%;
+  max-width: 1000px;
+  margin: 0 auto;
+  text-align: center;
+  white-space: pre-wrap;       /* 保留段落内换行 */
+  word-break: break-word;
+  transition: transform .55s var(--ease), opacity .55s var(--ease), filter .55s var(--ease);
+}
+
+.para-item.ghost { display: none; }
+
+/* 段落信息行 & 底部提示：深色舞台反白 */
+.para-info {
+  padding: 10px 18px 4px;
+  font-size: 13.5px;
+  font-weight: 600;
+  text-align: center;
+  color: rgba(255, 255, 255, 0.72);
+}
+
+.stage-hint {
+  padding: 4px 18px 18px;
+  font-size: 12.5px;
+  text-align: center;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+/* 右上角工具栏：全屏 + 隐藏设置
+ * .stage-toolbar / .icon-btn 的基础样式（定位、尺寸、圆形、hover）来自
+ * tool-common.css，与 random-call 完全一致；此处只按舞台主题做反色。
+ * 舞台默认深色，故按钮用浅色玻璃质感。 */
+.stage-toolbar .icon-btn {
+  color: rgba(255, 255, 255, 0.75);
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.22);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+.stage-toolbar .icon-btn:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.35);
+}
+
+/* 自动播放中：左上角小徽标 */
+#stage.running::before {
+  content: "● 播放中";
+  position: absolute;
+  top: 18px;
+  left: 18px;
+  z-index: 6;
+  padding: 4px 12px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #fff;
+  background: var(--primary);
+  border-radius: var(--r-pill);
+  box-shadow: var(--shadow-primary);
+  animation: ps-pulse 1.6s ease-in-out infinite;
+}
+@keyframes ps-pulse {
+  0%, 100% { opacity: 0.85; }
+  50%      { opacity: 1; }
+}
+
+/* 隐藏段落信息 */
+#stage.hide-info .para-info { display: none; }
+
+/* ---------------------------------------------------------------------------
+ * 三、浅色主题反色（白底/暖阳/晴空/樱粉/米纸/薄荷 时辅助元素改深色）
+ * ------------------------------------------------------------------------- */
+#stage.light-theme .para-info { color: var(--text-3); }
+#stage.light-theme .stage-hint { color: var(--text-3); }
+#stage.light-theme .stage-toolbar .icon-btn {
+  color: var(--text-2);
+  background: rgba(255, 255, 255, 0.7);
+  border-color: var(--border);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+#stage.light-theme .stage-toolbar .icon-btn:hover {
+  color: var(--primary);
+  background: #fff;
+  border-color: var(--primary-soft-2);
+}
+
+/* ---------------------------------------------------------------------------
+ * 四、逐段切换动画：.enter 为初始态，rAF 后 .enter-active 切到终态触发过渡
+ *   说明：opacity 内联由 JS 写入（cur=1），此处用 !important 覆盖以实现淡入
+ * ------------------------------------------------------------------------- */
+/* 放大 */
+.anim-zoom .para-item.enter { transform: scale(0.4); opacity: 0 !important; }
+.anim-zoom .para-item.enter-active { transform: scale(1); opacity: 1 !important; }
+
+/* 淡入淡出 */
+.anim-fade .para-item.enter { opacity: 0 !important; }
+.anim-fade .para-item.enter-active { opacity: 1 !important; }
+
+/* 上下滑动 */
+.anim-slide .para-item.enter { transform: translateY(64px); opacity: 0 !important; }
+.anim-slide .para-item.enter-active { transform: translateY(0); opacity: 1 !important; }
+
+/* 平滑切换 */
+.anim-smooth .para-item.enter { transform: translateY(22px); opacity: 0 !important; }
+.anim-smooth .para-item.enter-active { transform: translateY(0); opacity: 1 !important; }
+
+/* 弹跳（overshoot 缓动） */
+.anim-bounce .para-item.enter { transform: scale(0.3); opacity: 0 !important; }
+.anim-bounce .para-item.enter-active {
+  transform: scale(1); opacity: 1 !important;
+  transition: transform .6s cubic-bezier(0.34, 1.56, 0.64, 1), opacity .4s var(--ease);
+}
+
+/* 弹性放大 */
+.anim-elastic .para-item.enter { transform: scale(0); opacity: 0 !important; }
+.anim-elastic .para-item.enter-active {
+  transform: scale(1); opacity: 1 !important;
+  transition: transform .8s cubic-bezier(0.68, -0.55, 0.27, 1.55), opacity .5s var(--ease);
+}
+
+/* 翻转 */
+.anim-flip .para-item.enter { transform: perspective(900px) rotateY(90deg); opacity: 0 !important; }
+.anim-flip .para-item.enter-active { transform: perspective(900px) rotateY(0); opacity: 1 !important; }
+
+/* 脉冲放大（默认） */
+.anim-pulse .para-item.enter { transform: scale(1.25); opacity: 0 !important; }
+.anim-pulse .para-item.enter-active { transform: scale(1); opacity: 1 !important; }
+
+/* 浮动上升 */
+.anim-float .para-item.enter { transform: translateY(-44px); opacity: 0 !important; }
+.anim-float .para-item.enter-active { transform: translateY(0); opacity: 1 !important; }
+
+/* 旋转进入 */
+.anim-rotate .para-item.enter { transform: rotate(-12deg) scale(0.6); opacity: 0 !important; }
+.anim-rotate .para-item.enter-active { transform: rotate(0) scale(1); opacity: 1 !important; }
+
+/* ---------------------------------------------------------------------------
+ * 五、全屏投影（全屏元素即 #stage 本身，与 random-call 一致）
+ *    不再全屏 html/body，故不再需要整页黑底、.app 单栏覆盖等规则；
+ *    舞台沿用自身主题背景（JS 内联写入），铺满视口。
+ * ------------------------------------------------------------------------- */
+#stage:fullscreen,
+#stage:-webkit-full-screen,
+#stage.edutf-solo{
+  width: 100%;
+  height: 100%;
+  min-height: 100vh;
+  padding: 0;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+#stage:fullscreen .stage-inner,
+#stage:-webkit-full-screen .stage-inner,
+#stage.edutf-solo .stage-inner{
+  flex: 1;
+  min-height: 100vh;
+  padding: 80px 6% 60px;
+}
+
+/* 全屏下工具栏贴边半透明悬浮，鼠标移入恢复，不挡段落 */
+#stage:fullscreen .stage-toolbar,
+#stage:-webkit-full-screen .stage-toolbar,
+#stage.edutf-solo .stage-toolbar{
+  top: 20px;
+  right: 20px;
+  opacity: 0.55;
+}
+#stage:fullscreen .stage-toolbar:hover,
+#stage:-webkit-full-screen .stage-toolbar:hover,
+#stage.edutf-solo .stage-toolbar:hover{ opacity: 1; }
+
+/* ---------------------------------------------------------------------------
+ * 六、小屏微调
+ * ------------------------------------------------------------------------- */
+@media (max-width: 640px) {
+  .app { padding: 14px; }
+  #stage,
+  #stage .stage-inner { min-height: 460px; }
+  #stage .stage-inner { padding: 36px 5% 16px; }
+}

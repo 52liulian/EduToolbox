@@ -1,0 +1,819 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>数独PDF批量生成器</title>
+<style>
+/* ===========================================
+   全局重置
+   =========================================== */
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: 'Arial', 'Microsoft YaHei', sans-serif;
+  background: #f0f4f8;
+}
+
+/* ===========================================
+   控制面板（仅屏幕显示，打印时隐藏）
+   =========================================== */
+.print-hide { display: block; }
+@media print { .print-hide { display: none !important; } }
+
+.controls {
+  max-width: 900px;
+  margin: 0 auto 30px;
+  padding: 24px 30px;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+}
+.controls h1 {
+  text-align: center;
+  color: #1a202c;
+  font-size: 24px;
+  margin-bottom: 20px;
+}
+.controls .row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 16px;
+}
+.controls label {
+  font-size: 14px;
+  color: #4a5568;
+  font-weight: 500;
+}
+.controls select,
+.controls input[type="number"] {
+  padding: 8px 12px;
+  border: 1px solid #cbd5e0;
+  border-radius: 6px;
+  font-size: 14px;
+  background: #fff;
+  color: #2d3748;
+}
+.controls input[type="number"] {
+  width: 70px;
+  text-align: center;
+}
+.controls .btn {
+  padding: 10px 28px;
+  border: none;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.btn-generate { background: #4299e1; color: #fff; }
+.btn-generate:hover { background: #3182ce; }
+.btn-pdf { background: #48bb78; color: #fff; }
+.btn-pdf:hover { background: #38a169; }
+.controls .hint {
+  text-align: center;
+  font-size: 13px;
+  color: #718096;
+  margin-top: 6px;
+}
+.controls .info-bar {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  font-size: 14px;
+  color: #2d3748;
+  margin-top: 8px;
+}
+.controls .info-bar span {
+  background: #edf2f7;
+  padding: 4px 12px;
+  border-radius: 4px;
+}
+
+/* ===========================================
+   打印页面容器
+   =========================================== */
+#output {
+  max-width: 210mm;
+  margin: 0 auto;
+  background: #fff;
+}
+
+.print-page {
+  page-break-after: always;
+  page-break-inside: avoid;
+  padding: 15mm 12mm;
+  min-height: 297mm;
+  display: flex;
+  flex-direction: column;
+}
+.print-page:last-child { page-break-after: auto; }
+
+/* 页头 */
+.page-header {
+  text-align: center;
+  font-size: 14px;
+  color: #4a5568;
+  margin-bottom: 8px;
+  letter-spacing: 2px;
+  font-weight: 600;
+}
+.page-header .page-sub {
+  font-weight: 400;
+  font-size: 12px;
+  color: #a0aec0;
+}
+
+/* 题目组网格 */
+.puzzle-grid {
+  flex: 1;
+  display: grid;
+  gap: 28px 16px;
+  justify-items: center;
+  align-items: start;
+  align-content: start;
+}
+
+/* 页面编号 */
+.page-number {
+  text-align: center;
+  font-size: 10px;
+  color: #a0aec0;
+  margin-top: 6px;
+}
+
+/* ===========================================
+   数独表格
+   =========================================== */
+table.sudoku {
+  border-collapse: collapse;
+  background: #fff;
+  table-layout: fixed;
+  width: 100%;
+  height: 100%;
+}
+table.sudoku td {
+  border: 1px solid #a0aec0;
+  text-align: center;
+  font-weight: 500;
+  padding: 0;
+  overflow: hidden;
+  /* 宽高由 table-layout:fixed + 父容器正方形决定 */
+}
+
+/* 宫格粗边框 */
+table.sudoku td.btop    { border-top: 2.5px solid #1a202c; }
+table.sudoku td.bleft   { border-left: 2.5px solid #1a202c; }
+table.sudoku td.bbottom { border-bottom: 2.5px solid #1a202c; }
+table.sudoku td.bright  { border-right: 2.5px solid #1a202c; }
+
+/* 数字样式 */
+table.sudoku td .given { color: #1a202c; font-weight: 700; }
+table.sudoku td .filled { color: #e53e3e; font-weight: 600; }
+table.sudoku td .empty { visibility: hidden; }
+
+/* 数独容器：强制正方形 */
+.sudoku-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+/* 数独序号标签 */
+.puzzle-label {
+  font-size: 9px;
+  color: #718096;
+  margin-bottom: 2px;
+  line-height: 1;
+  user-select: none;
+}
+
+/* ===========================================
+   打印控制
+   =========================================== */
+@page {
+  size: A4;
+  margin: 0;
+}
+
+@media print {
+  body { background: #fff; }
+  #output { max-width: 100%; }
+  .print-page { padding: 12mm 10mm; }
+}
+
+/* ===========================================
+   屏幕预览装饰（仅在屏幕上显示）
+   =========================================== */
+@media screen {
+  .print-page {
+    box-shadow: 0 1px 8px rgba(0,0,0,0.12);
+    margin-bottom: 24px;
+    border-radius: 4px;
+  }
+}
+</style>
+</style>
+<style>
+/* ============================================================================
+ * EduToolbox 组件化挂载兜底（自动追加）
+ * ----------------------------------------------------------------------------
+ * 本工具未引入 assets/css/tool-common.css，挂载进站点（Shadow DOM）后会缺少：
+ *   1) 六色主题变量 --primary / --primary-soft / --primary-grad
+ *   2) .container 的宽度约束（否则内容铺满并贴边）
+ * 这里补齐最小等价集，保证「独立打开」与「站点内组件化挂载」视觉一致。
+ * ========================================================================== */
+
+:root,
+:host,
+body[data-theme="sky"]   { --primary:#0ea5e9; --primary-soft:#e0f2fe; --primary-soft-2:#ccecfc; --primary-grad:linear-gradient(135deg,#38bdf8,#0ea5e9,#0284c7); }
+body[data-theme="violet"]{ --primary:#7c3aed; --primary-soft:#f0e9fe; --primary-soft-2:#e2d5fc; --primary-grad:linear-gradient(135deg,#8b5cf6,#7c3aed,#6d28d9); }
+body[data-theme="green"] { --primary:#16a34a; --primary-soft:#e7f6ec; --primary-soft-2:#d3f0dc; --primary-grad:linear-gradient(135deg,#22c55e,#16a34a,#15803d); }
+body[data-theme="gold"]  { --primary:#d97706; --primary-soft:#fdf1dc; --primary-soft-2:#fbe3bc; --primary-grad:linear-gradient(135deg,#f59e0b,#d97706,#b45309); }
+body[data-theme="orange"]{ --primary:#ea580c; --primary-soft:#ffefe4; --primary-soft-2:#ffdec9; --primary-grad:linear-gradient(135deg,#fb923c,#ea580c,#c2410c); }
+body[data-theme="pink"]  { --primary:#db2777; --primary-soft:#fce7f0; --primary-soft-2:#f9cfe1; --primary-grad:linear-gradient(135deg,#f472b6,#db2777,#be185d); }
+
+/* 容器宽度兜底：仅在工具自身未声明时生效（不覆盖已有 .container 规则） */
+.container:not([data-no-fallback]) {
+  width: 100%;
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 28px 24px 56px;
+  box-sizing: border-box;
+}
+</style>
+</head>
+<body>
+
+<!-- ===== 控制面板 ===== -->
+<div class="controls print-hide" id="controls">
+  <h1>📄 数独 PDF 批量生成器</h1>
+  <div class="row">
+    <label>宫格尺寸：</label>
+    <select id="gridSize" onchange="updateLayoutOptions()">
+      <option value="4">4×4（2×2 宫格）</option>
+      <option value="6">6×6（2×3 宫格）</option>
+      <option value="9" selected>9×9（3×3 宫格）</option>
+    </select>
+
+    <label>每页布局：</label>
+    <select id="layoutSelect"></select>
+
+    <label>难度：</label>
+    <select id="difficulty">
+      <option value="0">简单</option>
+      <option value="1" selected>中等</option>
+      <option value="2">困难</option>
+      <option value="3">专家</option>
+    </select>
+  </div>
+  <div class="row">
+    <label>生成页数（题目页）：</label>
+    <input type="number" id="pageCount" value="2" min="1" max="50">
+    <label style="user-select:none;cursor:pointer;">
+      <input type="checkbox" id="showAnswer" checked onchange="updateInfo()">
+      包含参考答案
+    </label>
+    <button class="btn btn-generate" onclick="generateAll()">🎲 生成</button>
+    <button class="btn btn-pdf" onclick="window.print()">💾 保存为 PDF</button>
+  </div>
+  <div class="info-bar">
+    <span>每页 <strong id="infoPerPage">6</strong> 题</span>
+    <span>共 <strong id="infoTotal">12</strong> 道题目</span>
+    <span id="infoAnswerWrap">参考答案 <strong id="infoAnswerPages">2</strong> 页</span>
+  </div>
+  <div class="hint">点击「生成」预览 → 点击「保存为 PDF」→ 选择"另存为 PDF"即可批量保存</div>
+</div>
+
+<!-- ===== 输出区 ===== -->
+<div id="output"></div>
+
+<script src="../../assets/js/frame-bridge.js"></script>
+<script>
+// ==============================================================
+//  常量定义
+// ==============================================================
+
+/** A4 页面尺寸（mm） */
+const PAGE = { WIDTH: 210, HEIGHT: 297 };
+
+/** 各宫格尺寸的宫格结构：{ blockRows, blockCols } */
+const GRID_STRUCTURE = {
+  4: { blockRows: 2, blockCols: 2 },
+  6: { blockRows: 2, blockCols: 3 },
+  9: { blockRows: 3, blockCols: 3 },
+};
+
+/** 各宫格尺寸的难度挖空范围 [min, max] */
+const HOLE_RANGES = {
+  4: { easy: [4, 6], medium: [6, 8], hard: [8, 10], expert: [10, 11] },
+  6: { easy: [8, 11], medium: [12, 15], hard: [16, 20], expert: [20, 23] },
+  9: { easy: [28, 33], medium: [36, 42], hard: [44, 50], expert: [52, 58] },
+};
+
+/** 难度等级列表 */
+const DIFFICULTIES = ['easy', 'medium', 'hard', 'expert'];
+
+/** 布局预设 */
+const LAYOUTS = {
+  4: [ { cols: 4, rows: 4, label: '4列×4行（16题/页）' },
+       { cols: 3, rows: 4, label: '3列×4行（12题/页）' } ],
+  6: [ { cols: 4, rows: 3, label: '4列×3行（12题/页）' },
+       { cols: 3, rows: 3, label: '3列×3行（9题/页）' } ],
+  9: [ { cols: 3, rows: 2, label: '3列×2行（6题/页）' },
+       { cols: 3, rows: 3, label: '3列×3行（9题/页）' },
+       { cols: 3, rows: 4, label: '3列×4行（12题/页）' },
+       { cols: 2, rows: 3, label: '2列×3行（6题/页）' },
+       { cols: 2, rows: 2, label: '2列×2行（4题/页）' } ],
+};
+
+// ==============================================================
+//  工具函数
+// ==============================================================
+
+/** Fisher-Yates 洗牌，返回新数组 */
+function fisherYatesShuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+/** 生成 [min, max] 闭区间的随机整数 */
+function randomInt(min, max) {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+/** 将值限制在 [min, max] 区间内 */
+function clamp(val, min, max) {
+  return Math.max(min, Math.min(max, val));
+}
+
+/** 创建 N×N 的零矩阵 */
+function createEmptyGrid(N) {
+  return Array.from({ length: N }, () => Array(N).fill(0));
+}
+
+/** 深拷贝二维数组 */
+function cloneGrid(grid) {
+  return grid.map(row => [...row]);
+}
+
+// ==============================================================
+//  数独引擎
+// ==============================================================
+
+/**
+ * 检查在 grid 的 (row, col) 放置 num 是否合法
+ * @param {number[][]} grid - 当前棋盘（引用，不会被修改）
+ * @param {number} size - 棋盘尺寸
+ * @param {number} row
+ * @param {number} col
+ * @param {number} num
+ * @param {number} blockRows - 宫格行数
+ * @param {number} blockCols - 宫格列数
+ * @returns {boolean}
+ */
+function isSafe(grid, size, row, col, num, blockRows, blockCols) {
+  for (let c = 0; c < size; c++) {
+    if (grid[row][c] === num) return false;
+  }
+  for (let r = 0; r < size; r++) {
+    if (grid[r][col] === num) return false;
+  }
+  const br = Math.floor(row / blockRows) * blockRows;
+  const bc = Math.floor(col / blockCols) * blockCols;
+  for (let r = br; r < br + blockRows; r++) {
+    for (let c = bc; c < bc + blockCols; c++) {
+      if (grid[r][c] === num) return false;
+    }
+  }
+  return true;
+}
+
+/**
+ * 用回溯法生成一个合法的已解数独棋盘
+ * @param {number} size - 棋盘尺寸（4/6/9）
+ * @returns {number[][]} 完整解
+ */
+function generateSolution(size) {
+  const { blockRows, blockCols } = GRID_STRUCTURE[size];
+  const grid = createEmptyGrid(size);
+
+  function fill(pos) {
+    if (pos === size * size) return true;
+    const row = Math.floor(pos / size);
+    const col = pos % size;
+    const nums = fisherYatesShuffle(
+      Array.from({ length: size }, (_, i) => i + 1)
+    );
+    for (const n of nums) {
+      if (isSafe(grid, size, row, col, n, blockRows, blockCols)) {
+        grid[row][col] = n;
+        if (fill(pos + 1)) return true;
+        grid[row][col] = 0;
+      }
+    }
+    return false;
+  }
+
+  fill(0);
+  return grid;
+}
+
+/**
+ * 均衡挖空：保证每行/每列/每宫格至少保留一定数量的已知数字
+ * @param {number[][]} solution - 完整解
+ * @param {number} size - 棋盘尺寸
+ * @param {number} difficulty - 难度索引 0~3
+ * @returns {{ puzzle: number[][], given: boolean[][] }}
+ */
+function createPuzzle(solution, size, difficulty) {
+  const difficultyKey = DIFFICULTIES[difficulty];
+  const [minHoles, maxHoles] = HOLE_RANGES[size][difficultyKey];
+  const holes = randomInt(minHoles, maxHoles);
+  const { blockRows, blockCols } = GRID_STRUCTURE[size];
+  const N = size;
+
+  // 每行/每列/每宫至少保留几个数字（总量均衡策略）
+  const totalCells = N * N;
+  const remaining = totalCells - holes;
+  const minPerUnit = Math.max(1, Math.floor(remaining / (3 * N)));
+
+  const puzzle = cloneGrid(solution);
+  const given = Array.from({ length: N }, () => Array(N).fill(true));
+
+  /**
+   * 挖掉 (row, col) 后是否仍满足各维度最低约束
+   */
+  function canRemove(row, col) {
+    let rowCount = 0, colCount = 0;
+    for (let i = 0; i < N; i++) {
+      if (puzzle[row][i] !== 0) rowCount++;
+      if (puzzle[i][col] !== 0) colCount++;
+    }
+    const br = Math.floor(row / blockRows) * blockRows;
+    const bc = Math.floor(col / blockCols) * blockCols;
+    let blockCount = 0;
+    for (let r = br; r < br + blockRows; r++) {
+      for (let c = bc; c < bc + blockCols; c++) {
+        if (puzzle[r][c] !== 0) blockCount++;
+      }
+    }
+    return (rowCount - 1 >= minPerUnit)
+        && (colCount - 1 >= minPerUnit)
+        && (blockCount - 1 >= minPerUnit);
+  }
+
+  // 候选格随机打乱+均衡筛选
+  const candidates = [];
+  for (let r = 0; r < N; r++) {
+    for (let c = 0; c < N; c++) candidates.push([r, c]);
+  }
+  const shuffled = fisherYatesShuffle(candidates);
+
+  let removed = 0;
+  for (const [r, c] of shuffled) {
+    if (removed >= holes) break;
+    if (canRemove(r, c)) {
+      puzzle[r][c] = 0;
+      given[r][c] = false;
+      removed++;
+    }
+  }
+
+  // 补挖：均衡筛选未达到目标数时，从剩余格随机补挖
+  if (removed < holes) {
+    const remaining = shuffled.filter(([r, c]) => puzzle[r][c] !== 0);
+    for (const [r, c] of fisherYatesShuffle(remaining)) {
+      if (removed >= holes) break;
+      puzzle[r][c] = 0;
+      given[r][c] = false;
+      removed++;
+    }
+  }
+
+  return { puzzle, given };
+}
+
+// ==============================================================
+//  布局系统
+// ==============================================================
+
+/** 难度等级中文标签 */
+const DIFFICULTY_LABELS = { easy: '简单', medium: '中等', hard: '困难', expert: '专家' };
+
+/**
+ * 根据宫格尺寸和布局计算最佳单元格尺寸
+ * 同时考虑横向和纵向约束，取较小值保证不溢出
+ * @param {number} size - 棋盘尺寸
+ * @param {number} cols - 每行列数
+ * @param {number} rows - 每页行数
+ * @param {'screen'|'print'} mode - 渲染模式
+ * @returns {number} 单元格边长（mm），范围 5~16
+ */
+function calcCellSize(size, cols, rows, mode) {
+  const pad = mode === 'print' ? { h: 10, v: 12 } : { h: 12, v: 15 };
+  const gapCol = 4;  // 16px ≈ 4mm
+  const gapRow = 7;  // 28px ≈ 7mm
+  const headerH = 8; // 页头高度（mm）
+
+  const availW = PAGE.WIDTH - 2 * pad.h - (cols - 1) * gapCol;
+  const availH = PAGE.HEIGHT - 2 * pad.v - headerH - (rows - 1) * gapRow;
+
+  const maxByW = availW / (cols * size);
+  const maxByH = availH / (rows * size);
+
+  return clamp(Math.min(maxByW, maxByH), 5, 16);
+}
+
+/** 获取当前 UI 选择的布局配置 */
+function getLayout() {
+  const size = parseInt(document.getElementById('gridSize').value);
+  const idx = parseInt(document.getElementById('layoutSelect').value);
+  return { ...LAYOUTS[size][idx], size };
+}
+
+/** 更新布局下拉选项 */
+function updateLayoutOptions() {
+  const size = parseInt(document.getElementById('gridSize').value);
+  const sel = document.getElementById('layoutSelect');
+  sel.innerHTML = '';
+  LAYOUTS[size].forEach((l, i) => {
+    const opt = document.createElement('option');
+    opt.value = i;
+    opt.textContent = l.label;
+    sel.appendChild(opt);
+  });
+  updateInfo();
+}
+
+/** 更新信息栏 */
+function updateInfo() {
+  const { cols, rows, size } = getLayout();
+  const perPage = cols * rows;
+  const pages = parseInt(document.getElementById('pageCount').value) || 1;
+  const showAnswer = document.getElementById('showAnswer').checked;
+
+  document.getElementById('infoPerPage').textContent = perPage;
+  document.getElementById('infoTotal').textContent = perPage * pages;
+  const answerWrap = document.getElementById('infoAnswerWrap');
+  if (showAnswer) {
+    answerWrap.style.display = '';
+    document.getElementById('infoAnswerPages').textContent = pages;
+  } else {
+    answerWrap.style.display = 'none';
+  }
+}
+
+// ==============================================================
+//  渲染器
+// ==============================================================
+
+/** 数字序号 → 带圈数字（1~50） */
+function toCircledNum(n) {
+  if (n < 1 || n > 50) return String(n);
+  // 带圈数字 Unicode: ①=2460, ②=2461, ... ⑳=2473
+  // 21以上用 ㉑=3251 起
+  if (n <= 20) return String.fromCharCode(0x245F + n);
+  return String.fromCharCode(0x324F + n); // ㉑㉒...
+}
+
+/**
+ * 生成单个单元格的 HTML
+ * @param {number} val - 格内数值（0 表示空）
+ * @param {number} row
+ * @param {number} col
+ * @param {number} size - 棋盘尺寸
+ * @param {'puzzle'|'answer'} mode
+ * @param {boolean} isGiven - 是否为原始已知格（仅 answer 模式使用）
+ * @returns {string}
+ */
+function renderCell(val, row, col, size, mode, isGiven) {
+  const { blockRows, blockCols } = GRID_STRUCTURE[size];
+  const cls = [];
+  if (row % blockRows === 0) cls.push('btop');
+  if (col % blockCols === 0) cls.push('bleft');
+  if (row === size - 1) cls.push('bbottom');
+  if (col === size - 1) cls.push('bright');
+
+  let displayVal = '';
+  let spanCls;
+  if (mode === 'puzzle') {
+    if (val !== 0) {
+      displayVal = val;
+      spanCls = 'given';
+    } else {
+      spanCls = 'empty';
+    }
+  } else {
+    // answer mode
+    displayVal = val;
+    spanCls = isGiven ? 'given' : 'filled';
+  }
+
+  return `<td class="${cls.join(' ')}"><span class="${spanCls}">${displayVal}</span></td>`;
+}
+
+/**
+ * 渲染单个数独表格
+ * @param {number[][]} grid
+ * @param {number} size
+ * @param {boolean[][]} givenMask - 哪些是原始已知格
+ * @param {'puzzle'|'answer'} mode
+ * @param {number} [index] - 序号（可选，>=1 时显示）
+ * @param {number} cellSize - 单元格边长（mm），由调用方传入以保持一致性
+ * @returns {string}
+ */
+function renderTable(grid, size, givenMask, mode, index, cellSize) {
+  const puzzleSize = (size * cellSize).toFixed(1);
+  const fontSize = clamp(Math.round(cellSize * 1.4), 10, 22);
+
+  let label = '';
+  if (index > 0) {
+    label = `<div class="puzzle-label">${toCircledNum(index)}</div>`;
+  }
+
+  let html = `<div class="sudoku-wrap" style="width:${puzzleSize}mm;height:${puzzleSize}mm;">`;
+  html += label;
+  html += `<table class="sudoku" style="font-size:${fontSize}px;"><tbody>`;
+  for (let r = 0; r < size; r++) {
+    html += '<tr>';
+    for (let c = 0; c < size; c++) {
+      html += renderCell(grid[r][c], r, c, size, mode, givenMask[r][c]);
+    }
+    html += '</tr>';
+  }
+  html += '</tbody></table></div>';
+  return html;
+}
+
+/**
+ * 渲染一页（题目页或答案页）
+ * @param {object[]} items - 数独数据数组
+ * @param {number} size
+ * @param {number} cols - 每页列数
+ * @param {number} rows - 每页行数
+ * @param {'puzzle'|'answer'} mode
+ * @param {number} pageNum - 当前页码
+ * @param {number} totalPages - 总页数
+ * @returns {string}
+ */
+function renderPage(items, size, cols, rows, mode, pageNum, totalPages) {
+  const cellSize = calcCellSize(size, cols, rows, 'screen');
+  const label = mode === 'puzzle' ? '题 目' : '参考答案';
+  const subLabel = mode === 'puzzle'
+    ? `请在每个空格中填入 1~${size}`
+    : '红色数字为填出答案';
+
+  let html = `<div class="print-page">`;
+  html += `<div class="page-header">${label} <span class="page-sub">— ${subLabel}</span></div>`;
+  html += `<div class="puzzle-grid" style="grid-template-columns: repeat(${cols}, auto); justify-content: center;">`;
+
+  for (const item of items) {
+    const grid = mode === 'puzzle' ? item.puzzle : item.solution;
+    const given = item.given;
+    html += renderTable(grid, size, given, mode, item.index, cellSize);
+  }
+
+  html += '</div>';
+  html += `<div class="page-number">第 ${pageNum} 页 / 共 ${totalPages} 页</div>`;
+  html += '</div>';
+  return html;
+}
+
+// ==============================================================
+//  主流程
+// ==============================================================
+
+/**
+ * 获取安全 DOM 数值，解析失败时返回 fallback
+ */
+function getSafeInt(id, fallback) {
+  const raw = document.getElementById(id)?.value;
+  const val = parseInt(raw);
+  return Number.isFinite(val) ? val : fallback;
+}
+
+/**
+ * 生成所有数独并渲染到页面
+ * 分批生成以避免长阻塞
+ */
+function generateAll() {
+  try {
+    const { size, cols, rows } = getLayout();
+    const perPage = cols * rows;
+    const puzzlePages = clamp(getSafeInt('pageCount', 1), 1, 50);
+    const difficulty = clamp(getSafeInt('difficulty', 1), 0, 3);
+    const showAnswer = document.getElementById('showAnswer').checked;
+    const totalSets = perPage * puzzlePages;
+
+    if (!GRID_STRUCTURE[size]) {
+      throw new Error(`不支持的宫格尺寸：${size}`);
+    }
+
+    // 生成所有题目（分批，给浏览器喘息机会）
+    const allData = [];
+    const BATCH = 6;
+    let genIdx = 0;
+
+    function generateBatch() {
+      const end = Math.min(genIdx + BATCH, totalSets);
+      for (let i = genIdx; i < end; i++) {
+        const solution = generateSolution(size);
+        const { puzzle, given } = createPuzzle(solution, size, difficulty);
+        allData.push({ puzzle, solution, given, index: i + 1 });
+      }
+      genIdx = end;
+      if (genIdx < totalSets) {
+        // 用 requestAnimationFrame 或 setTimeout 分批，避免卡 UI
+        setTimeout(generateBatch, 0);
+        return;
+      }
+      // 全部生成完毕，渲染
+      renderAllPages(allData, size, cols, rows, perPage, puzzlePages, showAnswer);
+    }
+
+    // 如果数据量小则同步生成，否则分批
+    if (totalSets <= BATCH) {
+      for (let i = 0; i < totalSets; i++) {
+        const solution = generateSolution(size);
+        const { puzzle, given } = createPuzzle(solution, size, difficulty);
+        allData.push({ puzzle, solution, given, index: i + 1 });
+      }
+      renderAllPages(allData, size, cols, rows, perPage, puzzlePages, showAnswer);
+    } else {
+      generateBatch();
+    }
+  } catch (err) {
+    console.error('[数独生成器]', err);
+    document.getElementById('output').innerHTML =
+      `<div style="text-align:center;padding:40px;color:#e53e3e;">
+       生成失败：${err.message}
+       <br><br>
+       <button onclick="generateAll()" style="padding:8px 20px;">重试</button>
+      </div>`;
+  }
+}
+
+/**
+ * 将数据渲染为题目页+答案页交替
+ * @param {object[]} allData
+ * @param {number} size
+ * @param {number} cols
+ * @param {number} rows
+ * @param {number} perPage
+ * @param {number} puzzlePages
+ */
+function renderAllPages(allData, size, cols, rows, perPage, puzzlePages, showAnswer) {
+  let output = '';
+  let pageNum = 0;
+  const totalPages = showAnswer ? puzzlePages * 2 : puzzlePages;
+
+  for (let p = 0; p < puzzlePages; p++) {
+    const slice = allData.slice(p * perPage, (p + 1) * perPage);
+    pageNum++;
+    output += renderPage(slice, size, cols, rows, 'puzzle', pageNum, totalPages);
+    if (showAnswer) {
+      pageNum++;
+      output += renderPage(slice, size, cols, rows, 'answer', pageNum, totalPages);
+    }
+  }
+
+  document.getElementById('output').innerHTML = output;
+  updateInfo();
+}
+
+// ==============================================================
+//  初始化
+// ==============================================================
+
+function init() {
+  updateLayoutOptions();
+  document.getElementById('pageCount').addEventListener('input', updateInfo);
+  document.getElementById('gridSize').addEventListener('change', () => {
+    updateLayoutOptions();
+    generateAll();
+  });
+  document.getElementById('layoutSelect').addEventListener('change', generateAll);
+  document.getElementById('difficulty').addEventListener('change', generateAll);
+  generateAll();
+}
+
+// DOM 就绪后初始化
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', init);
+} else {
+  init();
+}
+</script>
+</body>
+</html>

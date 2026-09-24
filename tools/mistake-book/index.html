@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>课堂错题本整理 | EduToolbox · 错题录入·归类·打印</title>
+<meta name="description" content="课堂错题本：录入题干、错答与正确答案，按科目与错因归类，标记掌握状态，支持搜索筛选、错因分布统计、复制、CSV 导出与打印成册。">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%93%8B%3C/text%3E">
+<link rel="stylesheet" href="../../assets/css/tool-common.css">
+<link rel="stylesheet" href="mistake-book.css">
+</head>
+<body>
+
+<div class="container">
+  <div class="workbench">
+    <!-- ======================= 左侧录入面板 ======================= -->
+    <aside class="panel setup-panel">
+      <div class="block">
+        <h2 class="block-title">① 录入错题</h2>
+        <div class="chips chips-mini" id="subjChips">
+          <button type="button" class="chip active" data-subj="语文">语文</button>
+          <button type="button" class="chip" data-subj="数学">数学</button>
+          <button type="button" class="chip" data-subj="英语">英语</button>
+          <button type="button" class="chip" data-subj="科学">科学</button>
+          <button type="button" class="chip" data-subj="其他">其他</button>
+        </div>
+
+        <div class="field">
+          <label for="qInput">题干 / 题目</label>
+          <textarea id="qInput" rows="3" placeholder="如：25 × 4 ÷ 5 = ?"></textarea>
+        </div>
+        <div class="two-col">
+          <div class="field">
+            <label for="myAns">我的答案</label>
+            <input type="text" id="myAns" maxlength="120" placeholder="错答">
+          </div>
+          <div class="field">
+            <label for="rightAns">正确答案</label>
+            <input type="text" id="rightAns" maxlength="120" placeholder="正解">
+          </div>
+        </div>
+
+        <div class="field">
+          <span class="field-label">错因归类</span>
+          <div class="chips chips-mini" id="reasonChips">
+            <button type="button" class="chip active" data-reason="概念不清">概念不清</button>
+            <button type="button" class="chip" data-reason="计算失误">计算失误</button>
+            <button type="button" class="chip" data-reason="审题错误">审题错误</button>
+            <button type="button" class="chip" data-reason="知识遗忘">知识遗忘</button>
+            <button type="button" class="chip" data-reason="粗心大意">粗心大意</button>
+            <button type="button" class="chip" data-reason="其他">其他</button>
+          </div>
+        </div>
+
+        <div class="setting-row">
+          <label for="dateInput">日期</label>
+          <input type="date" id="dateInput">
+        </div>
+
+        <div class="actions">
+          <button type="button" class="btn btn-primary" id="btnSave">💾 保存错题</button>
+          <button type="button" class="btn btn-small btn-ghost" id="btnCancel" hidden>取消编辑</button>
+        </div>
+      </div>
+
+      <div class="block">
+        <h2 class="block-title">② 筛选查看</h2>
+        <div class="setting-row">
+          <label for="searchInput">搜索</label>
+          <input type="text" id="searchInput" placeholder="题干 / 答案关键词">
+        </div>
+        <div class="chips chips-mini" id="filterChips">
+          <button type="button" class="chip active" data-filter="all">全部科目</button>
+          <button type="button" class="chip" data-filter="语文">语文</button>
+          <button type="button" class="chip" data-filter="数学">数学</button>
+          <button type="button" class="chip" data-filter="英语">英语</button>
+          <button type="button" class="chip" data-filter="科学">科学</button>
+          <button type="button" class="chip" data-filter="其他">其他</button>
+        </div>
+        <div class="chips chips-mini" id="statusFilterChips">
+          <button type="button" class="chip active" data-status="all">全部状态</button>
+          <button type="button" class="chip" data-status="0">未掌握</button>
+          <button type="button" class="chip" data-status="1">复习中</button>
+          <button type="button" class="chip" data-status="2">已掌握</button>
+        </div>
+      </div>
+
+      <div class="block">
+        <h2 class="block-title">③ 导出</h2>
+        <div class="actions">
+          <div class="btn-row">
+            <button type="button" class="btn btn-small" id="btnCopy">📋 复制全部</button>
+            <button type="button" class="btn btn-small" id="btnExport">📥 导出 CSV</button>
+          </div>
+          <div class="btn-row">
+            <button type="button" class="btn btn-small btn-ghost" id="btnPrint">🖨️ 打印错题本</button>
+            <button type="button" class="btn btn-small btn-ghost" id="btnClear">🗑 清空全部</button>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- ======================= 右侧列表 ======================= -->
+    <main class="stage-panel">
+      <div class="stage-toolbar">
+        <button type="button" class="icon-btn" id="fullscreenBtn" title="全屏展示">⛶</button>
+        <button type="button" class="icon-btn" id="hideSetupBtn" title="隐藏设置栏">⚙</button>
+      </div>
+      <div class="stage-head">
+        <h2 class="panel-title">📚 错题列表</h2>
+        <span class="stage-ok" id="stageOk">等待录入</span>
+      </div>
+
+      <div class="stat-grid mb-stats">
+        <div class="stat-card"><span class="stat-num" id="statTotal">0</span><span class="stat-label">错题总数</span></div>
+        <div class="stat-card"><span class="stat-num" id="statNew">0</span><span class="stat-label">未掌握</span></div>
+        <div class="stat-card"><span class="stat-num" id="statDoing">0</span><span class="stat-label">复习中</span></div>
+        <div class="stat-card"><span class="stat-num" id="statDone">0</span><span class="stat-label">已掌握</span></div>
+      </div>
+
+      <div class="mb-block" id="distBlock" hidden>
+        <div class="chart-head">
+          <span class="chart-title">📊 错因分布</span>
+          <span class="chart-sub" id="distSub">—</span>
+        </div>
+        <div class="dist-list" id="distList"></div>
+      </div>
+
+      <div class="state state--empty" id="emptyState">
+        <div class="state-icon">📋</div>
+        <div class="state-title">还没有错题记录</div>
+        <div class="state-desc">在左侧录入第一道错题，攒起来就是一本专属错题本</div>
+      </div>
+
+      <div class="mb-list" id="listWrap"></div>
+    </main>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="../../assets/js/frame-bridge.js"></script>
+<script src="../../assets/js/tool-stage-toolbar.js"></script>
+<script src="mistake-book.js"></script>
+</body>
+</html>

@@ -1,0 +1,123 @@
+/* ============================================================
+ * EduToolbox · 学科常识速查表 quick-ref.css
+ * 依赖公共底座 tool-common.css（本文件应在其后加载）
+ * ============================================================ */
+
+body[data-theme="sky"]   { --primary:#0ea5e9; --primary-soft:#e0f2fe; --primary-soft-2:#ccecfc; --primary-grad:linear-gradient(135deg,#38bdf8,#0ea5e9,#0284c7); }
+body[data-theme="violet"]{ --primary:#7c3aed; --primary-soft:#f0e9fe; --primary-soft-2:#e2d5fc; --primary-grad:linear-gradient(135deg,#8b5cf6,#7c3aed,#6d28d9); }
+body[data-theme="green"] { --primary:#16a34a; --primary-soft:#e7f6ec; --primary-soft-2:#d3f0dc; --primary-grad:linear-gradient(135deg,#22c55e,#16a34a,#15803d); }
+body[data-theme="gold"]  { --primary:#d97706; --primary-soft:#fdf1dc; --primary-soft-2:#fbe3bc; --primary-grad:linear-gradient(135deg,#f59e0b,#d97706,#b45309); }
+body[data-theme="orange"]{ --primary:#ea580c; --primary-soft:#ffefe4; --primary-soft-2:#ffdec9; --primary-grad:linear-gradient(135deg,#fb923c,#ea580c,#c2410c); }
+body[data-theme="pink"]  { --primary:#db2777; --primary-soft:#fce7f0; --primary-soft-2:#f9cfe1; --primary-grad:linear-gradient(135deg,#f472b6,#db2777,#be185d); }
+
+.workbench { display:grid; grid-template-columns:320px minmax(0,1fr); gap:20px; align-items:start; }
+
+.hint-line { margin:8px 0 0; font-size:12.5px; line-height:1.6; color:var(--text-3); }
+/* position:relative —— 舞台右上角 .stage-toolbar 的绝对定位基准 */
+.stage-panel { position:relative; min-width:0; }
+/* padding-right 为右上角 ⛶⚙ 工具栏（40+8+40=88px）留出避让空间 */
+.stage-head { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:14px; padding-right:96px; }
+.stage-head .panel-title { margin-bottom:0; }
+.stage-ok { font-size:13px; font-weight:600; color:var(--primary); }
+
+.qr-stats { grid-template-columns:repeat(4,minmax(0,1fr)); }
+.qr-stats .stat-num { font-size:19px; }
+
+/* ---------- 分类小节 ---------- */
+.qr-list { display:flex; flex-direction:column; gap:14px; margin-top:16px; }
+
+.qr-section {
+  background:var(--card-bg); border:1px solid var(--border);
+  border-radius:var(--r); box-shadow:var(--shadow-sm); overflow:hidden;
+}
+.qr-sec-head {
+  display:flex; align-items:center; gap:10px; flex-wrap:wrap;
+  padding:12px 16px; background:var(--primary-grad); color:#fff; cursor:pointer;
+  user-select:none; transition:filter .16s var(--ease);
+}
+.qr-sec-head:hover { filter:brightness(1.06); }
+.qr-sec-title { font-size:15px; font-weight:800; letter-spacing:.2px; }
+.qr-sec-count {
+  padding:2px 9px; border-radius:var(--r-pill); font-size:11.5px; font-weight:700;
+  background:rgba(255,255,255,.22); color:#fff; border:1px solid rgba(255,255,255,.32);
+}
+.qr-sec-spacer { margin-left:auto; }
+.qr-sec-btn {
+  padding:3px 10px; font-size:12px; font-weight:700; border-radius:var(--r-pill);
+  background:rgba(255,255,255,.18); color:#fff; border:1px solid rgba(255,255,255,.34);
+  cursor:pointer; transition:background .16s var(--ease);
+}
+.qr-sec-btn:hover { background:rgba(255,255,255,.32); }
+.qr-sec-arrow { font-size:12px; opacity:.9; }
+.qr-section.collapsed .qr-sec-arrow { transform:rotate(-90deg); }
+.qr-section.collapsed .qr-sec-body { display:none; }
+
+.qr-group { padding:6px 16px 12px; border-bottom:1px dashed var(--border); }
+.qr-group:last-child { border-bottom:none; }
+.qr-group-title {
+  display:flex; align-items:center; gap:8px; margin:10px 0 6px;
+  font-size:13px; font-weight:700; color:var(--text-2);
+}
+.qr-group-title::before {
+  content:""; width:4px; height:13px; border-radius:2px; background:var(--primary);
+}
+
+/* ---------- 条目行 ---------- */
+.qr-row {
+  display:grid; grid-template-columns:minmax(0,1fr) auto; align-items:start; gap:10px;
+  padding:6px 8px; border-radius:8px; transition:background .14s var(--ease);
+}
+.qr-row:hover { background:var(--primary-soft); }
+.qr-k { font-size:13.5px; font-weight:700; color:var(--text-1); line-height:1.55; word-break:break-all; }
+.qr-v {
+  font-size:13px; color:var(--text-2); line-height:1.6; word-break:break-all;
+  font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,"Courier New",monospace;
+}
+.qr-note { display:block; margin-top:2px; font-size:12px; color:var(--text-3); font-family:inherit; }
+.qr-copy {
+  padding:3px 9px; font-size:11.5px; font-weight:700; border-radius:var(--r-pill);
+  background:var(--card-bg-2); color:var(--text-3); border:1px solid var(--border);
+  cursor:pointer; white-space:nowrap; transition:all .16s var(--ease);
+}
+.qr-copy:hover { background:var(--primary); color:#fff; border-color:var(--primary); }
+
+mark { padding:0 2px; border-radius:3px; background:#fde68a; color:#78350f; font-weight:700; }
+
+@media (max-width:900px){
+  .workbench { grid-template-columns:1fr; }
+  .qr-stats { grid-template-columns:repeat(2,minmax(0,1fr)); }
+  .qr-row { grid-template-columns:minmax(0,1fr); }
+  .qr-copy { justify-self:start; }
+}
+@media print {
+  .setup-panel, .stage-head, .toast, .qr-copy, .qr-sec-btn, .state { display:none !important; }
+  .workbench { display:block; }
+  .qr-section { break-inside:avoid; box-shadow:none; }
+  .qr-sec-head { background:none !important; color:#111 !important; border-bottom:1px solid #999; }
+  .qr-sec-count { background:none !important; color:#333 !important; border-color:#999 !important; }
+}
+
+/* ---------- 隐藏设置栏（⚙）：双栏 → 单栏，与 random-call 同构 ---------- */
+.workbench.setup-hidden { grid-template-columns:minmax(0,1fr); }
+.workbench.setup-hidden .setup-panel { display:none; }
+
+/* ---------- 舞台全屏（⛶）：全屏目标是 .stage-panel 自身，不是整页 ---------- */
+.stage-panel:fullscreen,
+.stage-panel:-webkit-full-screen,
+.stage-panel.edutf-solo{
+  display:flex; flex-direction:column; justify-content:center; align-items:stretch;
+  min-height:100vh; padding:36px 30px;
+  border-radius:0; border-color:transparent; box-shadow:none;
+  background:var(--bg); overflow:auto;
+}
+/* 全屏下工具栏仍可见：贴边 + 半透明，hover 恢复不透明 */
+.stage-panel:fullscreen .stage-toolbar,
+.stage-panel:-webkit-full-screen .stage-toolbar,
+.stage-panel.edutf-solo .stage-toolbar{
+  position:fixed; top:18px; right:22px; z-index:30;
+  opacity:.55; transition:opacity .18s var(--ease);
+}
+.stage-panel:fullscreen .stage-toolbar:hover,
+.stage-panel:-webkit-full-screen .stage-toolbar:hover,
+.stage-panel.edutf-solo .stage-toolbar:hover{ opacity:1; }
+@media print { .stage-toolbar { display:none; } }

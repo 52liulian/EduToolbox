@@ -1,0 +1,1136 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, print-scale: 100%">
+    <title>小学数学计算题生成器 · 1-6年级全覆盖</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+ 
+        body {
+            font-family: "Microsoft YaHei", "PingFang SC", "SimHei", system-ui, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4edf5 100%);
+            margin: 0;
+            padding: 20px 16px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+ 
+        /* 控制面板 */
+        .control-panel {
+            background: white;
+            padding: 20px 24px;
+            border-radius: 24px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.08);
+            margin-bottom: 24px;
+            width: 100%;
+            max-width: 900px;
+        }
+ 
+        .control-panel h1 {
+            text-align: center;
+            color: #1e3a5f;
+            font-size: 1.6rem;
+            margin-bottom: 6px;
+            letter-spacing: 1px;
+        }
+ 
+        .subtitle {
+            text-align: center;
+            color: #6b7c93;
+            font-size: 14px;
+            margin-bottom: 18px;
+        }
+ 
+        /* 年级选择器 */
+        .grade-selector {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+ 
+        .grade-btn {
+            padding: 10px 4px;
+            font-size: 14px;
+            font-weight: 700;
+            border: 2px solid #e2e8f0;
+            border-radius: 14px;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            background: white;
+            color: #475569;
+            text-align: center;
+        }
+ 
+        .grade-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+ 
+        .grade-btn.active {
+            color: white;
+            border-color: transparent;
+            box-shadow: 0 4px 14px rgba(0,0,0,0.15);
+        }
+ 
+        .grade-btn[data-grade="1"].active { background: #10b981; }
+        .grade-btn[data-grade="2"].active { background: #3b82f6; }
+        .grade-btn[data-grade="3"].active { background: #8b5cf6; }
+        .grade-btn[data-grade="4"].active { background: #f59e0b; }
+        .grade-btn[data-grade="5"].active { background: #ef4444; }
+        .grade-btn[data-grade="6"].active { background: #06b6d4; }
+ 
+        /* 题型选择 */
+        .type-selector {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            justify-content: center;
+            margin: 14px 0;
+            padding: 12px;
+            background: #f8fafc;
+            border-radius: 16px;
+            border: 1px solid #e2e8f0;
+        }
+ 
+        .type-btn {
+            padding: 6px 14px;
+            font-size: 13px;
+            border: 1.5px solid #cbd5e1;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: white;
+            color: #475569;
+            font-weight: 500;
+        }
+ 
+        .type-btn:hover { border-color: #6366f1; color: #6366f1; }
+        .type-btn.active {
+            background: #6366f1;
+            color: white;
+            border-color: #6366f1;
+        }
+ 
+        /* 按钮组 */
+        .button-group {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-top: 14px;
+        }
+ 
+        .btn {
+            padding: 10px 24px;
+            font-size: 15px;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-weight: 600;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+ 
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102,126,234,0.3);
+        }
+ 
+        .btn-secondary {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            color: white;
+        }
+        .btn-secondary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(17,153,142,0.3);
+        }
+ 
+        .btn-danger {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+            color: white;
+        }
+ 
+        /* 年级信息卡片 */
+        .grade-info {
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+            border-radius: 16px;
+            padding: 14px 18px;
+            margin: 14px 0;
+            border-left: 4px solid #0ea5e9;
+        }
+ 
+        .grade-info h3 {
+            color: #0369a1;
+            font-size: 15px;
+            margin-bottom: 6px;
+        }
+ 
+        .grade-info p {
+            color: #475569;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+ 
+        /* 练习纸容器 - A4 */
+        .worksheet-container {
+            width: 210mm;
+            min-height: 297mm;
+            background: white;
+            box-shadow: 0 12px 40px rgba(0,0,0,0.12);
+            padding: 12mm 10mm 10mm 10mm;
+            box-sizing: border-box;
+            display: none;
+            margin-bottom: 24px;
+            border-radius: 4px;
+        }
+ 
+        .title {
+            text-align: center;
+            font-size: 26px;
+            font-weight: 800;
+            margin-bottom: 10px;
+            color: #1e293b;
+            letter-spacing: 2px;
+        }
+ 
+        .info-bar {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            font-size: 15px;
+            margin-bottom: 14px;
+            padding: 8px 16px;
+            background: #f8fafc;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+        }
+ 
+        .info-bar span {
+            border-bottom: 1.5px dashed #94a3b8;
+            min-width: 120px;
+            text-align: center;
+            padding-bottom: 2px;
+            color: #334155;
+            font-weight: 500;
+        }
+ 
+        .section-title {
+            font-size: 15px;
+            font-weight: 700;
+            margin: 10px 0 6px 0;
+            color: #1e40af;
+            background: #eff6ff;
+            display: inline-block;
+            padding: 3px 14px;
+            border-radius: 20px;
+        }
+ 
+        .questions-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 12px;
+            table-layout: fixed;
+        }
+ 
+        .questions-table td {
+            width: 25%;
+            height: 40px;
+            padding: 5px 8px;
+            border: 1px solid #cbd5e1;
+            font-size: 15px;
+            text-align: left;
+            vertical-align: middle;
+            background: #ffffff;
+            font-weight: 500;
+            color: #1e293b;
+        }
+ 
+        .questions-table td input {
+            width: 56px;
+            height: 28px;
+            border: none;
+            border-bottom: 1.5px solid #94a3b8;
+            background: #fefce8;
+            text-align: center;
+            font-size: 14px;
+            font-weight: 600;
+            color: #059669;
+            margin: 0 2px;
+            outline: none;
+            transition: 0.15s;
+        }
+ 
+        .questions-table td input:focus {
+            border-bottom: 2.5px solid #059669;
+            background: #ecfdf5;
+        }
+ 
+        .print-button {
+            margin-top: 14px;
+            padding: 10px 20px;
+            font-size: 14px;
+            background: #3b82f6;
+            color: white;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            width: 200px;
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+            font-weight: 600;
+        }
+ 
+        /* 预览区 */
+        .preview-section {
+            width: 100%;
+            max-width: 900px;
+            margin-top: 20px;
+            background: white;
+            padding: 16px 20px;
+            border-radius: 20px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+        }
+ 
+        .preview-title {
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #1e293b;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+ 
+        .preview-content {
+            font-family: "Courier New", monospace;
+            font-size: 11px;
+            line-height: 1.5;
+            white-space: pre-wrap;
+            background: #f8fafc;
+            padding: 12px;
+            border-radius: 14px;
+            border: 1px solid #e2e8f0;
+            max-height: 280px;
+            overflow: auto;
+        }
+ 
+        .copy-btn {
+            padding: 6px 16px;
+            font-size: 12px;
+            background: #f59e0b;
+            color: white;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+ 
+        /* 状态消息 */
+        .status-message {
+            text-align: center;
+            margin-top: 12px;
+            padding: 10px;
+            border-radius: 50px;
+            font-size: 13px;
+            font-weight: 500;
+            display: none;
+        }
+        .status-success { background: #dcfce7; color: #166534; }
+        .status-error { background: #fee2e2; color: #991b1b; }
+ 
+        /* 打印样式 */
+        @media print {
+            body { background: white; padding: 0; margin: 0; }
+            .control-panel, .preview-section, .print-button { display: none !important; }
+            .worksheet-container {
+                width: 100%; min-height: 297mm; height: auto;
+                box-shadow: none; padding: 12mm 8mm 8mm 8mm;
+                display: block !important; margin: 0; border-radius: 0;
+            }
+            .questions-table td { border: 1px solid #999; }
+            .questions-table td input { border-bottom: 1px solid #000; background: transparent; }
+            .info-bar { background: #f1f5f9 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            @page { size: A4; margin: 0; }
+        }
+    
+/* ============================================================================
+ * EduToolbox 组件化挂载兜底（自动追加）
+ * ----------------------------------------------------------------------------
+ * 本工具未引入 assets/css/tool-common.css，挂载进站点（Shadow DOM）后会缺少：
+ *   1) 六色主题变量 --primary / --primary-soft / --primary-grad
+ *   2) .container 的宽度约束（否则内容铺满并贴边）
+ * 这里补齐最小等价集，保证「独立打开」与「站点内组件化挂载」视觉一致。
+ * ========================================================================== */
+
+:root,
+:host,
+body[data-theme="sky"]   { --primary:#0ea5e9; --primary-soft:#e0f2fe; --primary-soft-2:#ccecfc; --primary-grad:linear-gradient(135deg,#38bdf8,#0ea5e9,#0284c7); }
+body[data-theme="violet"]{ --primary:#7c3aed; --primary-soft:#f0e9fe; --primary-soft-2:#e2d5fc; --primary-grad:linear-gradient(135deg,#8b5cf6,#7c3aed,#6d28d9); }
+body[data-theme="green"] { --primary:#16a34a; --primary-soft:#e7f6ec; --primary-soft-2:#d3f0dc; --primary-grad:linear-gradient(135deg,#22c55e,#16a34a,#15803d); }
+body[data-theme="gold"]  { --primary:#d97706; --primary-soft:#fdf1dc; --primary-soft-2:#fbe3bc; --primary-grad:linear-gradient(135deg,#f59e0b,#d97706,#b45309); }
+body[data-theme="orange"]{ --primary:#ea580c; --primary-soft:#ffefe4; --primary-soft-2:#ffdec9; --primary-grad:linear-gradient(135deg,#fb923c,#ea580c,#c2410c); }
+body[data-theme="pink"]  { --primary:#db2777; --primary-soft:#fce7f0; --primary-soft-2:#f9cfe1; --primary-grad:linear-gradient(135deg,#f472b6,#db2777,#be185d); }
+
+/* 容器宽度兜底：仅在工具自身未声明时生效（不覆盖已有 .container 规则） */
+.container:not([data-no-fallback]) {
+  width: 100%;
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 28px 24px 56px;
+}
+
+/* ---------------------------------------------------------------------------
+ * 组件化挂载态的「左右居中」补偿（2026-09-23）
+ * -------------------------------------------------------------------------
+ * 本工具原本靠 `body{display:flex;flex-direction:column;align-items:center}`
+ * 让控制面板 / 预览区水平居中。挂载进站点后：
+ *   1) 适配器的 CSS 重定位把 `body{…}` 改写成 `:host{…}`（:host = 挂载容器）；
+ *   2) 适配器兜底又用 `:host{display:block}` 把 display:flex 覆盖掉，
+ *      于是 align-items:center 失效，内部块级子元素全部靠左
+ *      （实测：宿主 1192px 下控制面板左留白 0px、右留白 290px）。
+ * 修法：把同一套列向居中 flex 施加到影子树内层容器 .tool-page 上，
+ *      内部子元素的居中表现与「独立双击打开」完全一致。
+ * :host 前缀保证本规则只在站点内挂载时命中；独立打开时 :host 不匹配任何
+ * 元素，规则静默空转，原页面观感零影响。
+ * ------------------------------------------------------------------------- */
+:host .tool-page {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+</style>
+</head>
+<body>
+ 
+<div class="control-panel">
+    <h1>&#127891; 小学数学计算题生成器</h1>
+    <div class="subtitle">1-6年级全覆盖 · 贴合课标 · 题型丰富 · 一键打印</div>
+ 
+    <!-- 年级选择 -->
+    <div class="grade-selector">
+        <button class="grade-btn active" data-grade="1">一年级</button>
+        <button class="grade-btn" data-grade="2">二年级</button>
+        <button class="grade-btn" data-grade="3">三年级</button>
+        <button class="grade-btn" data-grade="4">四年级</button>
+        <button class="grade-btn" data-grade="5">五年级</button>
+        <button class="grade-btn" data-grade="6">六年级</button>
+    </div>
+ 
+    <!-- 年级知识点说明 -->
+    <div class="grade-info" id="gradeInfo">
+        <h3>&#128218; 一年级计算范围</h3>
+        <p>20以内加减法、100以内不进位/不退位加减、连加连减、加减混合、简单填空。不涉及乘除。</p>
+    </div>
+ 
+    <!-- 题型选择 -->
+    <div class="type-selector" id="typeSelector">
+        <!-- 动态生成 -->
+    </div>
+ 
+    <div class="button-group">
+        <button id="generateBtn" class="btn btn-primary">&#10024; 生成练习题</button>
+        <button id="printBtn" class="btn btn-secondary">&#128424;&#65039; 打印 / 保存PDF</button>
+        <button id="clearBtn" class="btn btn-danger">&#128465;&#65039; 清空重置</button>
+    </div>
+    <div id="statusMessage" class="status-message"></div>
+</div>
+ 
+<!-- 练习卷 -->
+<div class="worksheet-container" id="worksheet">
+    <div class="title" id="sheetTitle">一年级数学计算练习题</div>
+    <div class="info-bar">
+        <span>班级：____________</span>
+        <span>姓名：____________</span>
+        <span>得分：____________</span>
+    </div>
+    <div id="questions"></div>
+    <button id="innerPrintBtn" class="print-button">&#128424;&#65039; 打印练习题</button>
+</div>
+ 
+<!-- 预览 -->
+<div class="preview-section">
+    <div class="preview-title">
+        &#128203; 题目预览
+        <button id="copyPreviewBtn" class="copy-btn">&#128203; 复制内容</button>
+    </div>
+    <div class="preview-content" id="previewContent">选择年级和题型后，点击「生成练习题」开始出题～</div>
+</div>
+ 
+<script>
+// ==================== 配置数据 ====================
+const GRADE_CONFIG = {
+    1: {
+        name: "一年级",
+        color: "#10b981",
+        desc: "20以内加减法、100以内不进位/不退位加减、连加连减、加减混合、简单填空。不涉及乘除。",
+        types: [
+            { id: "addsub20", name: "20以内加减法", cols: 4 },
+            { id: "addsub100", name: "100以内加减法", cols: 4 },
+            { id: "three_add", name: "连加运算", cols: 4 },
+            { id: "three_sub", name: "连减运算", cols: 4 },
+            { id: "mixed", name: "加减混合", cols: 4 },
+            { id: "fillblank", name: "算式填空", cols: 4 }
+        ]
+    },
+    2: {
+        name: "二年级",
+        color: "#3b82f6",
+        desc: "100以内加减法（进位/退位）、表内乘除法（2-9口诀）、有余数除法、乘加乘减混合、带括号运算。",
+        types: [
+            { id: "addsub100", name: "100以内加减法", cols: 4 },
+            { id: "multiply", name: "表内乘法", cols: 4 },
+            { id: "divide", name: "表内除法", cols: 4 },
+            { id: "remainder", name: "有余数除法", cols: 4 },
+            { id: "mixed_md", name: "乘除混合", cols: 4 },
+            { id: "mixed_all", name: "四则混合", cols: 4 }
+        ]
+    },
+    3: {
+        name: "三年级",
+        color: "#8b5cf6",
+        desc: "万以内加减法、多位数乘一位数、两位数乘两位数、除数是一位数的除法、分数初步认识、小数初步认识。",
+        types: [
+            { id: "addsub10000", name: "万以内加减法", cols: 3 },
+            { id: "multiply_1d", name: "多位数×一位数", cols: 3 },
+            { id: "multiply_2d", name: "两位数×两位数", cols: 3 },
+            { id: "divide_1d", name: "除数是一位数", cols: 3 },
+            { id: "fraction_simple", name: "分数初步", cols: 4 },
+            { id: "decimal_simple", name: "小数初步", cols: 4 }
+        ]
+    },
+    4: {
+        name: "四年级",
+        color: "#f59e0b",
+        desc: "大数认识、三位数乘两位数、除数是两位数的除法、四则运算与运算定律、小数的意义和性质、小数加减法。",
+        types: [
+            { id: "multiply_3x2", name: "三位数×两位数", cols: 3 },
+            { id: "divide_2d", name: "除数是两位数", cols: 3 },
+            { id: "four_ops", name: "四则运算", cols: 3 },
+            { id: "laws", name: "运算定律", cols: 3 },
+            { id: "decimal_addsub", name: "小数加减法", cols: 4 },
+            { id: "decimal_mul", name: "小数×整数", cols: 4 }
+        ]
+    },
+    5: {
+        name: "五年级",
+        color: "#ef4444",
+        desc: "小数乘除法、简易方程、因数与倍数、分数的意义和性质、分数加减法、长方体正方体表面积体积。",
+        types: [
+            { id: "decimal_mul", name: "小数乘法", cols: 3 },
+            { id: "decimal_div", name: "小数除法", cols: 3 },
+            { id: "equation", name: "简易方程", cols: 3 },
+            { id: "fraction_addsub", name: "分数加减法", cols: 3 },
+            { id: "fraction_mul", name: "分数乘法", cols: 3 },
+            { id: "factor", name: "因数倍数", cols: 4 }
+        ]
+    },
+    6: {
+        name: "六年级",
+        color: "#06b6d4",
+        desc: "分数乘除法、比和比例、百分数、圆的相关计算、负数初步、圆柱圆锥表面积体积。",
+        types: [
+            { id: "fraction_muldiv", name: "分数乘除法", cols: 3 },
+            { id: "ratio", name: "比和比例", cols: 3 },
+            { id: "percent", name: "百分数计算", cols: 3 },
+            { id: "circle", name: "圆的计算", cols: 3 },
+            { id: "cylinder", name: "圆柱圆锥", cols: 3 },
+            { id: "mixed_adv", name: "综合运算", cols: 3 }
+        ]
+    }
+};
+ 
+// ==================== 全局状态 ====================
+let currentGrade = 1;
+let selectedTypes = new Set();
+ 
+// ==================== 工具函数 ====================
+function randInt(min, max) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+ 
+function randChoice(arr) {
+    return arr[Math.floor(Math.random() * arr.length)];
+}
+ 
+function gcd(a, b) {
+    return b === 0 ? a : gcd(b, a % b);
+}
+ 
+function simplifyFraction(num, den) {
+    const g = gcd(Math.abs(num), Math.abs(den));
+    return { num: num / g, den: den / g };
+}
+ 
+// ==================== 题目生成器 ====================
+const GENERATORS = {
+    // ===== 一年级 =====
+    addsub20: () => {
+        const q = [];
+        for (let i = 0; i < 16; i++) {
+            if (Math.random() < 0.5) {
+                let a = randInt(1, 19), b = randInt(1, 20 - a);
+                q.push(`${a} + ${b} = ______`);
+            } else {
+                let a = randInt(2, 20), b = randInt(1, a);
+                q.push(`${a} - ${b} = ______`);
+            }
+        }
+        return q;
+    },
+    addsub100: () => {
+        const q = [];
+        for (let i = 0; i < 16; i++) {
+            if (Math.random() < 0.5) {
+                let a = randInt(10, 90), b = randInt(1, 100 - a);
+                q.push(`${a} + ${b} = ______`);
+            } else {
+                let a = randInt(20, 100), b = randInt(1, a);
+                q.push(`${a} - ${b} = ______`);
+            }
+        }
+        return q;
+    },
+    three_add: () => {
+        const q = [];
+        for (let i = 0; i < 16; i++) {
+            let a = randInt(1, 30), b = randInt(1, 40), c = randInt(1, 30);
+            q.push(`${a} + ${b} + ${c} = ______`);
+        }
+        return q;
+    },
+    three_sub: () => {
+        const q = [];
+        for (let i = 0; i < 16; i++) {
+            let a = randInt(50, 100), b = randInt(1, a - 10), c = randInt(1, a - b);
+            q.push(`${a} - ${b} - ${c} = ______`);
+        }
+        return q;
+    },
+    mixed: () => {
+        const q = [];
+        for (let i = 0; i < 16; i++) {
+            let a = randInt(1, 50), b = randInt(1, 30), c = randInt(1, 30);
+            if (Math.random() < 0.5) q.push(`${a} + ${b} - ${c} = ______`);
+            else q.push(`${a} - ${b} + ${c} = ______`);
+        }
+        return q;
+    },
+    fillblank: () => {
+        const q = [];
+        for (let i = 0; i < 16; i++) {
+            let a = randInt(2, 20), b = randInt(1, a);
+            let c = randInt(1, a - b + 5);
+            if (Math.random() < 0.5) q.push(`${a} - ${b} = ______ + ${c}`);
+            else q.push(`${a} + ${b} = ${c} + ______`);
+        }
+        return q;
+    },
+ 
+    // ===== 二年级 =====
+    multiply: () => {
+        const q = [];
+        for (let i = 0; i < 16; i++) {
+            let a = randInt(2, 9), b = randInt(2, 9);
+            q.push(`${a} × ${b} = ______`);
+        }
+        return q;
+    },
+    divide: () => {
+        const q = [];
+        for (let i = 0; i < 16; i++) {
+            let b = randInt(2, 9), ans = randInt(2, 9);
+            let a = b * ans;
+            q.push(`${a} ÷ ${b} = ______`);
+        }
+        return q;
+    },
+    remainder: () => {
+        const q = [];
+        for (let i = 0; i < 16; i++) {
+            let b = randInt(2, 9), ans = randInt(2, 9), rem = randInt(1, b - 1);
+            let a = b * ans + rem;
+            q.push(`${a} ÷ ${b} = ______ …… ______`);
+        }
+        return q;
+    },
+    mixed_md: () => {
+        const q = [];
+        for (let i = 0; i < 16; i++) {
+            let a = randInt(2, 9), b = randInt(2, 9), c = randInt(2, 9);
+            if (Math.random() < 0.5) q.push(`${a} × ${b} ÷ ${c} = ______`);
+            else q.push(`${a} ÷ ${b} × ${c} = ______`);
+        }
+        return q;
+    },
+    mixed_all: () => {
+        const q = [];
+        for (let i = 0; i < 16; i++) {
+            let patterns = [
+                () => { let a=randInt(2,9),b=randInt(2,9),c=randInt(1,20); return `${a} × ${b} + ${c} = ______`; },
+                () => { let a=randInt(10,50),b=randInt(2,9),c=randInt(2,9); return `${a} - ${b} × ${c} = ______`; },
+                () => { let a=randInt(2,9),b=randInt(2,9),c=randInt(2,5); return `(${a} + ${b}) × ${c} = ______`; },
+                () => { let a=randInt(20,80),b=randInt(2,9),c=randInt(2,5); return `(${a} - ${b}) ÷ ${c} = ______`; }
+            ];
+            q.push(randChoice(patterns)());
+        }
+        return q;
+    },
+ 
+    // ===== 三年级 =====
+    addsub10000: () => {
+        const q = [];
+        for (let i = 0; i < 12; i++) {
+            if (Math.random() < 0.5) {
+                let a = randInt(1000, 9000), b = randInt(100, 1000);
+                q.push(`${a} + ${b} = ______`);
+            } else {
+                let a = randInt(1000, 9999), b = randInt(100, a);
+                q.push(`${a} - ${b} = ______`);
+            }
+        }
+        return q;
+    },
+    multiply_1d: () => {
+        const q = [];
+        for (let i = 0; i < 12; i++) {
+            let a = randInt(10, 999), b = randInt(2, 9);
+            q.push(`${a} × ${b} = ______`);
+        }
+        return q;
+    },
+    multiply_2d: () => {
+        const q = [];
+        for (let i = 0; i < 12; i++) {
+            let a = randInt(10, 99), b = randInt(10, 99);
+            q.push(`${a} × ${b} = ______`);
+        }
+        return q;
+    },
+    divide_1d: () => {
+        const q = [];
+        for (let i = 0; i < 12; i++) {
+            let b = randInt(2, 9), ans = randInt(10, 120);
+            let a = b * ans;
+            q.push(`${a} ÷ ${b} = ______`);
+        }
+        return q;
+    },
+    fraction_simple: () => {
+        const q = [];
+        for (let i = 0; i < 16; i++) {
+            let den = randInt(2, 8), num1 = randInt(1, den - 1), num2 = randInt(1, den - num1);
+            q.push(`${num1}/${den} + ${num2}/${den} = ______`);
+        }
+        return q;
+    },
+    decimal_simple: () => {
+        const q = [];
+        for (let i = 0; i < 16; i++) {
+            let a = (randInt(1, 99) / 10).toFixed(1);
+            let b = (randInt(1, 99) / 10).toFixed(1);
+            if (Math.random() < 0.5) q.push(`${a} + ${b} = ______`);
+            else q.push(`${Math.max(parseFloat(a), parseFloat(b))} - ${Math.min(parseFloat(a), parseFloat(b))} = ______`);
+        }
+        return q;
+    },
+ 
+    // ===== 四年级 =====
+    multiply_3x2: () => {
+        const q = [];
+        for (let i = 0; i < 12; i++) {
+            let a = randInt(100, 999), b = randInt(10, 99);
+            q.push(`${a} × ${b} = ______`);
+        }
+        return q;
+    },
+    divide_2d: () => {
+        const q = [];
+        for (let i = 0; i < 12; i++) {
+            let b = randInt(10, 99), ans = randInt(10, 99);
+            let a = b * ans;
+            q.push(`${a} ÷ ${b} = ______`);
+        }
+        return q;
+    },
+    four_ops: () => {
+        const q = [];
+        for (let i = 0; i < 12; i++) {
+            let a = randInt(1, 50), b = randInt(2, 9), c = randInt(2, 9);
+            let patterns = [
+                `${a} + ${b} × ${c} = ______`,
+                `${a} × ${b} - ${c} = ______`,
+                `(${a} + ${b}) × ${c} = ______`,
+                `${a} × (${b} + ${c}) = ______`
+            ];
+            q.push(randChoice(patterns));
+        }
+        return q;
+    },
+    laws: () => {
+        const q = [];
+        for (let i = 0; i < 12; i++) {
+            let a = randInt(10, 99), b = randInt(10, 99), c = randInt(2, 9);
+            let patterns = [
+                `${a} + ${b} + ${c} = ${a} + (______ + ${c})`,
+                `${a} × ${b} × ${c} = ${a} × (______ × ${c})`,
+                `(${a} + ${b}) × ${c} = ______ × ${c} + ${b} × ${c}`,
+                `${a} × ${b} + ${a} × ${c} = ${a} × (______ + ${c})`
+            ];
+            q.push(randChoice(patterns));
+        }
+        return q;
+    },
+    decimal_addsub: () => {
+        const q = [];
+        for (let i = 0; i < 16; i++) {
+            let a = (randInt(1, 999) / 100).toFixed(2);
+            let b = (randInt(1, 999) / 100).toFixed(2);
+            if (Math.random() < 0.5) q.push(`${a} + ${b} = ______`);
+            else q.push(`${Math.max(parseFloat(a), parseFloat(b))} - ${Math.min(parseFloat(a), parseFloat(b))} = ______`);
+        }
+        return q;
+    },
+    decimal_mul: () => {
+        const q = [];
+        for (let i = 0; i < 16; i++) {
+            let a = (randInt(1, 99) / 10).toFixed(1);
+            let b = randInt(2, 9);
+            q.push(`${a} × ${b} = ______`);
+        }
+        return q;
+    },
+ 
+    // ===== 五年级 =====
+    decimal_mul: () => {
+        const q = [];
+        for (let i = 0; i < 12; i++) {
+            let a = (randInt(1, 99) / 10).toFixed(1);
+            let b = (randInt(1, 99) / 10).toFixed(1);
+            q.push(`${a} × ${b} = ______`);
+        }
+        return q;
+    },
+    decimal_div: () => {
+        const q = [];
+        for (let i = 0; i < 12; i++) {
+            let b = (randInt(1, 99) / 10).toFixed(1);
+            let ans = randInt(2, 20);
+            let a = (parseFloat(b) * ans).toFixed(1);
+            q.push(`${a} ÷ ${b} = ______`);
+        }
+        return q;
+    },
+    equation: () => {
+        const q = [];
+        for (let i = 0; i < 12; i++) {
+            let a = randInt(2, 9), b = randInt(1, 20), c = a * randInt(2, 10) + b;
+            let patterns = [
+                `${a}x + ${b} = ${c}`,
+                `${c} - ${a}x = ${b}`,
+                `x ÷ ${a} + ${b} = ${c}`,
+                `${a}(x + ${b}) = ${c}`
+            ];
+            q.push(randChoice(patterns) + "  x = ______");
+        }
+        return q;
+    },
+    fraction_addsub: () => {
+        const q = [];
+        for (let i = 0; i < 12; i++) {
+            let den = randInt(2, 12);
+            let num1 = randInt(1, den - 1), num2 = randInt(1, den - 1);
+            let f1 = simplifyFraction(num1, den), f2 = simplifyFraction(num2, den);
+            if (Math.random() < 0.5) {
+                q.push(`${f1.num}/${f1.den} + ${f2.num}/${f2.den} = ______`);
+            } else {
+                let n1 = Math.max(f1.num, f2.num), n2 = Math.min(f1.num, f2.num);
+                q.push(`${n1}/${f1.den} - ${n2}/${f2.den} = ______`);
+            }
+        }
+        return q;
+    },
+    fraction_mul: () => {
+        const q = [];
+        for (let i = 0; i < 12; i++) {
+            let a = randInt(1, 8), b = randInt(2, 9), c = randInt(1, 8), d = randInt(2, 9);
+            let f1 = simplifyFraction(a, b), f2 = simplifyFraction(c, d);
+            q.push(`${f1.num}/${f1.den} × ${f2.num}/${f2.den} = ______`);
+        }
+        return q;
+    },
+    factor: () => {
+        const q = [];
+        for (let i = 0; i < 16; i++) {
+            let n = randInt(2, 100);
+            let patterns = [
+                `${n} 的因数有：________________`,
+                `${n} 的最小倍数是 ______`,
+                `${n} 是 ______ 和 ______ 的倍数`,
+                `${n} 以内 ${randInt(2,9)} 的倍数有：________________`
+            ];
+            q.push(randChoice(patterns));
+        }
+        return q;
+    },
+ 
+    // ===== 六年级 =====
+    fraction_muldiv: () => {
+        const q = [];
+        for (let i = 0; i < 12; i++) {
+            let a = randInt(1, 8), b = randInt(2, 9), c = randInt(1, 8), d = randInt(2, 9);
+            let f1 = simplifyFraction(a, b), f2 = simplifyFraction(c, d);
+            if (Math.random() < 0.5) {
+                q.push(`${f1.num}/${f1.den} × ${f2.num}/${f2.den} = ______`);
+            } else {
+                q.push(`${f1.num}/${f1.den} ÷ ${f2.num}/${f2.den} = ______`);
+            }
+        }
+        return q;
+    },
+    ratio: () => {
+        const q = [];
+        for (let i = 0; i < 12; i++) {
+            let a = randInt(2, 20), b = randInt(2, 20);
+            let patterns = [
+                `${a} : ${b} = ______ : ______ (化简比)`,
+                `${a} : ${b} = ______ (求比值)`,
+                `3 : 5 = ${a} : ______`,
+                `______ : 7 = ${a} : ${b}`
+            ];
+            q.push(randChoice(patterns));
+        }
+        return q;
+    },
+    percent: () => {
+        const q = [];
+        for (let i = 0; i < 12; i++) {
+            let a = randInt(10, 200), p = randInt(10, 90);
+            let patterns = [
+                `${a} 的 ${p}% = ______`,
+                `______ 的 ${p}% = ${a}`,
+                `${a} 是 ______ 的 ${p}%`,
+                `${p}% = ______ (化成小数)`
+            ];
+            q.push(randChoice(patterns));
+        }
+        return q;
+    },
+    circle: () => {
+        const q = [];
+        const PI = "π";
+        for (let i = 0; i < 12; i++) {
+            let r = randInt(1, 10);
+            let patterns = [
+                `r = ${r}cm, C = ______`,
+                `r = ${r}cm, S = ______`,
+                `d = ${r*2}cm, C = ______`,
+                `C = ${2*r}${PI}cm, r = ______`
+            ];
+            q.push(randChoice(patterns));
+        }
+        return q;
+    },
+    cylinder: () => {
+        const q = [];
+        const PI = "π";
+        for (let i = 0; i < 12; i++) {
+            let r = randInt(1, 6), h = randInt(2, 10);
+            let patterns = [
+                `r=${r}cm h=${h}cm, V=______`,
+                `r=${r}cm h=${h}cm, S<sub>侧</sub>=______`,
+                `d=${r*2}cm h=${h}cm, V=______`,
+                `C=${2*r}${PI}cm h=${h}cm, V=______`
+            ];
+            q.push(randChoice(patterns));
+        }
+        return q;
+    },
+    mixed_adv: () => {
+        const q = [];
+        for (let i = 0; i < 12; i++) {
+            let a = randInt(1, 10), b = randInt(2, 10), c = randInt(1, 10);
+            let patterns = [
+                `${a}/${b} + ${c}/${b} × ${randInt(2,5)} = ______`,
+                `(${a} + ${b}) × ${c}/${randInt(2,5)} = ______`,
+                `${a}/${b} ÷ ${c} + ${randInt(1,5)} = ______`,
+                `${a} × (1 - ${randInt(1,9)}/10) = ______`
+            ];
+            q.push(randChoice(patterns));
+        }
+        return q;
+    }
+};
+ 
+// ==================== UI 渲染 ====================
+function renderTypeSelector() {
+    const container = document.getElementById('typeSelector');
+    const config = GRADE_CONFIG[currentGrade];
+    container.innerHTML = '';
+    selectedTypes.clear();
+ 
+    config.types.forEach((type, idx) => {
+        const btn = document.createElement('button');
+        btn.className = 'type-btn' + (idx < 3 ? ' active' : '');
+        btn.textContent = type.name;
+        btn.dataset.type = type.id;
+        if (idx < 3) selectedTypes.add(type.id);
+ 
+        btn.addEventListener('click', function() {
+            this.classList.toggle('active');
+            if (this.classList.contains('active')) {
+                selectedTypes.add(this.dataset.type);
+            } else {
+                selectedTypes.delete(this.dataset.type);
+            }
+        });
+ 
+        container.appendChild(btn);
+    });
+}
+ 
+function updateGradeInfo() {
+    const config = GRADE_CONFIG[currentGrade];
+    const info = document.getElementById('gradeInfo');
+    info.innerHTML = `
+        <h3>&#128218; ${config.name}计算范围</h3>
+        <p>${config.desc}</p>
+    `;
+    info.style.borderLeftColor = config.color;
+    info.querySelector('h3').style.color = config.color;
+}
+ 
+// ==================== 试卷生成 ====================
+function renderWorksheet() {
+    if (selectedTypes.size === 0) {
+        showStatus('&#9888;&#65039; 请至少选择一种题型', 'error');
+        return;
+    }
+ 
+    const config = GRADE_CONFIG[currentGrade];
+    let questionsHTML = '';
+    let previewText = `【${config.name}数学计算练习卷】\n\n`;
+    previewText += '班级：__________  姓名：__________  得分：__________\n\n';
+ 
+    let typeIndex = 0;
+    selectedTypes.forEach(typeId => {
+        const typeConfig = config.types.find(t => t.id === typeId);
+        if (!typeConfig || !GENERATORS[typeId]) return;
+ 
+        const questions = GENERATORS[typeId]();
+        const cols = typeConfig.cols;
+        const rows = Math.ceil(questions.length / cols);
+ 
+        questionsHTML += `<div class="section-title">${String.fromCharCode(0x4E00 + typeIndex)}、${typeConfig.name}</div>\n`;
+        questionsHTML += `<table class="questions-table">\n`;
+ 
+        previewText += `${String.fromCharCode(0x4E00 + typeIndex)}、${typeConfig.name}\n`;
+        previewText += '─────────────────────────────────────────\n';
+ 
+        for (let r = 0; r < rows; r++) {
+            questionsHTML += '  <tr>\n';
+            for (let c = 0; c < cols; c++) {
+                const idx = r * cols + c;
+                if (idx < questions.length) {
+                    let qText = questions[idx];
+                    // 将 ______ 替换为输入框
+                    let cellHtml = qText.replace(/______/g, '<input type="text" placeholder="" />');
+                    questionsHTML += `    <td>${cellHtml}</td>\n`;
+                    previewText += qText.padEnd(28, ' ');
+                } else {
+                    questionsHTML += '    <td></td>\n';
+                    previewText += '                            ';
+                }
+            }
+            questionsHTML += '  </tr>\n';
+            previewText += '\n';
+        }
+        questionsHTML += '</table>\n\n';
+        previewText += '\n';
+        typeIndex++;
+    });
+ 
+    document.getElementById('questions').innerHTML = questionsHTML;
+    document.getElementById('previewContent').textContent = previewText;
+    document.getElementById('sheetTitle').textContent = `${config.name}数学计算练习题`;
+    document.getElementById('worksheet').style.display = 'block';
+ 
+    showStatus(`&#9989; ${config.name}练习卷生成完毕！共 ${selectedTypes.size} 种题型`, 'success');
+    document.getElementById('worksheet').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+ 
+function clearWorksheet() {
+    document.getElementById('questions').innerHTML = '';
+    document.getElementById('worksheet').style.display = 'none';
+    document.getElementById('previewContent').textContent = '选择年级和题型后，点击「生成练习题」开始出题～';
+    showStatus('&#128465;&#65039; 已清空试卷内容', 'success');
+}
+ 
+function handlePrint() {
+    const ws = document.getElementById('worksheet');
+    if (!ws || ws.style.display === 'none' || !document.getElementById('questions').innerHTML.trim()) {
+        showStatus('&#9888;&#65039; 还没有题目，请先生成练习题', 'error');
+        return;
+    }
+    window.print();
+}
+ 
+function copyPreview() {
+    const text = document.getElementById('previewContent').textContent;
+    if (!text || text.includes('选择年级和题型')) {
+        showStatus('&#9888;&#65039; 暂无题目内容，请先生成练习题', 'error');
+        return;
+    }
+    navigator.clipboard.writeText(text).then(() => {
+        showStatus('&#128203; 预览文本已复制到剪贴板', 'success');
+    }).catch(() => {
+        showStatus('&#10060; 复制失败，请手动选取复制', 'error');
+    });
+}
+ 
+function showStatus(msg, type) {
+    const div = document.getElementById('statusMessage');
+    div.textContent = msg;
+    div.className = `status-message status-${type}`;
+    div.style.display = 'block';
+    setTimeout(() => div.style.display = 'none', 3000);
+}
+ 
+// ==================== 事件绑定 ====================
+function initEvents() {
+    // 年级切换
+    document.querySelectorAll('.grade-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            document.querySelectorAll('.grade-btn').forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+            currentGrade = parseInt(this.dataset.grade);
+            updateGradeInfo();
+            renderTypeSelector();
+            clearWorksheet();
+        });
+    });
+ 
+    document.getElementById('generateBtn').addEventListener('click', renderWorksheet);
+    document.getElementById('printBtn').addEventListener('click', handlePrint);
+    document.getElementById('clearBtn').addEventListener('click', clearWorksheet);
+    document.getElementById('innerPrintBtn').addEventListener('click', handlePrint);
+    document.getElementById('copyPreviewBtn').addEventListener('click', copyPreview);
+}
+ 
+// ==================== 初始化 ====================
+window.addEventListener('DOMContentLoaded', () => {
+    initEvents();
+    updateGradeInfo();
+    renderTypeSelector();
+});
+</script>
+</body>
+</html>

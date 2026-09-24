@@ -1,0 +1,264 @@
+/* ============================================================================
+ * 课堂闹钟 · alarm-clock.css
+ * 仅包含本工具特有样式：当前时间大字 / 设置表单 / 闹钟列表 / 响铃弹窗
+ * 公共底座（hero、presets、按钮、switch、modal、empty 等）见 tool-common.css
+ * 高度策略：所有容器 height:auto 撑开，无内部滚动条；弹窗 max-height + overflow
+ * ========================================================================== */
+
+/* ---------------------------------------------------------------------------
+ * 一、当前时间大字显示区
+ * ------------------------------------------------------------------------- */
+.now {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 24px;
+  padding: 34px 20px;
+  text-align: center;
+  color: #fff;
+  background: var(--primary-grad);
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow-primary);
+}
+
+.now-label {
+  font-size: 13px;
+  letter-spacing: 0.18em;
+  color: rgba(255, 255, 255, 0.78);
+}
+
+.now-time {
+  font-size: clamp(46px, 9vw, 84px);
+  font-weight: 900;
+  line-height: 1.1;
+  letter-spacing: 0.04em;
+  font-variant-numeric: tabular-nums;
+  color: #fff;
+  text-shadow: 0 4px 24px rgba(0, 0, 0, 0.18);
+}
+
+.now-date {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.88);
+}
+
+/* 舞台（main.container）需要相对定位，供右上角 .stage-toolbar 绝对定位锚定 */
+main.container {
+  position: relative;
+}
+
+/* ---------------------------------------------------------------------------
+ * 二、添加闹钟表单区
+ * ------------------------------------------------------------------------- */
+.setter {
+  display: grid;
+  /* 原第 4 列是「⛶ 全屏」按钮，已移入舞台右上角工具栏 */
+  grid-template-columns: 1fr 1.4fr auto;
+  gap: 12px;
+  align-items: end;
+  margin-bottom: 14px;
+  padding: 22px;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  box-shadow: var(--shadow-sm);
+}
+
+.setter .field { margin-bottom: 0; }
+
+/* 预设按钮区域在容器内自带底部间距 */
+.presets {
+  justify-content: center;
+  margin-bottom: 22px;
+}
+.presets-label {
+  font-size: 13.5px;
+  color: var(--text-3);
+  align-self: center;
+}
+
+/* ---------------------------------------------------------------------------
+ * 三、状态提示行
+ * ------------------------------------------------------------------------- */
+#status {
+  margin-bottom: 18px;
+  padding: 12px 18px;
+  font-size: 14px;
+  font-weight: 600;
+  text-align: center;
+  color: var(--primary);
+  background: var(--primary-soft);
+  border-radius: var(--r-pill);
+}
+
+/* ---------------------------------------------------------------------------
+ * 四、闹钟列表
+ * ------------------------------------------------------------------------- */
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* 空状态占位 */
+.list .empty {
+  margin: 0;
+}
+
+/* 单条闹钟项：时间+文字 左 / 开关+删除 右 */
+.alarm {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--primary);
+  border-radius: var(--r);
+  box-shadow: var(--shadow-sm);
+  transition: all var(--t-fast) var(--ease);
+}
+
+.alarm:hover {
+  border-left-color: var(--primary);
+  box-shadow: var(--shadow);
+  transform: translateY(-1px);
+}
+
+.alarm.disabled {
+  border-left-color: var(--border-2);
+  opacity: 0.58;
+}
+
+.alarm-main {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  min-width: 0;
+  flex: 1;
+}
+
+.alarm-time {
+  font-size: 22px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-1);
+  flex-shrink: 0;
+}
+
+.alarm-msg {
+  font-size: 14px;
+  color: var(--text-2);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.alarm.disabled .alarm-time { color: var(--text-3); }
+
+/* 删除按钮：圆形 ghost 红色 */
+.del {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
+  font-size: 20px;
+  line-height: 1;
+  color: var(--text-3);
+  background: var(--card-bg-2);
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all var(--t-fast) var(--ease);
+}
+
+.del:hover {
+  color: #fff;
+  background: var(--danger);
+  border-color: var(--danger);
+}
+
+/* ---------------------------------------------------------------------------
+ * 五、响铃弹窗（覆盖公共 .modal-mask / .modal 风格，改为中央高亮卡片）
+ * ------------------------------------------------------------------------- */
+.ring-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 1200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: rgba(20, 28, 48, 0.62);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  animation: ring-fade 0.22s var(--ease);
+}
+
+.ring-modal[hidden] { display: none !important; }
+
+@keyframes ring-fade {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.ring-box {
+  width: 100%;
+  max-width: 460px;
+  max-height: 86vh;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  padding: 36px 28px;
+  text-align: center;
+  background: var(--card-bg);
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow-lg);
+  animation: ring-pop 0.34s var(--ease);
+}
+
+@keyframes ring-pop {
+  0%   { transform: scale(0.82); opacity: 0; }
+  60%  { transform: scale(1.04); opacity: 1; }
+  100% { transform: scale(1); }
+}
+
+.ring-icon {
+  font-size: 64px;
+  line-height: 1;
+  animation: ring-shake 0.5s var(--ease) infinite;
+}
+
+@keyframes ring-shake {
+  0%, 100% { transform: rotate(-8deg); }
+  50%      { transform: rotate(8deg); }
+}
+
+.ring-time {
+  font-size: clamp(40px, 7vw, 60px);
+  font-weight: 900;
+  letter-spacing: 0.04em;
+  font-variant-numeric: tabular-nums;
+  color: var(--primary);
+}
+
+.ring-msg {
+  font-size: clamp(18px, 2.4vw, 24px);
+  font-weight: 700;
+  color: var(--text-1);
+}
+
+/* ---------------------------------------------------------------------------
+ * 六、小屏适配：表单变单列
+ * ------------------------------------------------------------------------- */
+@media (max-width: 720px) {
+  .setter {
+    grid-template-columns: 1fr;
+  }
+  .setter .btn { width: 100%; }
+  .alarm-main { flex-direction: column; align-items: flex-start; gap: 2px; }
+}

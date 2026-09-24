@@ -1,0 +1,323 @@
+/* ============================================================================
+ * 多表合并（表格数据处理）· excel-merge.css
+ * 仅包含本工具特有样式：加载指示 / 文件条目 / 字段映射网格 / 预览统计 / 表格
+ * 公共底座（wrap、head、card、dropzone、opt-group、radio、check、actions、btn）
+ *   见 tool-common.css
+ * 高度策略：所有容器 height:auto 撑开；字段网格与条目随内容自然增高；
+ *   预览表格列多时允许横向滚动（与 .modal 同为合理例外）
+ * ========================================================================== */
+
+/* ---------------------------------------------------------------------------
+ * 一、加载指示
+ * ------------------------------------------------------------------------- */
+.loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin: 18px 0;
+  padding: 14px;
+  font-size: 14px;
+  color: var(--primary);
+  background: var(--primary-soft);
+  border-radius: var(--r);
+}
+
+.loading.hidden { display: none !important; }
+
+.spinner {
+  display: inline-block;
+  width: 18px;
+  height: 18px;
+  border: 2.5px solid rgba(59, 110, 246, 0.25);
+  border-top-color: var(--primary);
+  border-radius: 50%;
+  animation: em-spin 0.7s linear infinite;
+}
+
+@keyframes em-spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ---------------------------------------------------------------------------
+ * 二、文件条目
+ * ------------------------------------------------------------------------- */
+.entries {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-top: 18px;
+}
+
+.entry {
+  padding: 14px 18px;
+  background: var(--card-bg-2);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  box-shadow: var(--shadow-sm);
+  transition: box-shadow var(--t-fast) var(--ease);
+}
+
+.entry:hover { box-shadow: var(--shadow); }
+
+/* 条目头部：图标 + 文件名 + 工作表选择 + 字段按钮 + 状态 + 删除 */
+.entry-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.e-icon { font-size: 22px; flex-shrink: 0; }
+
+.e-name {
+  flex: 1;
+  min-width: 160px;
+  font-size: 14.5px;
+  font-weight: 700;
+  color: var(--text-1);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* 工作表下拉 */
+.entry-head select {
+  width: auto;
+  max-width: 200px;
+  padding: 7px 30px 7px 12px;
+  font-size: 13px;
+}
+
+/* 字段选择按钮 */
+.e-btn {
+  padding: 7px 14px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--primary);
+  background: var(--primary-soft);
+  border: 1px solid var(--primary-soft-2);
+  border-radius: var(--r-pill);
+  cursor: pointer;
+  transition: all var(--t-fast) var(--ease);
+  white-space: nowrap;
+}
+
+.e-btn:hover {
+  color: #fff;
+  background: var(--primary-grad);
+  border-color: transparent;
+}
+
+/* 解析状态 */
+.e-state {
+  font-size: 12.5px;
+  color: var(--text-3);
+  font-weight: 600;
+  padding: 3px 10px;
+  background: var(--bg-soft);
+  border-radius: var(--r-pill);
+}
+.e-state.err {
+  color: var(--danger);
+  background: #fff0f0;
+}
+
+/* 删除按钮 */
+.e-del {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  font-size: 14px;
+  color: var(--text-3);
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all var(--t-fast) var(--ease);
+  flex-shrink: 0;
+}
+
+.e-del:hover {
+  color: #fff;
+  background: var(--danger);
+  border-color: var(--danger);
+}
+
+/* ---------------------------------------------------------------------------
+ * 三、字段映射网格
+ * ------------------------------------------------------------------------- */
+.field-panel {
+  display: none;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px dashed var(--border);
+}
+
+.field-panel.show {
+  display: block;
+  animation: em-fade 0.2s var(--ease);
+}
+
+@keyframes em-fade {
+  from { opacity: 0; transform: translateY(-4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.field-hint {
+  margin-bottom: 10px;
+  padding: 8px 12px;
+  font-size: 12.5px;
+  color: var(--text-2);
+  background: var(--bg-soft);
+  border-left: 3px solid var(--primary);
+  border-radius: var(--r-sm);
+}
+
+.field-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 8px;
+}
+
+/* 字段项：勾选框 + 列名 + 箭头 + 输出列名输入框 */
+.field-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  cursor: pointer;
+  transition: all var(--t-fast) var(--ease);
+}
+
+.field-item:hover {
+  border-color: var(--primary-soft-2);
+  background: var(--primary-soft);
+}
+
+.field-item input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  accent-color: var(--primary);
+  cursor: pointer;
+}
+
+.field-item input[type="checkbox"]:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.f-name {
+  flex: 1;
+  min-width: 0;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-1);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.f-arrow {
+  font-size: 13px;
+  color: var(--text-3);
+  flex-shrink: 0;
+}
+
+.out-name {
+  width: 110px;
+  flex-shrink: 0;
+  padding: 6px 10px;
+  font-size: 12.5px;
+}
+
+/* 智能合并模式下：勾选框禁用 + 输出列输入框隐藏 */
+body[data-mode="smart"] .field-item input[type="checkbox"] { opacity: 0.4; }
+body[data-mode="smart"] .f-arrow,
+body[data-mode="smart"] .out-name { display: none; }
+
+/* ---------------------------------------------------------------------------
+ * 四、合并预览统计 + 表格
+ * ------------------------------------------------------------------------- */
+.summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.stat-pill {
+  padding: 5px 14px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--primary);
+  background: var(--primary-soft);
+  border-radius: var(--r-pill);
+}
+.stat-pill.warn {
+  color: #b25b00;
+  background: #fff4e0;
+}
+
+/* 表格容器：列多时允许横向滚动（与 .modal 同为合理例外） */
+.table-scroll {
+  width: 100%;
+  overflow-x: auto;
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  background: var(--card-bg);
+}
+
+#previewTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+#previewTable th,
+#previewTable td {
+  padding: 9px 12px;
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+
+#previewTable th {
+  background: var(--card-bg-2);
+  color: var(--text-1);
+  font-weight: 700;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
+#previewTable tbody tr:hover {
+  background: var(--primary-soft);
+}
+
+#previewTable td {
+  color: var(--text-2);
+}
+
+.tip-line {
+  margin-top: 12px;
+  font-size: 12.5px;
+  color: var(--text-3);
+  text-align: center;
+}
+
+/* ---------------------------------------------------------------------------
+ * 五、小屏适配
+ * ------------------------------------------------------------------------- */
+@media (max-width: 640px) {
+  .entry-head { gap: 8px; }
+  .e-name { min-width: 120px; font-size: 13px; }
+  .entry-head select { max-width: 140px; }
+  .field-grid { grid-template-columns: 1fr; }
+  .out-name { width: 90px; }
+}

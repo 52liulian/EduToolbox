@@ -1,0 +1,242 @@
+/* ============================================================================
+ * 随机抽取（大屏抽奖）· random-draw.css
+ * 仅包含本工具特有样式：深色舞台内景 / 流体 Canvas 层 / 超大姓名滚动与中奖动效
+ *                       隐藏设置栏 / stage 全屏投影
+ * 公共底座（双栏布局、面板、按钮、记录列表）见 tool-common.css
+ * 高度策略：舞台 min-height 撑开、内容自然增高，仅 body 主滚动条；深色仅限
+ *           舞台卡片内部与全屏模式，整页 body 保持浅色；仅全屏时铺满视口
+ * ========================================================================== */
+
+/* ---------------------------------------------------------------------------
+ * 一、双栏布局：窄屏回落 & 「隐藏设置」单栏态
+ * ------------------------------------------------------------------------- */
+@media (max-width: 900px) {
+  #app .main { grid-template-columns: 1fr; }
+}
+
+#app .main.setup-hidden {
+  grid-template-columns: 1fr;
+}
+.main.setup-hidden .setup-panel {
+  display: none;
+}
+
+/* 速度滑杆数值 */
+.slider-line .val {
+  min-width: 48px;
+  text-align: right;
+  font-size: 13.5px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--primary);
+}
+
+/* ---------------------------------------------------------------------------
+ * 二、抽奖舞台：白色卡片包裹一块深色沉浸内景（body 不变黑）
+ * ------------------------------------------------------------------------- */
+#stage {
+  min-height: 580px;
+  padding: 0;
+  overflow: hidden; /* 仅把流体背景裁切在圆角内，不产生滚动条 */
+  background:
+    radial-gradient(1100px 560px at 50% -10%, rgba(99, 102, 241, 0.28), transparent 62%),
+    linear-gradient(160deg, #1a2350 0%, #11183a 48%, #0a0f28 100%);
+}
+
+/* 流体光球画布：铺满整个舞台，由 JS 按 offsetWidth/Height 取尺寸 */
+.bg-canvas {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+/* 顶部暗角，让中央文字更聚焦 */
+#stage::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse at center, transparent 42%, rgba(5, 9, 24, 0.5) 100%);
+}
+
+/* 深色舞台内的角标按钮改为玻璃质感（覆盖公共白底 icon-btn） */
+#stage .stage-toolbar { z-index: 5; }
+#stage .stage-toolbar .icon-btn {
+  color: rgba(255, 255, 255, 0.9);
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.24);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+#stage .stage-toolbar .icon-btn:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.42);
+}
+
+/* ---------------------------------------------------------------------------
+ * 三、中央展示区（浮于流体层之上）
+ * ------------------------------------------------------------------------- */
+#stage .display {
+  position: relative;
+  z-index: 2;
+  justify-content: center;
+  gap: 18px;
+  min-height: 580px;
+  padding: 72px 24px 56px;
+}
+
+/* 超大姓名：覆盖公共 .name-display 的蓝色渐变文字，改为舞台高亮白字 */
+#nameDisplay {
+  max-width: 100%;
+  padding: 0 12px;
+  font-size: clamp(46px, 8.5vw, 104px);
+  font-weight: 900;
+  line-height: 1.15;
+  letter-spacing: 0.04em;
+  word-break: break-all;
+  color: rgba(255, 255, 255, 0.92);
+  background: none;
+  -webkit-text-fill-color: currentColor;
+  text-shadow: 0 0 36px rgba(147, 197, 253, 0.45);
+}
+
+/* 滚动态：高频切换 + 轻微上下抖动与辉光 */
+#nameDisplay.rolling {
+  color: #fff;
+  text-shadow:
+    0 0 18px rgba(165, 180, 252, 0.9),
+    0 0 56px rgba(147, 197, 253, 0.6);
+  animation: rd-rolling 0.14s linear infinite;
+}
+
+@keyframes rd-rolling {
+  0%   { transform: translateY(-4%) scale(0.985); opacity: 0.82; }
+  50%  { transform: translateY(4%) scale(1.02);  opacity: 1; }
+  100% { transform: translateY(-4%) scale(0.985); opacity: 0.82; }
+}
+
+/* 中奖态：金白渐变大字，先弹出再持续呼吸辉光 */
+#nameDisplay.winner {
+  font-size: clamp(58px, 11vw, 148px);
+  background: linear-gradient(180deg, #fff8e1 0%, #ffd34d 55%, #ff9e2c 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-shadow: none;
+  filter: drop-shadow(0 0 30px rgba(255, 196, 64, 0.55));
+  animation:
+    rd-win-pop 0.6s var(--ease),
+    rd-win-glow 1.8s ease-in-out 0.6s infinite alternate;
+}
+
+@keyframes rd-win-pop {
+  0%   { transform: scale(0.45); opacity: 0; }
+  60%  { transform: scale(1.14); opacity: 1; }
+  100% { transform: scale(1); }
+}
+@keyframes rd-win-glow {
+  from { filter: drop-shadow(0 0 22px rgba(255, 196, 64, 0.4)); }
+  to   { filter: drop-shadow(0 0 46px rgba(255, 196, 64, 0.75)); }
+}
+
+/* 提示行 / 按键说明：深色背景反色 */
+#displayHint {
+  color: rgba(255, 255, 255, 0.66);
+  font-size: 15px;
+}
+#stage .key-hint { color: rgba(255, 255, 255, 0.42); }
+#stage .key-hint kbd {
+  color: rgba(255, 255, 255, 0.88);
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.24);
+}
+
+/* 停止态按钮：主色蓝 → 警示红 */
+#startBtn.rolling {
+  background: linear-gradient(135deg, #ff7a7a, #ef4444);
+  box-shadow: 0 10px 26px rgba(239, 68, 68, 0.45);
+}
+
+/* ---------------------------------------------------------------------------
+ * 四、中奖记录列表项（.r-num / .r-name / .r-time 由 JS 生成）
+ * ------------------------------------------------------------------------- */
+.record-list li { justify-content: space-between; }
+.record-list li > span:first-child {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  min-width: 0;
+}
+.r-num {
+  display: inline-grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  flex-shrink: 0;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--primary);
+  background: var(--primary-soft);
+  border-radius: 50%;
+}
+.r-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--text-1);
+  font-weight: 600;
+}
+.r-time {
+  flex-shrink: 0;
+  margin-left: 10px;
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-3);
+}
+
+/* ---------------------------------------------------------------------------
+ * 五、全屏投影（全屏元素是 stage 本身；流体画布与姓名铺满视口）
+ * ------------------------------------------------------------------------- */
+#stage:fullscreen,
+#stage:-webkit-full-screen,
+#stage.edutf-solo{
+  width: 100%;
+  height: 100%;
+  min-height: 100vh;
+  border: none;
+  border-radius: 0;
+}
+
+#stage:fullscreen .display,
+#stage:-webkit-full-screen .display,
+#stage.edutf-solo .display{
+  min-height: 100vh;
+  padding: 40px 24px;
+}
+
+#stage:fullscreen #nameDisplay,
+#stage:-webkit-full-screen #nameDisplay,
+#stage.edutf-solo #nameDisplay{
+  font-size: clamp(64px, 12vw, 168px);
+}
+#stage:fullscreen #nameDisplay.winner,
+#stage:-webkit-full-screen #nameDisplay.winner,
+#stage.edutf-solo #nameDisplay.winner{
+  font-size: clamp(84px, 16vw, 220px);
+}
+
+/* ---------------------------------------------------------------------------
+ * 六、小屏微调
+ * ------------------------------------------------------------------------- */
+@media (max-width: 640px) {
+  #stage,
+  #stage .display { min-height: 480px; }
+  #stage .display { padding: 64px 14px 40px; gap: 14px; }
+  #startBtn { padding: 14px 40px; font-size: 18px; }
+}

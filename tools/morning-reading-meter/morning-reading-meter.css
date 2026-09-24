@@ -1,0 +1,320 @@
+/* ============================================================================
+ * morning-reading-meter.css · 早读检测（声音强度可视化）
+ * ----------------------------------------------------------------------------
+ * 仅写本工具特有样式；公共底座见 ../../assets/css/tool-common.css
+ * 页面结构：main.main（单列）> 设置卡 + 深色仪表展示卡 + 频谱画布 +
+ *           控制按钮 + 工具介绍
+ * 圆环 #ring 由 JS 实时写入 background / box-shadow / transform，
+ * 颜色通过下方 --ring-* 变量注入；高度全部自动撑开，仅 body 主滚动条，
+ * 全屏仅 html:fullscreen 时固定视口。
+ * ========================================================================== */
+
+/* ===================== 1. 单列页面骨架（覆盖 tool-common 双栏 .main） ===================== */
+
+main.main {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 100%;
+  max-width: 920px;
+  padding: 28px 24px 60px;
+}
+
+/* ===================== 2. 设置卡（灵敏度 / 达标值） ===================== */
+
+main.main > .settings {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 16px 22px;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow-sm);
+}
+
+main.main .setting-item {
+  gap: 14px;
+  padding: 10px 4px;
+  background: none;
+  border: none;
+  border-radius: 0;
+}
+main.main .setting-item label {
+  flex-shrink: 0;
+  min-width: 56px;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--text-2);
+}
+main.main .setting-item input[type="range"] {
+  flex: 1;
+}
+main.main .setting-item .setting-val {
+  min-width: 42px;
+  padding: 3px 10px;
+  font-size: 12.5px;
+  font-weight: 800;
+  text-align: center;
+  color: var(--primary);
+  background: var(--primary-soft);
+  border-radius: var(--r-pill);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ===================== 3. 深色仪表展示卡 + 发光圆环 ===================== */
+
+/* JS 通过 var(--ring-*) 读取下列变量，必须定义在圆环祖先上 */
+main.main {
+  --ring-blue: radial-gradient(circle at 32% 28%, #93ddff 0%, #38bdf8 46%, #2563eb 100%);
+  --ring-purple: radial-gradient(circle at 32% 28%, #e9b8ff 0%, #c084fc 46%, #7c3aed 100%);
+  --ring-red: radial-gradient(circle at 32% 28%, #ffc9c9 0%, #fb7185 46%, #dc2626 100%);
+  --ring-shadow-blue: rgba(56, 189, 248, 0.55);
+  --ring-shadow-purple: rgba(192, 132, 252, 0.55);
+  --ring-shadow-red: rgba(244, 63, 94, 0.60);
+}
+
+/* 展示卡：深色仅用于仪表内部 */
+main.main > .display {
+  position: relative;
+  min-height: 460px;
+  overflow: hidden;
+  border: 1px solid #25325a;
+  border-radius: var(--r-lg);
+  background:
+    radial-gradient(620px 380px at 50% -12%, rgba(96, 165, 250, 0.26), transparent 60%),
+    linear-gradient(162deg, #1c2747 0%, #141c35 58%, #0f1628 100%);
+  box-shadow: var(--shadow-lg);
+}
+
+/* 随声音缩放变色的中心光球（JS 写入 transform/background/box-shadow） */
+#ring {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 0;
+  width: min(58vw, 270px);
+  aspect-ratio: 1 / 1;
+  margin: 0;
+  border-radius: 50%;
+  background: var(--ring-blue);
+  box-shadow: 0 0 60px var(--ring-shadow-blue);
+  transform: translate(-50%, -50%) scale(0.8);
+  transition: transform 0.12s linear,
+              background 0.3s var(--ease),
+              box-shadow 0.3s var(--ease);
+}
+
+/* 中央数值压在光球之上 */
+.ring-content {
+  position: absolute;
+  top: 43%;
+  left: 50%;
+  z-index: 1;
+  transform: translate(-50%, -50%);
+  text-align: center;
+}
+.ring-content .score {
+  font-size: clamp(80px, 12vw, 120px);
+  font-weight: 900;
+  line-height: 1;
+  color: #fff;
+  font-variant-numeric: tabular-nums;
+  text-shadow: 0 6px 30px rgba(0, 0, 0, 0.35);
+}
+.ring-content .score-unit {
+  margin-top: 4px;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0.24em;
+  color: rgba(255, 255, 255, 0.62);
+}
+
+/* 状态文字：深底玻璃胶囊，按档位换色 */
+.display .status {
+  position: absolute;
+  top: 72%;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 8px 24px;
+  font-size: 17px;
+  font-weight: 800;
+  white-space: nowrap;
+  color: rgba(255, 255, 255, 0.85);
+  background: rgba(255, 255, 255, 0.10);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: var(--r-pill);
+}
+.display .status.low {
+  color: #dbeafe;
+  background: rgba(56, 189, 248, 0.20);
+  border-color: rgba(56, 189, 248, 0.45);
+}
+.display .status.good {
+  color: #f3e8ff;
+  background: rgba(192, 132, 252, 0.22);
+  border-color: rgba(192, 132, 252, 0.5);
+}
+.display .status.great {
+  color: #ffe4e6;
+  background: rgba(244, 63, 94, 0.24);
+  border-color: rgba(251, 113, 133, 0.55);
+}
+.display .status.error {
+  color: #fecaca;
+  background: rgba(239, 91, 91, 0.2);
+  border-color: rgba(239, 91, 91, 0.5);
+}
+
+/* ===================== 4. 频谱画布（固定画布高度，非滚动容器） ===================== */
+
+.canvas {
+  display: block;
+  width: 100%;
+  height: 170px;
+  padding: 10px 14px;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow-sm);
+}
+
+/* ===================== 5. 控制按钮 ===================== */
+
+main.main .controls {
+  gap: 12px;
+  margin-top: 2px;
+}
+
+/* tool-common 未定义 .btn-secondary，补一套白底描边钮 */
+.btn.btn-secondary {
+  color: var(--text-2);
+  background: var(--card-bg);
+  border: 1.5px solid var(--border);
+}
+.btn.btn-secondary:hover {
+  color: var(--primary);
+  background: var(--primary-soft);
+  border-color: var(--primary-soft-2);
+}
+
+/* ===================== 6. 工具介绍区 ===================== */
+
+.info {
+  padding: 24px;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow-sm);
+}
+.info-title {
+  margin-bottom: 10px;
+  font-size: 18px;
+}
+.info-desc {
+  margin-bottom: 18px;
+  font-size: 14px;
+  line-height: 1.85;
+  color: var(--text-2);
+}
+
+/* 覆盖 tool-common 中胶囊形态的 .feature，这里是纵向小卡 */
+.info-features {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 14px;
+  margin-bottom: 18px;
+}
+.info-features .feature {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  padding: 16px;
+  font-weight: 400;
+  color: inherit;
+  background: var(--card-bg-2);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+}
+.info-features .feature .feature-icon {
+  margin-bottom: 4px;
+  font-size: 26px;
+}
+.info-features .feature h3 {
+  font-size: 14.5px;
+  font-weight: 700;
+}
+.info-features .feature p {
+  font-size: 12.5px;
+  line-height: 1.65;
+  color: var(--text-3);
+}
+
+.info-tip {
+  padding: 12px 16px;
+  font-size: 13px;
+  line-height: 1.75;
+  color: var(--text-2);
+  background: var(--bg-soft);
+  border-left: 3px solid var(--primary);
+  border-radius: var(--r-sm);
+}
+
+/* ===================== 7. 全屏投影（舞台 .display 自身进入全屏） ===================== */
+
+/* 隐藏设置态：⚙ 给 main.main 加 .setup-hidden，收起顶部的灵敏度/达标值设置卡 */
+main.main.setup-hidden > .settings {
+  display: none;
+}
+
+/* 舞台自身全屏：UA 已给出 100% 宽高，这里只需保证最小高度 */
+.display:fullscreen,
+.display:-webkit-full-screen,
+.display.edutf-solo{
+  min-height: 100vh;
+}
+.display:fullscreen #ring,
+.display:-webkit-full-screen #ring,
+.display.edutf-solo #ring{
+  width: min(44vh, 400px);
+}
+.display:fullscreen .ring-content,
+.display:-webkit-full-screen .ring-content,
+.display.edutf-solo .ring-content{
+  top: 44%;
+}
+.display:fullscreen .ring-content .score,
+.display:-webkit-full-screen .ring-content .score,
+.display.edutf-solo .ring-content .score{
+  font-size: clamp(96px, 16vh, 150px);
+}
+.display:fullscreen .status,
+.display:-webkit-full-screen .status,
+.display.edutf-solo .status{
+  top: 74%;
+  font-size: clamp(19px, 3vh, 26px);
+}
+
+/* ===================== 8. 窄屏适配 ===================== */
+
+@media (max-width: 640px) {
+  main.main {
+    padding: 18px 14px 48px;
+  }
+  main.main > .display {
+    min-height: 400px;
+  }
+  #ring {
+    width: min(68vw, 230px);
+  }
+  .ring-content .score {
+    font-size: 76px;
+  }
+  .display .status {
+    font-size: 15px;
+  }
+  .canvas {
+    height: 140px;
+  }
+}

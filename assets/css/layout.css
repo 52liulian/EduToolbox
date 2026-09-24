@@ -1,0 +1,611 @@
+/* ============================================================================
+ * EduToolbox · layout.css
+ * 职责：站点顶栏、顶栏下拉菜单、主体布局 grid、分类侧栏、面包屑、
+ *       返回按钮、自研工具运行页（header + iframe 自适应）、页脚
+ * 依赖：base.css
+ * ========================================================================== */
+
+/* ---------------------------------------------------------------------------
+ * 1. 站点顶栏
+ * ------------------------------------------------------------------------- */
+.topnav {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: rgba(255, 255, 255, 0.88);
+  backdrop-filter: saturate(180%) blur(14px);
+  -webkit-backdrop-filter: saturate(180%) blur(14px);
+  border-bottom: 1px solid var(--border);
+  transition: background-color var(--t) var(--ease),
+              border-color var(--t) var(--ease);
+}
+
+body.dark .topnav { background: rgba(20, 24, 33, 0.85); }
+
+.topnav-inner {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+  height: var(--topnav-h);
+}
+
+/* Logo */
+.logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.logo:hover { color: inherit; }
+
+.logo-mark {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  font-size: 26px;
+  color: inherit;
+  background: transparent;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.logo-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.15;
+}
+
+.logo-text strong {
+  font-size: 18px;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  color: var(--text-1);
+}
+
+.logo-text small {
+  font-size: 12px;
+  color: var(--text-3);
+}
+
+/* 主导航 */
+.nav {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  flex: 1;
+}
+
+.nav-link {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 8px 16px;
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--text-2);
+  border-radius: var(--r-pill);
+  transition: all var(--t-fast) var(--ease);
+  white-space: nowrap;
+}
+
+.nav-link:hover {
+  color: var(--primary);
+  background: var(--primary-soft);
+}
+
+.nav-link.active {
+  color: var(--primary);
+  background: var(--primary-soft);
+  font-weight: 600;
+}
+
+.caret {
+  display: inline-block;
+  width: 0;
+  height: 0;
+  margin-left: 4px;
+  vertical-align: middle;
+  border: 4px solid transparent;
+  border-top-color: currentColor;
+  border-bottom: none;
+  transition: transform var(--t-fast) var(--ease);
+}
+
+.nav-dropdown.open .caret { transform: rotate(180deg); }
+
+/* 顶栏右侧操作 */
+.topnav-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+.submit-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 9px 18px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-1);
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--r-pill);
+  box-shadow: var(--shadow-sm);
+  transition: all var(--t-fast) var(--ease);
+  white-space: nowrap;
+}
+
+.submit-btn:hover {
+  color: var(--primary);
+  border-color: var(--primary-soft-2);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow);
+}
+
+/* 圆形图标按钮：深浅色（#themeBtn）+ 配色主题（#accentBtn）共用同一套视觉，
+   保证顶栏两个图标的大小、间距、hover 完全一致。 */
+.theme-btn,
+.accent-btn {
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  font-size: 17px;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  box-shadow: var(--shadow-sm);
+  transition: all var(--t-fast) var(--ease);
+}
+
+.theme-btn:hover,
+.accent-btn:hover {
+  transform: translateY(-1px) rotate(15deg);
+  box-shadow: var(--shadow);
+}
+
+/* ---------------------------------------------------------------------------
+ * 2. 顶栏下拉菜单
+ * ------------------------------------------------------------------------- */
+.nav-dropdown { position: relative; }
+
+.dropdown-menu {
+  position: absolute;
+  top: calc(100% + 12px);
+  left: 50%;
+  transform: translateX(-50%) translateY(-6px);
+  min-width: 248px;
+  max-width: min(320px, 86vw);
+  padding: 8px;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  box-shadow: var(--shadow-lg);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: all var(--t-fast) var(--ease);
+  z-index: 200;
+}
+
+/* 悬停展开（桌面） */
+@media (hover: hover) {
+  .nav-dropdown:hover .dropdown-menu {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    transform: translateX(-50%) translateY(0);
+  }
+  .nav-dropdown:hover .caret { transform: rotate(180deg); }
+}
+
+/* 触屏/点击展开 */
+.nav-dropdown.open .dropdown-menu {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transform: translateX(-50%) translateY(0);
+}
+
+/* 长菜单（分类很多时）整体可滚动但不撑破视口 —— 唯一允许滚动的弹层 */
+.dropdown-menu {
+  max-height: min(70vh, 560px);
+  overflow-y: auto;
+}
+
+.dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 12px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-2);
+  border-radius: var(--r-sm);
+  transition: all var(--t-fast) var(--ease);
+}
+
+.dropdown-item:hover {
+  color: var(--primary);
+  background: var(--primary-soft);
+}
+
+.dropdown-item-icon {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  font-size: 16px;
+  background: var(--bg-soft);
+  border-radius: 9px;
+  flex-shrink: 0;
+}
+
+.dropdown-item:hover .dropdown-item-icon {
+  background: #fff;
+  transform: scale(1.06);
+}
+
+body.dark .dropdown-item:hover .dropdown-item-icon { background: var(--primary-soft); }
+
+.dropdown-item-count {
+  margin-left: auto;
+  font-size: 12px;
+  color: var(--text-3);
+}
+
+/* ---------------------------------------------------------------------------
+ * 3. 主体布局
+ * ------------------------------------------------------------------------- */
+.main { padding: 28px 0 64px; flex: 1; }
+
+.layout {
+  display: grid;
+  grid-template-columns: 232px minmax(0, 1fr);
+  gap: 28px;
+  align-items: start;
+}
+
+.layout.no-sidebar { grid-template-columns: minmax(0, 1fr); }
+
+/* 分类侧栏 */
+.sidebar {
+  position: sticky;
+  top: calc(var(--topnav-h) + 20px);
+  padding: 14px;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  box-shadow: var(--shadow-sm);
+}
+
+.sidebar-title {
+  padding: 6px 10px 12px;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-1);
+}
+
+.cat-list li + li { margin-top: 2px; }
+
+.cat-item {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 9px 12px;
+  font-size: 14px;
+  color: var(--text-2);
+  border-radius: var(--r-sm);
+  transition: all var(--t-fast) var(--ease);
+}
+
+.cat-item:hover {
+  color: var(--primary);
+  background: var(--primary-soft);
+}
+
+.cat-item.active {
+  color: #fff;
+  background: var(--primary-grad);
+  font-weight: 600;
+  box-shadow: var(--shadow-primary);
+}
+
+.cat-icon { font-size: 16px; }
+.cat-name { flex: 1; }
+
+.cat-count {
+  font-size: 12px;
+  color: var(--text-3);
+  padding: 1px 8px;
+  background: var(--bg-soft);
+  border-radius: var(--r-pill);
+}
+
+.cat-item.active .cat-count {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.22);
+}
+
+/* 内容列 */
+.content { min-width: 0; }
+
+.content-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.content-head h2 { font-size: 22px; }
+
+.result-count {
+  font-size: 13px;
+  color: var(--text-3);
+}
+
+/* ---------------------------------------------------------------------------
+ * 4. 面包屑 / 返回按钮 / 分类页头部
+ * ------------------------------------------------------------------------- */
+.cp-breadcrumb,
+.breadcrumb {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--text-3);
+  margin-bottom: 16px;
+}
+
+.cp-breadcrumb a,
+.breadcrumb a {
+  color: var(--text-2);
+  transition: color var(--t-fast) var(--ease);
+}
+
+.cp-breadcrumb a:hover,
+.breadcrumb a:hover { color: var(--primary); }
+
+.cp-breadcrumb .sep,
+.breadcrumb .sep { color: var(--text-3); }
+
+.cp-breadcrumb-cur,
+.breadcrumb .current { color: var(--text-1); font-weight: 500; }
+
+.cp-breadcrumb-static { margin-bottom: 14px; }
+
+.back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 18px;
+  padding: 9px 20px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-2);
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--r-pill);
+  box-shadow: var(--shadow-sm);
+  transition: all var(--t-fast) var(--ease);
+}
+
+.back-btn:hover {
+  color: var(--primary);
+  border-color: var(--primary-soft-2);
+  transform: translateX(-2px);
+}
+
+/* 分类页动态头部：面包屑左对齐，标题副标题居中 */
+.category-page-header {
+  margin-bottom: 26px;
+  text-align: center;
+}
+
+.category-page-header .cp-breadcrumb {
+  justify-content: flex-start;
+}
+
+.category-page-header .cp-title {
+  text-align: center;
+}
+
+.category-page-header .cp-desc {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.cp-title {
+  font-size: clamp(26px, 3.4vw, 36px);
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  margin-bottom: 10px;
+}
+
+.cp-desc {
+  font-size: 15px;
+  color: var(--text-2);
+  max-width: 760px;
+}
+
+/* ---------------------------------------------------------------------------
+ * 5. 自研工具运行页（iframe 高度自适应：不设固定高度，不出现内部滚动条）
+ * ------------------------------------------------------------------------- */
+.tool-run-header {
+  padding: 28px 32px;
+  margin-bottom: 22px;
+  text-align: center;
+  background: var(--primary-grad);
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow-primary);
+  color: #fff;
+}
+
+.tool-run-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.tool-run-icon { font-size: 38px; line-height: 1; }
+
+.tool-run-title-row h1 {
+  color: #fff;
+  font-size: clamp(24px, 3vw, 32px);
+  font-weight: 800;
+}
+
+.tool-run-badge {
+  padding: 3px 12px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #fff;
+  background: rgba(255, 255, 255, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  border-radius: var(--r-pill);
+}
+
+.tool-run-sub {
+  color: rgba(255, 255, 255, 0.92);
+  font-size: 14.5px;
+  line-height: 1.7;
+  max-width: 880px;
+  margin: 0 auto 14px;
+}
+
+.tool-run-features {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+}
+
+.tool-feature {
+  padding: 6px 16px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #fff;
+  background: rgba(255, 255, 255, 0.18);
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  border-radius: var(--r-pill);
+}
+
+/* iframe 外框：随工具内容自动撑高（router.js 用 ResizeObserver 同步高度） */
+.tool-iframe-wrap {
+  position: relative;
+  width: 100%;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow);
+  overflow: hidden; /* 裁掉 iframe 圆角；高度随内容增长，不产生滚动条 */
+}
+
+#toolIframe {
+  display: block;
+  width: 100%;
+  min-width: 100%;
+  border: 0;
+  /* JS 按内容实际高度同步（file:// 由 frame-bridge 上报）；
+     这里只留一个「上报到达前」的最小展示区，绝不设固定高度 —— 工具区必须
+     随内容自动撑开。矮工具用较小兜底值，避免被撑出一截空白。 */
+  min-height: 360px;
+  background: var(--bg);
+  overflow: hidden; /* 正常高度同步下不显示 iframe 内滚动条 */
+}
+
+/* iframe 桥降级「伪全屏」：file:// 下 iframe 内 requestFullscreen 被权限策略
+   拒绝时，由 router.js 给外框加 .fs-pseudo，铺满视口模拟全屏（Esc 退出）。
+   z-index 1000 与站点模态层同级，可覆盖 .topnav(100)。 */
+.tool-iframe-wrap.fs-pseudo {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+  background: var(--bg);
+}
+.tool-iframe-wrap.fs-pseudo #toolIframe {
+  width: 100%;
+  height: 100% !important; /* JS 同步的高度让位于视口铺满 */
+  min-height: 0 !important;
+}
+
+/* ---------------------------------------------------------------------------
+ * 6. 通用页面（.page 切换由 router 控制 hidden）
+ * ------------------------------------------------------------------------- */
+.page { padding-bottom: 64px; }
+
+.page-title {
+  font-size: clamp(24px, 3vw, 32px);
+  font-weight: 800;
+  margin-bottom: 8px;
+}
+
+.page-desc {
+  font-size: 15px;
+  color: var(--text-2);
+  margin-bottom: 28px;
+}
+
+/* 空状态（布局兜底，主要样式见 components.css） */
+.empty-state { margin-top: 60px; }
+
+/* ---------------------------------------------------------------------------
+ * 7. 页脚
+ * ------------------------------------------------------------------------- */
+#app {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.footer {
+  margin-top: auto;
+  padding: 40px 0 48px;
+  background: var(--card-bg);
+  border-top: 1px solid var(--border);
+  color: var(--text-3);
+}
+
+.footer-inner {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 40px;
+  flex-wrap: wrap;
+}
+
+.footer strong {
+  display: block;
+  font-size: 16px;
+  color: var(--text-1);
+  margin-bottom: 8px;
+}
+
+.footer p {
+  max-width: 560px;
+  font-size: 13px;
+  line-height: 1.8;
+}
+
+.footer-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 22px;
+  font-size: 14px;
+}
+
+.footer-links a { color: var(--text-2); }
+.footer-links a:hover { color: var(--primary); }

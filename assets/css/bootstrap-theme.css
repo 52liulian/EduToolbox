@@ -1,0 +1,126 @@
+/**
+ * EduToolbox · Bootstrap 5 主题映射
+ * ============================================================================
+ * 作用：让 Bootstrap 5 组件的默认外观与站点既有设计体系保持一致（保持风格不变）。
+ * 加载顺序：bootstrap.min.css -> bootstrap-theme.css -> base.css -> 其余自定义 CSS
+ *         （后加载的自定义 CSS 仍拥有更高优先级，视觉以站点设计为准）
+ * 机制：把 Bootstrap 的 --bs-* 变量映射到站点 base.css 的变量，并对少量
+ *       未由自定义样式覆盖的 Bootstrap 组件（下拉/徽章/面包屑/列表组/导航）做微调。
+ * ============================================================================
+ */
+:root {
+  /* 主色调映射到站点主题色 */
+  --bs-primary: #3b6ef6;
+  --bs-primary-rgb: 59, 110, 246;
+  --bs-link-color: #3b6ef6;
+  --bs-link-color-rgb: 59, 110, 246;
+  --bs-link-hover-color: #2f5ee0;
+
+  /* 中性色与站点骨架色对齐 */
+  --bs-body-bg: #eef2fa;
+  --bs-body-color: #1f2733;
+  --bs-secondary-color: #515b6b;
+  --bs-tertiary-color: #8a93a3;
+  --bs-border-color: #dbe4ff;
+  --bs-border-radius: 0.6rem;
+  --bs-border-radius-lg: 0.85rem;
+  --bs-border-radius-sm: 0.4rem;
+
+  /* 字体栈与站点一致 */
+  --bs-body-font-family: -apple-system, BlinkMacSystemFont, "Segoe UI",
+    "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", system-ui, sans-serif;
+  --bs-body-font-size: 0.95rem;
+}
+
+/* ===== 深色模式：跟随站点 body.dark 重新映射 ===== */
+body.dark {
+  --bs-primary: #5b8bff;
+  --bs-primary-rgb: 91, 139, 255;
+  --bs-link-color: #7ea3ff;
+  --bs-link-color-rgb: 126, 163, 255;
+  --bs-link-hover-color: #a8c1ff;
+  --bs-body-bg: #141821;
+  --bs-body-color: #e7ecf5;
+  --bs-secondary-color: #aeb8c9;
+  --bs-border-color: #2a3a60;
+}
+
+/* ===== 顶栏下拉：站点用 opacity/visibility 控制显隐，需抵消 Bootstrap 的 display:none =====
+ * 站点 .nav-dropdown 的下拉菜单（layout.css）通过 opacity/visibility/pointer-events 过渡显隐，
+ * 从不设置 display；而 Bootstrap 的 .dropdown-menu 默认 display:none，会一直生效把菜单彻底隐藏，
+ * 导致 hover / 点击 .open 都"无反应"。此处仅把站点导航内的下拉恢复为 block，
+ * 作用域限定为 .nav-dropdown，不影响未来使用 Bootstrap 原生下拉组件（依赖 .show 切换 display）。
+ */
+.nav-dropdown .dropdown-menu {
+  display: block;
+}
+
+/* ===== 组件级微调（未被自定义 CSS 覆盖的部分） ===== */
+
+/* 下拉菜单：与站点圆角/阴影协调 */
+.dropdown-menu {
+  border: 1px solid var(--bs-border-color);
+  border-radius: var(--bs-border-radius-lg);
+  box-shadow: 0 12px 30px rgba(20, 30, 60, 0.12);
+  padding: 6px;
+}
+.dropdown-item {
+  border-radius: 0.5rem;
+  font-size: 0.9rem;
+  padding: 0.45rem 0.9rem;
+}
+.dropdown-item:hover,
+.dropdown-item:focus {
+  background: #eef2fe;
+  color: var(--bs-primary);
+}
+body.dark .dropdown-item:hover,
+body.dark .dropdown-item:focus {
+  background: #23304f;
+  color: #a8c1ff;
+}
+
+/* 徽章：与站点 tag 的柔和风格接近 */
+.badge {
+  font-weight: 500;
+  letter-spacing: 0.3px;
+}
+
+/* 面包屑分隔符颜色随主题 */
+.breadcrumb-item + .breadcrumb-item::before {
+  color: var(--bs-tertiary-color);
+}
+
+/* 列表组：柔和圆角 */
+.list-group-item {
+  border-color: var(--bs-border-color);
+}
+.list-group-item.active {
+  background: var(--bs-primary);
+  border-color: var(--bs-primary);
+}
+
+/* 按钮统一圆角与过渡（站点细节另由自定义 CSS 覆盖） */
+.btn {
+  --bs-btn-border-radius: 0.55rem;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, color 0.15s ease,
+    background-color 0.15s ease, border-color 0.15s ease;
+}
+.btn:hover { transform: translateY(-1px); }
+
+/* 卡片：柔和阴影 */
+.card {
+  border-color: var(--bs-border-color);
+  border-radius: var(--bs-border-radius-lg);
+  box-shadow: 0 6px 18px rgba(30, 42, 80, 0.06);
+}
+
+/* 表单控件：聚焦色随主题 */
+.form-control:focus,
+.form-select:focus {
+  border-color: var(--bs-primary);
+  box-shadow: 0 0 0 0.2rem rgba(var(--bs-primary-rgb), 0.12);
+}
+
+/* 模态/弹层遮罩统一站点深色 */
+.modal-backdrop { background: rgba(9, 14, 26, 0.55); }

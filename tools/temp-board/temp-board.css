@@ -1,0 +1,211 @@
+/* ============================================================================
+ * temp-board.css · 课堂临时记录板（专属样式）
+ * ----------------------------------------------------------------------------
+ * 依赖底座：../../assets/css/tool-common.css（后加载，同特异性底座胜出，
+ *           本文件用 #id / #stage[data-board] / :fullscreen 提高特异性）
+ * 内容分区：
+ *   1. 页面布局（工具栏 / 舞台 / 状态条）
+ *   2. 工具栏：主题圆点 / 字号控制
+ *   3. 大字记录板（contenteditable，自动撑高，允许占位提示）
+ *   4. 三种板面主题：白板 / 黑板 / 绿板（深色仅作用于舞台，页面保持浅色）
+ *   5. 状态条
+ *   6. 全屏投影：舞台 fixed 铺满视口，工具栏滑出/自动隐藏
+ * 高度策略：舞台与记录板全部 auto + min-height 自然撑开，仅 body 主滚动条；
+ *           仅全屏投影时才使用 position:fixed; inset:0。
+ * ========================================================================== */
+
+/* ---------------------------------------------------------------------------
+ * 1. 页面布局
+ * ------------------------------------------------------------------------- */
+
+/* 工具栏居中限宽（底座 .toolbar 已提供卡片外观） */
+#toolbar {
+  max-width: 1400px;
+  margin: 18px auto 16px;
+  flex-wrap: wrap;
+  row-gap: 12px;
+}
+
+/* 「隐藏设置」（舞台右上角工具栏的 ⚙）：隐藏顶部工具条，只留记录板 */
+#toolbar.setup-hidden { display: none; }
+
+/* 舞台居中限宽，预留更高的书写区域 */
+#stage {
+  max-width: 1400px;
+  margin: 0 auto;
+  min-height: 0;
+  padding: 0;                 /* 由内部记录板承担内边距 */
+  transition: background var(--t) var(--ease), border-color var(--t) var(--ease);
+}
+
+/* 状态条 */
+#status {
+  display: block;
+  max-width: 1400px;
+  margin: 12px auto 0;
+  padding: 0 6px 28px;
+  text-align: center;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-3);
+}
+
+/* ---------------------------------------------------------------------------
+ * 2. 工具栏：主题圆点 / 字号控制
+ * ------------------------------------------------------------------------- */
+.tool-label {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--text-2);
+  white-space: nowrap;
+}
+
+/* 主题圆点：颜色由按钮内联 --c 变量提供（白 / 黑 / 绿） */
+#toolbar .theme-dot {
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  background: var(--c, #fff);
+  border: 2px solid var(--border-2);
+  border-radius: 50%;
+  cursor: pointer;
+  box-shadow: none;
+  transition: transform var(--t-fast) var(--ease), box-shadow var(--t-fast) var(--ease),
+              border-color var(--t-fast) var(--ease);
+}
+
+#toolbar .theme-dot:hover { transform: scale(1.12); }
+
+#toolbar .theme-dot.active {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px var(--primary-soft);
+  transform: scale(1.1);
+}
+
+/* 字号显示值 */
+.size-val {
+  min-width: 38px;
+  text-align: center;
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--primary);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------------------------------------------------------------------------
+ * 3. 大字记录板
+ * ------------------------------------------------------------------------- */
+#board {
+  width: 100%;
+  min-height: 62vh;   /* 内容增多时继续向下撑开，不设固定高度、不出滚动条 */
+  padding: 34px clamp(22px, 4vw, 52px) 46px;
+  font-size: var(--font-size, 32px);
+  line-height: 1.7;
+  letter-spacing: 0.02em;
+  color: var(--text-1);
+  white-space: pre-wrap;       /* 保留换行 */
+  word-break: break-word;
+  overflow-wrap: break-word;
+  outline: none;
+  caret-color: var(--primary);
+  transition: color var(--t) var(--ease);
+}
+
+/* 空内容时显示 data-placeholder 提示（contenteditable 专用） */
+#board:empty::before {
+  content: attr(data-placeholder);
+  color: var(--text-3);
+  opacity: 0.7;
+  pointer-events: none;
+}
+
+/* 编辑中舞台描边轻微高亮 */
+#stage:focus-within {
+  border-color: var(--primary-soft-2);
+  box-shadow: var(--shadow-lg);
+}
+
+/* ---------------------------------------------------------------------------
+ * 4. 板面主题（#stage[data-board]；深色板面只改变舞台，整页 body 保持浅色）
+ * ------------------------------------------------------------------------- */
+
+/* 白板（默认） */
+#stage[data-board="white"] {
+  background: #ffffff;
+  border-color: var(--border);
+}
+#stage[data-board="white"] #board { color: var(--text-1); caret-color: var(--primary); }
+
+/* 黑板 */
+#stage[data-board="black"] {
+  background: #1a1a1a;
+  border-color: #3a3a3a;
+  box-shadow: 0 18px 44px rgba(0, 0, 0, 0.28);
+}
+#stage[data-board="black"] #board { color: #f5f3ee; caret-color: #f5f3ee; }
+#stage[data-board="black"] #board:empty::before { color: rgba(245, 243, 238, 0.45); }
+#stage[data-board="black"]:focus-within { border-color: #555; }
+
+/* 绿板（教室常见墨绿黑板 + 粉笔字色） */
+#stage[data-board="green"] {
+  background: #1f4d2e;
+  border-color: #2d6640;
+  box-shadow: 0 18px 44px rgba(18, 66, 38, 0.3);
+}
+#stage[data-board="green"] #board { color: #eaf5dd; caret-color: #eaf5dd; }
+#stage[data-board="green"] #board:empty::before { color: rgba(234, 245, 221, 0.45); }
+#stage[data-board="green"]:focus-within { border-color: #4c8a62; }
+
+/* ---------------------------------------------------------------------------
+ * 5. 状态条保存态
+ * ------------------------------------------------------------------------- */
+#status.saving {
+  color: var(--primary);
+  font-weight: 700;
+}
+#status.saving::before {
+  content: "● ";
+  animation: status-blink 0.9s var(--ease) infinite;
+}
+@keyframes status-blink {
+  0%, 100% { opacity: 0.25; }
+  50%      { opacity: 1; }
+}
+
+/* ---------------------------------------------------------------------------
+ * 6. 响应式（小屏工具栏折行）
+ * ------------------------------------------------------------------------- */
+@media (max-width: 640px) {
+  #toolbar { justify-content: center; margin-top: 12px; }
+  #board { min-height: 56vh; padding: 22px 18px 34px; }
+}
+
+/* ---------------------------------------------------------------------------
+ * 7. 全屏投影模式：舞台 #stage 自身进入全屏，铺满整屏
+ * ------------------------------------------------------------------------- */
+#stage:fullscreen,
+#stage:-webkit-full-screen,
+#stage.edutf-solo{
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  max-width: none;
+  margin: 0;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+  overflow-y: auto;          /* 全屏投影允许长内容滚动 */
+}
+
+#stage:fullscreen #board,
+#stage:-webkit-full-screen #board,
+#stage.edutf-solo #board{
+  min-height: 100vh;
+  padding: 5vh 6vw;
+  display: flex;
+  flex-direction: column;
+  justify-content: safe center;  /* 短内容居中、长内容从顶部开始不裁切 */
+}
+
+/* 说明：全屏目标已改为舞台 #stage 自身，#toolbar / #status 不在全屏子树内，
+        原「鼠标移到顶部呼出工具栏」的投影样式已不再生效，故移除。 */

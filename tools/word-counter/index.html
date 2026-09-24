@@ -1,0 +1,37 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>在线字数统计</title>
+<link rel="stylesheet" href="word-counter.css">
+<link rel="stylesheet" href="../../assets/css/tool-common.css">
+</head>
+<body>
+<div class="container">
+  <div class="controls">
+    <label class="chk"><input type="checkbox" id="optNoPunct"> 排除标点符号</label>
+    <label class="chk"><input type="checkbox" id="optNoSpace"> 排除空格</label>
+    <label class="chk"><input type="checkbox" id="optNoLine"> 排除换行</label>
+  </div>
+
+  <textarea id="wc-input" placeholder="在此粘贴或输入需要统计的文本…"></textarea>
+
+  <div class="stats-grid">
+    <div class="stat-card"><span class="stat-num" id="s-zh">0</span><span class="stat-label">中文字数</span></div>
+    <div class="stat-card"><span class="stat-num" id="s-en">0</span><span class="stat-label">英文字符</span></div>
+    <div class="stat-card"><span class="stat-num" id="s-digit">0</span><span class="stat-label">数字字符</span></div>
+    <div class="stat-card"><span class="stat-num" id="s-total">0</span><span class="stat-label">总字符数</span></div>
+    <div class="stat-card"><span class="stat-num" id="s-line">0</span><span class="stat-label">行数</span></div>
+    <div class="stat-card"><span class="stat-num" id="s-para">0</span><span class="stat-label">段落数</span></div>
+  </div>
+
+  <div class="actions">
+    <button class="btn btn-ghost" id="btn-copy">复制统计结果</button>
+    <button class="btn btn-ghost" id="btn-clear">清空</button>
+  </div>
+</div>
+<script src="../../assets/js/frame-bridge.js"></script>
+<script src="word-counter.js"></script>
+</body>
+</html>

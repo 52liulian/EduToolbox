@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>随机点名 | EduToolbox · 课堂点名工具</title>
+<meta name="description" content="输入学生名单，一键随机点名，支持本轮不重复与已点名标记，适合课堂提问与互动。本地处理，隐私安全，离线可用。">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%8E%93%3C/text%3E%3C/svg%3E">
+<link rel="stylesheet" href="random-call.css">
+<link rel="stylesheet" href="../../assets/css/tool-common.css">
+</head>
+<body>
+<div id="app">
+  <!-- 顶栏 -->
+
+  <main class="main">
+    <!-- 左侧：设置面板 -->
+    <section class="setup-panel" id="setupPanel">
+      <!-- 名单设置 -->
+      <div class="block">
+        <h2 class="block-title">📋 名单列表</h2>
+        <p class="block-hint">每行一个姓名，支持从 Excel/文本复制粘贴</p>
+        <textarea id="participants" placeholder="张三&#10;李四&#10;王五&#10;...">张三
+李四
+王五
+赵六
+钱七
+孙八
+周九
+吴十
+郑十一
+王十二
+刘十三
+陈十四
+杨十五</textarea>
+        <div class="count-bar">
+          共 <span id="count">13</span> 人
+          <button class="btn-mini" id="dedupBtn" title="去重">去重</button>
+          <button class="btn-mini" id="sortBtn" title="排序">排序</button>
+          <button class="btn-mini" id="clearBtn" title="清空">清空</button>
+        </div>
+        <div class="button-group">
+          <button class="btn-mini" id="importBtn">📥 导入</button>
+          <input type="file" id="fileInput" accept=".txt,.csv" hidden>
+          <button class="btn-mini" id="exportBtn">📤 导出</button>
+        </div>
+      </div>
+
+      <!-- 点名设置 -->
+      <div class="block">
+        <h2 class="block-title">⚙️ 点名设置</h2>
+        <label class="check-line">
+          <input type="checkbox" id="voiceEnabled" checked>
+          <span>🔊 播报姓名</span>
+        </label>
+        <label class="check-line">
+          <input type="checkbox" id="removeAfter" checked>
+          <span>🗑️ 点中后移除（本轮不重复）</span>
+        </label>
+        <div class="slider-line">
+          <label for="speed">滚动速度</label>
+          <input type="range" id="speed" min="30" max="300" value="50" step="10">
+          <span class="val" id="speedVal">50</span>ms
+        </div>
+      </div>
+
+      <!-- 历史记录 -->
+      <div class="block">
+        <h2 class="block-title">
+          📝 历史记录 (<span id="recordCount">0</span>)
+        </h2>
+        <ul id="recordList" class="record-list">
+          <li class="state state--list-item state--empty"><div class="state-icon">🎲</div><div class="state-title">暂无记录</div></li>
+        </ul>
+        <div class="button-group">
+          <button class="btn-mini" id="copyRecord">📋 复制</button>
+          <button class="btn-mini" id="clearRecord">🗑 清空</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- 右侧：点名舞台 -->
+    <section class="stage" id="stage">
+      <!-- 工具栏 -->
+      <div class="stage-toolbar">
+        <button class="icon-btn" id="fullscreenBtn" title="全屏">⛶</button>
+        <button class="icon-btn" id="hideSetupBtn" title="隐藏设置">⚙</button>
+      </div>
+
+      <!-- 流体背景 -->
+      <canvas id="bgCanvas" class="bg-canvas"></canvas>
+
+      <!-- 中央展示 -->
+      <div class="display">
+        <div class="name-display" id="nameDisplay">准备点名</div>
+        <div class="display-hint" id="displayHint">点击下方按钮或按 Space / PageDown 开始</div>
+        <button class="btn-start" id="startBtn">开始点名</button>
+        <p class="key-hint">按 <kbd>Space</kbd> 或 <kbd>PageDown</kbd> 开始/停止</p>
+      </div>
+    </section>
+  </main>
+</div>
+
+<script src="../../assets/js/frame-bridge.js"></script>
+<script src="../../assets/js/tool-stage-toolbar.js"></script>
+<script src="random-call.js"></script>
+</body>
+</html>

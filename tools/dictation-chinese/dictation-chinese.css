@@ -1,0 +1,99 @@
+/* ============================================================
+ * EduToolbox · 语文听写报词助手 dictation-chinese.css
+ * 依赖公共底座 tool-common.css（本文件应在其后加载）
+ * ============================================================ */
+
+/* ---------- 主题变量（JS 轮换主色） ---------- */
+body{ --acc:#3b6ef6; --acc-soft:#e8edff; }
+body[data-theme="sky"]   { --primary:#0ea5e9; --primary-soft:#e0f2fe; --primary-soft-2:#ccecfc; --primary-grad:linear-gradient(135deg,#38bdf8,#0ea5e9,#0284c7); }
+body[data-theme="violet"]{ --primary:#7c3aed; --primary-soft:#f0e9fe; --primary-soft-2:#e2d5fc; --primary-grad:linear-gradient(135deg,#8b5cf6,#7c3aed,#6d28d9); }
+body[data-theme="green"]{ --primary:#16a34a; --primary-soft:#e7f6ec; --primary-soft-2:#d3f0dc; --primary-grad:linear-gradient(135deg,#22c55e,#16a34a,#15803d); }
+body[data-theme="gold"] { --primary:#d97706; --primary-soft:#fdf1dc; --primary-soft-2:#fbe3bc; --primary-grad:linear-gradient(135deg,#f59e0b,#d97706,#b45309); }
+body[data-theme="orange"]{ --primary:#ea580c; --primary-soft:#ffefe4; --primary-soft-2:#ffdec9; --primary-grad:linear-gradient(135deg,#fb923c,#ea580c,#c2410c); }
+body[data-theme="pink"] { --primary:#db2777; --primary-soft:#fce7f0; --primary-soft-2:#f9cfe1; --primary-grad:linear-gradient(135deg,#f472b6,#db2777,#be185d); }
+
+/* ---------- 工作台两栏 ---------- */
+.workbench{ display:grid; grid-template-columns:minmax(280px,340px) minmax(0,1fr); gap:18px; margin-top:18px; align-items:start; }
+/* position:relative —— 舞台右上角 .stage-toolbar 的绝对定位基准 */
+.stage-panel{
+  position:relative;
+  background:var(--card-bg); border:1px solid var(--border);
+  border-radius:var(--r-lg); box-shadow:var(--shadow); padding:20px; min-width:0;
+}
+/* padding-right 为右上角 ⛶⚙ 工具栏（40+8+40=88px）留出避让空间 */
+.stage-head{ display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:14px; padding-right:96px; }
+.stage-head .panel-title{ margin-bottom:0; }
+.stage-ok{ font-size:12px; padding:3px 12px; border-radius:99px; background:var(--primary-soft); color:var(--primary); font-weight:600; }
+
+/* ---------- 面板细节 ---------- */
+.text-input{
+  width:100%; font-family:inherit; font-size:14px; padding:9px 12px;
+  border:1.5px solid var(--border); border-radius:10px;
+  background:#fafbfe; color:var(--text-1); margin-bottom:8px; transition:.15s;
+}
+.text-input:focus{ outline:none; border-color:var(--primary); box-shadow:0 0 0 3px var(--primary-soft); }
+textarea.text-input{ resize:vertical; line-height:1.6; font-family:inherit; }
+.text-input.sel{ width:100%; cursor:pointer; margin-bottom:0; }
+.field.row{ display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:8px; }
+.field label{ font-size:13px; color:var(--text-2); font-weight:600; }
+.field .text-input{ width:130px; flex-shrink:0; }
+.check{ display:flex; align-items:flex-start; gap:8px; font-size:13px; color:var(--text-2); margin:6px 0; cursor:pointer; line-height:1.5; }
+.check input{ margin-top:3px; accent-color:var(--primary); width:16px; height:16px; }
+.chips-mini{ margin-top:8px; }
+.chips-mini .chip{ font-size:12px; padding:6px 12px; }
+.setup-panel .actions{ margin-top:16px; flex-direction:row; flex-wrap:wrap; }
+.setup-panel .actions .btn{ flex:1 1 auto; }
+.setup-panel .actions .btn-primary{ flex-basis:100%; }
+
+/* ---------- 舞台状态 ---------- */
+.stage-ready,.stage-done{ text-align:center; padding:50px 20px; }
+.ready-icon,.done-icon{ font-size:52px; }
+.ready-title,.done-title{ font-size:22px; font-weight:800; margin:10px 0 4px; }
+.ready-desc,.done-desc{ font-size:14px; color:var(--text-3); }
+.stage-done .done-desc{ margin-bottom:18px; }
+.done-actions{ display:flex; gap:10px; justify-content:center; }
+
+.stage-running{ text-align:center; padding:8px 10px 20px; }
+.progress-line{ height:8px; background:var(--line-2,#eef0f6); border-radius:99px; overflow:hidden; margin-bottom:22px; }
+.progress-bar{ height:100%; width:0; background:var(--primary-grad); border-radius:99px; transition:width .4s var(--ease); }
+.big-index{ font-size:15px; color:var(--text-3); font-weight:600; letter-spacing:.06em; }
+.big-word{
+  font-size:clamp(64px,14vw,150px); font-weight:900; line-height:1.08; margin:12px 0 4px;
+  color:var(--text-1); font-family:"Kaiti SC","STKaiti","KaiTi","SimSun",serif; letter-spacing:.08em;
+  min-height:1.1em;
+}
+.word-note{ font-size:clamp(18px,3.6vw,30px); color:var(--primary); font-weight:700; min-height:1.3em; }
+.word-shadow{ font-size:12px; color:var(--text-3); opacity:.55; margin-top:14px; }
+.timer-line{ margin-top:16px; font-size:13px; color:var(--text-3); font-variant-numeric:tabular-nums; }
+
+.stage-tip{ margin-top:14px; font-size:12.5px; color:var(--text-3); text-align:center; }
+
+/* ---------- 响应式 ---------- */
+@media (max-width:880px){ .workbench{ grid-template-columns:1fr; } }
+
+/* ---------- 隐藏设置栏（⚙）：双栏 → 单栏，与 random-call 同构 ---------- */
+.workbench.setup-hidden{ grid-template-columns:minmax(0,1fr); }
+.workbench.setup-hidden .setup-panel{ display:none; }
+
+/* ---------- 舞台全屏（⛶）：全屏目标是 .stage-panel 自身，不是整页 ---------- */
+.stage-panel:fullscreen,
+.stage-panel:-webkit-full-screen,
+.stage-panel.edutf-solo{
+  display:flex; flex-direction:column; justify-content:center; align-items:stretch;
+  min-height:100vh; padding:36px 30px;
+  border-radius:0; border-color:transparent; box-shadow:none;
+  background:var(--card-bg); overflow:auto;
+}
+/* 全屏下工具栏仍可见：贴边 + 半透明，hover 恢复不透明 */
+.stage-panel:fullscreen .stage-toolbar,
+.stage-panel:-webkit-full-screen .stage-toolbar,
+.stage-panel.edutf-solo .stage-toolbar{
+  position:fixed; top:18px; right:22px; z-index:30;
+  opacity:.55; transition:opacity .18s var(--ease);
+}
+.stage-panel:fullscreen .stage-toolbar:hover,
+.stage-panel:-webkit-full-screen .stage-toolbar:hover,
+.stage-panel.edutf-solo .stage-toolbar:hover{ opacity:1; }
+@media print{ .stage-toolbar{ display:none; } }
+
+/* ---------- 打印：安静值/无需打印，保留基础 ---------- */

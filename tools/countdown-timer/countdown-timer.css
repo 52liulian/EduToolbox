@@ -1,0 +1,466 @@
+/* ============================================================================
+ * countdown-timer.css · 极简倒计时（深色霓虹大屏专属样式）
+ * ----------------------------------------------------------------------------
+ * 依赖底座：../../assets/css/tool-common.css（后加载）
+ *   覆盖策略：本工具整体为深色场景，需要压掉底座的浅色 body。注意底座是【后
+ *   加载】的同特异性规则，且在 Shadow DOM 下外部文档树的普通声明会压过影子树
+ *   内的普通声明 —— 所以本文件的页面级覆盖一律走 `body + !important`
+ *   （原理与实测数据见「2. 深色页面底」段注释），不靠堆特异性。
+ * 内容分区：
+ *   1. 强调色变量（霓虹绿兜底；站点配色由 JS 映射，原理见该段注释）
+ *   2. 深色页面底
+ *   3. 设置页（大数字输入 / 微调 / 预设 chips / 开始按钮）
+ *   4. 倒计时大屏（霓虹大字 / 时间到闪烁 / 操作按钮）
+ *   5. 底部细线进度条（最后 10 秒变红）
+ *   6. 全屏投影（Fullscreen API，仅此场景固定视口）
+ *   7. 减弱动效
+ * 高度策略：两屏均 min-height:100vh 内容居中，内容超高时由 body 主滚动条承担。
+ * ========================================================================== */
+
+/* ---------------------------------------------------------------------------
+ * 1. 强调色（--accent 霓虹强调色；--accent-rgb 供 rgba() 辉光使用，逗号分隔）
+ * ----------------------------------------------------------------------------
+ * 颜色来源：站点全局 🎨 配色（顶栏 #accentBtn → localStorage 键 et-accent）。
+ *   映射由 countdown-timer.js 的 applyAccent() 完成：读配色名 → 查工具霓虹色
+ *   调色板 → 把 --accent / --accent-rgb 写成工具根容器的内联自定义属性
+ *   （站点内嵌 = 影子树内层 .tool-page；独立页 = <body>）。
+ *   这里只提供兜底值，两种场景都会命中它：
+ *     ① 用户从未在站点选过配色（et-accent 键不存在）→ JS 不写内联 → 霓虹绿，
+ *        与改造前默认完全一致，视觉不跳变；
+ *     ② 独立页（file:// 双击打开）没有站点配色通道 → 同样是霓虹绿。
+ *
+ * ⚠️ 选择器必须是 body 而不是 html body：内嵌时 rebaseCss 逐个 token 替换，
+ *    `html body` 会变成 `:host :host`（后代选择器），影子树里永不命中。
+ * ⚠️ 不要用 body[data-theme="x"] 写映射表：内嵌时会被重基成
+ *    `:host[data-theme="x"]`，而 :host 的复合选择器写法浏览器不支持（实测
+ *    Edge/Chromium 下 `:host[attr]` 与 `:host[attr]` 均不命中，只有
+ *    `:host([attr])` 函数式写法命中），而该写法在独立页里又永不匹配。
+ * ⚠️ --accent-rgb 必须是 "52, 255, 176" 这种逗号分隔：全文件都以
+ *    rgba(var(--accent-rgb), 0.35) 形式消费，写成空格分隔会导致整条声明失效。
+ * ------------------------------------------------------------------------- */
+body {
+  --accent: #34ffb0;
+  --accent-rgb: 52, 255, 176;
+}
+
+/* ---------------------------------------------------------------------------
+ * 2. 深色页面底
+ * ----------------------------------------------------------------------------
+ * ⚠️ 选择器必须是 body（不能写 html body），且三条声明必须带 !important。
+ *   ① 不用 html body：站点内嵌时 tool-adapter.js 的 rebaseCss 逐个 token 把
+ *      html/body 都换成 :host，`html body` 会变成后代选择器 `:host :host`，
+ *      影子树里永不命中 —— 实测内嵌下整段失效，宿主背景退回 layout.css:504
+ *      `.tool-iframe-wrap{background:var(--card-bg)}` 的白卡片。
+ *   ② 为什么必须 !important（而不是继续提特异性）：
+ *      - 同树场景：index.html 里本文件先、../../assets/css/tool-common.css 后
+ *        加载，底座 72-87 行有同特异性的 body{background:…}；【同特异性时后
+ *        加载者通吃】，只写 body 会被压掉（实测独立页会从 #0a0f1f 掉回 #eef2fa）。
+ *      - 跨树场景：级联在 Shadow DOM 下先比「封装上下文」再比特异性，外部文档
+ *        树的普通声明一律压过影子树内的普通声明。实测往影子树追加
+ *        `:host(.tool-root){background:#0a0f1f}`（0,2,0,0，高于外层
+ *        .tool-iframe-wrap 的 0,1,0,0）依然不生效，加 !important 才命中。
+ *      故这里显式 !important，用途单一且明确：压过后加载底座的同特异性规则，
+ *      不用于解决工具内部的选择器冲突。
+ *   ③ 打印不能跟着变：底座打印段只重置 background（tool-common.css:1906
+ *      `body{background:#fff!important}`），没有重置 color。上面三条 !important
+ *      里只有 background 会被它压回来，color 会一路带进打印媒介，纸上变成
+ *      「白底 + #e8eeff 浅色字」——紧随其后的「2.1 打印修正」负责收掉。
+ * ------------------------------------------------------------------------- */
+body {
+  color: #e8eeff !important;
+  background:
+    radial-gradient(900px 480px at 85% -8%, rgba(var(--accent-rgb), 0.14), transparent 60%),
+    radial-gradient(760px 420px at 8% 4%, rgba(80, 120, 255, 0.12), transparent 58%),
+    #0a0f1f !important;
+  background-attachment: fixed !important;
+  transition: background 0.6s var(--ease);
+}
+
+/* ---------------------------------------------------------------------------
+ * 2.1 打印修正
+ * ----------------------------------------------------------------------------
+ * 承接上一段：那份深色的 !important 会一路带进打印媒介。这里把纸面恢复成
+ * 「白底 + 深字」。与底座打印段（tool-common.css:1906）同为 !important，
+ * 分工不冲突：底座负责刷白背景，本段负责把文字色改回可读的深色。
+ * ------------------------------------------------------------------------- */
+@media print {
+  body {
+    color: #1f2733 !important;
+    background: #fff !important;
+    background-attachment: scroll !important;
+  }
+}
+
+/* 两个屏幕的通用布局：整屏居中列 */
+.screen {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 22px;
+  width: 100%;
+  max-width: 880px;
+  min-height: 100vh;
+  margin: 0 auto;
+  padding: 48px 24px 64px;
+  text-align: center;
+}
+
+/* ---------------------------------------------------------------------------
+ * 3. 设置页
+ * ------------------------------------------------------------------------- */
+.setup-screen .title {
+  font-size: clamp(24px, 3.4vw, 34px);
+  font-weight: 800;
+  color: #fff;
+}
+
+.setup-screen .subtitle {
+  margin-top: -12px;
+  font-size: 14px;
+  letter-spacing: 1px;
+  color: rgba(232, 238, 255, 0.55);
+}
+
+/* 大号分:秒输入 */
+.big-input {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(10px, 2.4vw, 22px);
+}
+
+.big-input input {
+  width: clamp(96px, 20vw, 150px);
+  padding: 14px 10px;
+  font-size: clamp(40px, 7vw, 66px);
+  font-weight: 800;
+  text-align: center;
+  color: #fff;
+  background: rgba(255, 255, 255, 0.06);
+  border: 2px solid rgba(255, 255, 255, 0.14);
+  border-radius: var(--r-lg);
+  outline: none;
+  font-variant-numeric: tabular-nums;
+  transition: border-color var(--t-fast) var(--ease),
+              box-shadow var(--t-fast) var(--ease),
+              background var(--t-fast) var(--ease);
+}
+.big-input input:focus {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: var(--accent);
+  box-shadow: 0 0 0 4px rgba(var(--accent-rgb), 0.18),
+              0 0 30px rgba(var(--accent-rgb), 0.25);
+}
+
+.big-input .colon {
+  font-size: clamp(34px, 5vw, 52px);
+  color: rgba(232, 238, 255, 0.4);
+  padding: 0;
+}
+
+/* 分 / 秒 标注与输入框上下对齐 */
+.setup-screen .field-hint {
+  display: flex;
+  justify-content: center;
+  gap: clamp(10px, 2.4vw, 22px);
+  margin: -12px 0 0;
+}
+.setup-screen .field-hint span {
+  width: clamp(96px, 20vw, 150px);
+  text-align: center;
+  font-size: 13px;
+  color: rgba(232, 238, 255, 0.45);
+}
+
+/* 微调行（底座 .adj-btn 为 32px 方格，此处改为带文字的胶囊） */
+.adjust {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.adjust .adj-btn {
+  width: auto;
+  height: auto;
+  padding: 9px 18px;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: rgba(232, 238, 255, 0.82);
+  background: rgba(255, 255, 255, 0.07);
+  border: 1.5px solid rgba(255, 255, 255, 0.14);
+  border-radius: var(--r-pill);
+  cursor: pointer;
+  transition: all var(--t-fast) var(--ease);
+}
+.adjust .adj-btn:hover {
+  color: #07101f;
+  background: var(--accent);
+  border-color: transparent;
+  box-shadow: 0 6px 18px rgba(var(--accent-rgb), 0.4);
+}
+
+.adj-current {
+  min-width: 104px;
+  padding: 0 6px;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--accent);
+  font-variant-numeric: tabular-nums;
+}
+
+/* 预设 chips：深色玻璃风（覆盖底座白底 chip） */
+.setup-screen .chips {
+  justify-content: center;
+  max-width: 640px;
+}
+.setup-screen .chips .chip {
+  color: rgba(232, 238, 255, 0.78);
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.14);
+}
+.setup-screen .chips .chip:hover {
+  color: var(--accent);
+  border-color: rgba(var(--accent-rgb), 0.5);
+  background: rgba(var(--accent-rgb), 0.1);
+  transform: translateY(-1px);
+}
+.setup-screen .chips .chip.active {
+  color: #07101f;
+  background: var(--accent);
+  border-color: transparent;
+  box-shadow: 0 6px 18px rgba(var(--accent-rgb), 0.42);
+}
+
+/* 开始按钮（HTML 类名为 .start-btn） */
+.start-btn {
+  margin-top: 6px;
+  padding: 16px 60px;
+  font-size: 19px;
+  font-weight: 800;
+  letter-spacing: 2px;
+  color: #07101f;
+  background: var(--accent);
+  border: none;
+  border-radius: var(--r-pill);
+  cursor: pointer;
+  box-shadow: 0 12px 30px rgba(var(--accent-rgb), 0.42),
+              inset 0 1px 0 rgba(255, 255, 255, 0.4);
+  transition: transform var(--t-fast) var(--ease),
+              filter var(--t-fast) var(--ease),
+              box-shadow var(--t-fast) var(--ease);
+}
+.start-btn:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.06);
+  box-shadow: 0 16px 38px rgba(var(--accent-rgb), 0.55);
+}
+.start-btn:active {
+  transform: translateY(0);
+}
+
+/* ---------------------------------------------------------------------------
+ * 4. 倒计时大屏
+ * ------------------------------------------------------------------------- */
+.run-screen {
+  gap: 26px;
+  padding-bottom: 90px; /* 给底部进度条与按钮留呼吸空间 */
+}
+
+/* 霓虹大字（点击可暂停 / 继续） */
+.time-text {
+  font-size: clamp(96px, 20vw, 240px);
+  font-weight: 800;
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+  color: var(--accent);
+  text-shadow: 0 0 36px rgba(var(--accent-rgb), 0.55),
+               0 0 90px rgba(var(--accent-rgb), 0.3);
+  cursor: pointer;
+  user-select: none;
+  transition: color var(--t-fast) var(--ease),
+              text-shadow var(--t-fast) var(--ease);
+}
+.time-text:hover {
+  filter: brightness(1.1);
+}
+
+/* 最后 10 秒：红字 + 急促呼吸（JS 切换 .danger） */
+.time-text.danger {
+  color: #ff4d5e;
+  text-shadow: 0 0 36px rgba(255, 77, 94, 0.6),
+               0 0 90px rgba(255, 77, 94, 0.35);
+  animation: ct-danger-pulse 1s var(--ease) infinite;
+}
+
+@keyframes ct-danger-pulse {
+  0%, 100% { transform: scale(1); }
+  50%      { transform: scale(1.04); }
+}
+
+/* 时间到文字 */
+.finish-text {
+  font-size: clamp(30px, 5vw, 54px);
+  font-weight: 800;
+  letter-spacing: 4px;
+  color: #ff5d6e;
+  text-shadow: 0 0 34px rgba(255, 93, 110, 0.55);
+  animation: ct-blink 1s steps(1) infinite;
+}
+
+@keyframes ct-blink {
+  0%, 49%  { opacity: 1; }
+  50%, 100% { opacity: 0.25; }
+}
+
+.run-actions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 14px;
+}
+
+/* 霓虹描边按钮（覆盖底座紫色 .neon-btn） */
+.run-actions .neon-btn {
+  min-width: 124px;
+  padding: 12px 28px;
+  font-size: 15px;
+  color: var(--accent);
+  background: rgba(var(--accent-rgb), 0.1);
+  border: 1.5px solid rgba(var(--accent-rgb), 0.65);
+  border-radius: var(--r-pill);
+  box-shadow: 0 0 18px rgba(var(--accent-rgb), 0.18),
+              inset 0 0 12px rgba(var(--accent-rgb), 0.08);
+  transition: all var(--t-fast) var(--ease);
+}
+.run-actions .neon-btn:hover {
+  color: #07101f;
+  background: var(--accent);
+  border-color: transparent;
+  box-shadow: 0 8px 24px rgba(var(--accent-rgb), 0.5);
+  transform: translateY(-1px);
+}
+
+/* 次级幽灵按钮 */
+.run-actions .neon-btn.ghost {
+  color: rgba(232, 238, 255, 0.82);
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.18);
+  box-shadow: none;
+}
+.run-actions .neon-btn.ghost:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.14);
+  border-color: rgba(255, 255, 255, 0.4);
+}
+
+.run-hint {
+  font-size: 13px;
+  letter-spacing: 1px;
+  color: rgba(232, 238, 255, 0.4);
+}
+
+/* ---------------------------------------------------------------------------
+ * 5. 底部细线进度条（JS 用 transform:scaleX 驱动）
+ * ------------------------------------------------------------------------- */
+.progress-track {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 60;
+  height: 6px;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.progress-bar {
+  width: 100%;
+  height: 100%;
+  background: var(--accent);
+  box-shadow: 0 0 12px rgba(var(--accent-rgb), 0.7);
+  transform-origin: left center;
+  transition: transform 0.28s linear, background var(--t-fast) var(--ease);
+}
+
+.progress-bar.danger {
+  background: #ff4d5e;
+  box-shadow: 0 0 14px rgba(255, 77, 94, 0.8);
+}
+
+/* ---------------------------------------------------------------------------
+ * 6. 全屏投影（⛶ 由共享模块对 #runScreen 自身调用 Fullscreen API）
+ *    注：运行屏是舞台自身进入全屏，选择器必须是「舞台自身 :fullscreen」，
+ *        旧的 `:fullscreen .run-screen`（祖先全屏）在此永不匹配。
+ * ------------------------------------------------------------------------- */
+
+/* 工具栏需要相对运行屏定位 */
+#runScreen {
+  position: relative;
+}
+
+/* 深色舞台内的角标按钮改为玻璃质感（覆盖公共白底 icon-btn） */
+#runScreen .stage-toolbar {
+  z-index: 5;
+}
+#runScreen .stage-toolbar .icon-btn {
+  color: rgba(255, 255, 255, 0.9);
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.24);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+#runScreen .stage-toolbar .icon-btn:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.42);
+}
+
+#runScreen:fullscreen,
+#runScreen:-webkit-full-screen,
+#runScreen.edutf-solo{
+  min-height: 0;
+  max-width: none;
+  padding: 24px 24px 90px;
+  background: #0a0f1f;
+}
+
+#runScreen:fullscreen .time-text,
+#runScreen:-webkit-full-screen .time-text,
+#runScreen.edutf-solo .time-text{
+  font-size: clamp(140px, 24vw, 320px);
+}
+
+#runScreen:fullscreen .finish-text,
+#runScreen:-webkit-full-screen .finish-text,
+#runScreen.edutf-solo .finish-text{
+  font-size: clamp(44px, 7vw, 84px);
+}
+
+/* ---------------------------------------------------------------------------
+ * 7. 小屏适配 / 减弱动效
+ * ------------------------------------------------------------------------- */
+@media (max-width: 640px) {
+  .screen { padding: 36px 16px 80px; gap: 18px; }
+  .run-actions .neon-btn { min-width: 104px; padding: 11px 20px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body,
+  .big-input input,
+  .adjust .adj-btn,
+  .setup-screen .chips .chip,
+  .start-btn,
+  .time-text,
+  .run-actions .neon-btn,
+  .progress-bar {
+    transition: none !important;
+  }
+  .time-text.danger,
+  .finish-text {
+    animation: none !important;
+  }
+}

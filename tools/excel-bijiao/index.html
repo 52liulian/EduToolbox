@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <script src="../../assets/js/frame-bridge.js"></script>
+<script src="../../assets/vendor/xlsx.full.min.js"></script>
+    <style>
+        body{font-family:Segoe UI,Tahoma,Geneva,Verdana,sans-serif;max-width:1200px;margin:0 auto;padding:20px;background:linear-gradient(135deg,#0f2027,#203a43,#2c5364);color:#e0f7fa;min-height:100vh}
+        .container{background:rgba(255,255,255,.08);backdrop-filter:blur(10px);padding:30px;border-radius:15px;box-shadow:0 8px 32px rgba(0,0,0,.3);border:1px solid rgba(255,255,255,.1)}
+        h1{color:#4fc3f7;text-align:center;margin-bottom:30px;font-weight:300;text-shadow:0 0 10px rgba(79,195,247,.5)}
+        .file-input-group{margin-bottom:25px;padding:20px;background:rgba(0,30,60,.4);border-radius:10px;border:1px solid rgba(79,195,247,.2);transition:all .3s ease}
+        .file-input-group:hover{border-color:rgba(79,195,247,.5);box-shadow:0 0 15px rgba(79,195,247,.2)}
+        .file-input-group h3{color:#81d4fa;margin-top:0;margin-bottom:15px}
+        .input-row{display:flex;align-items:center;gap:15px;margin-bottom:15px;flex-wrap:wrap}
+        .input-row label{color:#b3e5fc;white-space:nowrap;margin-bottom:0}
+        .file-input-group input[type=file]{padding:10px;background:rgba(0,20,40,.5);border:1px solid rgba(79,195,247,.3);border-radius:5px;color:#e0f7fa;cursor:pointer;transition:all .3s ease;flex:1;min-width:200px}
+        .file-input-group input[type=file]:hover{border-color:#4fc3f7;box-shadow:0 0 10px rgba(79,195,247,.3)}
+        select{padding:10px;background:rgba(0,20,40,.5);border:1px solid rgba(79,195,247,.3);border-radius:5px;color:#e0f7fa;cursor:pointer;transition:all .3s ease;min-width:150px}
+        select:hover{border-color:#4fc3f7;box-shadow:0 0 10px rgba(79,195,247,.3)}
+        .column-selector{margin-top:15px}.column-selector h4{color:#81d4fa;margin-bottom:10px}
+        .column-checkbox{display:inline-block;margin-right:15px;margin-bottom:8px;cursor:pointer;padding:5px 10px;background:rgba(0,30,60,.4);border-radius:5px;transition:all .3s ease}
+        .column-checkbox:hover{background:rgba(79,195,247,.2)}
+        .column-checkbox input{margin-right:8px;cursor:pointer}
+        .column-checkbox label{cursor:pointer;color:#e0f7fa}
+        .compare-button{background:linear-gradient(to right,#0288d1,#4fc3f7);color:#fff;padding:15px 30px;border:none;border-radius:8px;font-size:16px;cursor:pointer;display:block;margin:30px auto;transition:all .3s ease;box-shadow:0 4px 15px rgba(2,136,209,.3);font-weight:500;letter-spacing:1px}
+        .compare-button:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(2,136,209,.5);background:linear-gradient(to right,#039be5,#29b6f6)}
+        .compare-button:disabled{background:linear-gradient(to right,#546e7a,#78909c);cursor:not-allowed;transform:none;box-shadow:none}
+        .download-button{background:linear-gradient(to right,#00c853,#64dd17);color:#fff;padding:15px 30px;border:none;border-radius:8px;font-size:16px;cursor:pointer;display:inline-block;margin:10px;transition:all .3s ease;box-shadow:0 4px 15px rgba(0,200,83,.3);font-weight:500;letter-spacing:1px}
+        .download-button:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(0,200,83,.5);background:linear-gradient(to right,#00e676,#76ff03)}
+        .download-button.simple{background:linear-gradient(to right,#ff9800,#ffb74d);box-shadow:0 4px 15px rgba(255,152,0,.3)}
+        .download-button.simple:hover{background:linear-gradient(to right,#ffa726,#ffcc80);box-shadow:0 6px 20px rgba(255,152,0,.5)}
+        .download-buttons{text-align:center;margin-top:20px}
+        .loading{text-align:center;color:#4fc3f7;font-size:18px;margin:20px 0;text-shadow:0 0 10px rgba(79,195,247,.5)}
+        .error{color:#ff5252;background:rgba(255,82,82,.1);padding:15px;border-radius:8px;margin:15px 0;border:1px solid rgba(255,82,82,.3);text-align:center}
+        .success{color:#69f0ae;background:rgba(105,240,174,.1);padding:15px;border-radius:8px;margin:15px 0;border:1px solid rgba(105,240,174,.3);text-align:center}
+        .warning{color:#ffb74d;background:rgba(255,183,77,.1);padding:15px;border-radius:8px;margin:15px 0;border:1px solid rgba(255,183,77,.3);text-align:center}
+        .info{color:#4fc3f7;background:rgba(79,195,247,.1);padding:15px;border-radius:8px;margin:15px 0;border:1px solid rgba(79,195,247,.3);text-align:center}
+        .progress-bar{width:100%;height:10px;background:rgba(0,30,60,.4);border-radius:5px;margin:20px 0;overflow:hidden}
+        .progress{height:100%;background:linear-gradient(to right,#0288d1,#4fc3f7);transition:width 0.3s ease}
+    </style>
+<style>
+/* ============================================================================
+ * EduToolbox 组件化挂载兜底（自动追加）
+ * ----------------------------------------------------------------------------
+ * 本工具未引入 assets/css/tool-common.css，挂载进站点（Shadow DOM）后会缺少：
+ *   1) 六色主题变量 --primary / --primary-soft / --primary-grad
+ *   2) .container 的宽度约束（否则内容铺满并贴边）
+ * 这里补齐最小等价集，保证「独立打开」与「站点内组件化挂载」视觉一致。
+ * ========================================================================== */
+
+:root,
+:host,
+body[data-theme="sky"]   { --primary:#0ea5e9; --primary-soft:#e0f2fe; --primary-soft-2:#ccecfc; --primary-grad:linear-gradient(135deg,#38bdf8,#0ea5e9,#0284c7); }
+body[data-theme="violet"]{ --primary:#7c3aed; --primary-soft:#f0e9fe; --primary-soft-2:#e2d5fc; --primary-grad:linear-gradient(135deg,#8b5cf6,#7c3aed,#6d28d9); }
+body[data-theme="green"] { --primary:#16a34a; --primary-soft:#e7f6ec; --primary-soft-2:#d3f0dc; --primary-grad:linear-gradient(135deg,#22c55e,#16a34a,#15803d); }
+body[data-theme="gold"]  { --primary:#d97706; --primary-soft:#fdf1dc; --primary-soft-2:#fbe3bc; --primary-grad:linear-gradient(135deg,#f59e0b,#d97706,#b45309); }
+body[data-theme="orange"]{ --primary:#ea580c; --primary-soft:#ffefe4; --primary-soft-2:#ffdec9; --primary-grad:linear-gradient(135deg,#fb923c,#ea580c,#c2410c); }
+body[data-theme="pink"]  { --primary:#db2777; --primary-soft:#fce7f0; --primary-soft-2:#f9cfe1; --primary-grad:linear-gradient(135deg,#f472b6,#db2777,#be185d); }
+
+/* 容器宽度兜底：仅在工具自身未声明时生效（不覆盖已有 .container 规则） */
+.container:not([data-no-fallback]) {
+  width: 100%;
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 28px 24px 56px;
+  box-sizing: border-box;
+}
+</style>
+</head>
+<body>
+    <div class="container">
+
+        <div class="warning">
+            <strong>数据一致性提醒：</strong>请确保两份文件中待比较列的写法完全一致（如"一（1）班"≠"一（1）"、"一班"≠"1班"、"101"≠"一（1）班"），否则会被视为不同数据！
+        </div>
+
+        <div class="file-input-group">
+            <h3>第一个Excel文件</h3>
+            <div class="input-row">
+                <label>选择文件：</label>
+                <input type="file" id="file1" accept=".xlsx,.xls">
+                <label>选择工作表：</label>
+                <select id="sheet1"></select>
+                <label>选择表头行：</label>
+                <select id="headerRow1"></select>
+            </div>
+
+            <div class="column-selector" id="columnSelector1" style="display:none;">
+                <h4>选择需要比较的列：</h4>
+                <div id="columnCheckboxes1"></div>
+            </div>
+        </div>
+
+        <div class="file-input-group">
+            <h3>第二个Excel文件</h3>
+            <div class="input-row">
+                <label>选择文件：</label>
+                <input type="file" id="file2" accept=".xlsx,.xls">
+                <label>选择工作表：</label>
+                <select id="sheet2"></select>
+                <label>选择表头行：</label>
+                <select id="headerRow2"></select>
+            </div>
+
+            <div class="column-selector" id="columnSelector2" style="display:none;">
+                <h4>选择需要比较的列：</h4>
+                <div id="columnCheckboxes2"></div>
+            </div>
+        </div>
+
+        <button class="compare-button" id="compareButton" disabled>开始比较</button>
+        
+        <div id="progressContainer" style="display:none;">
+            <div class="loading">正在处理数据，请稍候...</div>
+            <div class="progress-bar">
+                <div class="progress" id="progressBar" style="width:0%"></div>
+            </div>
+        </div>
+
+        <div id="result"></div>
+    </div>
+
+    <script>
+        /* ---------- 全局变量 ---------- */
+        let fileName1 = '', fileName2 = '';
+        let data1 = [], data2 = [];
+        let header1 = [], header2 = [];
+        let fullData1 = [], fullData2 = [];
+        let headerRowIndex1 = 0, headerRowIndex2 = 0;
+        let compareColumns1 = [], compareColumns2 = [];
+        let comparisonResult = null;
+
+        /* ---------- 文件选择 ---------- */
+        document.getElementById('file1').addEventListener('change', e => {
+            fileName1 = e.target.files[0].name.replace(/\.[^.]+$/,'');
+            handleFile(e.target.files[0], 1);
+        });
+        document.getElementById('file2').addEventListener('change', e => {
+            fileName2 = e.target.files[0].name.replace(/\.[^.]+$/,'');
+            handleFile(e.target.files[0], 2);
+        });
+
+        function handleFile(file, fileNumber) {
+            const reader = new FileReader();
+            reader.onload = e => {
+                try {
+                    const wb = XLSX.read(e.target.result, {type: 'array'});
+                    if (fileNumber === 1) {
+                        populateSheetDropdown(wb, 'sheet1');
+                    } else {
+                        populateSheetDropdown(wb, 'sheet2');
+                    }
+                } catch (err) {
+                    showError(`文件${fileNumber}读取失败：${err.message}`);
+                }
+            };
+            reader.readAsArrayBuffer(file);
+        }
+
+        /* ---------- 下拉初始化 ---------- */
+        function populateSheetDropdown(wb, selectId) {
+            const sel = document.getElementById(selectId);
+            sel.innerHTML = '';
+            wb.SheetNames.forEach(n => {
+                const opt = document.createElement('option');
+                opt.value = n;
+                opt.textContent = n;
+                sel.appendChild(opt);
+            });
+            sel.onchange = () => {
+                if (selectId === 'sheet1') {
+                    populateHeaderRowDropdown(wb, sel.value, 'headerRow1', 1);
+                } else {
+                    populateHeaderRowDropdown(wb, sel.value, 'headerRow2', 2);
+                }
+            };
+            sel.onchange();
+        }
+
+        function populateHeaderRowDropdown(wb, sheetName, selectId, fileNumber) {
+            const sel = document.getElementById(selectId);
+            sel.innerHTML = '';
+            const ws = wb.Sheets[sheetName];
+            const range = XLSX.utils.decode_range(ws['!ref']);
+            const rows = Math.min(10, range.e.r - range.s.r + 1);
+            for (let i = 1; i <= rows; i++) {
+                const opt = document.createElement('option');
+                opt.value = i - 1;
+                opt.textContent = `第${i}行`;
+                sel.appendChild(opt);
+            }
+            sel.onchange = () => {
+                const hr = parseInt(sel.value);
+                const json = XLSX.utils.sheet_to_json(ws, {header: 1});
+                if (fileNumber === 1) {
+                    fullData1 = json;
+                    headerRowIndex1 = hr;
+                    data1 = json.slice(hr + 1); // 从表头下一行开始
+                    header1 = json[hr] || [];
+                    showColumnSelector(1);
+                } else {
+                    fullData2 = json;
+                    headerRowIndex2 = hr;
+                    data2 = json.slice(hr + 1); // 从表头下一行开始
+                    header2 = json[hr] || [];
+                    showColumnSelector(2);
+                }
+            };
+            sel.onchange();
+        }
+
+        /* ---------- 列选择 ---------- */
+        function showColumnSelector(fileNumber) {
+            const csid = `columnSelector${fileNumber}`;
+            const ccid = `columnCheckboxes${fileNumber}`;
+            document.getElementById(csid).style.display = 'block';
+            
+            generateColumnCheckboxes(fileNumber === 1 ? header1 : header2, ccid, fileNumber);
+        }
+
+        function generateColumnCheckboxes(header, containerId, fileNumber) {
+            const box = document.getElementById(containerId);
+            box.innerHTML = '';
+            header.forEach((v, idx) => {
+                const cb = document.createElement('input');
+                cb.type = 'checkbox';
+                cb.value = idx;
+                cb.onchange = checkCompareButtonStatus;
+                const lbl = document.createElement('label');
+                lbl.textContent = v || `列${idx + 1}`;
+                lbl.prepend(cb);
+                const dv = document.createElement('div');
+                dv.className = 'column-checkbox';
+                dv.appendChild(lbl);
+                box.appendChild(dv);
+            });
+        }
+
+        function checkCompareButtonStatus() {
+            const c1 = Array.from(document.querySelectorAll('#columnCheckboxes1 input:checked'), x => +x.value);
+            const c2 = Array.from(document.querySelectorAll('#columnCheckboxes2 input:checked'), x => +x.value);
+            compareColumns1 = c1;
+            compareColumns2 = c2;
+            document.getElementById('compareButton').disabled = !(c1.length && c2.length);
+        }
+
+        /* ---------- 比较 ---------- */
+        document.getElementById('compareButton').onclick = async () => {
+            // 显示进度条
+            document.getElementById('progressContainer').style.display = 'block';
+            document.getElementById('progressBar').style.width = '0%';
+            
+            // 使用setTimeout让UI有机会更新
+            setTimeout(async () => {
+                try {
+                    // 构建包含完整数据的键值映射
+                    const map1 = await buildDataMap(fullData1, header1, compareColumns1, headerRowIndex1, 1);
+                    document.getElementById('progressBar').style.width = '30%';
+                    
+                    const map2 = await buildDataMap(fullData2, header2, compareColumns2, headerRowIndex2, 2);
+                    document.getElementById('progressBar').style.width = '60%';
+                    
+                    // 找出共同数据和差异数据
+                    const common = [], only1 = [], only2 = [];
+                    
+                    // 处理共同数据 - 合并两个文件的数据
+                    for (const [key, row1] of map1) {
+                        if (map2.has(key)) {
+                            const row2 = map2.get(key);
+                            // 合并两个文件的数据
+                            const mergedRow = mergeRows(row1, row2, header1, header2);
+                            common.push(mergedRow);
+                        } else {
+                            only1.push(cleanRow(row1));
+                        }
+                    }
+                    
+                    for (const [key, row2] of map2) {
+                        if (!map1.has(key)) {
+                            only2.push(cleanRow(row2));
+                        }
+                    }
+                    
+                    document.getElementById('progressBar').style.width = '80%';
+                    
+                    // 检测重复数据
+                    const duplicates = findDuplicates(fullData1, header1, compareColumns1, headerRowIndex1, 1)
+                        .concat(findDuplicates(fullData2, header2, compareColumns2, headerRowIndex2, 2));
+                    
+                    // 保存比较结果
+                    comparisonResult = { common, only1, only2, duplicates };
+                    
+                    document.getElementById('progressBar').style.width = '90%';
+                    
+                    generateResultExcel(common, only1, only2, duplicates, 'full');
+                    showResult(common.length, only1.length, only2.length, duplicates);
+                    
+                    document.getElementById('progressBar').style.width = '100%';
+                    
+                    // 隐藏进度条
+                    setTimeout(() => {
+                        document.getElementById('progressContainer').style.display = 'none';
+                    }, 1000);
+                    
+                } catch (error) {
+                    showError(`比较过程中出错：${error.message}`);
+                    document.getElementById('progressContainer').style.display = 'none';
+                }
+            }, 100);
+        };
+
+        function buildDataMap(fullData, header, cols, headerRowIndex, fileNumber) {
+            return new Promise((resolve) => {
+                // 使用setTimeout避免阻塞UI
+                setTimeout(() => {
+                    const map = new Map();
+                    
+                    // 从表头行的下一行开始处理数据
+                    for (let i = headerRowIndex + 1; i < fullData.length; i++) {
+                        const row = fullData[i];
+                        if (!row || row.length === 0) continue;
+                        
+                        // 创建键
+                        const keyParts = cols.map(c => (row[c] ?? '').toString().trim());
+                        if (keyParts.every(part => part === '')) continue; // 跳过全空的行
+                        keyParts.sort();
+                        const key = keyParts.join('|');
+                        
+                        if (key) {
+                            // 创建包含完整数据的对象
+                            const rowData = {};
+                            header.forEach((colName, idx) => {
+                                rowData[colName || `列${idx + 1}`] = row[idx] ?? '';
+                            });
+                            rowData._sourceFile = fileNumber; // 标记数据来源（内部使用）
+                            rowData._key = key; // 保存用于比较的键（内部使用）
+                            map.set(key, rowData);
+                        }
+                    }
+                    resolve(map);
+                }, 0);
+            });
+        }
+
+        function findDuplicates(fullData, header, cols, headerRowIndex, fileNumber) {
+            const duplicates = [];
+            const keyCounts = new Map();
+            const fileSource = fileNumber === 1 ? fileName1 : fileName2;
+            
+            // 从表头行的下一行开始处理数据
+            for (let i = headerRowIndex + 1; i < fullData.length; i++) {
+                const row = fullData[i];
+                if (!row || row.length === 0) continue;
+                
+                // 创建键
+                const keyParts = cols.map(c => (row[c] ?? '').toString().trim());
+                if (keyParts.every(part => part === '')) continue; // 跳过全空的行
+                keyParts.sort();
+                const key = keyParts.join('|');
+                
+                if (key) {
+                    // 创建包含完整数据的对象
+                    const rowData = {};
+                    header.forEach((colName, idx) => {
+                        rowData[colName || `列${idx + 1}`] = row[idx] ?? '';
+                    });
+                    rowData._sourceFile = fileNumber; // 标记数据来源（内部使用）
+                    rowData._key = key; // 保存用于比较的键（内部使用）
+                    rowData._fileSource = fileSource; // 标记文件来源
+                    
+                    // 统计键出现次数
+                    if (!keyCounts.has(key)) {
+                        keyCounts.set(key, []);
+                    }
+                    keyCounts.get(key).push(rowData);
+                }
+            }
+            
+            // 找出重复的键
+            for (const [key, rows] of keyCounts) {
+                if (rows.length > 1) {
+                    // 为每个重复行添加重复标记和重复次数
+                    rows.forEach((row, index) => {
+                        const duplicateRow = {...cleanRow(row)};
+                        duplicateRow['重复标识'] = `重复${index + 1}`;
+                        duplicateRow['重复次数'] = rows.length;
+                        duplicateRow['数据来源'] = fileSource;
+                        duplicates.push(duplicateRow);
+                    });
+                }
+            }
+            
+            return duplicates;
+        }
+
+        function mergeRows(row1, row2, header1, header2) {
+            const merged = {};
+            
+            // 获取所有表头并按字母顺序排序，确保相同表头排在一起
+            const allHeaders = [...new Set([...header1, ...header2])].sort();
+            
+            for (const header of allHeaders) {
+                const val1 = row1[header] ?? '';
+                const val2 = row2[header] ?? '';
+                
+                if (val1 === val2) {
+                    // 值相同，直接合并
+                    merged[header] = val1;
+                } else {
+                    // 值不同，创建两个相同的表头
+                    // 第一个表的数据
+                    merged[header] = val1;
+                    // 第二个表的数据 - 使用相同的表头名称
+                    merged[header] = val1; // 第一个值
+                    // 由于对象键不能重复，我们需要使用不同的键名但显示相同的表头
+                    // 这里我们使用数组来存储重复的表头
+                }
+            }
+            
+            // 处理重复表头的情况
+            return processDuplicateHeaders(merged, row1, row2, header1, header2);
+        }
+
+        function processDuplicateHeaders(merged, row1, row2, header1, header2) {
+            const result = {};
+            const allHeaders = [...new Set([...header1, ...header2])].sort();
+            
+            for (const header of allHeaders) {
+                const val1 = row1[header] ?? '';
+                const val2 = row2[header] ?? '';
+                
+                if (val1 === val2) {
+                    // 值相同，只显示一列
+                    result[header] = val1;
+                } else {
+                    // 值不同，显示两列相同的表头
+                    // 使用相同的表头名称，Excel会显示为重复的表头
+                    result[header] = val1;
+                    // 创建第二个相同的表头
+                    result[`${header}`] = val2; // 相同的键名，后面的会覆盖前面的
+                    // 我们需要使用不同的键名但让Excel显示相同的表头
+                }
+            }
+            
+            // 重新构建对象，确保相同表头排在一起
+            const finalResult = {};
+            for (const header of allHeaders) {
+                const val1 = row1[header] ?? '';
+                const val2 = row2[header] ?? '';
+                
+                if (val1 === val2) {
+                    finalResult[header] = val1;
+                } else {
+                    // 对于不同的值，我们创建两个相同的表头
+                    // 使用相同的键名，但通过数组顺序确保数据正确
+                    finalResult[header] = val1;
+                    // 由于JavaScript对象键不能重复，我们需要使用不同的键
+                    // 但在Excel中显示为相同的表头
+                    finalResult[`${header} `] = val2; // 加一个空格作为区分
+                }
+            }
+            
+            return cleanRow(finalResult);
+        }
+
+        function cleanRow(row) {
+            // 移除内部使用的字段
+            const cleaned = {};
+            for (const key in row) {
+                if (key !== '_sourceFile' && key !== '_key' && key !== '_fileSource') {
+                    cleaned[key] = row[key];
+                }
+            }
+            return cleaned;
+        }
+
+        /* ---------- 结果导出 ---------- */
+        function generateResultExcel(common, only1, only2, duplicates, version = 'full') {
+            const wb = XLSX.utils.book_new();
+            
+            // 截断工作表名称，确保不超过31个字符
+            const truncateSheetName = (name) => {
+                const maxLength = 31;
+                return name.length > maxLength ? name.substring(0, maxLength) : name;
+            };
+            
+            // 创建安全的工作表名称
+            const sheetCommon = '两表都有';
+            const sheetOnly1 = truncateSheetName(`仅${fileName1}`.substring(0, 15));
+            const sheetOnly2 = truncateSheetName(`仅${fileName2}`.substring(0, 15));
+            const sheetDuplicates = '重复数据';
+            
+            if (version === 'simple') {
+                // 简版：只保留构成唯一值的列
+                const simpleCommon = common.map(row => extractKeyColumns(row, compareColumns1, header1));
+                const simpleOnly1 = only1.map(row => extractKeyColumns(row, compareColumns1, header1));
+                const simpleOnly2 = only2.map(row => extractKeyColumns(row, compareColumns2, header2));
+                const simpleDuplicates = duplicates.map(row => extractKeyColumns(row, 
+                    row['数据来源'] === fileName1 ? compareColumns1 : compareColumns2, 
+                    row['数据来源'] === fileName1 ? header1 : header2));
+                
+                // 确保每个工作表都被创建，即使数据为空
+                XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(simpleCommon.length > 0 ? simpleCommon : [{}]), sheetCommon);
+                XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(simpleOnly1.length > 0 ? simpleOnly1 : [{}]), sheetOnly1);
+                XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(simpleOnly2.length > 0 ? simpleOnly2 : [{}]), sheetOnly2);
+                
+                // 添加重复数据工作表
+                if (simpleDuplicates.length > 0) {
+                    XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(simpleDuplicates), sheetDuplicates);
+                }
+            } else {
+                // 完整版：所有列（已清理内部字段）
+                // 确保每个工作表都被创建，即使数据为空
+                XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(common.length > 0 ? common : [{}]), sheetCommon);
+                XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(only1.length > 0 ? only1 : [{}]), sheetOnly1);
+                XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(only2.length > 0 ? only2 : [{}]), sheetOnly2);
+                
+                // 添加重复数据工作表
+                if (duplicates.length > 0) {
+                    XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(duplicates), sheetDuplicates);
+                }
+            }
+            
+            const buf = XLSX.write(wb, {bookType: 'xlsx', type: 'array'});
+            return new Blob([buf], {type: 'application/octet-stream'});
+        }
+
+        function extractKeyColumns(row, keyColumns, header) {
+            const simpleRow = {};
+            // 只保留构成唯一值的列
+            keyColumns.forEach(colIndex => {
+                const colName = header[colIndex] || `列${colIndex + 1}`;
+                simpleRow[colName] = row[colName] || '';
+            });
+            
+            // 保留重复相关的列
+            if (row['重复标识']) simpleRow['重复标识'] = row['重复标识'];
+            if (row['重复次数']) simpleRow['重复次数'] = row['重复次数'];
+            if (row['数据来源']) simpleRow['数据来源'] = row['数据来源'];
+            
+            return simpleRow;
+        }
+
+        function showResult(c, o1, o2, duplicates) {
+            const div = document.getElementById('result');
+            
+            let duplicateInfo = '';
+            if (duplicates.length > 0) {
+                const file1Duplicates = duplicates.filter(d => d['数据来源'] === fileName1).length / 2;
+                const file2Duplicates = duplicates.filter(d => d['数据来源'] === fileName2).length / 2;
+                
+                duplicateInfo = `
+                    <div class="info">
+                        <h3>重复数据统计</h3>
+                        <p>${fileName1}中重复数据：${file1Duplicates} 组</p>
+                        <p>${fileName2}中重复数据：${file2Duplicates} 组</p>
+                        <p>总重复数据：${duplicates.length / 2} 组</p>
+                    </div>`;
+            }
+            
+            div.innerHTML = `
+                <div class="success">
+                    <h3>比较完成！</h3>
+                    <p>两表都有：${c} 条</p>
+                    <p>仅${fileName1}有：${o1} 条</p>
+                    <p>仅${fileName2}有：${o2} 条</p>
+                </div>
+                ${duplicateInfo}
+                <div class="download-buttons">
+                    <button class="download-button" onclick="downloadResult('full')">下载完整数据</button>
+                    <button class="download-button simple" onclick="downloadResult('simple')">下载简版数据</button>
+                </div>`;
+        }
+
+        function downloadResult(version = 'full') {
+            if (!comparisonResult) return;
+            const { common, only1, only2, duplicates } = comparisonResult;
+            const blob = generateResultExcel(common, only1, only2, duplicates, version);
+            
+            const u = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = u;
+            const suffix = version === 'simple' ? '_简版' : '_完整版';
+            a.download = `Excel比较结果_${new Date().toISOString().slice(0, 10)}${suffix}.xlsx`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(u);
+        }
+
+        function showError(msg) {
+            document.getElementById('result').innerHTML = `<div class="error">${msg}</div>`;
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,55 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>在线抢答 | EduToolbox · 课堂抢答记录</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%8E%93%3C/text%3E%3C/svg%3E">
+<link rel="stylesheet" href="quick-answer.css">
+<link rel="stylesheet" href="../../assets/css/tool-common.css">
+</head>
+<body>
+
+<main class="app">
+  <section class="status-bar" aria-label="抢答状态">
+    <div class="status-info">
+      <span class="status-text" id="statusText">等待抢答中…</span>
+      <span class="round-info">第 <strong id="roundNum">1</strong> 轮 · <strong id="teamCount">2</strong> 队</span>
+    </div>
+    <div class="actions">
+      <button id="btnAddTeam" class="btn btn-ghost" type="button">+ 新增队伍</button>
+      <button id="btnNewRound" class="btn btn-ghost" type="button">新一轮</button>
+      <button id="btnImport" class="btn btn-ghost" type="button">名单导入</button>
+      <button id="btnReset" class="btn btn-warn" type="button">重置</button>
+    </div>
+  </section>
+
+  <div class="teams-stage" id="teamsStage">
+    <div class="stage-toolbar">
+      <button type="button" class="icon-btn" id="fullscreenBtn" title="全屏">⛶</button>
+    </div>
+    <section class="teams" id="teams" aria-label="抢答队伍卡片"></section>
+  </div>
+
+  <section class="history" aria-label="抢答历史记录">
+    <h3>抢答历史记录</h3>
+    <p class="history-empty" id="historyEmpty">暂无抢答记录，按下数字键 1-9 或点击对应卡片即可记录抢答。</p>
+    <ol id="log"></ol>
+  </section>
+</main>
+
+<dialog class="import-dialog" id="importDialog" aria-label="名单导入">
+  <h3>名单导入</h3>
+  <p class="hint">每行一个名字，按顺序对应数字键 1-N（最多 9 行，多余将被截断）。</p>
+  <textarea id="importTextarea" rows="10" placeholder="张三&#10;李四&#10;王五&#10;赵六"></textarea>
+  <div class="dialog-actions">
+    <button id="importCancel" class="btn btn-ghost" type="button">取消</button>
+    <button id="importConfirm" class="btn btn-primary" type="button">确认导入</button>
+  </div>
+</dialog>
+
+<script src="../../assets/js/frame-bridge.js"></script>
+<script src="../../assets/js/tool-stage-toolbar.js"></script>
+<script src="quick-answer.js"></script>
+</body>
+</html>

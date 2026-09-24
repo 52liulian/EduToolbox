@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>电子奖状生成器 | EduToolbox · 奖状/表扬信/喜报实时预览</title>
+<meta name="description" content="选模板、填姓名与奖项，实时预览奖状，一键打印或导出 PNG 图片。学期评优、课堂即时表扬必备。全本地处理，不上传任何数据。">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%8F%86%3C/text%3E%3C/svg%3E">
+<link rel="stylesheet" href="../../assets/css/tool-common.css">
+<link rel="stylesheet" href="award-generator.css">
+</head>
+<body>
+
+<div class="container">
+  <div class="workbench">
+    <!-- ======================= 左侧设置面板 ======================= -->
+    <aside class="panel setup-panel">
+      <div class="block">
+        <h2 class="block-title">① 奖状模板</h2>
+        <div class="chips" id="tplChips">
+          <button type="button" class="chip active" data-tpl="award">🏅 奖状</button>
+          <button type="button" class="chip" data-tpl="cert">📜 荣誉证书</button>
+          <button type="button" class="chip" data-tpl="praise">💌 表扬信</button>
+          <button type="button" class="chip" data-tpl="happy">🎉 喜报</button>
+        </div>
+      </div>
+
+      <div class="block">
+        <h2 class="block-title">② 奖项称号</h2>
+        <input type="text" id="awardName" class="text-input" placeholder="如：三好学生、学习之星" maxlength="12">
+        <div class="chips chips-mini" id="awardChips"></div>
+      </div>
+
+      <div class="block">
+        <h2 class="block-title">③ 学生姓名</h2>
+        <input type="text" id="studentName" class="text-input" placeholder="请输入学生姓名" maxlength="10">
+      </div>
+
+      <div class="block">
+        <h2 class="block-title">④ 颁发信息</h2>
+        <div class="field">
+          <label for="schoolName">颁发单位（落款）</label>
+          <input type="text" id="schoolName" class="text-input" value="杏坛实验学校" maxlength="20">
+        </div>
+        <div class="field">
+          <label for="awardDate">颁发日期</label>
+          <input type="date" id="awardDate" class="text-input">
+        </div>
+        <div class="field">
+          <label for="certBody">正文（可编辑）</label>
+          <textarea id="certBody" class="text-input" rows="2">在 2025—2026 学年度中，表现优异，特授予「{award}」荣誉称号，以资鼓励。</textarea>
+          <p class="block-hint">可用 <code>{name}</code> 与 <code>{award}</code> 两个占位符</p>
+        </div>
+      </div>
+
+      <div class="actions">
+        <button type="button" class="btn btn-primary" id="btnExport">📥 导出 PNG</button>
+        <button type="button" class="btn btn-small" id="btnPrint">🖨 打印奖状</button>
+        <button type="button" class="btn btn-small btn-ghost" id="btnDemo">🎲 示例</button>
+      </div>
+    </aside>
+
+    <!-- ======================= 右侧预览舞台 ======================= -->
+    <main class="stage-panel">
+      <!-- 舞台右上角工具栏：⛶ 舞台全屏（自动隐藏设置栏） / ⚙ 切换设置栏显隐 -->
+      <div class="stage-toolbar">
+        <button type="button" class="icon-btn" id="fullscreenBtn" title="全屏">⛶</button>
+        <button type="button" class="icon-btn" id="hideSetupBtn" title="隐藏设置">⚙</button>
+      </div>
+      <div class="stage-head">
+        <h2 class="panel-title">👀 实时预览</h2>
+        <span class="stage-ok" id="stageOk">自动更新中</span>
+      </div>
+
+      <div class="cert-sheet">
+        <!-- 奖状主体（导出/打印即以该元素为准） -->
+        <div class="certificate" id="certificate">
+          <div class="corner tl"></div>
+          <div class="corner tr"></div>
+          <div class="corner bl"></div>
+          <div class="corner br"></div>
+          <div class="cert-inner">
+            <h2 class="cert-title" id="certTitle">奖 状</h2>
+            <div class="cert-ribbon" id="certRibbon"></div>
+            <div class="cert-award" id="certAward">三好学生</div>
+            <div class="cert-line" id="certLine">兹有 <span class="hl" id="certName">张三</span> 同学：</div>
+            <p class="cert-body" id="certBodyView">在 2025—2026 学年度中，表现优异，特授予「三好学生」荣誉称号，以资鼓励。</p>
+            <div class="cert-foot">
+              <div class="cert-school" id="certSchool">杏坛实验学校</div>
+              <div class="cert-date" id="certDate">2026-09-21</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="stage-tip">💡 点击「导出 PNG」可保存为高清图片；「打印」可输出纸质奖状（A4 横向）。</div>
+    </main>
+  </div>
+</div>
+
+<!-- 提示条 -->
+<div class="toast" id="toast"></div>
+
+<script src="../../assets/js/frame-bridge.js"></script>
+<script src="../../assets/vendor/html2canvas.min.js"></script>
+<script src="../../assets/js/tool-stage-toolbar.js"></script>
+<script src="award-generator.js"></script>
+</body>
+</html>

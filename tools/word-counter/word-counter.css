@@ -1,0 +1,108 @@
+/* ============================================================================
+ * 在线字数统计 · word-counter.css
+ * 仅包含本工具特有样式：选项条 / 统计卡片网格 / 输入框
+ * 公共底座（容器、按钮、textarea、stat-card、chk）见 tool-common.css
+ * 高度策略：所有容器高度自动撑开，仅 body 主滚动条
+ * ========================================================================== */
+
+/* ---------------------------------------------------------------------------
+ * 一、选项条：复选项横排胶囊样式
+ * ------------------------------------------------------------------------- */
+#app .controls {
+  justify-content: flex-start;
+  gap: 10px;
+  margin-top: 14px;
+  margin-bottom: 14px;
+}
+
+/* 复选项改成胶囊外观，呼应主品牌色 */
+#app .controls .chk {
+  padding: 8px 14px;
+  font-size: 13.5px;
+  background: var(--card-bg);
+  border: 1.5px solid var(--border);
+  border-radius: var(--r-pill);
+  transition: all var(--t-fast) var(--ease);
+}
+
+#app .controls .chk:hover {
+  color: var(--primary);
+  border-color: var(--primary-soft-2);
+  background: var(--primary-soft);
+}
+
+#app .controls .chk input {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--primary);
+  cursor: pointer;
+}
+
+/* ---------------------------------------------------------------------------
+ * 二、输入框：稍高一些，便于粘贴长文本
+ * ------------------------------------------------------------------------- */
+#wc-input {
+  min-height: 200px;
+  font-size: 15px;
+  line-height: 1.8;
+  resize: vertical;
+}
+
+/* ---------------------------------------------------------------------------
+ * 三、统计卡片网格：6 张卡片自适应排列
+ * ------------------------------------------------------------------------- */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 14px;
+  margin: 20px 0;
+}
+
+/* 卡片内文字垂直堆叠 + 居中 */
+.stats-grid .stat-card {
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 18px 14px;
+  transition: transform var(--t-fast) var(--ease), box-shadow var(--t-fast) var(--ease);
+}
+
+.stats-grid .stat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow);
+}
+
+/* 大数字使用渐变文字色，呼应主品牌色 */
+.stats-grid .stat-num {
+  font-size: clamp(26px, 3vw, 34px);
+  font-weight: 900;
+  font-variant-numeric: tabular-nums;
+  background: var(--primary-grad);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  line-height: 1.2;
+}
+
+.stats-grid .stat-label {
+  margin-top: 4px;
+  font-size: 13px;
+  color: var(--text-3);
+}
+
+/* ---------------------------------------------------------------------------
+ * 四、操作区按钮组：靠右排布
+ * ------------------------------------------------------------------------- */
+#app .actions {
+  justify-content: flex-end;
+  margin-top: 8px;
+}
+
+/* ---------------------------------------------------------------------------
+ * 五、小屏微调
+ * ------------------------------------------------------------------------- */
+@media (max-width: 640px) {
+  #app .controls { gap: 8px; }
+  .stats-grid { grid-template-columns: repeat(2, 1fr); }
+  .stats-grid .stat-card { padding: 14px 10px; }
+}

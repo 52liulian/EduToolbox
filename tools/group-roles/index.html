@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>组内角色分配 | EduToolbox · 小组分工·随机抽取</title>
+<meta name="description" content="小组确定后，一键随机分配组长/记录员/计时员/发言人等角色，支持逐个抽取揭示与复制结果，课堂合作学习必备。">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%8E%AD%3C/text%3E%3C/svg%3E">
+<link rel="stylesheet" href="../../assets/css/tool-common.css">
+<link rel="stylesheet" href="group-roles.css">
+</head>
+<body>
+
+<div class="container">
+  <div class="workbench">
+    <!-- ======================= 左侧设置面板 ======================= -->
+    <aside class="panel setup-panel">
+      <div class="block">
+        <h2 class="block-title">① 组员名单</h2>
+        <p class="block-hint">每行一名组员</p>
+        <textarea id="members" class="text-input" rows="5" placeholder="例如：&#10;张三&#10;李四&#10;王五&#10;赵六&#10;孙七"></textarea>
+      </div>
+
+      <div class="block">
+        <h2 class="block-title">② 角色</h2>
+        <div class="chips chips-mini" id="rolePresets"></div>
+        <textarea id="roles" class="text-input" rows="4" placeholder="每行一个角色&#10;例如：&#10;组长&#10;记录员&#10;计时员&#10;发言人&#10;检查员">组长
+记录员
+计时员
+发言人
+检查员</textarea>
+      </div>
+
+      <div class="block">
+        <h2 class="block-title">③ 分配方式</h2>
+        <div class="chips" id="modeChips">
+          <button type="button" class="chip active" data-mode="shuffle">🔀 一键分配</button>
+          <button type="button" class="chip" data-mode="draw">🎲 逐个抽取</button>
+        </div>
+        <label class="check">
+          <input type="checkbox" id="allowRepeat">
+          <span>允许同一人担任多个角色</span>
+        </label>
+      </div>
+
+      <div class="actions">
+        <button type="button" class="btn btn-primary" id="btnShuffle">🔀 开始分配</button>
+        <button type="button" class="btn btn-small" id="btnDraw" style="display:none">🎲 抽取一个角色</button>
+        <button type="button" class="btn btn-small btn-ghost" id="btnReset">↺ 重置</button>
+      </div>
+    </aside>
+
+    <!-- ======================= 右侧结果舞台 ======================= -->
+    <main class="stage-panel">
+      <!-- 舞台右上角工具栏：⛶ 舞台全屏（自动隐藏设置栏） / ⚙ 切换设置栏显隐 -->
+      <div class="stage-toolbar">
+        <button type="button" class="icon-btn" id="fullscreenBtn" title="全屏">⛶</button>
+        <button type="button" class="icon-btn" id="hideSetupBtn" title="隐藏设置">⚙</button>
+      </div>
+      <div class="stage-head">
+        <h2 class="panel-title">📋 分配结果</h2>
+        <span class="stage-ok" id="stageOk">未分配</span>
+        <button type="button" class="btn btn-small" id="btnCopy">📋 复制结果</button>
+      </div>
+
+      <!-- 就绪/空态 -->
+      <div class="stage-ready" id="readyView">
+        <div class="ready-icon">👥</div>
+        <div class="ready-title">等待分配</div>
+        <div class="ready-desc">填写组员与角色后，选择分配方式开始</div>
+      </div>
+
+      <!-- 结果区 -->
+      <div id="resultView" style="display:none">
+        <!-- 卡片结果 -->
+        <div class="cards-grid" id="cardsGrid"></div>
+
+        <!-- 逐个抽取滚动区（仅 draw 模式） -->
+        <div class="draw-area" id="drawArea" style="display:none">
+          <div class="draw-roll" id="drawRoll">?</div>
+          <div class="draw-tip" id="drawTip">点「抽取一个角色」开始</div>
+          <div class="draw-rest" id="drawRest">剩余 0 个角色</div>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- 提示条 -->
+<div class="toast" id="toast"></div>
+
+<script src="../../assets/js/frame-bridge.js"></script>
+<script src="../../assets/js/tool-stage-toolbar.js"></script>
+<script src="group-roles.js"></script>
+</body>
+</html>

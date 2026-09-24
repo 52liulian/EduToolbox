@@ -1,0 +1,226 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>段落滚动 | EduToolbox · 朗读提词</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%8E%93%3C/text%3E%3C/svg%3E">
+<link rel="stylesheet" href="paragraph-scroll.css">
+<link rel="stylesheet" href="../../assets/css/tool-common.css">
+</head>
+<body>
+
+<main class="app">
+  <!-- 左侧设置面板 -->
+  <aside class="panel" id="panel">
+    <section class="panel-block">
+      <h3 class="block-title">段落内容 <span class="count" id="count">1 / 12</span></h3>
+      <textarea id="text" class="text-area" placeholder="每段之间用空行分隔…">第一段：清晨的教室安静明亮，同学们准备开始今天的朗读。
+请把视线集中在中间段落，跟着节奏慢慢进入状态。
+
+第二段：这款段落滚动工具采用歌词式显示方式。
+每次只突出一个段落，前后段落会按统一的淡出段数进行辅助展示。
+
+第三段：你可以设置淡出段数和段落间距。
+这样既能看到上下文，又不会让整屏文字显得太乱。
+
+第四段：如果选择自动模式，内容会按段停留并自动切换。
+如果选择手动模式，就可以自己控制上一段和下一段。
+
+第五段：切换动画支持脉冲放大、淡入淡出、上下滑动等多种效果。
+不同动画风格适合不同的课堂投影和舞台展示场景。
+
+第六段：你还可以自由设置左对齐、居中对齐或右对齐。
+无论是诗歌、台词、演讲稿还是歌词，都能找到更合适的排版方式。
+
+第七段：快速外观设置内置了多套默认主题。
+点击不同样式后，文字颜色和背景颜色会立即切换。
+
+第八段：淡出透明度会按段落距离逐级递减。
+越远离中心段落，透明度越低，视觉焦点就越集中。
+
+第九段：段落间距使用像素数值控制。
+间距调大后层次更清楚，间距调小后整体画面更紧凑。
+
+第十段：手动模式更适合课堂讲解和临时停顿。
+自动模式则适合晨读、朗诵、提词和节目排练等连续展示场景。
+
+第十一段：当切到第一段或最后一段时，工具会给出对应提示。
+自动模式播放到末尾后，也会提示播放结束并自动停止。
+
+第十二段：现在你可以直接用这组示例体验完整效果。
+确认没问题后，再替换成自己的课文、歌词或演讲内容。</textarea>
+      <div class="text-tools">
+        <button type="button" class="btn-mini" id="clearBtn">清空</button>
+        <button type="button" class="btn-mini" id="resetBtn">重置设置</button>
+        <button type="button" class="btn-mini" id="sampleBtn">加载示例</button>
+      </div>
+    </section>
+
+    <section class="panel-block">
+      <h3 class="block-title">播放控制</h3>
+      <div class="ctrl-row">
+        <button type="button" class="btn btn-primary" id="startBtn">▶ 开始播放 (空格)</button>
+      </div>
+      <div class="ctrl-row">
+        <button type="button" class="btn btn-ghost" id="prevBtn">◀ 上一段</button>
+        <button type="button" class="btn btn-ghost" id="nextBtn">下一段 ▶</button>
+      </div>
+      <div class="ctrl-row">
+        <button type="button" class="btn btn-ghost" id="resetPosBtn">↺ 重置</button>
+      </div>
+      <div class="mode-row">
+        <label class="field-label">切换模式</label>
+        <div class="seg" id="modeSeg">
+          <button type="button" class="seg-btn active" data-mode="manual">手动</button>
+          <button type="button" class="seg-btn" data-mode="auto">自动</button>
+        </div>
+      </div>
+      <div class="field">
+        <label class="field-label">自动切换时间 <span class="num-unit">秒</span></label>
+        <div class="num-ctrl">
+          <button type="button" class="num-btn" id="stayMinus">-</button>
+          <span class="num-val" id="stayVal">4</span>
+          <button type="button" class="num-btn" id="stayPlus">+</button>
+        </div>
+        <div class="duration-tip">完整播放一轮约 <span id="totalTime">48</span> 秒</div>
+      </div>
+    </section>
+
+    <section class="panel-block">
+      <h3 class="block-title">显示与动画</h3>
+      <div class="field">
+        <label class="field-label">淡出段数</label>
+        <div class="num-ctrl">
+          <button type="button" class="num-btn" id="fadeMinus">-</button>
+          <span class="num-val" id="fadeVal">2</span>
+          <button type="button" class="num-btn" id="fadePlus">+</button>
+        </div>
+      </div>
+      <div class="field">
+        <label class="field-label">淡出透明度</label>
+        <input type="range" id="fadeOpacity" class="range" min="0.1" max="1" value="0.7" step="0.05">
+      </div>
+      <div class="field">
+        <label class="field-label">段落间距 <span class="num-unit">px</span></label>
+        <div class="num-ctrl">
+          <button type="button" class="num-btn" id="gapMinus">-</button>
+          <span class="num-val" id="gapVal">60</span>
+          <button type="button" class="num-btn" id="gapPlus">+</button>
+        </div>
+      </div>
+      <div class="field">
+        <label class="field-label">左右边距 <span class="num-unit">%</span></label>
+        <input type="range" id="padding" class="range" min="0" max="20" value="6" step="1">
+      </div>
+      <div class="field">
+        <label class="field-label" for="anim">切换动画</label>
+        <select id="anim" class="select">
+          <option value="none">不使用动画</option>
+          <option value="zoom">放大</option>
+          <option value="fade">淡入淡出</option>
+          <option value="slide">上下滑动</option>
+          <option value="smooth">平滑切换</option>
+          <option value="bounce">弹跳</option>
+          <option value="elastic">弹性放大</option>
+          <option value="flip">翻转</option>
+          <option value="pulse" selected>脉冲放大</option>
+          <option value="float">浮动上升</option>
+          <option value="rotate">旋转进入</option>
+        </select>
+      </div>
+    </section>
+
+    <section class="panel-block">
+      <h3 class="block-title">外观设置</h3>
+      <div class="theme-row" id="themeRow">
+        <button type="button" class="theme-chip" data-theme="white">白底</button>
+        <button type="button" class="theme-chip" data-theme="black">黑底</button>
+        <button type="button" class="theme-chip" data-theme="green">绿板</button>
+        <button type="button" class="theme-chip" data-theme="warm">暖阳</button>
+        <button type="button" class="theme-chip" data-theme="sky">晴空</button>
+        <button type="button" class="theme-chip" data-theme="pink">樱粉</button>
+        <button type="button" class="theme-chip" data-theme="purple">紫雾</button>
+        <button type="button" class="theme-chip" data-theme="deep">深海</button>
+        <button type="button" class="theme-chip" data-theme="sunset">晚霞</button>
+        <button type="button" class="theme-chip" data-theme="paper">米纸</button>
+        <button type="button" class="theme-chip" data-theme="mint">薄荷</button>
+        <button type="button" class="theme-chip" data-theme="graphite">石墨</button>
+      </div>
+      <div class="field">
+        <label class="field-label" for="fontFamily">字体</label>
+        <select id="fontFamily" class="select">
+          <option value='"Microsoft YaHei", sans-serif'>微软雅黑</option>
+          <option value='SimSun, serif'>宋体</option>
+          <option value='SimHei, sans-serif'>黑体</option>
+          <option value='KaiTi, "楷体", serif'>楷体</option>
+          <option value='LiSu, "隶书", serif'>隶书</option>
+        </select>
+      </div>
+      <div class="field-row">
+        <div class="field">
+          <label class="field-label" for="color">字色</label>
+          <input type="color" id="color" class="color" value="#f8fafc">
+        </div>
+        <div class="field">
+          <label class="field-label" for="bgColor">背景</label>
+          <input type="color" id="bgColor" class="color" value="#0f172a">
+        </div>
+      </div>
+      <div class="field">
+        <label class="field-label">字号 (px)</label>
+        <div class="num-ctrl">
+          <button type="button" class="num-btn" id="fontMinus">-</button>
+          <span class="num-val" id="fontVal">40</span>
+          <button type="button" class="num-btn" id="fontPlus">+</button>
+        </div>
+      </div>
+      <div class="field">
+        <label class="field-label">行高</label>
+        <div class="num-ctrl">
+          <button type="button" class="num-btn" id="lhMinus">-</button>
+          <span class="num-val" id="lhVal">1.6</span>
+          <button type="button" class="num-btn" id="lhPlus">+</button>
+        </div>
+      </div>
+      <div class="field">
+        <label class="field-label">对齐方式</label>
+        <div class="seg" id="alignSeg">
+          <button type="button" class="seg-btn" data-align="left">左</button>
+          <button type="button" class="seg-btn active" data-align="center">中</button>
+          <button type="button" class="seg-btn" data-align="right">右</button>
+        </div>
+      </div>
+      <div class="field-row">
+        <label class="check">
+          <input type="checkbox" id="loop" checked>
+          <span>循环播放（最后一段后回到第一段）</span>
+        </label>
+        <label class="check">
+          <input type="checkbox" id="showInfo" checked>
+          <span>显示段落信息</span>
+        </label>
+      </div>
+    </section>
+  </aside>
+
+  <!-- 右侧段落展示舞台 -->
+  <section class="stage" id="stage">
+    <div class="stage-inner" id="stageInner">
+      <div class="para-list" id="paraList"></div>
+    </div>
+    <div class="para-info" id="paraInfo">当前第 1 段，共 12 段</div>
+    <!-- 舞台右上角工具栏：全屏 + 隐藏设置（与 random-call 结构/顺序一致） -->
+    <div class="stage-toolbar">
+      <button type="button" class="icon-btn" id="fullscreenBtn" title="全屏">⛶</button>
+      <button type="button" class="icon-btn" id="hideSetupBtn" title="隐藏设置">⚙</button>
+    </div>
+    <div class="stage-hint">按空格键开始/暂停 · 点击屏幕切换段落</div>
+  </section>
+</main>
+
+<script src="../../assets/js/frame-bridge.js"></script>
+<script src="../../assets/js/tool-stage-toolbar.js"></script>
+<script src="paragraph-scroll.js"></script>
+</body>
+</html>

@@ -1,0 +1,67 @@
+* { box-sizing: border-box; }
+body {
+  font-family: "Microsoft YaHei", "WenQuanYi Micro Hei", sans-serif;
+  background: #f4f6f9; margin: 0; padding: 20px; color: #222;
+}
+.wrap { max-width: 1100px; margin: 0 auto; }
+h1 { font-size: 22px; color: #1a3a6b; border-left: 5px solid #1a3a6b; padding-left: 12px; }
+.toolbar {
+  display: flex; flex-wrap: wrap; gap: 10px; align-items: center;
+  background: #fff; padding: 14px 18px; border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,.06); margin-bottom: 16px;
+}
+.toolbar label { font-weight: 600; font-size: 14px; }
+select, button, input {
+  font-size: 14px; padding: 7px 11px; border: 1px solid #ccd; border-radius: 6px;
+  font-family: inherit;
+}
+button { background: #1a3a6b; color: #fff; cursor: pointer; border: none; }
+button:hover { background: #2a4f8f; }
+button.ghost { background: #fff; color: #1a3a6b; border: 1px solid #1a3a6b; }
+.tip { font-size: 12px; color: #888; margin-left: auto; }
+.safety { background: #fff8e1; border: 1px solid #ffcc80; color: #c66900; font-size: 13px; padding: 8px 14px; border-radius: 6px; margin: 10px 0 0; line-height: 1.6; }
+.safety b { color: #d84315; }
+.date-box {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: #eef3fb; padding: 6px 12px; border-radius: 6px; font-size: 14px;
+}
+.date-box input { padding: 4px 8px; font-size: 14px; }
+
+/* ===== 食谱表格 —— 复刻示例学校模板 ===== */
+.sheet { max-width: 1100px; margin: 0 auto; background: #fff; padding: 18px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,.06); }
+table { border-collapse: collapse; width: 100%; table-layout: fixed; }
+.title-row td { text-align: center; vertical-align: middle; padding: 10px; border: none; }
+.title-row .title { font-family: "SimSun", "宋体"; font-size: 22px; font-weight: bold; text-align: center; }
+.title-row .range { font-family: "SimSun", "宋体"; font-size: 14px; font-weight: bold; text-align: right; padding-right: 20px; color: #333; }
+.header-row td {
+  font-family: "SimSun", "宋体"; font-size: 16px; font-weight: bold;
+  text-align: center; vertical-align: middle; background: #eef3fb; padding: 8px; border: 1px solid #999;
+}
+td { border: 1px solid #999; vertical-align: top; }
+td.day {
+  font-family: "SimSun", "宋体"; font-size: 13px; font-weight: bold;
+  text-align: center; vertical-align: middle; width: 200px; white-space: nowrap; background: #fafbff;
+}
+td.meal { font-family: "SimHei", "黑体"; font-size: 12px; padding: 6px 8px; line-height: 1.7; vertical-align: top; }
+/* 菜品行：inline-flex 让菜名与右侧 ✕ 删除按钮垂直居中对齐；✕ 跟在菜名后，默认隐藏，hover 整行时显示 */
+td.meal .dish { display: inline-flex; align-items: center; gap: 8px; cursor: grab; }
+td.meal .dish:active { cursor: grabbing; }
+td.meal .dish .x { flex: none; color: #c33; cursor: pointer; font-size: 12px; line-height: 1; display: none; }
+td.meal .dish:hover .x { display: inline-block; }
+td.meal .dish.dragging { opacity: .4; }
+td.meal .add-hint { color: #1a3a6b; font-size: 11px; cursor: pointer; margin-top: 4px; opacity: .7; }
+td.meal .add-hint:hover { opacity: 1; text-decoration: underline; }
+td.meal.drop-over { background: #eef3fb; outline: 2px dashed #1a3a6b; outline-offset: -2px; }
+.staple { color: #888; font-size: 11px; }
+.notice { font-size: 12px; color: #d05; margin-top: 10px; }
+/* 菜品库选择列表：输入框下方常驻，带边框、可滚动；列表项样式沿用 .cand-btn */
+.lib-list {
+  border: 1px solid #ccd; border-radius: 6px; background: #fff;
+  max-height: 200px; overflow-y: auto; margin-top: 6px; padding: 4px;
+}
+/* 菜品列表项：纯文本行，不加边框方框；整行可点，hover 浅高亮提示 */
+.lib-list .cand-btn {
+  display: block; width: 100%; text-align: left; margin: 2px 0; padding: 6px 10px;
+  background: #fff; border: none; color: #1a3a6b; border-radius: 4px;
+}
+.lib-list .cand-btn:hover { background: #eef3fb; }

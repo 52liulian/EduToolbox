@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>幼儿园评语生成 | EduToolbox · 童化语气评语工具</title>
+<meta name="description" content="幼儿园期末评语生成器：10 大维度童化评语词库、温暖鼓励/童趣可爱/具体细致三种风格、男女孩与中性适配，一键为全班生成不雷同评语，支持复制、导出 Word/Excel/TXT，数据本地自动保存。">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%8E%93%3C/text%3E%3C/svg%3E">
+<link rel="stylesheet" href="kinder-comment.css">
+<link rel="stylesheet" href="../../assets/css/tool-common.css">
+</head>
+<body>
+
+<main class="wrap">
+  <!-- 控制面板：名单 / 维度 / 设置 -->
+  <section class="panels">
+
+    <!-- 名单管理 -->
+    <div class="panel panel-names">
+      <h3 class="panel-title">🧒 名单管理</h3>
+      <textarea id="nameInput" placeholder="每行输入一个姓名，最多 100 人&#10;例如：&#10;李一诺&#10;王梓萱"></textarea>
+      <div class="btn-row">
+        <button type="button" class="btn btn-soft" id="btnSample">✨ 填入示例名单</button>
+        <button type="button" class="btn btn-soft" id="btnClear">🗑 清空</button>
+      </div>
+      <p class="panel-tip">提示：名单会自动保存，刷新页面不丢失。</p>
+    </div>
+
+    <!-- 评语维度 -->
+    <div class="panel panel-dims">
+      <div class="panel-head">
+        <h3 class="panel-title">🏷 评语维度（点击标签勾选）</h3>
+        <div class="dim-tools">
+          <button type="button" class="btn-mini" id="btnDimAll">全选</button>
+          <button type="button" class="btn-mini" id="btnDimNone">全不选</button>
+        </div>
+      </div>
+      <div class="chips" id="dimChips"></div>
+      <p class="panel-tip">生成时将从每个已勾选分类中随机抽取 1 条，相邻两位小朋友不会抽到同一条。</p>
+    </div>
+
+    <!-- 生成设置 -->
+    <div class="panel panel-settings">
+      <h3 class="panel-title">⚙️ 生成设置</h3>
+      <div class="setting-grid">
+        <div class="setting-item">
+          <span class="setting-label">性别选择</span>
+          <div class="seg-group" id="genderGroup">
+            <label class="seg"><input type="radio" name="gender" value="neutral" checked><span>🌈 中性</span></label>
+            <label class="seg"><input type="radio" name="gender" value="boy"><span>👦 男孩</span></label>
+            <label class="seg"><input type="radio" name="gender" value="girl"><span>👧 女孩</span></label>
+          </div>
+        </div>
+        <div class="setting-item">
+          <span class="setting-label">评语风格</span>
+          <div class="seg-group" id="styleGroup">
+            <label class="seg"><input type="radio" name="style" value="warm" checked><span>💖 温暖鼓励</span></label>
+            <label class="seg"><input type="radio" name="style" value="cute"><span>🧸 童趣可爱</span></label>
+            <label class="seg"><input type="radio" name="style" value="detailed"><span>📝 具体细致</span></label>
+          </div>
+        </div>
+        <div class="setting-item">
+          <span class="setting-label">称呼前缀</span>
+          <label class="switch-wrap">
+            <span class="switch-desc">显示「XXX 小朋友 / 小男子汉 / 小公主：」前缀</span>
+            <span class="switch"><input type="checkbox" id="chkPrefix" checked><span class="slider"></span></span>
+          </label>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 生成按钮 + 统计 -->
+  <div class="action-bar">
+    <button type="button" class="btn btn-primary btn-lg" id="btnGenerate">🚀 一键生成全部评语</button>
+    <div class="stats">
+      <span class="stat">共 <b id="statPeople">0</b> 人</span>
+      <span class="stat">共 <b id="statChars">0</b> 字</span>
+    </div>
+  </div>
+
+  <!-- 导出工具栏 -->
+  <div class="toolbar">
+    <button type="button" class="btn btn-ghost" id="btnCopy">📋 复制全部</button>
+    <button type="button" class="btn btn-ghost" id="btnTxt">📄 下载 TXT</button>
+    <button type="button" class="btn btn-ghost" id="btnExcel">📊 下载 Excel</button>
+    <button type="button" class="btn btn-ghost" id="btnWord">📝 下载 Word</button>
+  </div>
+
+  <!-- 评语结果区 -->
+  <section class="results">
+    <h3 class="results-title">🎁 评语结果（可直接在卡片中修改）</h3>
+    <div class="state state--compact state--empty" id="emptyTip"><div class="state-icon">📝</div><div class="state-title">还没有评语</div><div class="state-desc">填好名单后点击「一键生成全部评语」试试吧～</div></div>
+    <div class="r-grid" id="resultWrap"></div>
+  </section>
+
+</main>
+<div class="toast" id="toast"></div>
+<script src="../../assets/js/frame-bridge.js"></script>
+<script src="../../assets/vendor/xlsx.full.min.js"></script>
+<script src="kinder-comment.js"></script>
+</body>
+</html>

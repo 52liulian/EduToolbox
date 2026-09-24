@@ -1,0 +1,148 @@
+/**
+ * EduToolbox · 工具 mount 基样式
+ * ============================================================================
+ * 作用：为「同一文档直挂(mount)」的工具提供最小公共底座，替代工具在三件套
+ *       独立页面里依赖的 tool-common.css 基础类（如 .container/.btn/.ghost 等）。
+ * 样式作用域：工具相关选择器一律以 .tool-root 为前缀；例外有两处——
+ *   ①「挂载容器隔离」段用 .tool-iframe-wrap 命中挂载宿主（站点级元素）；
+ *   ②深色主题兜底用 body.dark 前缀。避免与站点以及其它已挂载工具互相污染。
+ * 加载时机：由 toolkit.js 在首次挂载工具时注入 <link>（仅一次）。
+ * ============================================================================
+ */
+
+/* ============================================================================
+ * 挂载容器隔离（层叠上下文）
+ * ----------------------------------------------------------------------------
+ * 问题（2026-09-21「顶栏菜单被遮挡」事故）：
+ *   工具 CSS 里普遍存在 `.modal-mask{z-index:1000}`、`.toast{z-index:1200}`、
+ *   各类 `position:fixed` 浮层，而站点顶栏 `.topnav` 只有 z-index:100
+ *   （layout.css）。适配器路径有 Shadow DOM 兜住大半，但 native 直挂路径的
+ *   浮层与桌面端打印面板会直接进入文档层叠；即便是 Shadow 内部的 fixed 浮层，
+ *   也会以视口定位参与外层排序 —— 结果就是工具一打开，下拉菜单被压在下面。
+ * 方案：给挂载容器建立独立层叠上下文（position:relative + z-index:0 +
+ *   isolation:isolate）。此后工具内部无论 z-index 写多大，都只在容器内部排序，
+ *   整个容器作为 z-index:0 的一层，永远低于 z-index:100 的 .topnav。
+ *   —— 不必抬高 .topnav 的 z-index（那会连带影响其它浮层层级）。
+ * 覆盖两条路径：
+ *   .tool-root       → native 组件（toolkit.open 添加）+ 适配器宿主（本次同步添加）
+ *   .tool-iframe-wrap→ 兜底 iframe 容器（layout.css 定义，此处补 z-index/isolation）
+ * ========================================================================== */
+.tool-root,
+.tool-iframe-wrap {
+  position: relative;
+  z-index: 0;
+  isolation: isolate;
+}
+
+/* ---- 布局底座：工具内部的 container（三件套里原由 tool-common/.css 提供） ---- */
+.tool-root .container {
+  width: 100%;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 16px;
+  box-sizing: border-box;
+}
+.tool-root *, .tool-root *::before, .tool-root *::after { box-sizing: border-box; }
+
+/* ---- 六色主题兜底（直挂场景） ----
+ * 工具自带的 `body[data-theme="x"]{--primary:…}` 依赖 <body>，直挂时不一定命中；
+ * toolkit.js 会把主题写到 .tool-root[data-theme] 上，此处按同一选择器补齐兜底，
+ * 供自身未声明六色变量的工具（如 rollcall / scoreboard）使用。
+ * 工具自身 CSS 后加载，其 `.tool-root[data-theme]` 或 body 规则仍可覆盖本段。
+ *
+ * 【2026-09-21 收敛】这里原本每段是三个选择器并列（.tool-root / :root / body）。
+ * QA 实证指出：本表由 <link> 注入在 head 末尾，而 `body[data-theme="x"]`
+ * 特异性 0-1-1 高于站点 `:root` 的 0-1-0 —— 一旦有人给真实 <body> 写上
+ * data-theme（项目里已有 25 个工具 JS 这么写，目前都跑在适配器 Shim 里才没触发，
+ * 任意原生工具照惯例加一句即中招），--primary 会立刻从 #3b6ef6 被改写成主题色，
+ * 污染 body 之下的整个站点。
+ * 因此只保留 .tool-root[data-theme="x"] 一支：
+ *   · native 路径 —— toolkit.open() 给挂载容器加 .tool-root，syncToolTheme()
+ *     把 data-theme 写在同一个元素上，选择器命中；
+ *   · adapter 路径 —— tool-adapter.js 给影子树宿主（#toolMount）同时加
+ *     .tool-root 与 data-theme，自定义属性可穿透 Shadow 边界继承进工具内部。
+ * 实测（verify_theme_variants.py）：删掉两支后两条路径的 --primary 取值与删前
+ * 完全一致，且 body 被写 data-theme 时站点 --primary 不再被改写。 */
+.tool-root[data-theme="sky"]    { --primary:#0ea5e9; --primary-soft:#e0f2fe; --primary-soft-2:#ccecfc; --primary-grad:linear-gradient(135deg,#38bdf8,#0ea5e9,#0284c7); }
+.tool-root[data-theme="violet"] { --primary:#7c3aed; --primary-soft:#f0e9fe; --primary-soft-2:#e2d5fc; --primary-grad:linear-gradient(135deg,#8b5cf6,#7c3aed,#6d28d9); }
+.tool-root[data-theme="green"]  { --primary:#16a34a; --primary-soft:#e7f6ec; --primary-soft-2:#d3f0dc; --primary-grad:linear-gradient(135deg,#22c55e,#16a34a,#15803d); }
+.tool-root[data-theme="gold"]   { --primary:#d97706; --primary-soft:#fdf1dc; --primary-soft-2:#fbe3bc; --primary-grad:linear-gradient(135deg,#f59e0b,#d97706,#b45309); }
+.tool-root[data-theme="orange"] { --primary:#ea580c; --primary-soft:#ffefe4; --primary-soft-2:#ffdec9; --primary-grad:linear-gradient(135deg,#fb923c,#ea580c,#c2410c); }
+.tool-root[data-theme="pink"]   { --primary:#db2777; --primary-soft:#fce7f0; --primary-soft-2:#f9cfe1; --primary-grad:linear-gradient(135deg,#f472b6,#db2777,#be185d); }
+
+/* ---- 工具按钮：兜底各类变体（具体工具会用自己的 .css 覆盖定制色） ---- */
+.tool-root .btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 0.55rem 1.1rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  line-height: 1.2;
+  color: #fff;
+  background: linear-gradient(135deg, #5a8dff, #3b6ef6);
+  border: none;
+  border-radius: 0.6rem;
+  cursor: pointer;
+  box-shadow: 0 6px 16px rgba(59, 110, 246, 0.24);
+  transition: transform 0.15s ease, box-shadow 0.15s ease, opacity 0.15s ease;
+}
+.tool-root .btn:hover { transform: translateY(-1px); box-shadow: 0 8px 20px rgba(59, 110, 246, 0.32); }
+.tool-root .btn:active { transform: translateY(0); }
+
+.tool-root .btn.ghost,
+.tool-root .btn.btn-ghost {
+  color: #3b6ef6;
+  background: #eef2fe;
+  box-shadow: none;
+  border: 1px solid #dbe4ff;
+}
+.tool-root .btn.ghost:hover,
+.tool-root .btn.btn-ghost:hover { background: #e3eafc; }
+
+.tool-root .btn.btn-primary {
+  color: #fff;
+  background: linear-gradient(135deg, #5a8dff, #3b6ef6);
+}
+.tool-root .btn.btn-danger {
+  color: #fff;
+  background: linear-gradient(135deg, #f87171, #dc2626);
+  box-shadow: 0 6px 16px rgba(220, 38, 38, 0.24);
+}
+
+/* ---- 文本输入兜底 ---- */
+.tool-root input[type="text"],
+.tool-root input[type="number"],
+.tool-root input[type="color"],
+.tool-root textarea {
+  border: 1px solid #d8e0f0;
+  border-radius: 0.5rem;
+  padding: 0.5rem 0.7rem;
+  font-size: 0.95rem;
+  font-family: inherit;
+  color: #1f2733;
+  background: #fff;
+}
+.tool-root input:focus,
+.tool-root textarea:focus {
+  outline: none;
+  border-color: #3b6ef6;
+  box-shadow: 0 0 0 0.2rem rgba(59, 110, 246, 0.14);
+}
+
+/* ---- 深色主题下的兜底 ---- */
+body.dark .tool-root .btn.ghost,
+body.dark .tool-root .btn.btn-ghost {
+  color: #a8c1ff;
+  background: #23304f;
+  border-color: #2a3a60;
+}
+body.dark .tool-root .btn.btn-danger { background: linear-gradient(135deg, #f87171, #dc2626); }
+body.dark .tool-root input[type="text"],
+body.dark .tool-root input[type="number"],
+body.dark .tool-root textarea {
+  color: #e7ecf5;
+  background: #1e2637;
+  border-color: #2a3a60;
+}

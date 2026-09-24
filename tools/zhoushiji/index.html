@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" href="static/zhoushiji.ico" type="image/x-icon">
+<title>周食记 · zhoushiji</title>
+<link rel="stylesheet" href="static/style.css">
+<style>
+/* ============================================================================
+ * EduToolbox 组件化挂载兜底（自动追加）
+ * ----------------------------------------------------------------------------
+ * 本工具未引入 assets/css/tool-common.css，挂载进站点（Shadow DOM）后会缺少：
+ *   1) 六色主题变量 --primary / --primary-soft / --primary-grad
+ *   2) .container 的宽度约束（否则内容铺满并贴边）
+ * 这里补齐最小等价集，保证「独立打开」与「站点内组件化挂载」视觉一致。
+ * ========================================================================== */
+
+:root,
+:host,
+body[data-theme="sky"]   { --primary:#0ea5e9; --primary-soft:#e0f2fe; --primary-soft-2:#ccecfc; --primary-grad:linear-gradient(135deg,#38bdf8,#0ea5e9,#0284c7); }
+body[data-theme="violet"]{ --primary:#7c3aed; --primary-soft:#f0e9fe; --primary-soft-2:#e2d5fc; --primary-grad:linear-gradient(135deg,#8b5cf6,#7c3aed,#6d28d9); }
+body[data-theme="green"] { --primary:#16a34a; --primary-soft:#e7f6ec; --primary-soft-2:#d3f0dc; --primary-grad:linear-gradient(135deg,#22c55e,#16a34a,#15803d); }
+body[data-theme="gold"]  { --primary:#d97706; --primary-soft:#fdf1dc; --primary-soft-2:#fbe3bc; --primary-grad:linear-gradient(135deg,#f59e0b,#d97706,#b45309); }
+body[data-theme="orange"]{ --primary:#ea580c; --primary-soft:#ffefe4; --primary-soft-2:#ffdec9; --primary-grad:linear-gradient(135deg,#fb923c,#ea580c,#c2410c); }
+body[data-theme="pink"]  { --primary:#db2777; --primary-soft:#fce7f0; --primary-soft-2:#f9cfe1; --primary-grad:linear-gradient(135deg,#f472b6,#db2777,#be185d); }
+
+/* 容器宽度兜底：仅在工具自身未声明时生效（不覆盖已有 .container 规则） */
+.container:not([data-no-fallback]) {
+  width: 100%;
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 28px 24px 56px;
+  box-sizing: border-box;
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="toolbar">
+    <label>学校名称：</label>
+    <input type="text" id="schoolName" style="min-width:170px;" placeholder="示例学校" onchange="onSchoolNameChange()">
+    <label>选择周：</label>
+    <button onclick="goPrevWeek()" title="上一周">◀</button>
+    <select id="weekSel" style="min-width:210px;"></select>
+    <button onclick="goNextWeek()" title="下一周">▶</button>
+    <span class="date-box" style="display:none;">
+      <label>开始：</label><input type="date" id="startDate">
+      <label>结束：</label><input type="date" id="endDate">
+    </span>
+    <button onclick="render()" style="display:none;">刷新</button>
+    <button onclick="openDishLibrary()">🥬 菜品库</button>
+    <button onclick="analyze()">📊 均衡检查</button>
+    <button onclick="exportExcel()" class="ghost">📥 导出Excel</button>
+    <span class="tip">提示：点击餐格 ➕ 加菜，✕ 删菜</span>
+  </div>
+  </div>
+
+  <div class="sheet">
+    <table id="menuTable">
+      <colgroup><col style="width:150px;"><col><col><col></colgroup>
+      <tbody>
+        <tr class="title-row"><td class="title" id="tblTitle" colspan="4">示例学校一周食谱</td></tr>
+        <tr class="title-row"><td class="range" id="tblRange" colspan="4"></td></tr>
+        <tr class="header-row"><td>星期</td><td>早&nbsp;&nbsp;餐</td><td>中&nbsp;&nbsp;餐</td><td>晚&nbsp;&nbsp;餐</td></tr>
+        <tbody id="mealBody"></tbody>
+      </tbody>
+    </table>
+    <div class="notice" id="notice"></div>
+  </div>
+  <div class="safety" style="max-width:1100px;margin:35px auto 0;">⚠️ <b>重要：数据安全提醒</b><br>本工具数据保存在浏览器本地，清理浏览器缓存或更换设备会导致数据丢失。菜谱完成后请<b>立即导出 Excel</b>，并存至电脑、微信收藏或云盘永久保存。</div>
+</div>
+
+<!-- 弹窗：添加菜品 / 菜品库 -->
+<div id="modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:50;align-items:center;justify-content:center;">
+  <div id="modalBox" style="background:#fff;padding:22px;border-radius:10px;min-width:440px;max-width:95vw;box-sizing:border-box;">
+    <h3 id="modalTitle" style="margin-top:0;"></h3>
+    <div id="modalBody"></div>
+    <div style="text-align:right;margin-top:14px;"><button class="ghost" onclick="closeModal()">取消</button></div>
+  </div>
+</div>
+
+<script src="../../assets/js/frame-bridge.js"></script>
+<script src="static/app.js"></script>
+</body>
+</html>

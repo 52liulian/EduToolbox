@@ -1,0 +1,190 @@
+/* ============================================================================
+ * 高中评语生成 · senior-comment.css
+ * 仅包含本工具特有样式：评语结果卡片 / 维度工具按钮 / 结果 textarea
+ * 公共底座（容器、面板、按钮、stat、toast、r-grid）见 tool-common.css
+ * 高度策略：所有容器高度自动撑开，仅 body 主滚动条
+ * ========================================================================== */
+
+/* ---------------------------------------------------------------------------
+ * 一、维度面板的工具按钮组（全选 / 全不选）放在面板头右侧
+ * ------------------------------------------------------------------------- */
+#app .panel-dims .panel-head {
+  margin-bottom: 10px;
+}
+
+.dim-tools {
+  display: inline-flex;
+  gap: 6px;
+}
+
+/* 维度 chips 区：紧凑两列以上排布 */
+#app .panel-dims .chips {
+  gap: 8px;
+}
+
+#app .panel-dims .chip {
+  padding: 7px 14px;
+  font-size: 13px;
+}
+
+/* ---------------------------------------------------------------------------
+ * 二、生成设置面板：让 setting-grid 在窄屏单列堆叠
+ * ------------------------------------------------------------------------- */
+.panel-settings .setting-grid {
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+}
+
+/* seg-group 在 setting-item 内部时撑满 */
+.setting-item .seg-group { flex-wrap: wrap; }
+
+.setting-item--full { grid-column: 1 / -1; }
+
+/* ---------------------------------------------------------------------------
+ * 三、操作栏 + 统计：左右对齐
+ * ------------------------------------------------------------------------- */
+#app .action-bar {
+  margin: 22px 0 18px;
+}
+
+#app .action-bar .stats {
+  gap: 22px;
+}
+
+#app .action-bar .stat b {
+  font-size: 22px;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------------------------------------------------------------------------
+ * 四、导出工具栏：按钮间距统一
+ * ------------------------------------------------------------------------- */
+#app .toolbar {
+  padding: 14px 18px;
+  margin-bottom: 22px;
+}
+
+#app .toolbar .btn {
+  padding: 9px 18px;
+  font-size: 13.5px;
+}
+
+/* ---------------------------------------------------------------------------
+ * 五、评语结果卡片（JS 动态生成 .r-card / .r-head / .r-no / .r-name / .r-text）
+ * ------------------------------------------------------------------------- */
+#app .r-grid {
+  grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+  gap: 16px;
+}
+
+.r-card {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 18px;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  box-shadow: var(--shadow-sm);
+  transition: box-shadow var(--t-fast) var(--ease), transform var(--t-fast) var(--ease);
+}
+
+.r-card:hover {
+  box-shadow: var(--shadow);
+  transform: translateY(-1px);
+}
+
+.r-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding-bottom: 10px;
+  border-bottom: 1px dashed var(--border);
+}
+
+.r-no {
+  display: inline-grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  flex-shrink: 0;
+  font-size: 13px;
+  font-weight: 700;
+  color: #fff;
+  background: var(--primary-grad);
+  border-radius: 50%;
+  font-variant-numeric: tabular-nums;
+}
+
+.r-name {
+  flex: 1;
+  min-width: 0;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text-1);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.r-head .btn-mini {
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
+/* 评语文本域：可编辑，宽松行高便于阅读 */
+.r-text {
+  width: 100%;
+  min-height: 200px;
+  padding: 12px 14px;
+  font-size: 14px;
+  line-height: 1.85;
+  color: var(--text-1);
+  background: var(--card-bg-2);
+  border: 1.5px solid var(--border);
+  border-radius: var(--r-sm);
+  resize: vertical;
+  outline: none;
+  transition: border-color var(--t-fast) var(--ease), box-shadow var(--t-fast) var(--ease);
+}
+
+.r-text:focus {
+  border-color: var(--primary);
+  background: #fff;
+  box-shadow: 0 0 0 3px rgba(59, 110, 246, 0.12);
+}
+
+/* ---------------------------------------------------------------------------
+ * 六、空提示：在结果区上方居中显示
+ * ------------------------------------------------------------------------- */
+#app .results .empty-tip {
+  padding: 40px 20px;
+  font-size: 15px;
+  color: var(--text-3);
+  background: var(--bg-soft);
+  border: 1.5px dashed var(--border-2);
+  border-radius: var(--r);
+}
+
+/* ---------------------------------------------------------------------------
+ * 七、小屏微调
+ * ------------------------------------------------------------------------- */
+@media (max-width: 720px) {
+  /* 双栏面板在窄屏单列堆叠 */
+  #app .panels {
+    grid-template-columns: 1fr;
+  }
+  #app .panel-names,
+  #app .panel-dims,
+  #app .panel-settings { grid-column: 1; }
+
+  /* 结果卡片单列 */
+  #app .r-grid { grid-template-columns: 1fr; }
+
+  /* 操作栏：按钮与统计垂直堆叠 */
+  #app .action-bar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 14px;
+  }
+  #app .action-bar .stats { justify-content: center; }
+}

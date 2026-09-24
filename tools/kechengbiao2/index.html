@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>智能课程表工具 | 免费在线排课系统</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <script src="../../assets/js/frame-bridge.js"></script>
+<script src="js/html2canvas.min.js"></script>
+<style>
+/* ============================================================================
+ * EduToolbox 组件化挂载兜底（自动追加）
+ * ----------------------------------------------------------------------------
+ * 本工具未引入 assets/css/tool-common.css，挂载进站点（Shadow DOM）后会缺少：
+ *   1) 六色主题变量 --primary / --primary-soft / --primary-grad
+ *   2) .container 的宽度约束（否则内容铺满并贴边）
+ * 这里补齐最小等价集，保证「独立打开」与「站点内组件化挂载」视觉一致。
+ * ========================================================================== */
+
+:root,
+:host,
+body[data-theme="sky"]   { --primary:#0ea5e9; --primary-soft:#e0f2fe; --primary-soft-2:#ccecfc; --primary-grad:linear-gradient(135deg,#38bdf8,#0ea5e9,#0284c7); }
+body[data-theme="violet"]{ --primary:#7c3aed; --primary-soft:#f0e9fe; --primary-soft-2:#e2d5fc; --primary-grad:linear-gradient(135deg,#8b5cf6,#7c3aed,#6d28d9); }
+body[data-theme="green"] { --primary:#16a34a; --primary-soft:#e7f6ec; --primary-soft-2:#d3f0dc; --primary-grad:linear-gradient(135deg,#22c55e,#16a34a,#15803d); }
+body[data-theme="gold"]  { --primary:#d97706; --primary-soft:#fdf1dc; --primary-soft-2:#fbe3bc; --primary-grad:linear-gradient(135deg,#f59e0b,#d97706,#b45309); }
+body[data-theme="orange"]{ --primary:#ea580c; --primary-soft:#ffefe4; --primary-soft-2:#ffdec9; --primary-grad:linear-gradient(135deg,#fb923c,#ea580c,#c2410c); }
+body[data-theme="pink"]  { --primary:#db2777; --primary-soft:#fce7f0; --primary-soft-2:#f9cfe1; --primary-grad:linear-gradient(135deg,#f472b6,#db2777,#be185d); }
+
+/* 容器宽度兜底：仅在工具自身未声明时生效（不覆盖已有 .container 规则） */
+.container:not([data-no-fallback]) {
+  width: 100%;
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 28px 24px 56px;
+  box-sizing: border-box;
+}
+</style>
+</head>
+<body>
+    <!-- 固定顶部区域 -->
+    <div class="fixed-top-area">
+        <header class="header">
+            <!-- 手机端汉堡菜单按钮 倾企企业服务 -->
+            <button id="hamburgerBtn" class="hamburger-btn">
+                <span class="hamburger-line"></span>
+                <span class="hamburger-line"></span>
+                <span class="hamburger-line"></span>
+            </button>
+            <div class="title-section">
+                <input type="text" id="timetableTitle" class="timetable-title" value="我的课程表" placeholder="请输入课程表名称" readonly style="cursor: default;">
+            </div>
+            <div class="controls">
+                <button id="tutorialBtn" class="btn danger">
+                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"/>
+                        <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/>
+                        <line x1="12" y1="17" x2="12.01" y2="17"/>
+                    </svg>
+                    教程
+                </button>
+                <button id="resetBtn" class="btn secondary">
+                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/>
+                        <path d="M21 3v5h-5"/>
+                        <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/>
+                        <path d="M3 21v-5h5"/>
+                    </svg>
+                    重置课表
+                </button>
+                <div class="export-dropdown">
+                    <button id="exportBtn" class="btn primary">
+                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                            <polyline points="7,10 12,15 17,10"/>
+                            <line x1="12" y1="15" x2="12" y2="3"/>
+                        </svg>
+                        导出打印
+                    </button>
+                    <div class="export-menu" id="exportMenu">
+                        <button id="saveImageBtn" class="export-item">
+                            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                                <circle cx="8.5" cy="8.5" r="1.5"/>
+                                <polyline points="21,15 16,10 5,21"/>
+                            </svg>
+                            保存图片
+                        </button>
+                        <button id="exportWordBtn" class="export-item">
+                            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                                <polyline points="14,2 14,8 20,8"/>
+                                <line x1="16" y1="13" x2="8" y2="13"/>
+                                <line x1="16" y1="17" x2="8" y2="17"/>
+                                <polyline points="10,9 9,9 8,9"/>
+                            </svg>
+                            导出Word
+                        </button>
+                        <button id="exportExcelBtn" class="export-item">
+                            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                                <polyline points="14,2 14,8 20,8"/>
+                                <line x1="16" y1="13" x2="8" y2="13"/>
+                                <line x1="16" y1="17" x2="8" y2="17"/>
+                                <polyline points="10,9 9,9 8,9"/>
+                            </svg>
+                            导出Excel
+                        </button>
+                    </div>
+                </div>
+                <div class="backup-dropdown">
+                    <button id="backupBtn" class="btn primary">
+                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+                            <polyline points="3.27,6.96 12,12.01 20.73,6.96"/>
+                            <line x1="12" y1="22.08" x2="12" y2="12"/>
+                        </svg>
+                        备份数据
+                    </button>
+                    <div class="backup-menu" id="backupMenu">
+                        <button id="exportDataBtn" class="backup-item">
+                            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                                <polyline points="7,10 12,15 17,10"/>
+                                <line x1="12" y1="15" x2="12" y2="3"/>
+                            </svg>
+                            导出数据
+                        </button>
+                        <button id="importDataBtn" class="backup-item">
+                            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                                <polyline points="17,8 12,3 7,8"/>
+                                <line x1="12" y1="3" x2="12" y2="15"/>
+                            </svg>
+                            导入数据
+                        </button>
+                    </div>
+                </div>
+                <div class="font-dropdown">
+                    <button id="fontBtn" class="btn primary">
+                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M4 7V4h16v3"/>
+                            <path d="M9 20h6"/>
+                            <path d="M12 4v16"/>
+                        </svg>
+                        字体
+                    </button>
+                    <div class="font-menu" id="fontMenu">
+                        <button class="font-item" data-font="system">系统默认</button>
+                        <button class="font-item" data-font="microsoft-yahei">微软雅黑</button>
+                        <button class="font-item" data-font="simsun">宋体</button>
+                        <button class="font-item" data-font="heiti">黑体</button>
+                        <button class="font-item" data-font="kaiti">楷体</button>
+                        <button class="font-item" data-font="fangsong">仿宋</button>
+                        <button class="font-item" data-font="xingkai">行楷字体</button>
+                        <button class="font-item" data-font="lishu">隶书字体</button>
+                        <button class="font-item" data-font="kaiti">楷体字体</button>
+                        <button class="font-item" data-font="fangsong">仿宋字体</button>
+                        <button class="font-item" data-font="youyuan">幼圆字体</button>
+                        <button class="font-item" data-font="source-han-sans">思源黑体</button>
+                        <button class="font-item" data-font="source-han-serif">思源宋体</button>
+                        <button class="font-item" data-font="arial">Arial</button>
+                        <button class="font-item" data-font="helvetica">Helvetica</button>
+                        <button class="font-item" data-font="georgia">Georgia</button>
+                        <button class="font-item" data-font="times-new-roman">Times New Roman</button>
+                    </div>
+                </div>
+                <div class="theme-dropdown">
+                    <button id="themeBtn" class="btn primary">
+                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="3"/>
+                            <path d="M12 1v6m0 6v6m4.22-13.22l4.24 4.24M1.54 1.54l4.24 4.24M20.46 20.46l-4.24-4.24M1.54 20.46l4.24-4.24"/>
+                        </svg>
+                        主题
+                    </button>
+                    <div class="theme-menu" id="themeMenu">
+                        <button class="theme-item" data-theme="default">默认主题</button>
+                        <button class="theme-item" data-theme="blue">蓝色主题</button>
+                        <button class="theme-item" data-theme="purple">紫色主题</button>
+                        <button class="theme-item" data-theme="pink">粉色主题</button>
+                        <button class="theme-item" data-theme="orange">橙色主题</button>
+                        <button class="theme-item" data-theme="dark">深色主题</button>
+                        <div class="custom-color" style="padding: 10px; border-top: 1px solid var(--border-color); display: flex; align-items: center; gap: 8px;">
+                            <input type="color" id="customColorPicker" value="#4a7c59" style="width: 32px; height: 32px; border: none; cursor: pointer; border-radius: 4px;">
+                            <span style="font-size: 14px; color: var(--text-color);">自定义</span>
+                        </div>
+                    </div>
+                </div>
+                <button id="settingsBtn" class="btn primary">
+                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="3"/>
+                        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1 1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+                    </svg>
+                    设置
+                </button>
+            </div>
+        </header>
+        
+        <div class="period-controls">
+            <div class="period-control-line">
+                <span>上午课时</span>
+                <button id="addMorningBtn" class="btn small">增加</button>
+                <button id="removeMorningBtn" class="btn small danger">减少</button>
+            </div>
+            <div class="period-control-line">
+                <span>下午课时</span>
+                <button id="addAfternoonBtn" class="btn small">增加</button>
+                <button id="removeAfternoonBtn" class="btn small danger">减少</button>
+            </div>
+            <div class="period-control-line">
+                <span>晚上课时</span>
+                <button id="addEveningBtn" class="btn small">增加</button>
+                <button id="removeEveningBtn" class="btn small danger">减少</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 主要内容区域 -->
+    <div class="container">
+        <main class="main-content">
+            <!-- 左侧栏：课时控制和科目池 倾企版权所有-->
+            <div class="left-sidebar">
+                <!-- 课时设置主标题 -->
+                <h3 class="section-title">课时设置</h3>
+                
+                <!-- PC端课时控制区域倾企企服 -->
+                <div class="period-controls-desktop">
+                    <div class="period-control-line">
+                        <span>上午课时</span>
+                        <button id="addMorningBtn2" class="btn small">增加</button>
+                        <button id="removeMorningBtn2" class="btn small danger">减少</button>
+                    </div>
+                    <div class="period-control-line">
+                        <span>下午课时</span>
+                        <button id="addAfternoonBtn2" class="btn small">增加</button>
+                        <button id="removeAfternoonBtn2" class="btn small danger">减少</button>
+                    </div>
+                    <div class="period-control-line">
+                        <span>晚上课时</span>
+                        <button id="addEveningBtn2" class="btn small">增加</button>
+                        <button id="removeEveningBtn2" class="btn small danger">减少</button>
+                    </div>
+                </div>
+                
+                <div class="subject-pool">
+                    <!-- 科目池主标题 -->
+                    <h3 class="section-title">科目池</h3>
+                    <div class="subject-pool-header">
+                        <button id="importSubjectBtn" class="btn secondary">导入科目</button>
+                        <button id="addSubjectBtn" class="btn primary">+ 科目</button>
+                    </div>
+                    <div id="subjectPool" class="subjects">
+                        <!-- 科目卡片将在这里动态生成 -->
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 右侧栏：倾企课程表格 -->
+            <div class="right-content">
+
+            <div class="timetable-container">
+                <div class="timetable-title-section">
+                    <input type="text" id="tableTitle" class="table-title-input" value="周一到周五课程表" placeholder="请输入课程表名称">
+                </div>
+                <div class="timetable-wrapper">
+                    <table class="timetable" id="timetable">
+                        <thead>
+                            <tr>
+                                <th class="time-header">时间</th>
+                                <th class="period-header">课时</th>
+                                <th class="weekday-col">周一</th>
+                                <th class="weekday-col">周二</th>
+                                <th class="weekday-col">周三</th>
+                                <th class="weekday-col">周四</th>
+                                <th class="weekday-col">周五</th>
+                                <th class="weekend-col" id="saturdayCol">周六</th>
+                                <th class="weekend-col" id="sundayCol">周日</th>
+                            </tr>
+                        </thead>
+                        <tbody id="timetableBody">
+                            <!-- 动态生成的内容 -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            </div> 
+        </main>
+    </div>
+
+    <!-- 科目编辑弹窗 -->
+    <div id="subjectModal" class="modal">
+        <div class="modal-content">
+            <h3>科目设置</h3>
+            <form id="subjectForm">
+                <div class="form-group">
+                    <label>科目名称</label>
+                    <input type="text" id="subjectName" required>
+                </div>
+                <div class="form-group">
+                    <label>老师姓名</label>
+                    <input type="text" id="teacherName" placeholder="可选">
+                </div>
+                <div class="form-group">
+                    <label>颜色模式</label>
+                    <div class="color-mode-selector">
+                        <label class="color-mode-option">
+                            <input type="radio" name="colorMode" value="both" checked>
+                            <span>背景+字体</span>
+                        </label>
+                        <label class="color-mode-option">
+                            <input type="radio" name="colorMode" value="textOnly">
+                            <span>仅字体色</span>
+                        </label>
+                    </div>
+                </div>
+                <div class="form-group color-group" id="bgColorGroup">
+                    <label>背景色</label>
+                    <div class="color-options">
+                        <div class="preset-colors" id="backgroundColors">
+                            <!-- 18种背景色 -->
+                            <div class="color-option bg-color" data-color="#3498DB" style="background: #3498DB" title="明亮蓝"></div>
+                            <div class="color-option bg-color" data-color="#2ECC71" style="background: #2ECC71" title="鲜绿色"></div>
+                            <div class="color-option bg-color" data-color="#E74C3C" style="background: #E74C3C" title="亮红色"></div>
+                            <div class="color-option bg-color" data-color="#9B59B6" style="background: #9B59B6" title="紫罗兰"></div>
+                            <div class="color-option bg-color" data-color="#F39C12" style="background: #F39C12" title="橙黄色"></div>
+                            <div class="color-option bg-color" data-color="#1ABC9C" style="background: #1ABC9C" title="青绿色"></div>
+                            <div class="color-option bg-color" data-color="#D35400" style="background: #D35400" title="南瓜橙"></div>
+                            <div class="color-option bg-color" data-color="#C0392B" style="background: #C0392B" title="深红色"></div>
+                            <div class="color-option bg-color" data-color="#8E44AD" style="background: #8E44AD" title="深紫色"></div>
+                            <div class="color-option bg-color" data-color="#2980B9" style="background: #2980B9" title="天蓝色"></div>
+                            <div class="color-option bg-color" data-color="#27AE60" style="background: #27AE60" title="森林绿"></div>
+                            <div class="color-option bg-color" data-color="#E67E22" style="background: #E67E22" title="胡萝卜橙"></div>
+                            <div class="color-option bg-color" data-color="#16A085" style="background: #16A085" title="海绿色"></div>
+                            <div class="color-option bg-color" data-color="#D68910" style="background: #D68910" title="金黄橙"></div>
+                            <div class="color-option bg-color" data-color="#A569BD" style="background: #A569BD" title="薰衣草紫"></div>
+                            <div class="color-option bg-color" data-color="#5D6D7E" style="background: #5D6D7E" title="石板灰"></div>
+                            <div class="color-option bg-color" data-color="#F7DC6F" style="background: #F7DC6F" title="淡黄色"></div>
+                            <div class="color-option bg-color" data-color="#85C1E9" style="background: #85C1E9" title="浅蓝色"></div>
+                        </div>
+                        <div class="custom-color-inline">
+                            <input type="color" id="bgColorPicker" value="#3498DB">
+                            <input type="text" id="bgColorText" placeholder="#3498DB" maxlength="7">
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group color-group" id="textColorGroup">
+                    <label>字体色</label>
+                    <div class="color-options">
+                        <div class="preset-colors" id="textColors">
+                            <!-- 18种字体色 -->
+                            <div class="color-option text-color" data-color="#FFFFFF" style="background: #FFFFFF; border: 1px solid #ddd;" title="白色"></div>
+                            <div class="color-option text-color" data-color="#000000" style="background: #000000" title="黑色"></div>
+                            <div class="color-option text-color" data-color="#2C3E50" style="background: #2C3E50" title="深蓝灰"></div>
+                            <div class="color-option text-color" data-color="#1B2631" style="background: #1B2631" title="墨黑色"></div>
+                            <div class="color-option text-color" data-color="#154360" style="background: #154360" title="午夜蓝"></div>
+                            <div class="color-option text-color" data-color="#1A5276" style="background: #1A5276" title="深海蓝"></div>
+                            <div class="color-option text-color" data-color="#0E6251" style="background: #0E6251" title="深松绿"></div>
+                            <div class="color-option text-color" data-color="#145A32" style="background: #145A32" title="墨绿色"></div>
+                            <div class="color-option text-color" data-color="#186A3B" style="background: #186A3B" title="深林绿"></div>
+                            <div class="color-option text-color" data-color="#4A235A" style="background: #4A235A" title="深紫色"></div>
+                            <div class="color-option text-color" data-color="#512E5F" style="background: #512E5F" title="紫罗兰"></div>
+                            <div class="color-option text-color" data-color="#6C3483" style="background: #6C3483" title="葡萄紫"></div>
+                            <div class="color-option text-color" data-color="#78281F" style="background: #78281F" title="暗红色"></div>
+                            <div class="color-option text-color" data-color="#641E16" style="background: #641E16" title="深酒红"></div>
+                            <div class="color-option text-color" data-color="#7E5109" style="background: #7E5109" title="深土黄"></div>
+                            <div class="color-option text-color" data-color="#E74C3C" style="background: #E74C3C" title="亮红色"></div>
+                            <div class="color-option text-color" data-color="#3498DB" style="background: #3498DB" title="明亮蓝"></div>
+                            <div class="color-option text-color" data-color="#27AE60" style="background: #27AE60" title="森林绿"></div>
+                        </div>
+                        <div class="custom-color-inline">
+                            <input type="color" id="textColorPicker" value="#FFFFFF">
+                            <input type="text" id="textColorText" placeholder="#FFFFFF" maxlength="7">
+                        </div>
+                    </div>
+                </div>
+                <div class="color-preview-section">
+                    <label>预览效果</label>
+                    <div class="color-preview" id="colorPreview">科目名称</div>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn primary">保存</button>
+                    <button type="button" id="deleteSubjectBtn" class="btn danger" style="display: none;">删除</button>
+                    <button type="button" id="cancelBtn" class="btn secondary">取消</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 时间编辑弹窗 -->
+    <div id="timeModal" class="modal">
+        <div class="modal-content">
+                <h3>修改课时</h3>
+                <form id="timeForm">
+                    <div class="form-group">
+                        <label>课时名称</label>
+                        <input type="text" id="periodName" required placeholder="第1课时">
+                    </div>
+                <div class="form-group">
+                    <label>开始时间</label>
+                    <div style="display: flex; gap: 10px; align-items: center;">
+                        <select id="startHour" style="flex: 1; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                            <option value="">时</option>
+                        </select>
+                        <span>:</span>
+                        <select id="startMinute" style="flex: 1; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                            <option value="">分</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>结束时间</label>
+                    <div style="display: flex; gap: 10px; align-items: center;">
+                        <select id="endHour" style="flex: 1; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                            <option value="">时</option>
+                        </select>
+                        <span>:</span>
+                        <select id="endMinute" style="flex: 1; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                            <option value="">分</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn primary">保存</button>
+                    <button type="button" id="cancelTimeBtn" class="btn secondary">取消</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 设置弹窗 -->
+    <div id="settingsModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>⚙️ 显示设置</h3>
+                <button type="button" class="modal-close" onclick="app.closeSettingsModal()">&times;</button>
+            </div>
+            <form id="settingsForm">
+                <div class="settings-content">
+                    <div class="setting-item">
+                        <label class="setting-label">
+                            <input type="checkbox" id="showEvening" class="setting-checkbox">
+                            <span class="checkmark"></span>
+                            <div class="setting-text">
+                                <strong>显示晚上课时</strong>
+                                <small>包含晚上的课程时间段</small>
+                            </div>
+                        </label>
+                    </div>
+                    
+                    <div class="setting-item">
+                        <label class="setting-label">
+                            <input type="checkbox" id="showSaturday" class="setting-checkbox">
+                            <span class="checkmark"></span>
+                            <div class="setting-text">
+                                <strong>显示周六</strong>
+                                <small>在课程表中添加周六列</small>
+                            </div>
+                        </label>
+                    </div>
+                    
+                    <div class="setting-item">
+                        <label class="setting-label">
+                            <input type="checkbox" id="showSunday" class="setting-checkbox">
+                            <span class="checkmark"></span>
+                            <div class="setting-text">
+                                <strong>显示周日</strong>
+                                <small>在课程表中添加周日列</small>
+                            </div>
+                        </label>
+                    </div>
+                    
+                    <div class="setting-item">
+                        <label class="setting-label">
+                            <input type="checkbox" id="showPeriodTime" class="setting-checkbox">
+                            <span class="checkmark"></span>
+                            <div class="setting-text">
+                                <strong>显示课时时间</strong>
+                                <small>在课时列中显示开始和结束时间</small>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+                
+                <div class="form-actions">
+                    <button type="button" id="cancelSettingsBtn" class="btn secondary">取消</button>
+                    <button type="submit" class="btn primary">保存设置</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 教程弹窗 -->
+    <div id="tutorialModal" class="modal tutorial-modal" onclick="if(event.target===this)app.closeTutorialModal()">
+        <div class="modal-content tutorial-modal-content">
+            <div class="tutorial-header">
+                <div class="tutorial-header-icon">📚</div>
+                <h3>课程表使用教程</h3>
+                <button class="tutorial-close-btn" onclick="app.closeTutorialModal()">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+            <div id="tutorialContent" class="tutorial-content">
+                <!-- 教程内容将由JavaScript动态生成 -->
+            </div>
+            <div class="tutorial-footer">
+                <div class="tutorial-hint">
+                    <span class="hint-icon">💡</span>
+                    按 <kbd>ESC</kbd> 键也可以关闭
+                </div>
+                <div class="tutorial-actions">
+                    <button type="button" onclick="app.closeTutorialModal()" class="btn secondary">关闭</button>
+                    <button type="button" id="closeTutorialBtn" class="btn primary">我知道了</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 隐藏的文件输入元素用于导入数据 -->
+    <input type="file" id="importFileInput" accept=".json" style="display: none;">
+    
+    <!-- 自定义确认对话框 -->
+    <div id="confirmModal" class="modal">
+        <div class="modal-content">
+            <h3>确认操作</h3>
+            <div class="confirm-message">
+                <!-- 确认消息将动态设置 -->
+            </div>
+            <div class="form-actions">
+                <button type="button" id="confirmCancelBtn" class="btn secondary">取消</button>
+                <button type="button" id="confirmOkBtn" class="btn danger">确定</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 导入科目模态框 -->
+    <div id="importSubjectModal" class="modal">
+        <div class="modal-content">
+            <h3>导入科目</h3>
+            <form id="importSubjectForm">
+                <div class="form-group">
+                    <label>选择学习阶段</label>
+                    <select id="stageSelect" class="form-control" required>
+                        <option value="">请选择学习阶段</option>
+                        <option value="primary">小学</option>
+                        <option value="junior">初中</option>
+                        <option value="senior">高中</option>
+                        <option value="university">大学</option>
+                    </select>
+                </div>
+                <div class="form-actions">
+                    <button type="button" id="cancelImportBtn" class="btn secondary">取消</button>
+                    <button type="submit" class="btn primary">导入</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 手机端侧边栏菜单 -->
+    <div id="mobileSidebar" class="mobile-sidebar">
+        <div class="sidebar-header">
+            <h3>菜单</h3>
+            <button id="closeSidebarBtn" class="close-sidebar-btn">×</button>
+        </div>
+        <div class="sidebar-content">
+            <div class="sidebar-section">
+                <h4>课程表操作</h4>
+                <button class="sidebar-btn" data-action="tutorial">
+                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"/>
+                        <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/>
+                        <line x1="12" y1="17" x2="12.01" y2="17"/>
+                    </svg>
+                    查看教程
+                </button>
+                <button class="sidebar-btn" data-action="reset">
+                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/>
+                        <path d="M21 3v5h-5"/>
+                        <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/>
+                        <path d="M3 21v-5h5"/>
+                    </svg>
+                    重置课表
+                </button>
+            </div>
+            
+            <div class="sidebar-section">
+                <h4>导出功能</h4>
+                <button class="sidebar-btn" data-action="saveImage">
+                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                        <circle cx="8.5" cy="8.5" r="1.5"/>
+                        <polyline points="21,15 16,10 5,21"/>
+                    </svg>
+                    保存图片
+                </button>
+                <button class="sidebar-btn" data-action="exportWord">
+                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                        <polyline points="14,2 14,8 20,8"/>
+                        <line x1="16" y1="13" x2="8" y2="13"/>
+                        <line x1="16" y1="17" x2="8" y2="17"/>
+                        <polyline points="10,9 9,9 8,9"/>
+                    </svg>
+                    导出Word
+                </button>
+                <button class="sidebar-btn" data-action="exportExcel">
+                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                        <polyline points="14,2 14,8 20,8"/>
+                        <line x1="16" y1="13" x2="8" y2="13"/>
+                        <line x1="16" y1="17" x2="8" y2="17"/>
+                        <polyline points="10,9 9,9 8,9"/>
+                    </svg>
+                    导出Excel
+                </button>
+            </div>
+            
+            <div class="sidebar-section">
+                <h4>数据管理</h4>
+                <button class="sidebar-btn" data-action="exportData">
+                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                        <polyline points="7,10 12,15 17,10"/>
+                        <line x1="12" y1="15" x2="12" y2="3"/>
+                    </svg>
+                    导出数据
+                </button>
+                <button class="sidebar-btn" data-action="importData">
+                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                        <polyline points="17,8 12,3 7,8"/>
+                        <line x1="12" y1="3" x2="12" y2="15"/>
+                    </svg>
+                    导入数据
+                </button>
+            </div>
+            
+            <div class="sidebar-section">
+                <h4>设置</h4>
+                <button class="sidebar-btn" data-action="settings">
+                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="3"/>
+                        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1 1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+                    </svg>
+                    显示设置
+                </button>
+            </div>
+            
+            <div class="sidebar-section">
+                <h4>主题切换</h4>
+                <div class="sidebar-theme-grid">
+                    <button class="sidebar-theme-btn" data-action="theme" data-theme="default">默认</button>
+                    <button class="sidebar-theme-btn" data-action="theme" data-theme="blue">蓝色</button>
+                    <button class="sidebar-theme-btn" data-action="theme" data-theme="purple">紫色</button>
+                    <button class="sidebar-theme-btn" data-action="theme" data-theme="pink">粉色</button>
+                    <button class="sidebar-theme-btn" data-action="theme" data-theme="orange">橙色</button>
+                    <button class="sidebar-theme-btn" data-action="theme" data-theme="dark">深色</button>
+                </div>
+                <div class="sidebar-custom-color">
+                    <input type="color" id="mobileCustomColorPicker" value="#4a7c59">
+                    <span>自定义主题色</span>
+                </div>
+            </div>
+            
+            <div class="sidebar-section">
+                <h4>字体切换</h4>
+                <div class="sidebar-font-grid">
+                    <button class="sidebar-font-btn" data-action="font" data-font="system">系统默认</button>
+                    <button class="sidebar-font-btn" data-action="font" data-font="microsoft-yahei">微软雅黑</button>
+                    <button class="sidebar-font-btn" data-action="font" data-font="simsun">宋体</button>
+                    <button class="sidebar-font-btn" data-action="font" data-font="heiti">黑体</button>
+                    <button class="sidebar-font-btn" data-action="font" data-font="kaiti">楷体</button>
+                    <button class="sidebar-font-btn" data-action="font" data-font="fangsong">仿宋</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 侧边栏倾企遮罩层 -->
+    <div id="sidebarOverlay" class="sidebar-overlay"></div>
+    <script src="js/script.js"></script>
+</body>
+</html>

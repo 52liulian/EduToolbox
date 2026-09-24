@@ -1,0 +1,429 @@
+/* ============================================================================
+ * scoreboard.css · 课堂积分板（专属样式）
+ * ----------------------------------------------------------------------------
+ * 依赖底座：../../assets/css/tool-common.css（后加载，同特异性时底座胜出，
+ *           故本文件统一用 .board / :fullscreen 等更高特异性选择器覆盖）
+ * 内容分区：
+ *   1. 顶部操作栏（添加小组 / 批量操作）
+ *   2. 积分榜网格与队伍卡片
+ *   3. 卡片头部（队名输入 / 名次徽章 / 删除）
+ *   4. 分数展示与弹跳动画
+ *   5. 快捷加减分按钮 / 自定义分值
+ *   6. 前三名金 / 银 / 铜配色
+ *   7. 空状态
+ *   8. 全屏投影模式（深色大屏，仅此区域允许 fixed/inset）
+ * 高度策略：所有容器高度 auto，页面仅由 body 主滚动条滚动。
+ * ========================================================================== */
+
+/* ---------------------------------------------------------------------------
+ * 1. 顶部操作栏
+ * ------------------------------------------------------------------------- */
+.toolbar {
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.add-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1 1 320px;
+  min-width: 0;
+}
+
+.add-group input {
+  flex: 1 1 200px;
+  min-width: 0;
+  max-width: 300px;
+}
+
+.bulk-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+/* ---------------------------------------------------------------------------
+ * 2. 积分榜网格与队伍卡片
+ * ------------------------------------------------------------------------- */
+.board {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 18px;
+  margin-bottom: 24px;
+}
+
+/* 覆盖底座 .card：队伍卡片为纵向居中布局 */
+.board .card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  padding: 20px 18px 18px;
+  text-align: center;
+  border-width: 1.5px;
+  transition: transform var(--t) var(--ease), box-shadow var(--t) var(--ease),
+              border-color var(--t) var(--ease);
+  overflow: visible;
+}
+
+.board .card:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-lg);
+}
+
+/* ---------------------------------------------------------------------------
+ * 3. 卡片头部：队名 / 名次徽章 / 删除按钮
+ * ------------------------------------------------------------------------- */
+.card-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+}
+
+/* 队名是可直接编辑的 input，默认无边框融入卡片 */
+.board .team-name {
+  flex: 1 1 auto;
+  min-width: 0;
+  width: 100%;
+  padding: 6px 8px;
+  font-size: 17px;
+  font-weight: 800;
+  color: var(--text-1);
+  text-align: center;
+  background: transparent;
+  border: 1.5px solid transparent;
+  border-radius: var(--r-sm);
+  transition: all var(--t-fast) var(--ease);
+}
+
+.board .team-name:hover {
+  border-color: var(--border);
+  background: var(--card-bg-2);
+}
+
+.board .team-name:focus {
+  border-color: var(--primary);
+  background: #fff;
+  box-shadow: 0 0 0 3px rgba(59, 110, 246, 0.12);
+}
+
+/* 名次数字徽章（默认普通名次 = 蓝色软底） */
+.rank-badge {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  flex-shrink: 0;
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--primary);
+  background: var(--primary-soft);
+  border: 1.5px solid var(--primary-soft-2);
+  border-radius: 50%;
+  font-variant-numeric: tabular-nums;
+}
+
+/* 删除按钮 */
+.del-team {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  flex-shrink: 0;
+  font-size: 18px;
+  line-height: 1;
+  color: var(--text-3);
+  background: transparent;
+  border-radius: 50%;
+  transition: all var(--t-fast) var(--ease);
+}
+
+.del-team:hover {
+  color: #fff;
+  background: var(--danger);
+}
+
+/* ---------------------------------------------------------------------------
+ * 4. 分数展示 + 变化弹跳动画
+ * ------------------------------------------------------------------------- */
+.score-wrap {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 5px;
+}
+
+.board .score {
+  font-size: 52px;
+  font-weight: 900;
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  color: var(--primary);
+  font-variant-numeric: tabular-nums;
+  transition: transform var(--t-fast) var(--ease);
+}
+
+.score-unit {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-3);
+}
+
+/* JS 在分数变化时短暂添加 .bump */
+.score.bump {
+  animation: score-bump 0.2s var(--ease);
+}
+
+@keyframes score-bump {
+  0%   { transform: scale(1); }
+  50%  { transform: scale(1.28); }
+  100% { transform: scale(1); }
+}
+
+/* ---------------------------------------------------------------------------
+ * 5. 快捷加减分按钮 + 自定义分值
+ * ------------------------------------------------------------------------- */
+.quick {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  width: 100%;
+}
+
+.quick-btn {
+  padding: 9px 0;
+  font-size: 14px;
+  font-weight: 800;
+  border-radius: var(--r-sm);
+  border: 1.5px solid transparent;
+  cursor: pointer;
+  user-select: none;
+  font-variant-numeric: tabular-nums;
+  transition: all var(--t-fast) var(--ease);
+}
+
+.quick-btn:active { transform: scale(0.92); }
+
+/* 扣分：红色软底 */
+.quick-btn.minus {
+  color: var(--danger);
+  background: #fff1f1;
+  border-color: #ffdede;
+}
+.quick-btn.minus:hover {
+  color: #fff;
+  background: var(--danger);
+  border-color: var(--danger);
+}
+
+/* 加分：蓝色渐变（主操作） */
+.quick-btn.plus {
+  color: var(--primary);
+  background: var(--primary-soft);
+  border-color: var(--primary-soft-2);
+}
+.quick-btn.plus:hover {
+  color: #fff;
+  background: var(--primary-grad);
+  border-color: transparent;
+  box-shadow: var(--shadow-primary);
+}
+
+/* 自定义分值行（覆盖底座 .custom 的居中外边距） */
+.board .custom {
+  display: flex;
+  gap: 8px;
+  width: 100%;
+  margin-bottom: 0;
+  justify-content: stretch;
+}
+
+.board .custom input {
+  flex: 1 1 auto;
+  min-width: 0;
+  width: 100%;
+  padding: 8px 10px;
+  font-size: 13.5px;
+  text-align: center;
+}
+
+.custom-add {
+  flex-shrink: 0;
+  padding: 8px 16px;
+  font-size: 13.5px;
+  font-weight: 700;
+  color: #fff;
+  background: var(--primary-grad);
+  border-radius: var(--r-sm);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: filter var(--t-fast) var(--ease), transform var(--t-fast) var(--ease);
+}
+.custom-add:hover { filter: brightness(1.06); }
+.custom-add:active { transform: scale(0.95); }
+
+/* ---------------------------------------------------------------------------
+ * 6. 前三名：金 / 银 / 铜
+ * ------------------------------------------------------------------------- */
+
+/* 第 1 名 · 金 */
+.board .rank-1 {
+  border-color: #f0d27a;
+  background: linear-gradient(160deg, #fffaf0 0%, #fff3d6 70%, #ffedc2 100%);
+  box-shadow: 0 10px 26px rgba(230, 176, 60, 0.18);
+}
+.board .rank-1:hover { box-shadow: 0 16px 36px rgba(230, 176, 60, 0.28); }
+.rank-1 .rank-badge {
+  color: #fff;
+  background: linear-gradient(135deg, #ffd766, #f0a91f);
+  border-color: #eab93f;
+  box-shadow: 0 4px 10px rgba(240, 169, 31, 0.4);
+}
+.rank-1 .score { color: #d49416; }
+.rank-1 .team-name { color: #6b4a08; }
+
+/* 第 2 名 · 银 */
+.board .rank-2 {
+  border-color: #d6ddea;
+  background: linear-gradient(160deg, #ffffff 0%, #f4f7fc 70%, #eaeff7 100%);
+  box-shadow: 0 8px 22px rgba(120, 138, 168, 0.16);
+}
+.rank-2 .rank-badge {
+  color: #fff;
+  background: linear-gradient(135deg, #c3cedf, #94a4bd);
+  border-color: #aab8cf;
+  box-shadow: 0 4px 10px rgba(148, 164, 189, 0.4);
+}
+.rank-2 .score { color: #71809b; }
+
+/* 第 3 名 · 铜 */
+.board .rank-3 {
+  border-color: #ecc9a6;
+  background: linear-gradient(160deg, #fff7f0 0%, #fdeede 70%, #fbe3cb 100%);
+  box-shadow: 0 8px 22px rgba(196, 128, 72, 0.15);
+}
+.rank-3 .rank-badge {
+  color: #fff;
+  background: linear-gradient(135deg, #e3a46e, #c47a3d);
+  border-color: #d18f55;
+  box-shadow: 0 4px 10px rgba(196, 122, 61, 0.4);
+}
+.rank-3 .score { color: #b06a2f; }
+
+/* ---------------------------------------------------------------------------
+ * 7. 空状态（底座已提供主样式，此处只补间距）
+ * ------------------------------------------------------------------------- */
+.empty { margin-top: 40px; }
+
+/* ---------------------------------------------------------------------------
+ * 8. 响应式
+ * ------------------------------------------------------------------------- */
+@media (max-width: 640px) {
+  .add-group { flex-basis: 100%; }
+  .add-group input { max-width: none; }
+  .bulk-actions { width: 100%; }
+  .bulk-actions .btn { flex: 1; }
+  .board { grid-template-columns: 1fr; }
+}
+
+/* ---------------------------------------------------------------------------
+ * 9. 全屏投影模式（舞台 #scoreboardRoot 自身进入全屏）
+ *    整屏深色背景 + 大卡片，方便教室投影观看
+ * ------------------------------------------------------------------------- */
+/* 舞台容器：⛶ 按钮所在的 .stage-toolbar 绝对定位于此 */
+#scoreboardRoot {
+  position: relative;
+}
+
+#scoreboardRoot:fullscreen,
+#scoreboardRoot:-webkit-full-screen,
+#scoreboardRoot.edutf-solo{
+  max-width: none;
+  padding: 20px 28px 40px;
+  background: #101623;
+  /* 小组数量多时舞台全屏后没有 body 滚动条，这里让舞台自己滚动 */
+  overflow: auto;
+}
+
+#scoreboardRoot:fullscreen::backdrop,
+#scoreboardRoot:-webkit-full-screen::backdrop,
+#scoreboardRoot.edutf-solo::backdrop{
+  background: #101623;
+}
+
+#scoreboardRoot:fullscreen .toolbar,
+#scoreboardRoot:-webkit-full-screen .toolbar,
+#scoreboardRoot.edutf-solo .toolbar{
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
+#scoreboardRoot:fullscreen .board,
+#scoreboardRoot:-webkit-full-screen .board,
+#scoreboardRoot.edutf-solo .board{
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 22px;
+}
+
+/* 全屏下的深色卡片 */
+#scoreboardRoot:fullscreen .board .card,
+#scoreboardRoot:-webkit-full-screen .board .card,
+#scoreboardRoot.edutf-solo .board .card{
+  background: #1b2537;
+  border-color: #2e3c56;
+  box-shadow: none;
+}
+#scoreboardRoot:fullscreen .board .card:hover,
+#scoreboardRoot:-webkit-full-screen .board .card:hover,
+#scoreboardRoot.edutf-solo .board .card:hover{ box-shadow: 0 14px 34px rgba(0, 0, 0, 0.35); }
+
+#scoreboardRoot:fullscreen .team-name,
+#scoreboardRoot:-webkit-full-screen .team-name,
+#scoreboardRoot.edutf-solo .team-name{ color: #eef2fb; }
+#scoreboardRoot:fullscreen .score-unit,
+#scoreboardRoot:-webkit-full-screen .score-unit,
+#scoreboardRoot.edutf-solo .score-unit{ color: #94a0b8; }
+#scoreboardRoot:fullscreen .board .team-name:hover,
+#scoreboardRoot:-webkit-full-screen .board .team-name:hover,
+#scoreboardRoot.edutf-solo .board .team-name:hover{
+  background: rgba(255, 255, 255, 0.08);
+  border-color: #3a4a6a;
+}
+
+/* 全屏下前三名保留金/银/铜气质（半透明深底） */
+#scoreboardRoot:fullscreen .board .rank-1,
+#scoreboardRoot:-webkit-full-screen .board .rank-1,
+#scoreboardRoot.edutf-solo .board .rank-1{
+  background: linear-gradient(160deg, rgba(240, 190, 80, 0.22), rgba(240, 190, 80, 0.08));
+  border-color: rgba(240, 190, 80, 0.55);
+}
+#scoreboardRoot:fullscreen .rank-1 .score,
+#scoreboardRoot:-webkit-full-screen .rank-1 .score,
+#scoreboardRoot.edutf-solo .rank-1 .score{ color: #ffce5c; }
+#scoreboardRoot:fullscreen .rank-1 .team-name,
+#scoreboardRoot:-webkit-full-screen .rank-1 .team-name,
+#scoreboardRoot.edutf-solo .rank-1 .team-name{ color: #ffe2a1; }
+
+#scoreboardRoot:fullscreen .board .rank-2,
+#scoreboardRoot:-webkit-full-screen .board .rank-2,
+#scoreboardRoot.edutf-solo .board .rank-2{
+  background: linear-gradient(160deg, rgba(190, 204, 226, 0.18), rgba(190, 204, 226, 0.06));
+  border-color: rgba(190, 204, 226, 0.5);
+}
+#scoreboardRoot:fullscreen .rank-2 .score,
+#scoreboardRoot:-webkit-full-screen .rank-2 .score,
+#scoreboardRoot.edutf-solo .rank-2 .score{ color: #c2cddd; }
+
+#scoreboardRoot:fullscreen .board .rank-3,
+#scoreboardRoot:-webkit-full-screen .board .rank-3,
+#scoreboardRoot.edutf-solo .board .rank-3{
+  background: linear-gradient(160deg, rgba(214, 150, 96, 0.2), rgba(214, 150, 96, 0.07));
+  border-color: rgba(214, 150, 96, 0.5);
+}
+#scoreboardRoot:fullscreen .rank-3 .score,
+#scoreboardRoot:-webkit-full-screen .rank-3 .score,
+#scoreboardRoot.edutf-solo .rank-3 .score{ color: #e5a468; }

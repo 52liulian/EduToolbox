@@ -1,0 +1,94 @@
+/* ============================================================
+ * EduToolbox · 单词闪卡记忆 flash-cards.css
+ * 依赖公共底座 tool-common.css（本文件应在其后加载）
+ * ============================================================ */
+
+body[data-theme="sky"]   { --primary:#0ea5e9; --primary-soft:#e0f2fe; --primary-soft-2:#ccecfc; --primary-grad:linear-gradient(135deg,#38bdf8,#0ea5e9,#0284c7); }
+body[data-theme="violet"]{ --primary:#7c3aed; --primary-soft:#f0e9fe; --primary-soft-2:#e2d5fc; --primary-grad:linear-gradient(135deg,#8b5cf6,#7c3aed,#6d28d9); }
+body[data-theme="green"] { --primary:#16a34a; --primary-soft:#e7f6ec; --primary-soft-2:#d3f0dc; --primary-grad:linear-gradient(135deg,#22c55e,#16a34a,#15803d); }
+body[data-theme="gold"]  { --primary:#d97706; --primary-soft:#fdf1dc; --primary-soft-2:#fbe3bc; --primary-grad:linear-gradient(135deg,#f59e0b,#d97706,#b45309); }
+body[data-theme="orange"]{ --primary:#ea580c; --primary-soft:#ffefe4; --primary-soft-2:#ffdec9; --primary-grad:linear-gradient(135deg,#fb923c,#ea580c,#c2410c); }
+body[data-theme="pink"]  { --primary:#db2777; --primary-soft:#fce7f0; --primary-soft-2:#f9cfe1; --primary-grad:linear-gradient(135deg,#f472b6,#db2777,#be185d); }
+
+.workbench { display:grid; grid-template-columns:350px minmax(0,1fr); gap:20px; align-items:start; }
+
+/* ---------- 统计 ---------- */
+.stat-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; }
+.stat-grid .stat-card { padding:12px 10px; min-width:0; }
+.stat-grid .stat-num { font-size:20px; }
+.progress-line { margin-top:12px; height:10px; background:var(--primary-soft-2); border-radius:999px; overflow:hidden; }
+.progress-fill { height:100%; width:0%; background:var(--primary-grad); border-radius:999px; transition:width .3s var(--ease); }
+.progress-text { margin-top:6px; font-size:12.5px; color:var(--text-3); }
+
+/* ---------- 卡片区 ---------- */
+/* position:relative —— 舞台右上角 .stage-toolbar 的绝对定位基准 */
+.stage-panel { position:relative; min-width:0; }
+/* padding-right 为右上角 ⛶⚙ 工具栏（40+8+40=88px）留出避让空间 */
+.stage-head { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:14px; padding-right:96px; }
+.stage-head .panel-title { margin-bottom:0; }
+.stage-ok { font-size:13px; font-weight:600; color:var(--primary); }
+
+.card-area { display:flex; flex-direction:column; align-items:center; gap:16px; }
+
+.flip-card { width:100%; max-width:520px; height:300px; perspective:1200px; cursor:pointer; }
+.flip-inner { position:relative; width:100%; height:100%; transform-style:preserve-3d; transition:transform .5s var(--ease); }
+.flip-card.flipped .flip-inner { transform:rotateY(180deg); }
+
+.flip-face {
+  position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:10px;
+  padding:26px; text-align:center; backface-visibility:hidden; -webkit-backface-visibility:hidden;
+  background:var(--card-bg); border:1px solid var(--border); border-radius:22px; box-shadow:var(--shadow);
+}
+.flip-front { background:linear-gradient(160deg,#ffffff 0%, var(--card-bg-2) 100%); }
+.flip-back { transform:rotateY(180deg); background:linear-gradient(160deg, var(--primary-soft) 0%, #ffffff 100%); }
+.flip-back::before { content:""; position:absolute; left:0; top:0; right:0; height:6px; background:var(--primary-grad); border-radius:22px 22px 0 0; }
+
+.face-tag { font-size:12.5px; font-weight:700; color:var(--primary); letter-spacing:.08em; }
+.face-word { font-size:clamp(30px,5vw,54px); font-weight:900; line-height:1.25; word-break:break-word; }
+.back-word { font-size:clamp(24px,4vw,40px); }
+.face-hint { font-size:12.5px; color:var(--text-3); }
+
+.card-meta { font-size:12.5px; color:var(--text-3); text-align:center; min-height:1.4em; }
+
+/* ---------- 反馈按钮 ---------- */
+.feedback-row { display:flex; flex-wrap:wrap; justify-content:center; gap:12px; width:100%; }
+.fb-btn { flex-direction:column; gap:2px; min-width:132px; padding:12px 18px; }
+.fb-sub { font-size:11.5px; font-weight:500; opacity:.75; }
+.fb-again { color:var(--danger); border-color:#ffd4d4; background:#fff5f5; }
+.fb-again:hover { color:#fff; background:var(--danger); border-color:var(--danger); }
+.fb-hard { color:var(--warning); border-color:#ffe2b8; background:#fffaf0; }
+.fb-hard:hover { color:#fff; background:var(--warning); border-color:var(--warning); }
+.fb-good { color:var(--success); border-color:#c7f0da; background:#f2fdf7; }
+.fb-good:hover { color:#fff; background:var(--success); border-color:var(--success); }
+.fb-btn:hover .fb-sub { opacity:.9; }
+
+.card-nav { display:flex; flex-wrap:wrap; justify-content:center; gap:10px; }
+
+@media (max-width:900px){ .workbench { grid-template-columns:1fr; } }
+
+/* ---------- 隐藏设置栏（⚙）：双栏 → 单栏，与 random-call 同构 ---------- */
+.workbench.setup-hidden { grid-template-columns:minmax(0,1fr); }
+.workbench.setup-hidden .setup-panel { display:none; }
+
+/* ---------- 舞台全屏（⛶）：全屏目标是 .stage-panel 自身，不是整页 ---------- */
+.stage-panel:fullscreen,
+.stage-panel:-webkit-full-screen,
+.stage-panel.edutf-solo{
+  display:flex; flex-direction:column; justify-content:center; align-items:stretch;
+  min-height:100vh; padding:36px 30px;
+  background:var(--bg); overflow:auto;
+}
+.stage-panel:fullscreen .card-area,
+.stage-panel:-webkit-full-screen .card-area,
+.stage-panel.edutf-solo .card-area{ flex:1 1 auto; justify-content:center; }
+/* 全屏下工具栏仍可见：贴边 + 半透明，hover 恢复不透明 */
+.stage-panel:fullscreen .stage-toolbar,
+.stage-panel:-webkit-full-screen .stage-toolbar,
+.stage-panel.edutf-solo .stage-toolbar{
+  position:fixed; top:18px; right:22px; z-index:30;
+  opacity:.55; transition:opacity .18s var(--ease);
+}
+.stage-panel:fullscreen .stage-toolbar:hover,
+.stage-panel:-webkit-full-screen .stage-toolbar:hover,
+.stage-panel.edutf-solo .stage-toolbar:hover{ opacity:1; }
+@media print { .stage-toolbar { display:none; } }

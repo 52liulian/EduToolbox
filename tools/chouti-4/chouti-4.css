@@ -1,0 +1,433 @@
+/* ============================================================================
+ * chouti-4.css · 滚动抽题（多题连抽版）
+ * ----------------------------------------------------------------------------
+ * 仅写本工具特有样式；公共底座见 ../../assets/css/tool-common.css
+ * 与另外两个抽题工具的差异：
+ *   1. 舞台结构为「滚动预览区 .preview-area + 结果区 .results-area + 底部操作条」
+ *   2. 一轮锁定后结果以玻璃卡片网格 .results-list > .result-card 依次入场
+ *   3. 预览区锁定后压缩为 .compact 小标题条
+ * 高度策略：所有区域自动撑高，结果再多也只走 body 主滚动条；
+ *           全屏仅 #stage:fullscreen。
+ * ========================================================================== */
+
+/* ===================== 1. 设置面板 ===================== */
+
+#app #qList {
+  min-height: 220px;
+}
+
+#app .block-hint code {
+  padding: 1px 7px;
+  font-family: Consolas, Menlo, monospace;
+  font-size: 12px;
+  color: var(--primary);
+  background: var(--primary-soft);
+  border-radius: 6px;
+}
+
+/* 滑杆数值胶囊 */
+#app .slider-line .val {
+  min-width: 52px;
+  padding: 3px 10px;
+  font-size: 12.5px;
+  font-weight: 800;
+  text-align: center;
+  color: var(--primary);
+  background: var(--primary-soft);
+  border-radius: var(--r-pill);
+  font-variant-numeric: tabular-nums;
+}
+
+/* “每次抽取 N 题/轮”：数字输入框收窄，不与滑杆样式打架 */
+#app #drawCount {
+  width: 84px;
+  flex-shrink: 0;
+  padding: 8px 10px;
+  text-align: center;
+  font-weight: 700;
+}
+#app .val-unit {
+  font-size: 12.5px;
+  color: var(--text-3);
+}
+
+/* 隐藏设置面板 */
+#app .main.setup-hidden {
+  grid-template-columns: minmax(0, 1fr);
+}
+#app .main.setup-hidden .setup-panel {
+  display: none;
+}
+
+/* ===================== 2. 蓝紫夜色舞台 ===================== */
+
+#app .stage {
+  overflow: hidden;
+  border-color: rgba(255, 255, 255, 0.08);
+  background:
+    radial-gradient(920px 540px at 84% -12%, rgba(56, 189, 248, 0.22), transparent 60%),
+    radial-gradient(780px 500px at 4% 112%, rgba(129, 140, 248, 0.24), transparent 60%),
+    linear-gradient(162deg, #1a2342 0%, #151c36 55%, #101527 100%);
+}
+
+/* 顶部通栏工具栏（覆盖 tool-common 绝对定位） */
+#app .stage .stage-toolbar {
+  position: static;
+  inset: auto;
+  z-index: 2;
+  width: 100%;
+  margin: 0 0 10px;
+  justify-content: space-between;
+}
+
+/* 统计玻璃药丸 */
+#app .stage .status-bar {
+  justify-content: flex-start;
+  gap: 10px;
+  margin-right: auto;
+}
+#app .stage .status-item {
+  padding: 6px 15px;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.68);
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.13);
+  border-radius: var(--r-pill);
+}
+#app .stage .status-item em {
+  font-style: normal;
+  font-weight: 800;
+  color: #fff;
+}
+
+/* 玻璃圆形图标钮 */
+#app .stage .icon-btn {
+  color: rgba(255, 255, 255, 0.85);
+  background: rgba(255, 255, 255, 0.10);
+  border-color: rgba(255, 255, 255, 0.18);
+}
+#app .stage .icon-btn:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.20);
+  border-color: rgba(255, 255, 255, 0.35);
+}
+
+/* 流体背景画布 */
+#app .bg-canvas {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+/* ===================== 3. 展示区总布局 ===================== */
+
+#app .stage .display {
+  position: relative;
+  z-index: 1;
+  justify-content: flex-start;
+  gap: 22px;
+  min-height: 540px;
+  width: 100%;
+  padding: 6px 0;
+}
+
+/* ===================== 4. 滚动预览区 ===================== */
+
+.preview-area {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  width: 100%;
+  min-height: clamp(240px, 34vh, 340px);
+  transition: min-height var(--t) var(--ease), gap var(--t) var(--ease);
+}
+
+.preview-area .q-index {
+  padding: 6px 20px;
+  font-size: 14px;
+  letter-spacing: 0.12em;
+  color: rgba(255, 255, 255, 0.70);
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: var(--r-pill);
+}
+
+.preview-area .num-display {
+  font-size: clamp(88px, 12vw, 190px);
+  line-height: 1.05;
+  color: transparent;
+  background: linear-gradient(180deg, #cfe0ff 0%, #7aa5ff 46%, #5a7cf0 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 12px 32px rgba(90, 124, 240, 0.38));
+  word-break: break-word;
+}
+.preview-area .num-display.rolling {
+  animation: ct4-flicker 0.12s steps(2, jump-none) infinite;
+}
+.preview-area .num-display.winner {
+  animation: ct4-pop 0.6s var(--ease);
+}
+@keyframes ct4-flicker {
+  from { opacity: 0.7; transform: translateY(-2px) scale(0.985); }
+  to   { opacity: 1;   transform: translateY(2px)  scale(1.015); }
+}
+@keyframes ct4-pop {
+  0%   { transform: scale(0.78); }
+  42%  { transform: scale(1.16); }
+  72%  { transform: scale(0.97); }
+  100% { transform: scale(1); }
+}
+
+.preview-area .q-display {
+  max-width: 980px;
+  padding: 0 12px;
+  font-size: clamp(20px, 2.6vw, 36px);
+  line-height: 1.5;
+  color: rgba(255, 255, 255, 0.94);
+  text-shadow: 0 4px 22px rgba(0, 0, 0, 0.32);
+  word-break: break-word;
+}
+.preview-area .q-display.rolling { opacity: 0.6; }
+.preview-area .q-display.winner {
+  animation: ct4-q-pop 0.55s var(--ease);
+}
+@keyframes ct4-q-pop {
+  0%   { opacity: 0; transform: translateY(12px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+/* 锁定后：预览区压缩为顶部小标题条，把空间让给结果网格 */
+.preview-area.compact {
+  gap: 6px;
+  min-height: 0;
+  padding: 10px 14px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: var(--r);
+}
+.preview-area.compact .q-index {
+  padding: 2px 14px;
+  font-size: 12.5px;
+  letter-spacing: 0.08em;
+}
+.preview-area.compact .num-display {
+  font-size: clamp(38px, 5vw, 64px);
+  filter: drop-shadow(0 6px 16px rgba(90, 124, 240, 0.3));
+}
+.preview-area.compact .q-display {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  font-size: clamp(14px, 1.5vw, 19px);
+  line-height: 1.5;
+}
+
+/* ===================== 5. 多题结果区（自动撑高，不内部滚动） ===================== */
+
+.results-area {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.results-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 30px 20px;
+  font-size: 14.5px;
+  color: rgba(255, 255, 255, 0.55);
+  border: 1.5px dashed rgba(255, 255, 255, 0.22);
+  border-radius: var(--r);
+}
+
+.results-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 14px;
+  width: 100%;
+}
+
+/* 单张结果卡：深色玻璃拟态 */
+.result-card {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 18px;
+  text-align: left;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: var(--r);
+  box-shadow: 0 10px 26px rgba(8, 12, 28, 0.28);
+  backdrop-filter: blur(6px);
+  opacity: 0;
+  animation: ct4-card-in 0.42s var(--ease) forwards;
+}
+@keyframes ct4-card-in {
+  from { opacity: 0; transform: translateY(18px) scale(0.96); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+.card-idx {
+  font-size: 12.5px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  color: rgba(255, 255, 255, 0.62);
+}
+.card-num {
+  font-size: 22px;
+  font-weight: 900;
+  font-variant-numeric: tabular-nums;
+  color: transparent;
+  background: linear-gradient(135deg, #93c5fd, #818cf8);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.card-title {
+  font-size: 15.5px;
+  line-height: 1.65;
+  color: rgba(255, 255, 255, 0.92);
+  white-space: pre-line;   /* 多段标题保留 JS 清洗后的换行 */
+  word-break: break-word;
+}
+
+/* ===================== 6. 底部操作条 ===================== */
+
+/* 覆盖 tool-common 的 .action-bar（两端对齐），此处为居中竖排 */
+#app .stage .action-bar {
+  position: relative;
+  z-index: 1;
+  flex-direction: column;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  margin: 2px 0 0;
+}
+#app .stage .key-hint {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.46);
+}
+#app .stage .key-hint kbd {
+  color: rgba(255, 255, 255, 0.85);
+  background: rgba(255, 255, 255, 0.10);
+  border-color: rgba(255, 255, 255, 0.25);
+}
+#app .stage .btn-start.rolling {
+  background: linear-gradient(135deg, #ff8a8a 0%, #ef5b5b 55%, #d63c3c 100%);
+  box-shadow: 0 12px 28px rgba(239, 91, 91, 0.42);
+}
+
+/* ===================== 7. 抽题记录（每轮一条，自动撑高） ===================== */
+
+.record-list .r-num {
+  display: inline-grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 26px;
+  height: 26px;
+  font-size: 12px;
+  font-weight: 800;
+  color: var(--primary);
+  background: var(--primary-soft);
+  border-radius: 50%;
+}
+.record-list .r-name {
+  flex: 1;
+  min-width: 0;
+  word-break: break-word;
+}
+.record-list .r-name em {
+  font-style: normal;
+  font-weight: 800;
+  color: #b36a09;
+  background: #fff6e8;
+  padding: 1px 9px;
+  margin-right: 6px;
+  border-radius: var(--r-pill);
+  font-size: 12px;
+}
+.record-list .r-time {
+  margin-left: auto;
+  flex-shrink: 0;
+  font-size: 12px;
+  color: var(--text-3);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ===================== 8. 全屏投影 ===================== */
+
+#stage:fullscreen,
+#stage:-webkit-full-screen,
+#stage.edutf-solo{
+  width: 100vw;
+  height: 100vh;
+  padding: 30px 44px;
+  border: 0;
+  border-radius: 0;
+  overflow: auto;
+  background:
+    radial-gradient(1000px 620px at 84% -12%, rgba(56, 189, 248, 0.26), transparent 60%),
+    radial-gradient(920px 560px at 4% 112%, rgba(129, 140, 248, 0.28), transparent 60%),
+    linear-gradient(162deg, #1a2342 0%, #151c36 55%, #101527 100%);
+}
+#stage:fullscreen .display,
+#stage:-webkit-full-screen .display,
+#stage.edutf-solo .display{
+  min-height: calc(100vh - 120px);
+  justify-content: center;
+}
+#stage:fullscreen .results-list,
+#stage:-webkit-full-screen .results-list,
+#stage.edutf-solo .results-list{
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 18px;
+}
+#stage:fullscreen .result-card,
+#stage:-webkit-full-screen .result-card,
+#stage.edutf-solo .result-card{
+  padding: 24px;
+}
+#stage:fullscreen .card-title,
+#stage:-webkit-full-screen .card-title,
+#stage.edutf-solo .card-title{
+  font-size: 18px;
+}
+
+/* ===================== 9. 窄屏适配 ===================== */
+
+@media (max-width: 960px) {
+  #app .main {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  #app .stage .display {
+    min-height: 440px;
+  }
+  .preview-area {
+    min-height: 240px;
+  }
+  .preview-area .num-display {
+    font-size: clamp(72px, 22vw, 130px);
+  }
+  #app .stage-toolbar {
+    flex-wrap: wrap;
+  }
+  .results-list {
+    grid-template-columns: 1fr;
+  }
+}

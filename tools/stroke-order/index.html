@@ -1,0 +1,29 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>生字笔画笔顺练习</title>
+<link rel="stylesheet" href="stroke-order.css">
+<link rel="stylesheet" href="../../assets/css/tool-common.css">
+</head>
+<body>
+<div class="container">
+  <div class="ctrl">
+    <textarea id="chars" placeholder="输入要练习的汉字…">一二三四五六七八九十</textarea>
+    <div class="opts">
+      <label>每行格数 <input type="number" id="cols" min="1" max="10" value="8"></label>
+      <label>每字练习次数 <input type="number" id="repeat" min="1" max="10" value="3"></label>
+      <label><input type="checkbox" id="showRef" checked> 显示示范字</label>
+    </div>
+    <div class="btns">
+      <button class="btn" id="gen">生成练习纸</button>
+      <button class="btn ghost" id="print">打印</button>
+    </div>
+  </div>
+  <div class="sheet" id="sheet"></div>
+</div>
+<script src="../../assets/js/frame-bridge.js"></script>
+<script src="stroke-order.js"></script>
+</body>
+</html>
