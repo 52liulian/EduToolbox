@@ -376,13 +376,14 @@
   }
 
   /**
-   * 切换 #categoryGridView 内的视图区块（同一容器内的四种互斥视图）
-   * "tools"    —— 分类页 / 搜索结果页：content-head + 工具网格（+空状态）
-   * "catList"  —— 全部分类页：分类卡片网格
-   * "articles" —— 教学资讯页：资讯卡片网格
-   * "about"    —— 关于页：项目介绍区块
-   * 四种视图共用同一个容器宽度，保证五页视觉几何完全一致
-   * @param {"tools"|"catList"|"articles"|"about"} mode - 视图模式
+   * 切换 #categoryGridView 内的视图区块（同一容器内的五种互斥视图）
+   * "tools"     —— 分类页 / 搜索结果页：content-head + 工具网格（+空状态）
+   * "catList"   —— 全部分类页：分类卡片网格
+   * "articles"  —— 教学资讯页：资讯卡片网格
+   * "about"     —— 关于页：项目介绍区块
+   * "selfTools" —— 自研工具页：自研工具卡片网格
+   * 五种视图共用同一个容器宽度，保证六页视觉几何完全一致
+   * @param {"tools"|"catList"|"articles"|"about"|"selfTools"} mode - 视图模式
    * @returns {void}
    */
   function setGridView(mode) {
@@ -391,11 +392,13 @@
     const catGrid = $("#catListGrid");
     const articleList = $("#articleList");
     const aboutView = $("#aboutView");
+    const selfGrid = $("#selfToolsGrid");
     if (head) head.hidden = mode !== "tools";
     if (toolGrid) toolGrid.hidden = mode !== "tools";
     if (catGrid) catGrid.hidden = mode !== "catList";
     if (articleList) articleList.hidden = mode !== "articles";
     if (aboutView) aboutView.hidden = mode !== "about";
+    if (selfGrid) selfGrid.hidden = mode !== "selfTools";
     // 非工具视图下空状态不应残留（搜索空结果态只对工具视图有意义）
     const empty = $("#emptyState");
     if (empty && mode !== "tools") empty.hidden = true;
@@ -446,11 +449,23 @@
   }
 
   /**
-   * 渲染自研工具卡片网格
+   * 渲染自研工具页（/tools）
+   * 与分类页 / 搜索结果页 / 全部分类页 / 教学资讯页 / 关于页共用 #categoryGridView 容器与
+   * renderCategoryHeader 头部：先切到 "selfTools" 视图，再注入共用头部，
+   * 最后填充 #selfToolsGrid 自研工具卡片网格并绑定跳转
    * @returns {void}
    */
   function renderSelfTools() {
-    $("#selfToolsGrid").innerHTML = DB.selfTools.map(t => `
+    const grid = $("#selfToolsGrid");
+    if (!grid) return;
+    setGridView("selfTools");
+    const total = (DB.selfTools || []).length;
+    renderCategoryHeader({
+      cur: "必用工具",
+      title: "🛠️ 自研免费小工具",
+      desc: `共 ${total} 个自研工具 · 浏览器本地运行，数据不上传，永久免费使用`,
+    });
+    grid.innerHTML = DB.selfTools.map(t => `
       <div class="tool-card self-tool-card" data-tool="${t.slug}">
         ${t.featured ? `<span class="tool-badge">推荐</span>` : ""}
         <h4 class="tool-name">${t.icon || ""} ${escapeHtml(t.name)}</h4>

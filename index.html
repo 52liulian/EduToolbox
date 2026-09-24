@@ -177,10 +177,10 @@
         <!-- ============================================================
              分类页：完整工具网格（带侧栏时使用）
              ============================================================ -->
-        <!-- 分类页 / 搜索结果页 / 全部分类页 / 教学资讯页 / 关于页 共用容器：
+        <!-- 分类页 / 搜索结果页 / 全部分类页 / 教学资讯页 / 关于页 / 自研工具页 共用容器：
              页面头部由 renderCategoryHeader 注入，下方按视图切换
              toolGrid（分类/搜索） / catListGrid（全部分类） / articleList（教学资讯）
-             / aboutView（关于本站）。
+             / aboutView（关于本站） / selfToolsGrid（自研工具）。
              ⚠️ 这些页面都不另起独立 .page + .container：.page > .container 保留左右
                 padding: 0 24px，内容宽只有 1192（x=104），与这里的 1240（x=80）
                 差 48px —— 同头部不同宽会让五页视觉几何对不齐。 -->
@@ -198,28 +198,16 @@
           <div class="cat-list-grid" id="catListGrid" hidden></div>
           <div class="article-list" id="articleList" hidden></div>
           <div class="about-view" id="aboutView" hidden></div>
+          <div class="tool-grid" id="selfToolsGrid" hidden></div>
         </div>
 
       </section>
     </div>
   </main>
 
-  <!-- 搜索结果页 / 全部分类页 / 教学资讯页不再各自独立成页：均复用上面的
-       #categoryGridView（同头部 + 同容器 + 同宽度），由 router 的
-       /search、/categories、/articles 分支驱动 -->
-
-  <!-- ====================================================================
-       自研工具页
-       ==================================================================== -->
-  <section class="page" id="toolsPage" hidden>
-    <div class="container">
-      <h2 class="page-title">🛠️ 自研免费小工具</h2>
-      <p class="page-desc">浏览器本地运行，数据不上传，永久免费使用。</p>
-      <div class="tool-grid" id="selfToolsGrid"></div>
-    </div>
-  </section>
-
-  <!-- 教学资讯页不再独立成页：#articleList 已移入 #categoryGridView -->
+  <!-- 搜索结果页 / 全部分类页 / 教学资讯页 / 关于页 / 自研工具页不再各自独立成页：
+       均复用上面的 #categoryGridView（同头部 + 同容器 + 同宽度），由 router 的
+       /search、/categories、/articles、/about、/tools 分支驱动 -->
 
   <!-- ====================================================================
        工具详情 / 自研工具运行区

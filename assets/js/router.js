@@ -5,7 +5,7 @@
  * 路由表：
  *   /                      -> 首页（Hero + 分类标签云 + 全部工具网格，无侧栏）
  *   /section/:catId        -> 分类页（侧栏 + 过滤后网格）
- *   /tools                 -> 自研工具页
+ *   /tools                 -> 自研工具页（复用分类页布局：同容器 + 同头部）
  *   /tool/:slug            -> 外链工具详情页
  *   /onlinetools/:id       -> 自研工具运行页（异步加载模板）
  *   /articles              -> 教学资讯页（复用分类页布局：同容器 + 同头部）
@@ -39,7 +39,6 @@
   /** 页面容器映射 */
   const PAGES = {
     home: ["heroSection", "main"],
-    tools: ["toolsPage"],
     detail: ["detailPage"],
   };
 
@@ -471,8 +470,15 @@
       EduT.render.renderCategories("all");
       EduT.render.renderCategoryList();
     } else if (path === "/tools") {
-      showPage("tools");
+      /* 自研工具页：与其它五页共用同一视图容器与页面头部
+         （不再有独立的 #toolsPage，避免 .page > .container 的 24px 左右 padding
+           让内容宽度比其余几页窄 48px） */
+      showPage("home");
       setLayout(false);
+      setContentView("category");
+      EduT.search.setCat("all");
+      EduT.search.setSubCat("");
+      EduT.render.renderCategories("all");
       EduT.render.renderSelfTools();
     } else if (path === "/articles") {
       /* 教学资讯页：与分类页 / 搜索结果页 / 全部分类页共用同一视图容器与页面头部
