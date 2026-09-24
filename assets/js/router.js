@@ -8,8 +8,9 @@
  *   /tools                 -> 自研工具页
  *   /tool/:slug            -> 外链工具详情页
  *   /onlinetools/:id       -> 自研工具运行页（异步加载模板）
- *   /articles              -> 文章资讯页
+ *   /articles              -> 教学资讯页（复用分类页布局：同容器 + 同头部）
  *   /categories            -> 全部分类页（复用分类页布局：同容器 + 同头部）
+ *   /about                 -> 关于页（复用分类页布局：同容器 + 同头部）
  *   /search?q=关键词       -> 搜索结果页（复用分类页布局：同容器 + 同头部 + 同网格）
  * 加载顺序：utils.js / render.js / search.js 之后
  * ============================================================================
@@ -39,7 +40,6 @@
   const PAGES = {
     home: ["heroSection", "main"],
     tools: ["toolsPage"],
-    articles: ["articlesPage"],
     detail: ["detailPage"],
   };
 
@@ -385,6 +385,12 @@
       const homeClear = $("#searchClear");
       if (homeInput) homeInput.value = "";
       if (homeClear) homeClear.hidden = true;
+      /* 把 #categoryGridView 内的视图切回默认的工具网格：
+         从 /categories、/articles 等共用容器切回首页时，若不做复位，
+         #catListGrid / #articleList 的 hidden 会停留在 false ——
+         虽然容器（#categoryGridView）整体是隐藏的、肉眼不可见，但视图状态是脏的，
+         下次切到分类页/搜索页时可能出现两个网格并存。 */
+      EduT.render.setGridView("tools");
       EduT.render.renderFeatured();
       EduT.render.renderAllCategories();
       EduT.render.renderCategories("all");
@@ -437,6 +443,10 @@
           title: `${catObj.icon} ${catObj.name}`,
           desc,
         });
+      } else {
+        // 未知分类 id：清掉上一次注入的共用头部（避免残留其它页面的标题）
+        const stale = document.querySelector("#categoryGridView .category-page-header");
+        if (stale) stale.remove();
       }
     } else if (path.startsWith("/tool/")) {
       showPage("detail");
@@ -465,9 +475,26 @@
       setLayout(false);
       EduT.render.renderSelfTools();
     } else if (path === "/articles") {
-      showPage("articles");
+      /* 教学资讯页：与分类页 / 搜索结果页 / 全部分类页共用同一视图容器与页面头部
+         （不再有独立的 #articlesPage，避免 .page > .container 的 24px 左右 padding
+           让内容宽度比其余三页窄 48px） */
+      showPage("home");
       setLayout(false);
+      setContentView("category");
+      EduT.search.setCat("all");
+      EduT.search.setSubCat("");
+      EduT.render.renderCategories("all");
       EduT.render.renderArticles();
+    } else if (path === "/about") {
+      /* 关于页：与分类页 / 搜索结果页 / 全部分类页 / 教学资讯页共用同一视图容器与页面头部
+         （顶栏「关于」与页脚「关于我们」指向此处，早期该路由不存在会被弹回首页） */
+      showPage("home");
+      setLayout(false);
+      setContentView("category");
+      EduT.search.setCat("all");
+      EduT.search.setSubCat("");
+      EduT.render.renderCategories("all");
+      EduT.render.renderAbout();
     } else {
       navigate("/");
     }

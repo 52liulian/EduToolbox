@@ -328,3 +328,160 @@ body.dark .subject-btn:hover {
   font-size: 12.5px;
   color: var(--text-3);
 }
+
+/* ---------------------------------------------------------------------------
+ * 6. 关于页（/about）
+ * 说明：复用分类页容器 #categoryGridView 与共用头部 .category-page-header，
+ *       这里只定义头部之下的 #aboutView 内容区块样式；配色全部走 base.css 令牌，
+ *       深浅色主题自动跟随，无需额外的 body.dark 覆盖。
+ * ------------------------------------------------------------------------- */
+.about-view {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+.about-block {
+  padding: 26px 28px;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  box-shadow: var(--shadow-sm);
+}
+
+.about-block-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 14px;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text-1);
+}
+
+/* 标题左侧品牌色竖条 */
+.about-block-title::before {
+  content: "";
+  width: 4px;
+  height: 18px;
+  border-radius: 2px;
+  background: var(--primary-grad);
+}
+
+.about-text {
+  font-size: 14.5px;
+  line-height: 1.85;
+  color: var(--text-2);
+}
+
+.about-text + .about-text { margin-top: 12px; }
+.about-text strong { color: var(--text-1); }
+
+/* 数据统计四宫格 */
+.about-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 14px;
+  margin-top: 20px;
+}
+
+.about-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 16px 12px;
+  background: var(--card-bg-2);
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+}
+
+.about-stat b {
+  font-size: 24px;
+  font-weight: 800;
+  color: var(--primary);
+  line-height: 1.2;
+}
+
+.about-stat span {
+  font-size: 12.5px;
+  color: var(--text-3);
+}
+
+/* 站内入口按钮行 */
+.about-entry {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+/* 特性六宫格 */
+.about-features {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 16px;
+}
+
+.about-feature {
+  padding: 20px 22px;
+  background: var(--card-bg-2);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  transition: all var(--t) var(--ease);
+}
+
+.about-feature:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-lg);
+  border-color: var(--primary-soft-2);
+}
+
+.about-feature-icon {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  margin-bottom: 12px;
+  font-size: 22px;
+  background: var(--primary-soft);
+  border-radius: 12px;
+}
+
+.about-feature h4 {
+  margin-bottom: 6px;
+  font-size: 15.5px;
+  font-weight: 700;
+  color: var(--text-1);
+}
+
+.about-feature p {
+  font-size: 13.5px;
+  line-height: 1.75;
+  color: var(--text-2);
+}
+
+/* 收录标准 / 隐私说明清单 */
+.about-rules {
+  padding-left: 22px;
+  font-size: 14px;
+  line-height: 1.9;
+  color: var(--text-2);
+}
+
+.about-rules li { margin-bottom: 4px; }
+.about-rules li::marker { color: var(--primary); font-weight: 700; }
+
+/* 无序号版本（圆点列表） */
+.about-rules-plain { list-style: disc; }
+
+/* 底部免责声明 */
+.about-note {
+  padding: 16px 20px;
+  font-size: 13px;
+  line-height: 1.8;
+  color: var(--text-3);
+  background: var(--bg-soft);
+  border: 1px dashed var(--border-2);
+  border-radius: var(--r-sm);
+}

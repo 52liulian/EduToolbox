@@ -376,20 +376,29 @@
   }
 
   /**
-   * 切换 #categoryGridView 内的视图区块
-   * "tools"   —— 分类页 / 搜索结果页：content-head + 工具网格（+空状态）
-   * "catList" —— 全部分类页：分类卡片网格
-   * @param {"tools"|"catList"} mode - 视图模式
+   * 切换 #categoryGridView 内的视图区块（同一容器内的四种互斥视图）
+   * "tools"    —— 分类页 / 搜索结果页：content-head + 工具网格（+空状态）
+   * "catList"  —— 全部分类页：分类卡片网格
+   * "articles" —— 教学资讯页：资讯卡片网格
+   * "about"    —— 关于页：项目介绍区块
+   * 四种视图共用同一个容器宽度，保证五页视觉几何完全一致
+   * @param {"tools"|"catList"|"articles"|"about"} mode - 视图模式
    * @returns {void}
    */
   function setGridView(mode) {
-    const showTools = mode !== "catList";
     const head = $("#categoryContentHead");
     const toolGrid = $("#toolGrid");
     const catGrid = $("#catListGrid");
-    if (head) head.hidden = !showTools;
-    if (toolGrid) toolGrid.hidden = !showTools;
-    if (catGrid) catGrid.hidden = showTools;
+    const articleList = $("#articleList");
+    const aboutView = $("#aboutView");
+    if (head) head.hidden = mode !== "tools";
+    if (toolGrid) toolGrid.hidden = mode !== "tools";
+    if (catGrid) catGrid.hidden = mode !== "catList";
+    if (articleList) articleList.hidden = mode !== "articles";
+    if (aboutView) aboutView.hidden = mode !== "about";
+    // 非工具视图下空状态不应残留（搜索空结果态只对工具视图有意义）
+    const empty = $("#emptyState");
+    if (empty && mode !== "tools") empty.hidden = true;
   }
 
   /**
@@ -458,17 +467,143 @@
   }
 
   /**
-   * 渲染文章列表
+   * 渲染教学资讯页（/articles）
+   * 与分类页 / 搜索结果页 / 全部分类页共用 #categoryGridView 容器与
+   * renderCategoryHeader 头部：先切到 "articles" 视图，再注入共用头部，
+   * 最后填充 #articleList 资讯卡片网格
    * @returns {void}
    */
   function renderArticles() {
-    $("#articleList").innerHTML = DB.articles.map(a => `
+    const list = $("#articleList");
+    if (!list) return;
+    setGridView("articles");
+    const total = (DB.articles || []).length;
+    renderCategoryHeader({
+      cur: "教学资讯",
+      title: "📚 教学工具资讯",
+      desc: `共 ${total} 篇教学工具动态与资源推荐，分享课堂实用技巧与好用的教学工具`,
+    });
+    list.innerHTML = (DB.articles || []).map(a => `
       <article class="article-card">
         <div class="article-meta"><span class="tag">${escapeHtml(a.tag)}</span><time>${escapeHtml(a.date)}</time></div>
         <h4>${escapeHtml(a.title)}</h4>
         <p>${escapeHtml(a.excerpt)}</p>
       </article>
     `).join("");
+  }
+
+  /**
+   * 渲染关于页（/about）
+   * 与分类页 / 搜索结果页 / 全部分类页 / 教学资讯页共用 #categoryGridView 容器与
+   * renderCategoryHeader 头部：先切到 "about" 视图，再注入共用头部，
+   * 最后填充 #aboutView（项目简介 + 数据统计 + 站点特性 + 收录标准 + 隐私说明 + 联系入口）
+   * 说明：所有统计数字实时取自 DB / search，数据增删后无需同步改文案
+   * @returns {void}
+   */
+  function renderAbout() {
+    const view = $("#aboutView");
+    if (!view) return;
+    setGridView("about");
+    const catCount = DB.categories.length;
+    const toolCount = EduT.search.flattenTools().length;
+    const selfCount = (DB.selfTools || []).length;
+    const articleCount = (DB.articles || []).length;
+
+    renderCategoryHeader({
+      cur: "关于",
+      title: "🙋 关于 EduToolbox",
+      desc: "一站式教师工具资源导航平台 · 由杏坛网络工作室维护 —— 整理好用的教学工具，自研开箱即用的课堂小工具",
+    });
+
+    // 数据统计四宫格（数字随数据层实时变化）
+    const stats = [
+      { n: toolCount, label: "收录工具" },
+      { n: catCount, label: "工具分类" },
+      { n: selfCount, label: "自研工具" },
+      { n: articleCount, label: "教学资讯" },
+    ].map(s => `
+      <div class="about-stat">
+        <b>${s.n}</b>
+        <span>${escapeHtml(s.label)}</span>
+      </div>`).join("");
+
+    // 站点特性六宫格
+    const features = [
+      { icon: "🧭", name: "分类导航", text: `按备课、课件、组卷、直播、教学管理等 ${catCount} 个场景分类整理，按图索骥即可找到需要的工具。` },
+      { icon: "🛠️", name: "自研工具", text: `${selfCount} 个浏览器内直跑的小工具：评语生成、随机点名、考试倒计时、抽题、奖状、Excel 处理等，点开即用。` },
+      { icon: "🔒", name: "隐私优先", text: "自研工具全部在本地计算，名单与文本不上传服务器；主题、偏好只写在本机 localStorage。" },
+      { icon: "📴", name: "离线可用", text: "依赖库已全部本地化，下载后双击 index.html（file://）也能完整运行，断网不耽误备课。" },
+      { icon: "🎨", name: "双主题", text: "浅色 / 深色一键切换，另有六套品牌配色，夜间备课不刺眼，偏好自动记住。" },
+      { icon: "🖨️", name: "打印友好", text: "工具结果打印时只输出内容本身，不带站点导航与页眉页脚，直接贴教案或发给家长。" },
+    ].map(f => `
+      <div class="about-feature">
+        <span class="about-feature-icon">${f.icon}</span>
+        <h4>${escapeHtml(f.name)}</h4>
+        <p>${escapeHtml(f.text)}</p>
+      </div>`).join("");
+
+    // 收录标准（有序清单）
+    const rules = [
+      "真实教学场景可用，优先免费或 freemium（有免费额度的商业工具）；",
+      "界面清晰、无强制弹窗与诱导广告，不需要复杂培训就能上手；",
+      "长期维护、链接稳定，收录后定期复查死链并及时下架；",
+      "尊重版权，不收录破解软件与侵权资源。",
+    ].map(r => `<li>${escapeHtml(r)}</li>`).join("");
+
+    view.innerHTML = `
+      <section class="about-block">
+        <h3 class="about-block-title">项目简介</h3>
+        <p class="about-text">
+          EduToolbox（教师工具箱）是一站式教师工具资源导航平台，由<strong>杏坛网络工作室</strong>维护。
+          我们把散落在各处的好用教学工具按场景整理成 ${catCount} 个分类，并自研了一批开箱即用的课堂小工具。
+          目标只有一个：让老师少折腾工具，把时间留给课堂。
+        </p>
+        <div class="about-stats">${stats}</div>
+        <div class="about-entry">
+          <a class="btn btn-primary" href="/categories">📂 浏览全部分类</a>
+          <a class="btn btn-ghost" href="/tools">🛠️ 必用工具</a>
+          <a class="btn btn-ghost" href="/articles">📚 教学资讯</a>
+        </div>
+      </section>
+
+      <section class="about-block">
+        <h3 class="about-block-title">站点特性</h3>
+        <div class="about-features">${features}</div>
+      </section>
+
+      <section class="about-block">
+        <h3 class="about-block-title">收录标准</h3>
+        <ol class="about-rules">${rules}</ol>
+        <p class="about-text">
+          技术说明：本站为纯前端静态站点，原生 HTML + CSS + JavaScript（IIFE 模块化），
+          零构建、零后端、零埋点，可托管在任意静态服务器（GitHub Pages / 对象存储 / 本地 file:// 均可）。
+        </p>
+      </section>
+
+      <section class="about-block">
+        <h3 class="about-block-title">隐私与数据</h3>
+        <ul class="about-rules about-rules-plain">
+          <li>没有账号体系，不需要注册登录。</li>
+          <li>自研工具的输入（学生名单、评语文本、题目等）只在你的浏览器里处理，刷新即消失。</li>
+          <li>配色与深浅色偏好写在浏览器 localStorage，清除浏览器数据即可一并抹掉。</li>
+        </ul>
+      </section>
+
+      <section class="about-block">
+        <h3 class="about-block-title">提交收录 / 联系我们</h3>
+        <p class="about-text">
+          发现死链、分类有误，或想推荐一个好用的教学工具？欢迎通过下面的表单告诉我们，我们会尽快核实处理。
+        </p>
+        <div class="about-entry">
+          <a class="btn btn-primary" href="${withUtm("https://f.wps.cn/g/Ap4o8gL1/")}" target="_blank" rel="noopener">📲 提交收录 / 意见反馈</a>
+        </div>
+      </section>
+
+      <p class="about-note">
+        免责声明：本站仅提供工具导航与索引，收录工具的版权、可用性与收费规则归原作者所有；
+        点击工具卡片会跳转第三方站点，请自行甄别内容与付费信息。
+      </p>
+    `;
   }
 
   /**
@@ -512,7 +647,7 @@
     renderCategories, renderCategoryDropdown, renderSelfDropdown,
     renderSubjectEntry, renderCategoryTags,
     renderTools, renderFeatured, renderAllCategories, renderCategoryList,
-    renderCategoryHeader, renderSearchResults,
-    renderSelfTools, renderArticles, renderToolDetail, renderStats
+    renderCategoryHeader, setGridView, renderSearchResults,
+    renderSelfTools, renderArticles, renderAbout, renderToolDetail, renderStats
   };
 })(window);

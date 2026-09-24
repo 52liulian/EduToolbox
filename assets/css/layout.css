@@ -74,7 +74,7 @@ body.dark .topnav { background: rgba(20, 24, 33, 0.85); }
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 4px;
+  gap: 24px;
   flex: 1;
 }
 
@@ -571,41 +571,79 @@ body.dark .dropdown-item:hover .dropdown-item-icon { background: var(--primary-s
   min-height: 100vh;
 }
 
+/* 四列信息架构：品牌介绍 / 快速链接 / 法律信息 / 联系我们 + 底部版权栏 */
 .footer {
   margin-top: auto;
-  padding: 40px 0 48px;
-  background: var(--card-bg);
+  padding: 48px 0 0;
+  background: var(--bg-soft);
   border-top: 1px solid var(--border);
   color: var(--text-3);
 }
 
-.footer-inner {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 40px;
-  flex-wrap: wrap;
+.footer-grid {
+  display: grid;
+  grid-template-columns: 1.5fr 1fr 1fr 1fr;
+  gap: 56px;
+  padding-bottom: 36px;
 }
 
-.footer strong {
-  display: block;
-  font-size: 16px;
-  color: var(--text-1);
-  margin-bottom: 8px;
-}
-
-.footer p {
-  max-width: 560px;
-  font-size: 13px;
-  line-height: 1.8;
-}
-
-.footer-links {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 22px;
+/* 品牌列 */
+.footer-tagline {
+  margin: 16px 0 0;
   font-size: 14px;
+  color: var(--text-2);
 }
 
-.footer-links a { color: var(--text-2); }
-.footer-links a:hover { color: var(--primary); }
+.footer-note {
+  margin: 10px 0 0;
+  max-width: 320px;
+  font-size: 12px;
+  line-height: 1.8;
+  color: var(--text-3);
+}
+
+/* 链接列 */
+.footer-col {
+  display: flex;
+  flex-direction: column;
+}
+
+.footer-col h4 {
+  margin: 4px 0 18px;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text-1);
+}
+
+.footer-col a,
+.footer-static {
+  display: block;
+  margin-bottom: 14px;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.footer-col a {
+  color: var(--text-2);
+  transition: color var(--t-fast) var(--ease);
+}
+
+.footer-col a:last-child,
+.footer-static:last-child { margin-bottom: 0; }
+
+.footer-col a:hover { color: var(--primary); }
+
+/* 尚未上线的栏目（隐私政策/服务条款/技术支持）用静态文字，避免死链 */
+.footer-static {
+  color: var(--text-3);
+  cursor: default;
+}
+
+/* 底部版权栏 */
+.footer-bottom {
+  padding: 20px 0 24px;
+  border-top: 1px solid var(--border);
+  text-align: center;
+  font-size: 13px;
+  color: var(--text-3);
+}

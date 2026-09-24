@@ -96,6 +96,7 @@ EduToolbox/
 | `#/onlinetools/:slug` | 自研工具运行页 | iframe 嵌入，如 `#/onlinetools/gaokao-countdown` |
 | `#/categories` | 全部分类入口 | 分类卡片网格 |
 | `#/articles` | 文章资讯 | 教学工具资讯列表 |
+| `#/about` | 关于本站 | 项目简介 + 数据统计 + 收录标准 + 联系入口（与分类页共用头部） |
 
 > 干净 URL（如 `/onlinetools/comment`）访问时自动迁移为 hash URL，刷新不 404。
 
@@ -160,6 +161,7 @@ math-mastery：https://github.com/kenowong/math-mastery
 
 | 日期 | 范围 | 内容 |
 |---|---|---|
+| 2026-09-24 | `index.html` / `assets/css/layout.css` / `assets/css/tools.css` | 页脚按参考设计改版为四列信息架构（品牌介绍 / 快速链接 / 法律信息 / 联系我们）+ 分隔线居中版权栏「© 2026 杏坛网络工作室 · 版权所有」；背景改用 --bg-soft，≤760px 两列折行；顺手清理死链 /about，未上线栏目暂为静态文字 |
 | 2026-09-23 | `tools/xingmingtie` | 姓名贴工具 Google Fonts 在线引用本地化：新增 `assets/vendor/fonts/xingmingtie.css`（662 个 `@font-face`）与 `assets/vendor/fonts/xingmingtie/`（662 个 woff2 子集，约 25 MB），覆盖 Long Cang、Ma Shan Zheng、ZCOOL QingKe HuangYou、ZCOOL XiaoWei、Zhi Mang Xing、Noto Sans SC、Noto Serif SC 共 7 个字族；`index.html` 改用相对路径并移除 preconnect，消除对 `fonts.googleapis.com` / `fonts.gstatic.com` 的外部请求，支持 `file://` 离线打印 |
 
 ## 许可
