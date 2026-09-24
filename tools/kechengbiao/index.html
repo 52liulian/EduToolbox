@@ -5,9 +5,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>课程表 🦋</title>
+    <!-- Comic Neue / Noto Sans SC 字体（已本地化，离线可用；构建器按 link 内联进 bundle） -->
+    <link href="../../assets/vendor/fonts/kechengbiao.css" rel="stylesheet">
     <style>
-        @import url('tools/kechengbiao/css2.css');
-
         * {
             margin: 0;
             padding: 0;
@@ -1365,7 +1365,37 @@
         .schedule-table td.time-cell:hover::after {
             opacity: 0.6;
         }
-    </style>
+
+        /* ============================================================================
+         * EduToolbox 组件化挂载兜底（自动追加）
+         * ----------------------------------------------------------------------------
+         * 本工具未引入 assets/css/tool-common.css，挂载进站点（Shadow DOM）后会缺少：
+         *   1) 六色主题变量 --primary / --primary-soft / --primary-grad
+         *   2) .container 的宽度约束（否则内容铺满并贴边）
+         * 这里补齐最小等价集，保证「独立打开」与「站点内组件化挂载」视觉一致。
+         * 本工具自带 .container{max-width:1400px}，该容器已加 data-no-fallback 豁免，
+         * 沿用 1400px 原宽度；下方兜底仅对未声明宽度的 .container 生效。
+         * ========================================================================== */
+
+        :root,
+        :host,
+        body[data-theme="sky"]   { --primary:#0ea5e9; --primary-soft:#e0f2fe; --primary-soft-2:#ccecfc; --primary-grad:linear-gradient(135deg,#38bdf8,#0ea5e9,#0284c7); }
+        body[data-theme="violet"]{ --primary:#7c3aed; --primary-soft:#f0e9fe; --primary-soft-2:#e2d5fc; --primary-grad:linear-gradient(135deg,#8b5cf6,#7c3aed,#6d28d9); }
+        body[data-theme="green"] { --primary:#16a34a; --primary-soft:#e7f6ec; --primary-soft-2:#d3f0dc; --primary-grad:linear-gradient(135deg,#22c55e,#16a34a,#15803d); }
+        body[data-theme="gold"]  { --primary:#d97706; --primary-soft:#fdf1dc; --primary-soft-2:#fbe3bc; --primary-grad:linear-gradient(135deg,#f59e0b,#d97706,#b45309); }
+        body[data-theme="orange"]{ --primary:#ea580c; --primary-soft:#ffefe4; --primary-soft-2:#ffdec9; --primary-grad:linear-gradient(135deg,#fb923c,#ea580c,#c2410c); }
+        body[data-theme="pink"]  { --primary:#db2777; --primary-soft:#fce7f0; --primary-soft-2:#f9cfe1; --primary-grad:linear-gradient(135deg,#f472b6,#db2777,#be185d); }
+
+        /* 容器宽度兜底：仅在工具自身未声明时生效（不覆盖已有 .container 规则） */
+        .container:not([data-no-fallback]) {
+            width: 100%;
+            max-width: 1180px;
+            margin: 0 auto;
+            padding: 28px 24px 56px;
+            box-sizing: border-box;
+        }
+
+</style>
 </head>
 
 <body>
@@ -1381,7 +1411,7 @@
     <div class="decoration star">✨</div>
     <div class="decoration star">💫</div>
 
-    <div class="container">
+    <div class="container" data-no-fallback>
         <header class="header">
             <h1>🌈 我的课程表 🌈</h1>
             <div class="owner-name" id="ownerNameDisplay" onclick="showNameEdit()">
