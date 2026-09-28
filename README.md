@@ -127,6 +127,8 @@ tools/<slug>/
 5. 资源一律使用**相对路径**，自动适配 http(s) 和 `file://`；工具 CSS 禁裸 `<link>` 注入全局 head（由适配器 rebase 进 Shadow DOM）
 6. 注册默认 `mount:"adapter"`；改动源码后必须重跑 `python .workbuddy/scripts/build_tool_bundles.py`，`--check` 无 STALE
 7. **脚本命名约定**：工具自有入口 JS 必须叫 `<slug>.js`（与目录同名）——挂载适配器只把同名脚本放进 Shadow DOM 作用域执行；第三方库须放 `assets/vendor/`（或工具内 `vendor/` 目录），文件名也不要借用 html2canvas/xlsx/katex/pinyin 等库名开头，否则会被误当外部库在主页面作用域执行，出现「独立打开可用、嵌套后按钮无反应」问题。
+8. **内联事件与挂载态兼容**：工具若使用 `onclick="全局函数()"` 等 HTML 内联事件，Shim 脚本经 `new Function` 注入后函数声明是局部变量不挂 `window`，内联事件在真实 window 作用域查找会 `ReferenceError`——须在 `<script>` 末尾显式 `window.fn = fn` 桥接。新工具优先用 `addEventListener` 绑事件，避免内联事件（2026-09-28 xingmingtie 事故）。
+9. **源文件 UTF-8 无 BOM**：保存时确认编码为「UTF-8 无 BOM」（VS Code 右下角切换），构建脚本读入阶段已 `.replace('\ufeff','')` 兜底，但避免不可见字符污染 bundle 产物（2026-09-28 事故）。
 
 ### 注册到 data.js
 

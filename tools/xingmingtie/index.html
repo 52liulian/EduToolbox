@@ -260,7 +260,7 @@ body[data-theme="pink"]  { --primary:#db2777; --primary-soft:#fce7f0; --primary-
         </div>
         <div class="divider"></div>
         <label>姓名：</label>
-        <input type="text" class="inp-name" id="nameInput" value="搁得平" oninput="render()">
+        <input type="text" class="inp-name" id="nameInput" value="张思睿" oninput="render()">
         <div class="divider"></div>
         <label class="f-class">班级：</label>
         <input type="text" class="inp-class" id="classInput" value="一(二)班" oninput="render()">
@@ -382,7 +382,7 @@ body[data-theme="pink"]  { --primary:#db2777; --primary-soft:#fce7f0; --primary-
     <div class="row">
         <span class="label-sm">预览：</span>
         <div class="preview-field g-subj-only" id="pvBoxSubj"><span class="pf-label">学科</span><span class="pf-sample" id="pvSubj">语文</span></div>
-        <div class="preview-field" id="pvBoxName"><span class="pf-label">姓名</span><span class="pf-sample" id="pvName">搁得平</span></div>
+        <div class="preview-field" id="pvBoxName"><span class="pf-label">姓名</span><span class="pf-sample" id="pvName">张思睿</span></div>
         <div class="preview-field g-subj-only" id="pvBoxClass"><span class="pf-label">班级</span><span class="pf-sample" id="pvClass">一(二)班</span></div>
         <div class="preview-field g-subj-only" id="pvBoxNum"><span class="pf-label">学号</span><span class="pf-sample" id="pvNum">41</span></div>
         <div class="divider"></div>
@@ -797,6 +797,28 @@ function renderHTag(i,name,bd,tagBg,ff,nfs,bwN,cNT,cNB,is,tw,th){
     tag.appendChild(ns);
     return tag;
 }
+
+/* ============================================================================
+ * 挂载态兼容：把内联事件用到的函数挂到 window
+ * ----------------------------------------------------------------------------
+ * 本工具大量使用 HTML 内联事件（onclick="render()" 等）。独立打开时
+ * <script> 顶层函数声明自动成为 window 属性，内联事件能找到；但站点
+ * 组件化挂载（Shadow DOM adapter）时，脚本经 new Function("document",
+ * "window", code) 注入，函数声明是该 Function 体的局部变量，不挂 window ——
+ * 内联事件在真实 window 作用域查找 render/setLayout/... 全部 ReferenceError，
+ * 所有 onclick/oninput/onchange 控件（宽高滑块、版式切换、颜色、字号等）
+ * 在嵌套态下全部无响应。此处显式挂 window 修复（Shim 的 set 落到真实
+ * window，见 tool-adapter.js makeWinShim 的 Proxy 无 set 拦截器）。
+ * ========================================================================== */
+try{
+  ['render','setLayout','applyLayoutUI','addSubj','removeSubj','getSubjFor',
+   'editSubjOnTag','addToQueue','addCustomIcon','handleFileUpload','removeFromQueue',
+   'clearQueue','updateQueue','setIconMode','getIcon','buildIconNode',
+   'toggleBold','resetTagBg','resetFieldColor','bgC'
+  ].forEach(function(fn){
+    try{ if(typeof window[fn]!=='function'){ window[fn]=eval(fn); } }catch(e){}
+  });
+}catch(e){}
 </script>
 
 </body>

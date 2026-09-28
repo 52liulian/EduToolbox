@@ -1,16 +1,11197 @@
-/* 自动生成，请勿手改 —— 源：tools/kechengbiao2/  ·  构建：2026-09-28 09:10:16 */
+/* 自动生成，请勿手改 —— 源：tools/kechengbiao2/  ·  构建：2026-09-28 11:07:05 */
 /* 用途：file:// 离线场景下 fetch 被 CORS 拦截，站点改用 <script src> 加载本文件，
    拿到工具页面与本地 CSS/JS 文本后走与 http 相同的 Shadow DOM 组件化挂载。
    工具源码改动后请重跑：python .workbuddy/scripts/build_tool_bundles.py */
 (function(){
   var g = window.EduToolboxToolBundles || (window.EduToolboxToolBundles = {});
   g["kechengbiao2"] = {
-    html: "<!DOCTYPE html>\n<html lang=\"zh-CN\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <title>智能课程表工具 | 免费在线排课系统<\/title>\n    <link rel=\"stylesheet\" href=\"css/styles.css\">\n    <script src=\"../../assets/js/frame-bridge.js\"><\/script>\n<script src=\"js/html2canvas.min.js\"><\/script>\n<style>\n/* ============================================================================\n * EduToolbox 组件化挂载兜底（自动追加）\n * ----------------------------------------------------------------------------\n * 本工具未引入 assets/css/tool-common.css，挂载进站点（Shadow DOM）后会缺少：\n *   1) 六色主题变量 --primary / --primary-soft / --primary-grad\n *   2) .container 的宽度约束（否则内容铺满并贴边）\n * 这里补齐最小等价集，保证「独立打开」与「站点内组件化挂载」视觉一致。\n * ========================================================================== */\n\n:root,\n:host,\nbody[data-theme=\"sky\"]   { --primary:#0ea5e9; --primary-soft:#e0f2fe; --primary-soft-2:#ccecfc; --primary-grad:linear-gradient(135deg,#38bdf8,#0ea5e9,#0284c7); }\nbody[data-theme=\"violet\"]{ --primary:#7c3aed; --primary-soft:#f0e9fe; --primary-soft-2:#e2d5fc; --primary-grad:linear-gradient(135deg,#8b5cf6,#7c3aed,#6d28d9); }\nbody[data-theme=\"green\"] { --primary:#16a34a; --primary-soft:#e7f6ec; --primary-soft-2:#d3f0dc; --primary-grad:linear-gradient(135deg,#22c55e,#16a34a,#15803d); }\nbody[data-theme=\"gold\"]  { --primary:#d97706; --primary-soft:#fdf1dc; --primary-soft-2:#fbe3bc; --primary-grad:linear-gradient(135deg,#f59e0b,#d97706,#b45309); }\nbody[data-theme=\"orange\"]{ --primary:#ea580c; --primary-soft:#ffefe4; --primary-soft-2:#ffdec9; --primary-grad:linear-gradient(135deg,#fb923c,#ea580c,#c2410c); }\nbody[data-theme=\"pink\"]  { --primary:#db2777; --primary-soft:#fce7f0; --primary-soft-2:#f9cfe1; --primary-grad:linear-gradient(135deg,#f472b6,#db2777,#be185d); }\n\n/* 容器宽度兜底：仅在工具自身未声明时生效（不覆盖已有 .container 规则） */\n.container:not([data-no-fallback]) {\n  width: 100%;\n  max-width: 1180px;\n  margin: 0 auto;\n  padding: 28px 24px 56px;\n  box-sizing: border-box;\n}\n<\/style>\n<\/head>\n<body>\n    <!-- 固定顶部区域 -->\n    <div class=\"fixed-top-area\">\n        <header class=\"header\">\n            <!-- 手机端汉堡菜单按钮 倾企企业服务 -->\n            <button id=\"hamburgerBtn\" class=\"hamburger-btn\">\n                <span class=\"hamburger-line\"><\/span>\n                <span class=\"hamburger-line\"><\/span>\n                <span class=\"hamburger-line\"><\/span>\n            <\/button>\n            <div class=\"title-section\">\n                <input type=\"text\" id=\"timetableTitle\" class=\"timetable-title\" value=\"我的课程表\" placeholder=\"请输入课程表名称\" readonly style=\"cursor: default;\">\n            <\/div>\n            <div class=\"controls\">\n                <button id=\"tutorialBtn\" class=\"btn danger\">\n                    <svg class=\"icon\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\">\n                        <circle cx=\"12\" cy=\"12\" r=\"10\"/>\n                        <path d=\"M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3\"/>\n                        <line x1=\"12\" y1=\"17\" x2=\"12.01\" y2=\"17\"/>\n                    <\/svg>\n                    教程\n                <\/button>\n                <button id=\"resetBtn\" class=\"btn secondary\">\n                    <svg class=\"icon\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\">\n                        <path d=\"M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8\"/>\n                        <path d=\"M21 3v5h-5\"/>\n                        <path d=\"M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16\"/>\n                        <path d=\"M3 21v-5h5\"/>\n                    <\/svg>\n                    重置课表\n                <\/button>\n                <div class=\"export-dropdown\">\n                    <button id=\"exportBtn\" class=\"btn primary\">\n                        <svg class=\"icon\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\">\n                            <path d=\"M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4\"/>\n                            <polyline points=\"7,10 12,15 17,10\"/>\n                            <line x1=\"12\" y1=\"15\" x2=\"12\" y2=\"3\"/>\n                        <\/svg>\n                        导出打印\n                    <\/button>\n                    <div class=\"export-menu\" id=\"exportMenu\">\n                        <button id=\"saveImageBtn\" class=\"export-item\">\n                            <svg class=\"icon\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\">\n                                <rect x=\"3\" y=\"3\" width=\"18\" height=\"18\" rx=\"2\" ry=\"2\"/>\n                                <circle cx=\"8.5\" cy=\"8.5\" r=\"1.5\"/>\n                                <polyline points=\"21,15 16,10 5,21\"/>\n                            <\/svg>\n                            保存图片\n                        <\/button>\n                        <button id=\"exportWordBtn\" class=\"export-item\">\n                            <svg class=\"icon\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\">\n                                <path d=\"M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z\"/>\n                                <polyline points=\"14,2 14,8 20,8\"/>\n                                <line x1=\"16\" y1=\"13\" x2=\"8\" y2=\"13\"/>\n                                <line x1=\"16\" y1=\"17\" x2=\"8\" y2=\"17\"/>\n                                <polyline points=\"10,9 9,9 8,9\"/>\n                            <\/svg>\n                            导出Word\n                        <\/button>\n                        <button id=\"exportExcelBtn\" class=\"export-item\">\n                            <svg class=\"icon\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\">\n                                <path d=\"M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z\"/>\n                                <polyline points=\"14,2 14,8 20,8\"/>\n                                <line x1=\"16\" y1=\"13\" x2=\"8\" y2=\"13\"/>\n                                <line x1=\"16\" y1=\"17\" x2=\"8\" y2=\"17\"/>\n                                <polyline points=\"10,9 9,9 8,9\"/>\n                            <\/svg>\n                            导出Excel\n                        <\/button>\n                    <\/div>\n                <\/div>\n                <div class=\"backup-dropdown\">\n                    <button id=\"backupBtn\" class=\"btn primary\">\n                        <svg class=\"icon\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\">\n                            <path d=\"M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z\"/>\n                            <polyline points=\"3.27,6.96 12,12.01 20.73,6.96\"/>\n                            <line x1=\"12\" y1=\"22.08\" x2=\"12\" y2=\"12\"/>\n                        <\/svg>\n                        备份数据\n                    <\/button>\n                    <div class=\"backup-menu\" id=\"backupMenu\">\n                        <button id=\"exportDataBtn\" class=\"backup-item\">\n                            <svg class=\"icon\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\">\n                                <path d=\"M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4\"/>\n                                <polyline points=\"7,10 12,15 17,10\"/>\n                                <line x1=\"12\" y1=\"15\" x2=\"12\" y2=\"3\"/>\n                            <\/svg>\n                            导出数据\n                        <\/button>\n                        <button id=\"importDataBtn\" class=\"backup-item\">\n                            <svg class=\"icon\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\">\n                                <path d=\"M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4\"/>\n                                <polyline points=\"17,8 12,3 7,8\"/>\n                                <line x1=\"12\" y1=\"3\" x2=\"12\" y2=\"15\"/>\n                            <\/svg>\n                            导入数据\n                        <\/button>\n                    <\/div>\n                <\/div>\n                <div class=\"font-dropdown\">\n                    <button id=\"fontBtn\" class=\"btn primary\">\n                        <svg class=\"icon\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\">\n                            <path d=\"M4 7V4h16v3\"/>\n                            <path d=\"M9 20h6\"/>\n                            <path d=\"M12 4v16\"/>\n                        <\/svg>\n                        字体\n                    <\/button>\n                    <div class=\"font-menu\" id=\"fontMenu\">\n                        <button class=\"font-item\" data-font=\"system\">系统默认<\/button>\n                        <button class=\"font-item\" data-font=\"microsoft-yahei\">微软雅黑<\/button>\n                        <button class=\"font-item\" data-font=\"simsun\">宋体<\/button>\n                        <button class=\"font-item\" data-font=\"heiti\">黑体<\/button>\n                        <button class=\"font-item\" data-font=\"kaiti\">楷体<\/button>\n                        <button class=\"font-item\" data-font=\"fangsong\">仿宋<\/button>\n                        <button class=\"font-item\" data-font=\"xingkai\">行楷字体<\/button>\n                        <button class=\"font-item\" data-font=\"lishu\">隶书字体<\/button>\n                        <button class=\"font-item\" data-font=\"kaiti\">楷体字体<\/button>\n                        <button class=\"font-item\" data-font=\"fangsong\">仿宋字体<\/button>\n                        <button class=\"font-item\" data-font=\"youyuan\">幼圆字体<\/button>\n                        <button class=\"font-item\" data-font=\"source-han-sans\">思源黑体<\/button>\n                        <button class=\"font-item\" data-font=\"source-han-serif\">思源宋体<\/button>\n                        <button class=\"font-item\" data-font=\"arial\">Arial<\/button>\n                        <button class=\"font-item\" data-font=\"helvetica\">Helvetica<\/button>\n                        <button class=\"font-item\" data-font=\"georgia\">Georgia<\/button>\n                        <button class=\"font-item\" data-font=\"times-new-roman\">Times New Roman<\/button>\n                    <\/div>\n                <\/div>\n                <div class=\"theme-dropdown\">\n                    <button id=\"themeBtn\" class=\"btn primary\">\n                        <svg class=\"icon\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\">\n                            <circle cx=\"12\" cy=\"12\" r=\"3\"/>\n                            <path d=\"M12 1v6m0 6v6m4.22-13.22l4.24 4.24M1.54 1.54l4.24 4.24M20.46 20.46l-4.24-4.24M1.54 20.46l4.24-4.24\"/>\n                        <\/svg>\n                        主题\n                    <\/button>\n                    <div class=\"theme-menu\" id=\"themeMenu\">\n                        <button class=\"theme-item\" data-theme=\"default\">默认主题<\/button>\n                        <button class=\"theme-item\" data-theme=\"blue\">蓝色主题<\/button>\n                        <button class=\"theme-item\" data-theme=\"purple\">紫色主题<\/button>\n                        <button class=\"theme-item\" data-theme=\"pink\">粉色主题<\/button>\n                        <button class=\"theme-item\" data-theme=\"orange\">橙色主题<\/button>\n                        <button class=\"theme-item\" data-theme=\"dark\">深色主题<\/button>\n                        <div class=\"custom-color\" style=\"padding: 10px; border-top: 1px solid var(--border-color); display: flex; align-items: center; gap: 8px;\">\n                            <input type=\"color\" id=\"customColorPicker\" value=\"#4a7c59\" style=\"width: 32px; height: 32px; border: none; cursor: pointer; border-radius: 4px;\">\n                            <span style=\"font-size: 14px; color: var(--text-color);\">自定义<\/span>\n                        <\/div>\n                    <\/div>\n                <\/div>\n                <button id=\"settingsBtn\" class=\"btn primary\">\n                    <svg class=\"icon\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\">\n                        <circle cx=\"12\" cy=\"12\" r=\"3\"/>\n                        <path d=\"M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1 1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z\"/>\n                    <\/svg>\n                    设置\n                <\/button>\n            <\/div>\n        <\/header>\n        \n        <div class=\"period-controls\">\n            <div class=\"period-control-line\">\n                <span>上午课时<\/span>\n                <button id=\"addMorningBtn\" class=\"btn small\">增加<\/button>\n                <button id=\"removeMorningBtn\" class=\"btn small danger\">减少<\/button>\n            <\/div>\n            <div class=\"period-control-line\">\n                <span>下午课时<\/span>\n                <button id=\"addAfternoonBtn\" class=\"btn small\">增加<\/button>\n                <button id=\"removeAfternoonBtn\" class=\"btn small danger\">减少<\/button>\n            <\/div>\n            <div class=\"period-control-line\">\n                <span>晚上课时<\/span>\n                <button id=\"addEveningBtn\" class=\"btn small\">增加<\/button>\n                <button id=\"removeEveningBtn\" class=\"btn small danger\">减少<\/button>\n            <\/div>\n        <\/div>\n    <\/div>\n    \n    <!-- 主要内容区域 -->\n    <div class=\"container\">\n        <main class=\"main-content\">\n            <!-- 左侧栏：课时控制和科目池 倾企版权所有-->\n            <div class=\"left-sidebar\">\n                <!-- 课时设置主标题 -->\n                <h3 class=\"section-title\">课时设置<\/h3>\n                \n                <!-- PC端课时控制区域倾企企服 -->\n                <div class=\"period-controls-desktop\">\n                    <div class=\"period-control-line\">\n                        <span>上午课时<\/span>\n                        <button id=\"addMorningBtn2\" class=\"btn small\">增加<\/button>\n                        <button id=\"removeMorningBtn2\" class=\"btn small danger\">减少<\/button>\n                    <\/div>\n                    <div class=\"period-control-line\">\n                        <span>下午课时<\/span>\n                        <button id=\"addAfternoonBtn2\" class=\"btn small\">增加<\/button>\n                        <button id=\"removeAfternoonBtn2\" class=\"btn small danger\">减少<\/button>\n                    <\/div>\n                    <div class=\"period-control-line\">\n                        <span>晚上课时<\/span>\n                        <button id=\"addEveningBtn2\" class=\"btn small\">增加<\/button>\n                        <button id=\"removeEveningBtn2\" class=\"btn small danger\">减少<\/button>\n                    <\/div>\n                <\/div>\n                \n                <div class=\"subject-pool\">\n                    <!-- 科目池主标题 -->\n                    <h3 class=\"section-title\">科目池<\/h3>\n                    <div class=\"subject-pool-header\">\n                        <button id=\"importSubjectBtn\" class=\"btn secondary\">导入科目<\/button>\n                        <button id=\"addSubjectBtn\" class=\"btn primary\">+ 科目<\/button>\n                    <\/div>\n                    <div id=\"subjectPool\" class=\"subjects\">\n                        <!-- 科目卡片将在这里动态生成 -->\n                    <\/div>\n                <\/div>\n            <\/div>\n            \n            <!-- 右侧栏：倾企课程表格 -->\n            <div class=\"right-content\">\n\n            <div class=\"timetable-container\">\n                <div class=\"timetable-title-section\">\n                    <input type=\"text\" id=\"tableTitle\" class=\"table-title-input\" value=\"周一到周五课程表\" placeholder=\"请输入课程表名称\">\n                <\/div>\n                <div class=\"timetable-wrapper\">\n                    <table class=\"timetable\" id=\"timetable\">\n                        <thead>\n                            <tr>\n                                <th class=\"time-header\">时间<\/th>\n                                <th class=\"period-header\">课时<\/th>\n                                <th class=\"weekday-col\">周一<\/th>\n                                <th class=\"weekday-col\">周二<\/th>\n                                <th class=\"weekday-col\">周三<\/th>\n                                <th class=\"weekday-col\">周四<\/th>\n                                <th class=\"weekday-col\">周五<\/th>\n                                <th class=\"weekend-col\" id=\"saturdayCol\">周六<\/th>\n                                <th class=\"weekend-col\" id=\"sundayCol\">周日<\/th>\n                            <\/tr>\n                        <\/thead>\n                        <tbody id=\"timetableBody\">\n                            <!-- 动态生成的内容 -->\n                        <\/tbody>\n                    <\/table>\n                <\/div>\n            <\/div>\n            <\/div> \n        <\/main>\n    <\/div>\n\n    <!-- 科目编辑弹窗 -->\n    <div id=\"subjectModal\" class=\"modal\">\n        <div class=\"modal-content\">\n            <h3>科目设置<\/h3>\n            <form id=\"subjectForm\">\n                <div class=\"form-group\">\n                    <label>科目名称<\/label>\n                    <input type=\"text\" id=\"subjectName\" required>\n                <\/div>\n                <div class=\"form-group\">\n                    <label>老师姓名<\/label>\n                    <input type=\"text\" id=\"teacherName\" placeholder=\"可选\">\n                <\/div>\n                <div class=\"form-group\">\n                    <label>颜色模式<\/label>\n                    <div class=\"color-mode-selector\">\n                        <label class=\"color-mode-option\">\n                            <input type=\"radio\" name=\"colorMode\" value=\"both\" checked>\n                            <span>背景+字体<\/span>\n                        <\/label>\n                        <label class=\"color-mode-option\">\n                            <input type=\"radio\" name=\"colorMode\" value=\"textOnly\">\n                            <span>仅字体色<\/span>\n                        <\/label>\n                    <\/div>\n                <\/div>\n                <div class=\"form-group color-group\" id=\"bgColorGroup\">\n                    <label>背景色<\/label>\n                    <div class=\"color-options\">\n                        <div class=\"preset-colors\" id=\"backgroundColors\">\n                            <!-- 18种背景色 -->\n                            <div class=\"color-option bg-color\" data-color=\"#3498DB\" style=\"background: #3498DB\" title=\"明亮蓝\"><\/div>\n                            <div class=\"color-option bg-color\" data-color=\"#2ECC71\" style=\"background: #2ECC71\" title=\"鲜绿色\"><\/div>\n                            <div class=\"color-option bg-color\" data-color=\"#E74C3C\" style=\"background: #E74C3C\" title=\"亮红色\"><\/div>\n                            <div class=\"color-option bg-color\" data-color=\"#9B59B6\" style=\"background: #9B59B6\" title=\"紫罗兰\"><\/div>\n                            <div class=\"color-option bg-color\" data-color=\"#F39C12\" style=\"background: #F39C12\" title=\"橙黄色\"><\/div>\n                            <div class=\"color-option bg-color\" data-color=\"#1ABC9C\" style=\"background: #1ABC9C\" title=\"青绿色\"><\/div>\n                            <div class=\"color-option bg-color\" data-color=\"#D35400\" style=\"background: #D35400\" title=\"南瓜橙\"><\/div>\n                            <div class=\"color-option bg-color\" data-color=\"#C0392B\" style=\"background: #C0392B\" title=\"深红色\"><\/div>\n                            <div class=\"color-option bg-color\" data-color=\"#8E44AD\" style=\"background: #8E44AD\" title=\"深紫色\"><\/div>\n                            <div class=\"color-option bg-color\" data-color=\"#2980B9\" style=\"background: #2980B9\" title=\"天蓝色\"><\/div>\n                            <div class=\"color-option bg-color\" data-color=\"#27AE60\" style=\"background: #27AE60\" title=\"森林绿\"><\/div>\n                            <div class=\"color-option bg-color\" data-color=\"#E67E22\" style=\"background: #E67E22\" title=\"胡萝卜橙\"><\/div>\n                            <div class=\"color-option bg-color\" data-color=\"#16A085\" style=\"background: #16A085\" title=\"海绿色\"><\/div>\n                            <div class=\"color-option bg-color\" data-color=\"#D68910\" style=\"background: #D68910\" title=\"金黄橙\"><\/div>\n                            <div class=\"color-option bg-color\" data-color=\"#A569BD\" style=\"background: #A569BD\" title=\"薰衣草紫\"><\/div>\n                            <div class=\"color-option bg-color\" data-color=\"#5D6D7E\" style=\"background: #5D6D7E\" title=\"石板灰\"><\/div>\n                            <div class=\"color-option bg-color\" data-color=\"#F7DC6F\" style=\"background: #F7DC6F\" title=\"淡黄色\"><\/div>\n                            <div class=\"color-option bg-color\" data-color=\"#85C1E9\" style=\"background: #85C1E9\" title=\"浅蓝色\"><\/div>\n                        <\/div>\n                        <div class=\"custom-color-inline\">\n                            <input type=\"color\" id=\"bgColorPicker\" value=\"#3498DB\">\n                            <input type=\"text\" id=\"bgColorText\" placeholder=\"#3498DB\" maxlength=\"7\">\n                        <\/div>\n                    <\/div>\n                <\/div>\n                <div class=\"form-group color-group\" id=\"textColorGroup\">\n                    <label>字体色<\/label>\n                    <div class=\"color-options\">\n                        <div class=\"preset-colors\" id=\"textColors\">\n                            <!-- 18种字体色 -->\n                            <div class=\"color-option text-color\" data-color=\"#FFFFFF\" style=\"background: #FFFFFF; border: 1px solid #ddd;\" title=\"白色\"><\/div>\n                            <div class=\"color-option text-color\" data-color=\"#000000\" style=\"background: #000000\" title=\"黑色\"><\/div>\n                            <div class=\"color-option text-color\" data-color=\"#2C3E50\" style=\"background: #2C3E50\" title=\"深蓝灰\"><\/div>\n                            <div class=\"color-option text-color\" data-color=\"#1B2631\" style=\"background: #1B2631\" title=\"墨黑色\"><\/div>\n                            <div class=\"color-option text-color\" data-color=\"#154360\" style=\"background: #154360\" title=\"午夜蓝\"><\/div>\n                            <div class=\"color-option text-color\" data-color=\"#1A5276\" style=\"background: #1A5276\" title=\"深海蓝\"><\/div>\n                            <div class=\"color-option text-color\" data-color=\"#0E6251\" style=\"background: #0E6251\" title=\"深松绿\"><\/div>\n                            <div class=\"color-option text-color\" data-color=\"#145A32\" style=\"background: #145A32\" title=\"墨绿色\"><\/div>\n                            <div class=\"color-option text-color\" data-color=\"#186A3B\" style=\"background: #186A3B\" title=\"深林绿\"><\/div>\n                            <div class=\"color-option text-color\" data-color=\"#4A235A\" style=\"background: #4A235A\" title=\"深紫色\"><\/div>\n                            <div class=\"color-option text-color\" data-color=\"#512E5F\" style=\"background: #512E5F\" title=\"紫罗兰\"><\/div>\n                            <div class=\"color-option text-color\" data-color=\"#6C3483\" style=\"background: #6C3483\" title=\"葡萄紫\"><\/div>\n                            <div class=\"color-option text-color\" data-color=\"#78281F\" style=\"background: #78281F\" title=\"暗红色\"><\/div>\n                            <div class=\"color-option text-color\" data-color=\"#641E16\" style=\"background: #641E16\" title=\"深酒红\"><\/div>\n                            <div class=\"color-option text-color\" data-color=\"#7E5109\" style=\"background: #7E5109\" title=\"深土黄\"><\/div>\n                            <div class=\"color-option text-color\" data-color=\"#E74C3C\" style=\"background: #E74C3C\" title=\"亮红色\"><\/div>\n                            <div class=\"color-option text-color\" data-color=\"#3498DB\" style=\"background: #3498DB\" title=\"明亮蓝\"><\/div>\n                            <div class=\"color-option text-color\" data-color=\"#27AE60\" style=\"background: #27AE60\" title=\"森林绿\"><\/div>\n                        <\/div>\n                        <div class=\"custom-color-inline\">\n                            <input type=\"color\" id=\"textColorPicker\" value=\"#FFFFFF\">\n                            <input type=\"text\" id=\"textColorText\" placeholder=\"#FFFFFF\" maxlength=\"7\">\n                        <\/div>\n                    <\/div>\n                <\/div>\n                <div class=\"color-preview-section\">\n                    <label>预览效果<\/label>\n                    <div class=\"color-preview\" id=\"colorPreview\">科目名称<\/div>\n                <\/div>\n                <div class=\"form-actions\">\n                    <button type=\"submit\" class=\"btn primary\">保存<\/button>\n                    <button type=\"button\" id=\"deleteSubjectBtn\" class=\"btn danger\" style=\"display: none;\">删除<\/button>\n                    <button type=\"button\" id=\"cancelBtn\" class=\"btn secondary\">取消<\/button>\n                <\/div>\n            <\/form>\n        <\/div>\n    <\/div>\n\n    <!-- 时间编辑弹窗 -->\n    <div id=\"timeModal\" class=\"modal\">\n        <div class=\"modal-content\">\n                <h3>修改课时<\/h3>\n                <form id=\"timeForm\">\n                    <div class=\"form-group\">\n                        <label>课时名称<\/label>\n                        <input type=\"text\" id=\"periodName\" required placeholder=\"第1课时\">\n                    <\/div>\n                <div class=\"form-group\">\n                    <label>开始时间<\/label>\n                    <div style=\"display: flex; gap: 10px; align-items: center;\">\n                        <select id=\"startHour\" style=\"flex: 1; padding: 8px; border: 1px solid #ddd; border-radius: 4px;\">\n                            <option value=\"\">时<\/option>\n                        <\/select>\n                        <span>:<\/span>\n                        <select id=\"startMinute\" style=\"flex: 1; padding: 8px; border: 1px solid #ddd; border-radius: 4px;\">\n                            <option value=\"\">分<\/option>\n                        <\/select>\n                    <\/div>\n                <\/div>\n                <div class=\"form-group\">\n                    <label>结束时间<\/label>\n                    <div style=\"display: flex; gap: 10px; align-items: center;\">\n                        <select id=\"endHour\" style=\"flex: 1; padding: 8px; border: 1px solid #ddd; border-radius: 4px;\">\n                            <option value=\"\">时<\/option>\n                        <\/select>\n                        <span>:<\/span>\n                        <select id=\"endMinute\" style=\"flex: 1; padding: 8px; border: 1px solid #ddd; border-radius: 4px;\">\n                            <option value=\"\">分<\/option>\n                        <\/select>\n                    <\/div>\n                <\/div>\n                <div class=\"form-actions\">\n                    <button type=\"submit\" class=\"btn primary\">保存<\/button>\n                    <button type=\"button\" id=\"cancelTimeBtn\" class=\"btn secondary\">取消<\/button>\n                <\/div>\n            <\/form>\n        <\/div>\n    <\/div>\n\n    <!-- 设置弹窗 -->\n    <div id=\"settingsModal\" class=\"modal\">\n        <div class=\"modal-content\">\n            <div class=\"modal-header\">\n                <h3>⚙️ 显示设置<\/h3>\n                <button type=\"button\" class=\"modal-close\" onclick=\"app.closeSettingsModal()\">&times;<\/button>\n            <\/div>\n            <form id=\"settingsForm\">\n                <div class=\"settings-content\">\n                    <div class=\"setting-item\">\n                        <label class=\"setting-label\">\n                            <input type=\"checkbox\" id=\"showEvening\" class=\"setting-checkbox\">\n                            <span class=\"checkmark\"><\/span>\n                            <div class=\"setting-text\">\n                                <strong>显示晚上课时<\/strong>\n                                <small>包含晚上的课程时间段<\/small>\n                            <\/div>\n                        <\/label>\n                    <\/div>\n                    \n                    <div class=\"setting-item\">\n                        <label class=\"setting-label\">\n                            <input type=\"checkbox\" id=\"showSaturday\" class=\"setting-checkbox\">\n                            <span class=\"checkmark\"><\/span>\n                            <div class=\"setting-text\">\n                                <strong>显示周六<\/strong>\n                                <small>在课程表中添加周六列<\/small>\n                            <\/div>\n                        <\/label>\n                    <\/div>\n                    \n                    <div class=\"setting-item\">\n                        <label class=\"setting-label\">\n                            <input type=\"checkbox\" id=\"showSunday\" class=\"setting-checkbox\">\n                            <span class=\"checkmark\"><\/span>\n                            <div class=\"setting-text\">\n                                <strong>显示周日<\/strong>\n                                <small>在课程表中添加周日列<\/small>\n                            <\/div>\n                        <\/label>\n                    <\/div>\n                    \n                    <div class=\"setting-item\">\n                        <label class=\"setting-label\">\n                            <input type=\"checkbox\" id=\"showPeriodTime\" class=\"setting-checkbox\">\n                            <span class=\"checkmark\"><\/span>\n                            <div class=\"setting-text\">\n                                <strong>显示课时时间<\/strong>\n                                <small>在课时列中显示开始和结束时间<\/small>\n                            <\/div>\n                        <\/label>\n                    <\/div>\n                <\/div>\n                \n                <div class=\"form-actions\">\n                    <button type=\"button\" id=\"cancelSettingsBtn\" class=\"btn secondary\">取消<\/button>\n                    <button type=\"submit\" class=\"btn primary\">保存设置<\/button>\n                <\/div>\n            <\/form>\n        <\/div>\n    <\/div>\n\n    <!-- 教程弹窗 -->\n    <div id=\"tutorialModal\" class=\"modal tutorial-modal\" onclick=\"if(event.target===this)app.closeTutorialModal()\">\n        <div class=\"modal-content tutorial-modal-content\">\n            <div class=\"tutorial-header\">\n                <div class=\"tutorial-header-icon\">📚<\/div>\n                <h3>课程表使用教程<\/h3>\n                <button class=\"tutorial-close-btn\" onclick=\"app.closeTutorialModal()\">\n                    <svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\">\n                        <line x1=\"18\" y1=\"6\" x2=\"6\" y2=\"18\"><\/line>\n                        <line x1=\"6\" y1=\"6\" x2=\"18\" y2=\"18\"><\/line>\n                    <\/svg>\n                <\/button>\n            <\/div>\n            <div id=\"tutorialContent\" class=\"tutorial-content\">\n                <!-- 教程内容将由JavaScript动态生成 -->\n            <\/div>\n            <div class=\"tutorial-footer\">\n                <div class=\"tutorial-hint\">\n                    <span class=\"hint-icon\">💡<\/span>\n                    按 <kbd>ESC<\/kbd> 键也可以关闭\n                <\/div>\n                <div class=\"tutorial-actions\">\n                    <button type=\"button\" onclick=\"app.closeTutorialModal()\" class=\"btn secondary\">关闭<\/button>\n                    <button type=\"button\" id=\"closeTutorialBtn\" class=\"btn primary\">我知道了<\/button>\n                <\/div>\n            <\/div>\n        <\/div>\n    <\/div>\n\n    <!-- 隐藏的文件输入元素用于导入数据 -->\n    <input type=\"file\" id=\"importFileInput\" accept=\".json\" style=\"display: none;\">\n    \n    <!-- 自定义确认对话框 -->\n    <div id=\"confirmModal\" class=\"modal\">\n        <div class=\"modal-content\">\n            <h3>确认操作<\/h3>\n            <div class=\"confirm-message\">\n                <!-- 确认消息将动态设置 -->\n            <\/div>\n            <div class=\"form-actions\">\n                <button type=\"button\" id=\"confirmCancelBtn\" class=\"btn secondary\">取消<\/button>\n                <button type=\"button\" id=\"confirmOkBtn\" class=\"btn danger\">确定<\/button>\n            <\/div>\n        <\/div>\n    <\/div>\n    \n    <!-- 导入科目模态框 -->\n    <div id=\"importSubjectModal\" class=\"modal\">\n        <div class=\"modal-content\">\n            <h3>导入科目<\/h3>\n            <form id=\"importSubjectForm\">\n                <div class=\"form-group\">\n                    <label>选择学习阶段<\/label>\n                    <select id=\"stageSelect\" class=\"form-control\" required>\n                        <option value=\"\">请选择学习阶段<\/option>\n                        <option value=\"primary\">小学<\/option>\n                        <option value=\"junior\">初中<\/option>\n                        <option value=\"senior\">高中<\/option>\n                        <option value=\"university\">大学<\/option>\n                    <\/select>\n                <\/div>\n                <div class=\"form-actions\">\n                    <button type=\"button\" id=\"cancelImportBtn\" class=\"btn secondary\">取消<\/button>\n                    <button type=\"submit\" class=\"btn primary\">导入<\/button>\n                <\/div>\n            <\/form>\n        <\/div>\n    <\/div>\n\n    <!-- 手机端侧边栏菜单 -->\n    <div id=\"mobileSidebar\" class=\"mobile-sidebar\">\n        <div class=\"sidebar-header\">\n            <h3>菜单<\/h3>\n            <button id=\"closeSidebarBtn\" class=\"close-sidebar-btn\">×<\/button>\n        <\/div>\n        <div class=\"sidebar-content\">\n            <div class=\"sidebar-section\">\n                <h4>课程表操作<\/h4>\n                <button class=\"sidebar-btn\" data-action=\"tutorial\">\n                    <svg class=\"icon\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\">\n                        <circle cx=\"12\" cy=\"12\" r=\"10\"/>\n                        <path d=\"M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3\"/>\n                        <line x1=\"12\" y1=\"17\" x2=\"12.01\" y2=\"17\"/>\n                    <\/svg>\n                    查看教程\n                <\/button>\n                <button class=\"sidebar-btn\" data-action=\"reset\">\n                    <svg class=\"icon\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\">\n                        <path d=\"M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8\"/>\n                        <path d=\"M21 3v5h-5\"/>\n                        <path d=\"M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16\"/>\n                        <path d=\"M3 21v-5h5\"/>\n                    <\/svg>\n                    重置课表\n                <\/button>\n            <\/div>\n            \n            <div class=\"sidebar-section\">\n                <h4>导出功能<\/h4>\n                <button class=\"sidebar-btn\" data-action=\"saveImage\">\n                    <svg class=\"icon\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\">\n                        <rect x=\"3\" y=\"3\" width=\"18\" height=\"18\" rx=\"2\" ry=\"2\"/>\n                        <circle cx=\"8.5\" cy=\"8.5\" r=\"1.5\"/>\n                        <polyline points=\"21,15 16,10 5,21\"/>\n                    <\/svg>\n                    保存图片\n                <\/button>\n                <button class=\"sidebar-btn\" data-action=\"exportWord\">\n                    <svg class=\"icon\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\">\n                        <path d=\"M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z\"/>\n                        <polyline points=\"14,2 14,8 20,8\"/>\n                        <line x1=\"16\" y1=\"13\" x2=\"8\" y2=\"13\"/>\n                        <line x1=\"16\" y1=\"17\" x2=\"8\" y2=\"17\"/>\n                        <polyline points=\"10,9 9,9 8,9\"/>\n                    <\/svg>\n                    导出Word\n                <\/button>\n                <button class=\"sidebar-btn\" data-action=\"exportExcel\">\n                    <svg class=\"icon\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\">\n                        <path d=\"M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z\"/>\n                        <polyline points=\"14,2 14,8 20,8\"/>\n                        <line x1=\"16\" y1=\"13\" x2=\"8\" y2=\"13\"/>\n                        <line x1=\"16\" y1=\"17\" x2=\"8\" y2=\"17\"/>\n                        <polyline points=\"10,9 9,9 8,9\"/>\n                    <\/svg>\n                    导出Excel\n                <\/button>\n            <\/div>\n            \n            <div class=\"sidebar-section\">\n                <h4>数据管理<\/h4>\n                <button class=\"sidebar-btn\" data-action=\"exportData\">\n                    <svg class=\"icon\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\">\n                        <path d=\"M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4\"/>\n                        <polyline points=\"7,10 12,15 17,10\"/>\n                        <line x1=\"12\" y1=\"15\" x2=\"12\" y2=\"3\"/>\n                    <\/svg>\n                    导出数据\n                <\/button>\n                <button class=\"sidebar-btn\" data-action=\"importData\">\n                    <svg class=\"icon\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\">\n                        <path d=\"M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4\"/>\n                        <polyline points=\"17,8 12,3 7,8\"/>\n                        <line x1=\"12\" y1=\"3\" x2=\"12\" y2=\"15\"/>\n                    <\/svg>\n                    导入数据\n                <\/button>\n            <\/div>\n            \n            <div class=\"sidebar-section\">\n                <h4>设置<\/h4>\n                <button class=\"sidebar-btn\" data-action=\"settings\">\n                    <svg class=\"icon\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\">\n                        <circle cx=\"12\" cy=\"12\" r=\"3\"/>\n                        <path d=\"M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1 1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z\"/>\n                    <\/svg>\n                    显示设置\n                <\/button>\n            <\/div>\n            \n            <div class=\"sidebar-section\">\n                <h4>主题切换<\/h4>\n                <div class=\"sidebar-theme-grid\">\n                    <button class=\"sidebar-theme-btn\" data-action=\"theme\" data-theme=\"default\">默认<\/button>\n                    <button class=\"sidebar-theme-btn\" data-action=\"theme\" data-theme=\"blue\">蓝色<\/button>\n                    <button class=\"sidebar-theme-btn\" data-action=\"theme\" data-theme=\"purple\">紫色<\/button>\n                    <button class=\"sidebar-theme-btn\" data-action=\"theme\" data-theme=\"pink\">粉色<\/button>\n                    <button class=\"sidebar-theme-btn\" data-action=\"theme\" data-theme=\"orange\">橙色<\/button>\n                    <button class=\"sidebar-theme-btn\" data-action=\"theme\" data-theme=\"dark\">深色<\/button>\n                <\/div>\n                <div class=\"sidebar-custom-color\">\n                    <input type=\"color\" id=\"mobileCustomColorPicker\" value=\"#4a7c59\">\n                    <span>自定义主题色<\/span>\n                <\/div>\n            <\/div>\n            \n            <div class=\"sidebar-section\">\n                <h4>字体切换<\/h4>\n                <div class=\"sidebar-font-grid\">\n                    <button class=\"sidebar-font-btn\" data-action=\"font\" data-font=\"system\">系统默认<\/button>\n                    <button class=\"sidebar-font-btn\" data-action=\"font\" data-font=\"microsoft-yahei\">微软雅黑<\/button>\n                    <button class=\"sidebar-font-btn\" data-action=\"font\" data-font=\"simsun\">宋体<\/button>\n                    <button class=\"sidebar-font-btn\" data-action=\"font\" data-font=\"heiti\">黑体<\/button>\n                    <button class=\"sidebar-font-btn\" data-action=\"font\" data-font=\"kaiti\">楷体<\/button>\n                    <button class=\"sidebar-font-btn\" data-action=\"font\" data-font=\"fangsong\">仿宋<\/button>\n                <\/div>\n            <\/div>\n        <\/div>\n    <\/div>\n    \n    <!-- 侧边栏倾企遮罩层 -->\n    <div id=\"sidebarOverlay\" class=\"sidebar-overlay\"><\/div>\n    <script src=\"js/script.js\"><\/script>\n<\/body>\n<\/html>",
+    html: `<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>智能课程表工具 | 免费在线排课系统<\/title>
+    <link rel="stylesheet" href="css/styles.css">
+    <script src="../../assets/js/frame-bridge.js"><\/script>
+<script src="js/html2canvas.min.js"><\/script>
+<style>
+/* ============================================================================
+ * EduToolbox 组件化挂载兜底（自动追加）
+ * ----------------------------------------------------------------------------
+ * 本工具未引入 assets/css/tool-common.css，挂载进站点（Shadow DOM）后会缺少：
+ *   1) 六色主题变量 --primary / --primary-soft / --primary-grad
+ *   2) .container 的宽度约束（否则内容铺满并贴边）
+ * 这里补齐最小等价集，保证「独立打开」与「站点内组件化挂载」视觉一致。
+ * ========================================================================== */
+
+:root,
+:host,
+body[data-theme="sky"]   { --primary:#0ea5e9; --primary-soft:#e0f2fe; --primary-soft-2:#ccecfc; --primary-grad:linear-gradient(135deg,#38bdf8,#0ea5e9,#0284c7); }
+body[data-theme="violet"]{ --primary:#7c3aed; --primary-soft:#f0e9fe; --primary-soft-2:#e2d5fc; --primary-grad:linear-gradient(135deg,#8b5cf6,#7c3aed,#6d28d9); }
+body[data-theme="green"] { --primary:#16a34a; --primary-soft:#e7f6ec; --primary-soft-2:#d3f0dc; --primary-grad:linear-gradient(135deg,#22c55e,#16a34a,#15803d); }
+body[data-theme="gold"]  { --primary:#d97706; --primary-soft:#fdf1dc; --primary-soft-2:#fbe3bc; --primary-grad:linear-gradient(135deg,#f59e0b,#d97706,#b45309); }
+body[data-theme="orange"]{ --primary:#ea580c; --primary-soft:#ffefe4; --primary-soft-2:#ffdec9; --primary-grad:linear-gradient(135deg,#fb923c,#ea580c,#c2410c); }
+body[data-theme="pink"]  { --primary:#db2777; --primary-soft:#fce7f0; --primary-soft-2:#f9cfe1; --primary-grad:linear-gradient(135deg,#f472b6,#db2777,#be185d); }
+
+/* 容器宽度兜底：仅在工具自身未声明时生效（不覆盖已有 .container 规则） */
+.container:not([data-no-fallback]) {
+  width: 100%;
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 28px 24px 56px;
+  box-sizing: border-box;
+}
+<\/style>
+<\/head>
+<body>
+    <!-- 固定顶部区域 -->
+    <div class="fixed-top-area">
+        <header class="header">
+            <!-- 手机端汉堡菜单按钮 倾企企业服务 -->
+            <button id="hamburgerBtn" class="hamburger-btn">
+                <span class="hamburger-line"><\/span>
+                <span class="hamburger-line"><\/span>
+                <span class="hamburger-line"><\/span>
+            <\/button>
+            <div class="title-section">
+                <input type="text" id="timetableTitle" class="timetable-title" value="我的课程表" placeholder="请输入课程表名称" readonly style="cursor: default;">
+            <\/div>
+            <div class="controls">
+                <button id="tutorialBtn" class="btn danger">
+                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"/>
+                        <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/>
+                        <line x1="12" y1="17" x2="12.01" y2="17"/>
+                    <\/svg>
+                    教程
+                <\/button>
+                <button id="resetBtn" class="btn secondary">
+                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/>
+                        <path d="M21 3v5h-5"/>
+                        <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/>
+                        <path d="M3 21v-5h5"/>
+                    <\/svg>
+                    重置课表
+                <\/button>
+                <div class="export-dropdown">
+                    <button id="exportBtn" class="btn primary">
+                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                            <polyline points="7,10 12,15 17,10"/>
+                            <line x1="12" y1="15" x2="12" y2="3"/>
+                        <\/svg>
+                        导出打印
+                    <\/button>
+                    <div class="export-menu" id="exportMenu">
+                        <button id="saveImageBtn" class="export-item">
+                            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                                <circle cx="8.5" cy="8.5" r="1.5"/>
+                                <polyline points="21,15 16,10 5,21"/>
+                            <\/svg>
+                            保存图片
+                        <\/button>
+                        <button id="exportWordBtn" class="export-item">
+                            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                                <polyline points="14,2 14,8 20,8"/>
+                                <line x1="16" y1="13" x2="8" y2="13"/>
+                                <line x1="16" y1="17" x2="8" y2="17"/>
+                                <polyline points="10,9 9,9 8,9"/>
+                            <\/svg>
+                            导出Word
+                        <\/button>
+                        <button id="exportExcelBtn" class="export-item">
+                            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                                <polyline points="14,2 14,8 20,8"/>
+                                <line x1="16" y1="13" x2="8" y2="13"/>
+                                <line x1="16" y1="17" x2="8" y2="17"/>
+                                <polyline points="10,9 9,9 8,9"/>
+                            <\/svg>
+                            导出Excel
+                        <\/button>
+                    <\/div>
+                <\/div>
+                <div class="backup-dropdown">
+                    <button id="backupBtn" class="btn primary">
+                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+                            <polyline points="3.27,6.96 12,12.01 20.73,6.96"/>
+                            <line x1="12" y1="22.08" x2="12" y2="12"/>
+                        <\/svg>
+                        备份数据
+                    <\/button>
+                    <div class="backup-menu" id="backupMenu">
+                        <button id="exportDataBtn" class="backup-item">
+                            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                                <polyline points="7,10 12,15 17,10"/>
+                                <line x1="12" y1="15" x2="12" y2="3"/>
+                            <\/svg>
+                            导出数据
+                        <\/button>
+                        <button id="importDataBtn" class="backup-item">
+                            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                                <polyline points="17,8 12,3 7,8"/>
+                                <line x1="12" y1="3" x2="12" y2="15"/>
+                            <\/svg>
+                            导入数据
+                        <\/button>
+                    <\/div>
+                <\/div>
+                <div class="font-dropdown">
+                    <button id="fontBtn" class="btn primary">
+                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M4 7V4h16v3"/>
+                            <path d="M9 20h6"/>
+                            <path d="M12 4v16"/>
+                        <\/svg>
+                        字体
+                    <\/button>
+                    <div class="font-menu" id="fontMenu">
+                        <button class="font-item" data-font="system">系统默认<\/button>
+                        <button class="font-item" data-font="microsoft-yahei">微软雅黑<\/button>
+                        <button class="font-item" data-font="simsun">宋体<\/button>
+                        <button class="font-item" data-font="heiti">黑体<\/button>
+                        <button class="font-item" data-font="kaiti">楷体<\/button>
+                        <button class="font-item" data-font="fangsong">仿宋<\/button>
+                        <button class="font-item" data-font="xingkai">行楷字体<\/button>
+                        <button class="font-item" data-font="lishu">隶书字体<\/button>
+                        <button class="font-item" data-font="kaiti">楷体字体<\/button>
+                        <button class="font-item" data-font="fangsong">仿宋字体<\/button>
+                        <button class="font-item" data-font="youyuan">幼圆字体<\/button>
+                        <button class="font-item" data-font="source-han-sans">思源黑体<\/button>
+                        <button class="font-item" data-font="source-han-serif">思源宋体<\/button>
+                        <button class="font-item" data-font="arial">Arial<\/button>
+                        <button class="font-item" data-font="helvetica">Helvetica<\/button>
+                        <button class="font-item" data-font="georgia">Georgia<\/button>
+                        <button class="font-item" data-font="times-new-roman">Times New Roman<\/button>
+                    <\/div>
+                <\/div>
+                <div class="theme-dropdown">
+                    <button id="themeBtn" class="btn primary">
+                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="3"/>
+                            <path d="M12 1v6m0 6v6m4.22-13.22l4.24 4.24M1.54 1.54l4.24 4.24M20.46 20.46l-4.24-4.24M1.54 20.46l4.24-4.24"/>
+                        <\/svg>
+                        主题
+                    <\/button>
+                    <div class="theme-menu" id="themeMenu">
+                        <button class="theme-item" data-theme="default">默认主题<\/button>
+                        <button class="theme-item" data-theme="blue">蓝色主题<\/button>
+                        <button class="theme-item" data-theme="purple">紫色主题<\/button>
+                        <button class="theme-item" data-theme="pink">粉色主题<\/button>
+                        <button class="theme-item" data-theme="orange">橙色主题<\/button>
+                        <button class="theme-item" data-theme="dark">深色主题<\/button>
+                        <div class="custom-color" style="padding: 10px; border-top: 1px solid var(--border-color); display: flex; align-items: center; gap: 8px;">
+                            <input type="color" id="customColorPicker" value="#4a7c59" style="width: 32px; height: 32px; border: none; cursor: pointer; border-radius: 4px;">
+                            <span style="font-size: 14px; color: var(--text-color);">自定义<\/span>
+                        <\/div>
+                    <\/div>
+                <\/div>
+                <button id="settingsBtn" class="btn primary">
+                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="3"/>
+                        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1 1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+                    <\/svg>
+                    设置
+                <\/button>
+            <\/div>
+        <\/header>
+        
+        <div class="period-controls">
+            <div class="period-control-line">
+                <span>上午课时<\/span>
+                <button id="addMorningBtn" class="btn small">增加<\/button>
+                <button id="removeMorningBtn" class="btn small danger">减少<\/button>
+            <\/div>
+            <div class="period-control-line">
+                <span>下午课时<\/span>
+                <button id="addAfternoonBtn" class="btn small">增加<\/button>
+                <button id="removeAfternoonBtn" class="btn small danger">减少<\/button>
+            <\/div>
+            <div class="period-control-line">
+                <span>晚上课时<\/span>
+                <button id="addEveningBtn" class="btn small">增加<\/button>
+                <button id="removeEveningBtn" class="btn small danger">减少<\/button>
+            <\/div>
+        <\/div>
+    <\/div>
+    
+    <!-- 主要内容区域 -->
+    <div class="container">
+        <main class="main-content">
+            <!-- 左侧栏：课时控制和科目池 倾企版权所有-->
+            <div class="left-sidebar">
+                <!-- 课时设置主标题 -->
+                <h3 class="section-title">课时设置<\/h3>
+                
+                <!-- PC端课时控制区域倾企企服 -->
+                <div class="period-controls-desktop">
+                    <div class="period-control-line">
+                        <span>上午课时<\/span>
+                        <button id="addMorningBtn2" class="btn small">增加<\/button>
+                        <button id="removeMorningBtn2" class="btn small danger">减少<\/button>
+                    <\/div>
+                    <div class="period-control-line">
+                        <span>下午课时<\/span>
+                        <button id="addAfternoonBtn2" class="btn small">增加<\/button>
+                        <button id="removeAfternoonBtn2" class="btn small danger">减少<\/button>
+                    <\/div>
+                    <div class="period-control-line">
+                        <span>晚上课时<\/span>
+                        <button id="addEveningBtn2" class="btn small">增加<\/button>
+                        <button id="removeEveningBtn2" class="btn small danger">减少<\/button>
+                    <\/div>
+                <\/div>
+                
+                <div class="subject-pool">
+                    <!-- 科目池主标题 -->
+                    <h3 class="section-title">科目池<\/h3>
+                    <div class="subject-pool-header">
+                        <button id="importSubjectBtn" class="btn secondary">导入科目<\/button>
+                        <button id="addSubjectBtn" class="btn primary">+ 科目<\/button>
+                    <\/div>
+                    <div id="subjectPool" class="subjects">
+                        <!-- 科目卡片将在这里动态生成 -->
+                    <\/div>
+                <\/div>
+            <\/div>
+            
+            <!-- 右侧栏：倾企课程表格 -->
+            <div class="right-content">
+
+            <div class="timetable-container">
+                <div class="timetable-title-section">
+                    <input type="text" id="tableTitle" class="table-title-input" value="周一到周五课程表" placeholder="请输入课程表名称">
+                <\/div>
+                <div class="timetable-wrapper">
+                    <table class="timetable" id="timetable">
+                        <thead>
+                            <tr>
+                                <th class="time-header">时间<\/th>
+                                <th class="period-header">课时<\/th>
+                                <th class="weekday-col">周一<\/th>
+                                <th class="weekday-col">周二<\/th>
+                                <th class="weekday-col">周三<\/th>
+                                <th class="weekday-col">周四<\/th>
+                                <th class="weekday-col">周五<\/th>
+                                <th class="weekend-col" id="saturdayCol">周六<\/th>
+                                <th class="weekend-col" id="sundayCol">周日<\/th>
+                            <\/tr>
+                        <\/thead>
+                        <tbody id="timetableBody">
+                            <!-- 动态生成的内容 -->
+                        <\/tbody>
+                    <\/table>
+                <\/div>
+            <\/div>
+            <\/div> 
+        <\/main>
+    <\/div>
+
+    <!-- 科目编辑弹窗 -->
+    <div id="subjectModal" class="modal">
+        <div class="modal-content">
+            <h3>科目设置<\/h3>
+            <form id="subjectForm">
+                <div class="form-group">
+                    <label>科目名称<\/label>
+                    <input type="text" id="subjectName" required>
+                <\/div>
+                <div class="form-group">
+                    <label>老师姓名<\/label>
+                    <input type="text" id="teacherName" placeholder="可选">
+                <\/div>
+                <div class="form-group">
+                    <label>颜色模式<\/label>
+                    <div class="color-mode-selector">
+                        <label class="color-mode-option">
+                            <input type="radio" name="colorMode" value="both" checked>
+                            <span>背景+字体<\/span>
+                        <\/label>
+                        <label class="color-mode-option">
+                            <input type="radio" name="colorMode" value="textOnly">
+                            <span>仅字体色<\/span>
+                        <\/label>
+                    <\/div>
+                <\/div>
+                <div class="form-group color-group" id="bgColorGroup">
+                    <label>背景色<\/label>
+                    <div class="color-options">
+                        <div class="preset-colors" id="backgroundColors">
+                            <!-- 18种背景色 -->
+                            <div class="color-option bg-color" data-color="#3498DB" style="background: #3498DB" title="明亮蓝"><\/div>
+                            <div class="color-option bg-color" data-color="#2ECC71" style="background: #2ECC71" title="鲜绿色"><\/div>
+                            <div class="color-option bg-color" data-color="#E74C3C" style="background: #E74C3C" title="亮红色"><\/div>
+                            <div class="color-option bg-color" data-color="#9B59B6" style="background: #9B59B6" title="紫罗兰"><\/div>
+                            <div class="color-option bg-color" data-color="#F39C12" style="background: #F39C12" title="橙黄色"><\/div>
+                            <div class="color-option bg-color" data-color="#1ABC9C" style="background: #1ABC9C" title="青绿色"><\/div>
+                            <div class="color-option bg-color" data-color="#D35400" style="background: #D35400" title="南瓜橙"><\/div>
+                            <div class="color-option bg-color" data-color="#C0392B" style="background: #C0392B" title="深红色"><\/div>
+                            <div class="color-option bg-color" data-color="#8E44AD" style="background: #8E44AD" title="深紫色"><\/div>
+                            <div class="color-option bg-color" data-color="#2980B9" style="background: #2980B9" title="天蓝色"><\/div>
+                            <div class="color-option bg-color" data-color="#27AE60" style="background: #27AE60" title="森林绿"><\/div>
+                            <div class="color-option bg-color" data-color="#E67E22" style="background: #E67E22" title="胡萝卜橙"><\/div>
+                            <div class="color-option bg-color" data-color="#16A085" style="background: #16A085" title="海绿色"><\/div>
+                            <div class="color-option bg-color" data-color="#D68910" style="background: #D68910" title="金黄橙"><\/div>
+                            <div class="color-option bg-color" data-color="#A569BD" style="background: #A569BD" title="薰衣草紫"><\/div>
+                            <div class="color-option bg-color" data-color="#5D6D7E" style="background: #5D6D7E" title="石板灰"><\/div>
+                            <div class="color-option bg-color" data-color="#F7DC6F" style="background: #F7DC6F" title="淡黄色"><\/div>
+                            <div class="color-option bg-color" data-color="#85C1E9" style="background: #85C1E9" title="浅蓝色"><\/div>
+                        <\/div>
+                        <div class="custom-color-inline">
+                            <input type="color" id="bgColorPicker" value="#3498DB">
+                            <input type="text" id="bgColorText" placeholder="#3498DB" maxlength="7">
+                        <\/div>
+                    <\/div>
+                <\/div>
+                <div class="form-group color-group" id="textColorGroup">
+                    <label>字体色<\/label>
+                    <div class="color-options">
+                        <div class="preset-colors" id="textColors">
+                            <!-- 18种字体色 -->
+                            <div class="color-option text-color" data-color="#FFFFFF" style="background: #FFFFFF; border: 1px solid #ddd;" title="白色"><\/div>
+                            <div class="color-option text-color" data-color="#000000" style="background: #000000" title="黑色"><\/div>
+                            <div class="color-option text-color" data-color="#2C3E50" style="background: #2C3E50" title="深蓝灰"><\/div>
+                            <div class="color-option text-color" data-color="#1B2631" style="background: #1B2631" title="墨黑色"><\/div>
+                            <div class="color-option text-color" data-color="#154360" style="background: #154360" title="午夜蓝"><\/div>
+                            <div class="color-option text-color" data-color="#1A5276" style="background: #1A5276" title="深海蓝"><\/div>
+                            <div class="color-option text-color" data-color="#0E6251" style="background: #0E6251" title="深松绿"><\/div>
+                            <div class="color-option text-color" data-color="#145A32" style="background: #145A32" title="墨绿色"><\/div>
+                            <div class="color-option text-color" data-color="#186A3B" style="background: #186A3B" title="深林绿"><\/div>
+                            <div class="color-option text-color" data-color="#4A235A" style="background: #4A235A" title="深紫色"><\/div>
+                            <div class="color-option text-color" data-color="#512E5F" style="background: #512E5F" title="紫罗兰"><\/div>
+                            <div class="color-option text-color" data-color="#6C3483" style="background: #6C3483" title="葡萄紫"><\/div>
+                            <div class="color-option text-color" data-color="#78281F" style="background: #78281F" title="暗红色"><\/div>
+                            <div class="color-option text-color" data-color="#641E16" style="background: #641E16" title="深酒红"><\/div>
+                            <div class="color-option text-color" data-color="#7E5109" style="background: #7E5109" title="深土黄"><\/div>
+                            <div class="color-option text-color" data-color="#E74C3C" style="background: #E74C3C" title="亮红色"><\/div>
+                            <div class="color-option text-color" data-color="#3498DB" style="background: #3498DB" title="明亮蓝"><\/div>
+                            <div class="color-option text-color" data-color="#27AE60" style="background: #27AE60" title="森林绿"><\/div>
+                        <\/div>
+                        <div class="custom-color-inline">
+                            <input type="color" id="textColorPicker" value="#FFFFFF">
+                            <input type="text" id="textColorText" placeholder="#FFFFFF" maxlength="7">
+                        <\/div>
+                    <\/div>
+                <\/div>
+                <div class="color-preview-section">
+                    <label>预览效果<\/label>
+                    <div class="color-preview" id="colorPreview">科目名称<\/div>
+                <\/div>
+                <div class="form-actions">
+                    <button type="submit" class="btn primary">保存<\/button>
+                    <button type="button" id="deleteSubjectBtn" class="btn danger" style="display: none;">删除<\/button>
+                    <button type="button" id="cancelBtn" class="btn secondary">取消<\/button>
+                <\/div>
+            <\/form>
+        <\/div>
+    <\/div>
+
+    <!-- 时间编辑弹窗 -->
+    <div id="timeModal" class="modal">
+        <div class="modal-content">
+                <h3>修改课时<\/h3>
+                <form id="timeForm">
+                    <div class="form-group">
+                        <label>课时名称<\/label>
+                        <input type="text" id="periodName" required placeholder="第1课时">
+                    <\/div>
+                <div class="form-group">
+                    <label>开始时间<\/label>
+                    <div style="display: flex; gap: 10px; align-items: center;">
+                        <select id="startHour" style="flex: 1; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                            <option value="">时<\/option>
+                        <\/select>
+                        <span>:<\/span>
+                        <select id="startMinute" style="flex: 1; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                            <option value="">分<\/option>
+                        <\/select>
+                    <\/div>
+                <\/div>
+                <div class="form-group">
+                    <label>结束时间<\/label>
+                    <div style="display: flex; gap: 10px; align-items: center;">
+                        <select id="endHour" style="flex: 1; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                            <option value="">时<\/option>
+                        <\/select>
+                        <span>:<\/span>
+                        <select id="endMinute" style="flex: 1; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                            <option value="">分<\/option>
+                        <\/select>
+                    <\/div>
+                <\/div>
+                <div class="form-actions">
+                    <button type="submit" class="btn primary">保存<\/button>
+                    <button type="button" id="cancelTimeBtn" class="btn secondary">取消<\/button>
+                <\/div>
+            <\/form>
+        <\/div>
+    <\/div>
+
+    <!-- 设置弹窗 -->
+    <div id="settingsModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>⚙️ 显示设置<\/h3>
+                <button type="button" class="modal-close" onclick="app.closeSettingsModal()">&times;<\/button>
+            <\/div>
+            <form id="settingsForm">
+                <div class="settings-content">
+                    <div class="setting-item">
+                        <label class="setting-label">
+                            <input type="checkbox" id="showEvening" class="setting-checkbox">
+                            <span class="checkmark"><\/span>
+                            <div class="setting-text">
+                                <strong>显示晚上课时<\/strong>
+                                <small>包含晚上的课程时间段<\/small>
+                            <\/div>
+                        <\/label>
+                    <\/div>
+                    
+                    <div class="setting-item">
+                        <label class="setting-label">
+                            <input type="checkbox" id="showSaturday" class="setting-checkbox">
+                            <span class="checkmark"><\/span>
+                            <div class="setting-text">
+                                <strong>显示周六<\/strong>
+                                <small>在课程表中添加周六列<\/small>
+                            <\/div>
+                        <\/label>
+                    <\/div>
+                    
+                    <div class="setting-item">
+                        <label class="setting-label">
+                            <input type="checkbox" id="showSunday" class="setting-checkbox">
+                            <span class="checkmark"><\/span>
+                            <div class="setting-text">
+                                <strong>显示周日<\/strong>
+                                <small>在课程表中添加周日列<\/small>
+                            <\/div>
+                        <\/label>
+                    <\/div>
+                    
+                    <div class="setting-item">
+                        <label class="setting-label">
+                            <input type="checkbox" id="showPeriodTime" class="setting-checkbox">
+                            <span class="checkmark"><\/span>
+                            <div class="setting-text">
+                                <strong>显示课时时间<\/strong>
+                                <small>在课时列中显示开始和结束时间<\/small>
+                            <\/div>
+                        <\/label>
+                    <\/div>
+                <\/div>
+                
+                <div class="form-actions">
+                    <button type="button" id="cancelSettingsBtn" class="btn secondary">取消<\/button>
+                    <button type="submit" class="btn primary">保存设置<\/button>
+                <\/div>
+            <\/form>
+        <\/div>
+    <\/div>
+
+    <!-- 教程弹窗 -->
+    <div id="tutorialModal" class="modal tutorial-modal" onclick="if(event.target===this)app.closeTutorialModal()">
+        <div class="modal-content tutorial-modal-content">
+            <div class="tutorial-header">
+                <div class="tutorial-header-icon">📚<\/div>
+                <h3>课程表使用教程<\/h3>
+                <button class="tutorial-close-btn" onclick="app.closeTutorialModal()">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18"><\/line>
+                        <line x1="6" y1="6" x2="18" y2="18"><\/line>
+                    <\/svg>
+                <\/button>
+            <\/div>
+            <div id="tutorialContent" class="tutorial-content">
+                <!-- 教程内容将由JavaScript动态生成 -->
+            <\/div>
+            <div class="tutorial-footer">
+                <div class="tutorial-hint">
+                    <span class="hint-icon">💡<\/span>
+                    按 <kbd>ESC<\/kbd> 键也可以关闭
+                <\/div>
+                <div class="tutorial-actions">
+                    <button type="button" onclick="app.closeTutorialModal()" class="btn secondary">关闭<\/button>
+                    <button type="button" id="closeTutorialBtn" class="btn primary">我知道了<\/button>
+                <\/div>
+            <\/div>
+        <\/div>
+    <\/div>
+
+    <!-- 隐藏的文件输入元素用于导入数据 -->
+    <input type="file" id="importFileInput" accept=".json" style="display: none;">
+    
+    <!-- 自定义确认对话框 -->
+    <div id="confirmModal" class="modal">
+        <div class="modal-content">
+            <h3>确认操作<\/h3>
+            <div class="confirm-message">
+                <!-- 确认消息将动态设置 -->
+            <\/div>
+            <div class="form-actions">
+                <button type="button" id="confirmCancelBtn" class="btn secondary">取消<\/button>
+                <button type="button" id="confirmOkBtn" class="btn danger">确定<\/button>
+            <\/div>
+        <\/div>
+    <\/div>
+    
+    <!-- 导入科目模态框 -->
+    <div id="importSubjectModal" class="modal">
+        <div class="modal-content">
+            <h3>导入科目<\/h3>
+            <form id="importSubjectForm">
+                <div class="form-group">
+                    <label>选择学习阶段<\/label>
+                    <select id="stageSelect" class="form-control" required>
+                        <option value="">请选择学习阶段<\/option>
+                        <option value="primary">小学<\/option>
+                        <option value="junior">初中<\/option>
+                        <option value="senior">高中<\/option>
+                        <option value="university">大学<\/option>
+                    <\/select>
+                <\/div>
+                <div class="form-actions">
+                    <button type="button" id="cancelImportBtn" class="btn secondary">取消<\/button>
+                    <button type="submit" class="btn primary">导入<\/button>
+                <\/div>
+            <\/form>
+        <\/div>
+    <\/div>
+
+    <!-- 手机端侧边栏菜单 -->
+    <div id="mobileSidebar" class="mobile-sidebar">
+        <div class="sidebar-header">
+            <h3>菜单<\/h3>
+            <button id="closeSidebarBtn" class="close-sidebar-btn">×<\/button>
+        <\/div>
+        <div class="sidebar-content">
+            <div class="sidebar-section">
+                <h4>课程表操作<\/h4>
+                <button class="sidebar-btn" data-action="tutorial">
+                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"/>
+                        <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/>
+                        <line x1="12" y1="17" x2="12.01" y2="17"/>
+                    <\/svg>
+                    查看教程
+                <\/button>
+                <button class="sidebar-btn" data-action="reset">
+                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/>
+                        <path d="M21 3v5h-5"/>
+                        <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/>
+                        <path d="M3 21v-5h5"/>
+                    <\/svg>
+                    重置课表
+                <\/button>
+            <\/div>
+            
+            <div class="sidebar-section">
+                <h4>导出功能<\/h4>
+                <button class="sidebar-btn" data-action="saveImage">
+                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                        <circle cx="8.5" cy="8.5" r="1.5"/>
+                        <polyline points="21,15 16,10 5,21"/>
+                    <\/svg>
+                    保存图片
+                <\/button>
+                <button class="sidebar-btn" data-action="exportWord">
+                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                        <polyline points="14,2 14,8 20,8"/>
+                        <line x1="16" y1="13" x2="8" y2="13"/>
+                        <line x1="16" y1="17" x2="8" y2="17"/>
+                        <polyline points="10,9 9,9 8,9"/>
+                    <\/svg>
+                    导出Word
+                <\/button>
+                <button class="sidebar-btn" data-action="exportExcel">
+                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                        <polyline points="14,2 14,8 20,8"/>
+                        <line x1="16" y1="13" x2="8" y2="13"/>
+                        <line x1="16" y1="17" x2="8" y2="17"/>
+                        <polyline points="10,9 9,9 8,9"/>
+                    <\/svg>
+                    导出Excel
+                <\/button>
+            <\/div>
+            
+            <div class="sidebar-section">
+                <h4>数据管理<\/h4>
+                <button class="sidebar-btn" data-action="exportData">
+                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                        <polyline points="7,10 12,15 17,10"/>
+                        <line x1="12" y1="15" x2="12" y2="3"/>
+                    <\/svg>
+                    导出数据
+                <\/button>
+                <button class="sidebar-btn" data-action="importData">
+                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                        <polyline points="17,8 12,3 7,8"/>
+                        <line x1="12" y1="3" x2="12" y2="15"/>
+                    <\/svg>
+                    导入数据
+                <\/button>
+            <\/div>
+            
+            <div class="sidebar-section">
+                <h4>设置<\/h4>
+                <button class="sidebar-btn" data-action="settings">
+                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="3"/>
+                        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1 1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+                    <\/svg>
+                    显示设置
+                <\/button>
+            <\/div>
+            
+            <div class="sidebar-section">
+                <h4>主题切换<\/h4>
+                <div class="sidebar-theme-grid">
+                    <button class="sidebar-theme-btn" data-action="theme" data-theme="default">默认<\/button>
+                    <button class="sidebar-theme-btn" data-action="theme" data-theme="blue">蓝色<\/button>
+                    <button class="sidebar-theme-btn" data-action="theme" data-theme="purple">紫色<\/button>
+                    <button class="sidebar-theme-btn" data-action="theme" data-theme="pink">粉色<\/button>
+                    <button class="sidebar-theme-btn" data-action="theme" data-theme="orange">橙色<\/button>
+                    <button class="sidebar-theme-btn" data-action="theme" data-theme="dark">深色<\/button>
+                <\/div>
+                <div class="sidebar-custom-color">
+                    <input type="color" id="mobileCustomColorPicker" value="#4a7c59">
+                    <span>自定义主题色<\/span>
+                <\/div>
+            <\/div>
+            
+            <div class="sidebar-section">
+                <h4>字体切换<\/h4>
+                <div class="sidebar-font-grid">
+                    <button class="sidebar-font-btn" data-action="font" data-font="system">系统默认<\/button>
+                    <button class="sidebar-font-btn" data-action="font" data-font="microsoft-yahei">微软雅黑<\/button>
+                    <button class="sidebar-font-btn" data-action="font" data-font="simsun">宋体<\/button>
+                    <button class="sidebar-font-btn" data-action="font" data-font="heiti">黑体<\/button>
+                    <button class="sidebar-font-btn" data-action="font" data-font="kaiti">楷体<\/button>
+                    <button class="sidebar-font-btn" data-action="font" data-font="fangsong">仿宋<\/button>
+                <\/div>
+            <\/div>
+        <\/div>
+    <\/div>
+    
+    <!-- 侧边栏倾企遮罩层 -->
+    <div id="sidebarOverlay" class="sidebar-overlay"><\/div>
+    <script src="js/script.js"><\/script>
+<\/body>
+<\/html>`,
     files: {
-      "assets/js/frame-bridge.js": "/* ============================================================================\n * iframe 内工具桥 · frame-bridge.js\n * ============================================================================\n * 【背景】站点在 file://（离线双击 index.html）下无法用 fetch 读取工具页面\n * （Chromium 把 file:// 互相视为不透明源，fetch/XHR 一律被 CORS 拦截），于是\n * 所有自研工具回退为 <iframe> 兜底。跨源带来两个问题：\n *   ① 父页拿不到 iframe 的 contentDocument → 高度自适应失效，工具页被压成\n *      固定视口高度（\"页面不能自动撑开\"）；\n *   ② file:// 下 iframe 内的 requestFullscreen 被权限策略拒绝 → 工具右上角\n *      ⛶ 点了没反应（\"全屏按钮不能用\"）。\n *\n * 【方案】本脚本随工具页面一起被 iframe 加载（真实文档环境），通过\n * postMessage 向父页（站点外壳）上报：\n *   - height     ：工具内容实际高度（rAF 节流 + ResizeObserver 持续监听）；\n *   - fullscreen ：工具内部全屏请求被拒时，请父页对 <iframe> 本身发起全屏\n *                  （postMessage 会把 user activation 一并委托给父页；\n *                  父页若仍失败，再降级为父页侧 CSS 伪全屏）。\n *\n * 【安全阀】用 self !== top 判定「真实运行在 iframe 里」：\n *   - 独立双击打开工具页 → self === top → 本脚本整体空转；\n *   - 站点内嵌 Shadow DOM（http 适配器）路径下，脚本在 docShim/winShim 代理里\n *     执行，self/top 都落到真实顶层 window → self === top → 空转，\n *     不会向父页发任何消息；\n *   - 真实 iframe 内（含 file:// 跨源）→ self !== top → 激活。\n *   ⚠️ 不要用 window.frameElement 判定：跨源 iframe 里访问它会抛 SecurityError\n *     （实测），一旦 catch 成 null 桥就整体失效。\n *   ⚠️ self / top 属于跨源 WindowProxy 的「允许访问」属性（不会抛错），\n *     引用比较即可判定。\n * 消息一律带 __edutoolboxFrame 命名空间标记，父页校验 e.source 后才处理。\n * ========================================================================== */\n(function () {\n  \"use strict\";\n\n  /* 只在真实 iframe 内激活 */\n  var inFrame = false;\n  try {\n    var self = window.self, top = window.top;\n    inFrame = !!(self && top && self !== top && window.parent && window.parent !== window);\n  } catch (e) { inFrame = false; }\n  if (!inFrame) return;\n\n  var raf = 0;\n\n  /** rAF 节流地把当前文档高度报给父页 */\n  function reportHeight() {\n    if (raf) return;\n    raf = (window.requestAnimationFrame || function (f) { return setTimeout(f, 60); })(\n      function () {\n        raf = 0;\n        try {\n          var h = Math.max(\n            document.documentElement ? document.documentElement.scrollHeight : 0,\n            document.body ? document.body.scrollHeight : 0\n          );\n          window.parent.postMessage({\n            __edutoolboxFrame: true,\n            type: \"height\",\n            h: h\n          }, \"*\");\n        } catch (e) { /* 父页不可达：静默 */ }\n      }\n    );\n  }\n\n  /** 工具内部全屏请求失败时，委托父页对 iframe 元素本身发起全屏 */\n  function requestParentFullscreen() {\n    try {\n      window.parent.postMessage({\n        __edutoolboxFrame: true,\n        type: \"fullscreen\"\n      }, \"*\");\n    } catch (e) { /* 静默 */ }\n  }\n\n  /* 暴露给共享舞台模块（tool-stage-toolbar.js）在全屏失败分支调用 */\n  window.EduToolFrameBridge = {\n    reportHeight: reportHeight,\n    requestParentFullscreen: requestParentFullscreen\n  };\n\n  /* 首帧 + load 后补报，防首报时内容未排完 */\n  reportHeight();\n  window.addEventListener(\"load\", function () {\n    reportHeight();\n    setTimeout(reportHeight, 300);\n  });\n\n  /* 内容持续变化（点名记录增长、生成结果插入等）→ 宿主跟着长高 */\n  if (typeof ResizeObserver === \"function\") {\n    try {\n      new ResizeObserver(reportHeight).observe(document.documentElement);\n    } catch (e) { /* 老浏览器无此能力：靠 load 兜底 */ }\n  }\n\n  /* 父页通知重新测量（伪全屏退出后恢复常规高度） */\n  window.addEventListener(\"message\", function (e) {\n    var d = e.data;\n    if (d && d.__edutoolboxFrame === true && d.type === \"report\") reportHeight();\n  });\n})();\n",
-      "tools/kechengbiao2/css/styles.css": "/* 字体定义 - 使用系统字体 */\n/* 这些字体在大多数Windows系统上都可用 */\n\n* {\n    margin: 0;\n    padding: 0;\n    box-sizing: border-box;\n}\n\n:root {\n    /* 豆沙绿主题配色方案 - 默认主题 */\n    --primary-color: #93c572; /* 豆沙绿主色调 */\n    --primary-hover-color: #7cb342; /* 豆沙绿悬停色 */\n    --secondary-color: #6c757d;\n    --secondary-hover-color: #5a6268; /* 次要色悬停色 */\n    --success-color: #28a745;\n    --danger-color: #dc3545;\n    --warning-color: #ffc107;\n    --info-color: #17a2b8;\n    --light-color: #f0f8f0; /* 浅豆沙绿背景 */\n    --dark-color: #556b2f; /* 深豆沙绿 */\n    --border-color: #a0c49d; /* 豆沙绿边框 */\n    --background-color: #f5faf5; /* 豆沙绿背景 */\n    --text-color: #455a64; /* 深豆沙绿文字 */\n    --shadow-color: rgba(147, 197, 114, 0.2); /* 豆沙绿阴影 */\n    --pattern-background: radial-gradient(circle at 10% 20%, rgba(147, 197, 114, 0.15) 0%, rgba(147, 197, 114, 0.08) 90%); /* 豆沙绿背景图案 */\n}\n\n/* 蓝色主题 */\nbody.theme-blue {\n    --primary-color: #007bff;\n    --primary-hover-color: #0056b3;\n    --secondary-color: #6c757d;\n    --secondary-hover-color: #5a6268;\n    --success-color: #28a745;\n    --danger-color: #dc3545;\n    --warning-color: #ffc107;\n    --info-color: #17a2b8;\n    --light-color: #e3f2fd;\n    --dark-color: #0056b3;\n    --border-color: #90caf9;\n    --background-color: #f0f8ff;\n    --text-color: #0056b3;\n    --shadow-color: rgba(0, 123, 255, 0.15);\n    --pattern-background: radial-gradient(circle at 10% 20%, rgba(0, 123, 255, 0.1) 0%, rgba(0, 123, 255, 0.05) 90%);\n}\n\n/* 紫色主题 */\nbody.theme-purple {\n    --primary-color: #6f42c1;\n    --primary-hover-color: #5a3d8c;\n    --secondary-hover-color: #5a6268;\n    --secondary-color: #6c757d;\n    --success-color: #28a745;\n    --danger-color: #dc3545;\n    --warning-color: #ffc107;\n    --info-color: #17a2b8;\n    --light-color: #f3e5f5;\n    --dark-color: #5a3d8c;\n    --border-color: #ba68c8;\n    --background-color: #f5f0ff;\n    --text-color: #5a3d8c;\n    --shadow-color: rgba(111, 66, 193, 0.15);\n    --pattern-background: radial-gradient(circle at 10% 20%, rgba(111, 66, 193, 0.1) 0%, rgba(111, 66, 193, 0.05) 90%);\n}\n\n/* 粉色主题 */\nbody.theme-pink {\n    --primary-color: #e91e63;\n    --primary-hover-color: #ad1457;\n    --secondary-hover-color: #5a6268;\n    --secondary-color: #6c757d;\n    --success-color: #28a745;\n    --danger-color: #dc3545;\n    --warning-color: #ffc107;\n    --info-color: #17a2b8;\n    --light-color: #fce4ec;\n    --dark-color: #c2185b;\n    --border-color: #f48fb1;\n    --background-color: #fff0f6;\n    --text-color: #c2185b;\n    --shadow-color: rgba(233, 30, 99, 0.15);\n    --pattern-background: radial-gradient(circle at 10% 20%, rgba(233, 30, 99, 0.1) 0%, rgba(233, 30, 99, 0.05) 90%);\n}\n\n/* 橙色主题 */\nbody.theme-orange {\n    --primary-color: #fd7e14;\n    --primary-hover-color: #e65100;\n    --secondary-hover-color: #5a6268;\n    --secondary-color: #6c757d;\n    --success-color: #28a745;\n    --danger-color: #dc3545;\n    --warning-color: #ffc107;\n    --info-color: #17a2b8;\n    --light-color: #fff3e0;\n    --dark-color: #e67e22;\n    --border-color: #ffb74d;\n    --background-color: #fff8f0;\n    --text-color: #e67e22;\n    --shadow-color: rgba(253, 126, 20, 0.15);\n    --pattern-background: radial-gradient(circle at 10% 20%, rgba(253, 126, 20, 0.1) 0%, rgba(253, 126, 20, 0.05) 90%);\n}\n\n/* 深色主题 */\nbody.theme-dark {\n    --primary-color: #20c997;\n    --primary-hover-color: #1aa580;\n    --secondary-color: #6c757d;\n    --secondary-hover-color: #5a6268;\n    --success-color: #28a745;\n    --danger-color: #dc3545;\n    --warning-color: #ffc107;\n    --info-color: #17a2b8;\n    --light-color: #1a1a1a;\n    --dark-color: #17a673;\n    --border-color: #17a673;\n    --background-color: #121212;\n    --text-color: #20c997;\n    --shadow-color: rgba(32, 201, 151, 0.15);\n    --pattern-background: radial-gradient(circle at 10% 20%, rgba(32, 201, 151, 0.1) 0%, rgba(32, 201, 151, 0.05) 90%);\n}\n\nbody.theme-dark .timetable {\n    background-color: var(--background-color);\n    border-color: var(--border-color);\n}\n\nbody.theme-dark .timetable-container {\n    background-color: var(--background-color);\n}\n\nbody.theme-dark .section-title {\n    background-color: var(--primary-color);\n    color: white;\n}\n\nbody.theme-dark .section-controls {\n    background-color: var(--light-color);\n    border-color: var(--border-color);\n}\n\nbody.theme-dark .section-controls button {\n    background-color: var(--background-color);\n    color: var(--text-color);\n    border-color: var(--border-color);\n}\n\nbody.theme-dark .section-controls button:hover {\n    background-color: var(--primary-color);\n    color: white;\n}\n\nbody.theme-dark .cell {\n    background-color: var(--background-color);\n    border-color: var(--border-color);\n    color: var(--text-color);\n}\n\nbody.theme-dark .cell:hover {\n    background-color: var(--light-color);\n}\n\nbody.theme-dark .cell.occupied {\n    background-color: var(--background-color);\n}\n\n/* 深色主题下cell-content的颜色由JavaScript控制 */\nbody.theme-dark .cell-content {\n    /* 颜色继承自内联样式 */\n}\n\nbody.theme-dark .period-cell {\n    background-color: var(--light-color);\n    color: var(--text-color);\n}\n\nbody.theme-dark .time-cell {\n    background-color: var(--light-color);\n    color: var(--text-color);\n}\n\nbody.theme-dark th {\n    background-color: #333;\n    color: var(--text-color);\n}\n\nbody.theme-dark .header {\n    background: var(--light-color);\n    border-color: var(--border-color);\n}\n\nbody.theme-dark .timetable-title {\n    color: var(--primary-color);\n}\n\nbody.theme-dark .btn {\n    background: var(--light-color);\n    color: var(--text-color);\n    border-color: var(--border-color);\n}\n\nbody.theme-dark .btn:hover {\n    background: var(--dark-color);\n    color: white;\n}\n\nbody.theme-dark .btn.primary {\n    background: var(--primary-color);\n    color: white;\n}\n\nbody.theme-dark .btn.primary:hover {\n    background: var(--dark-color);\n}\n\nbody.theme-dark .modal-content {\n    background: var(--light-color);\n    color: var(--text-color);\n}\n\nbody.theme-dark .modal-header {\n    background: var(--primary-color);\n    color: white;\n}\n\nbody.theme-dark .modal-footer {\n    background: var(--light-color);\n    border-top-color: var(--border-color);\n}\n\nbody.theme-dark .form-group label {\n    color: var(--text-color);\n}\n\nbody.theme-dark .form-control {\n    background: var(--background-color);\n    color: var(--text-color);\n    border-color: var(--border-color);\n}\n\nbody.theme-dark .form-control:focus {\n    border-color: var(--primary-color);\n    box-shadow: 0 0 0 0.2rem var(--shadow-color);\n}\n\nbody.theme-dark .subject-item {\n    background: var(--background-color);\n    border-color: var(--border-color);\n}\n\nbody.theme-dark .subject-item:hover {\n    background: var(--light-color);\n}\n\nbody.theme-dark .color-picker {\n    background: var(--background-color);\n    border-color: var(--border-color);\n}\n\nbody.theme-dark .color-options {\n    background: var(--light-color);\n    border-color: var(--border-color);\n}\n\nbody.theme-dark .color-type-selector label {\n    color: var(--text-color);\n}\n\nbody.theme-dark .settings-panel {\n    background: var(--light-color);\n    border-color: var(--border-color);\n}\n\nbody.theme-dark .settings-panel h3 {\n    color: var(--primary-color);\n}\n\nbody.theme-dark .settings-panel label {\n    color: var(--text-color);\n}\n\nbody.theme-dark .settings-panel .form-control {\n    background: var(--background-color);\n    color: var(--text-color);\n    border-color: var(--border-color);\n}\n\n/* 深色主题下设置弹窗样式 */\nbody.theme-dark #settingsModal .modal-content {\n    background: var(--light-color);\n    color: var(--text-color);\n}\n\n/* 深色主题下设置弹窗标题 */\nbody.theme-dark #settingsModal .modal-content h3 {\n    color: #ffffff !important;\n}\n\nbody.theme-dark .setting-item {\n    background: var(--background-color);\n    border-color: var(--border-color);\n}\n\nbody.theme-dark .setting-item:hover {\n    background: rgba(32, 201, 151, 0.1);\n}\n\nbody.theme-dark .setting-text strong {\n    color: #ffffff !important;\n}\n\nbody.theme-dark .setting-text small {\n    color: #aaaaaa !important;\n}\n\nbody.theme-dark .setting-label .checkmark {\n    background: var(--background-color);\n    border-color: var(--border-color);\n}\n\n/* 深色主题下科目弹窗样式 */\nbody.theme-dark #subjectModal .modal-content {\n    background: var(--light-color);\n    color: var(--text-color);\n}\n\nbody.theme-dark #subjectModal .modal-content h3 {\n    color: #ffffff !important;\n}\n\nbody.theme-dark #subjectModal .form-group > label {\n    color: #ffffff !important;\n}\n\nbody.theme-dark .period-controls-desktop {\n    background: var(--light-color);\n    border-color: var(--border-color);\n}\n\nbody.theme-dark .period-control-line span {\n    color: var(--text-color);\n}\n\nbody.theme-dark .period-control-line .btn {\n    background: var(--background-color);\n    color: var(--text-color);\n    border-color: var(--border-color);\n}\n\nbody.theme-dark .period-control-line .btn:hover {\n    background: var(--primary-color);\n    color: white;\n}\n\nbody.theme-dark .period-control-line .btn.danger {\n    background: var(--danger-color);\n    color: white;\n}\n\nbody.theme-dark .period-control-line .btn.danger:hover {\n    background: #c82333;\n}\n\nbody.theme-dark .subject-pool-header {\n    background: var(--light-color);\n    border-color: var(--border-color);\n}\n\nbody.theme-dark .subject-pool-header h3 {\n    color: var(--primary-color);\n}\n\n/* 深色主题下科目池中的科目名称样式 - 确保清晰可见 */\nbody.theme-dark .subject-card .subject-name {\n    color: var(--text-color) !important;\n    font-weight: 600 !important;\n}\n\n/* 深色主题下科目池中的老师姓名样式 - 确保清晰可见 */\nbody.theme-dark .subject-card .teacher-name {\n    color: var(--text-color) !important;\n    opacity: 0.8;\n}\n\n/* 深色主题下科目操作按钮样式 - 确保清晰可见 */\nbody.theme-dark .subject-actions .btn-text {\n    color: var(--text-color) !important;\n    background-color: transparent !important;\n    border: 1px solid var(--border-color) !important;\n    transition: all 0.3s ease !important;\n}\n\nbody.theme-dark .subject-actions .btn-text:hover {\n    background-color: var(--primary-color) !important;\n    color: white !important;\n    border-color: var(--primary-color) !important;\n    box-shadow: 0 2px 8px rgba(32, 201, 151, 0.3) !important;\n}\n\n/* 深色主题下科目卡片内部信息样式 */\nbody.theme-dark .subject-info {\n    color: var(--text-color) !important;\n}\n\nbody.theme-dark .subject-pool {\n    background-color: var(--background-color);\n    border-color: var(--border-color);\n    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);\n}\n\nbody.theme-dark .subjects {\n    background-color: var(--background-color);\n}\n\nbody.theme-dark .subject-card {\n    background-color: var(--light-color);\n    border-color: var(--border-color);\n    color: var(--text-color);\n}\n\nbody.theme-dark .subject-card:hover {\n    background-color: var(--dark-color);\n    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);\n}\n\nbody {\n    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;\n    background-color: var(--background-color);\n    background-image: var(--pattern-background);\n    background-attachment: fixed;\n    color: var(--text-color);\n    line-height: 1.6;\n    font-size: 16px;\n    font-weight: 400;\n    -webkit-font-smoothing: antialiased;\n    -moz-osx-font-smoothing: grayscale;\n    text-rendering: optimizeLegibility;\n}\n\n.container {\n    max-width: 1200px;\n    margin: 0 auto;\n    padding: 20px;\n}\n\n/* 标题和文本样式优化 */\nh1, h2, h3, h4, h5, h6 {\n    font-weight: 600;\n    line-height: 1.3;\n    margin-bottom: 0.5em;\n    color: var(--text-color);\n}\n\nh1 {\n    font-size: 2.5rem;\n    font-weight: 700;\n}\n\nh2 {\n    font-size: 2rem;\n}\n\nh3 {\n    font-size: 1.5rem;\n}\n\nh4 {\n    font-size: 1.25rem;\n}\n\nh5 {\n    font-size: 1.1rem;\n}\n\nh6 {\n    font-size: 1rem;\n}\n\n/* 段落和文本样式 */\np {\n    margin-bottom: 1em;\n    line-height: 1.7;\n}\n\n/* 按钮文本优化 */\n.btn {\n    font-weight: 500;\n    letter-spacing: 0.02em;\n}\n\n/* 输入框文本优化 */\ninput, textarea, select {\n    font-family: inherit;\n    font-size: 0.95em;\n}\n\n.header {\n    background: white;\n    border-radius: 8px;\n    padding: 20px;\n    margin-bottom: 20px;\n    box-shadow: 0 2px 10px var(--shadow-color);\n    border: 1px solid var(--border-color);\n    display: flex;\n    justify-content: space-between;\n    align-items: center;\n    flex-wrap: wrap;\n}\n\n.title-section {\n    flex: 1;\n}\n\n.timetable-title {\n    font-size: 28px;\n    font-weight: bold;\n    color: var(--primary-color);\n    border: none;\n    background: transparent;\n    padding: 5px 10px;\n    border-bottom: 2px solid transparent;\n    transition: border-color 0.3s;\n    width: 300px;\n}\n\n.timetable-title:focus {\n    outline: none;\n    border-bottom-color: var(--primary-color);\n}\n\n.controls {\n    display: flex;\n    gap: 10px;\n    align-items: center;\n    flex-wrap: wrap;\n}\n\n.btn {\n    padding: 8px 16px;\n    border: none;\n    border-radius: 6px;\n    cursor: pointer;\n    font-size: 14px;\n    transition: all 0.3s ease;\n    display: inline-flex;\n    align-items: center;\n    justify-content: center;\n    gap: 8px;\n    height: 36px;\n    box-sizing: border-box;\n}\n\n.btn.small {\n    padding: 8px 16px;\n    font-size: 12px;\n    height: 36px;\n    font-weight: 500;\n    border-radius: 8px;\n    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);\n    text-transform: uppercase;\n    letter-spacing: 0.5px;\n    min-width: 60px;\n    box-sizing: border-box;\n}\n\n.btn.primary {\n    background: var(--primary-color);\n    color: white;\n}\n\n.btn.primary:hover {\n    background: var(--dark-color);\n}\n\n.btn.secondary {\n    background: var(--secondary-color);\n    color: white;\n}\n\n.btn.secondary:hover {\n    background: #545b62;\n}\n\n.btn.tertiary {\n    background: var(--success-color);\n    color: white;\n}\n\n.btn.tertiary:hover {\n    background: #1e7e34;\n}\n\n.btn.danger {\n    background: var(--danger-color);\n    color: white;\n}\n\n/* 课时增减按钮现代化设计 */\n.period-controls .btn.small,\n.period-controls-desktop .btn.small {\n    background: transparent;\n    border: 1px solid rgba(59, 130, 246, 0.2);\n    color: #3b82f6;\n    position: relative;\n    overflow: hidden;\n}\n\n.period-controls .btn.small:hover,\n.period-controls-desktop .btn.small:hover {\n    background: rgba(59, 130, 246, 0.1);\n    color: #1d4ed8;\n    border-color: rgba(59, 130, 246, 0.4);\n    transform: translateY(-1px);\n    box-shadow: 0 2px 8px rgba(59, 130, 246, 0.15);\n}\n\n.period-controls .btn.small:active,\n.period-controls-desktop .btn.small:active {\n    transform: translateY(0);\n    background: rgba(59, 130, 246, 0.15);\n}\n\n/* 减少按钮（危险操作）样式 */\n.period-controls .btn.small.danger,\n.period-controls-desktop .btn.small.danger {\n    border-color: rgba(239, 68, 68, 0.2);\n    color: #ef4444;\n}\n\n.period-controls .btn.small.danger:hover,\n.period-controls-desktop .btn.small.danger:hover {\n    background: rgba(239, 68, 68, 0.1);\n    color: #dc2626;\n    border-color: rgba(239, 68, 68, 0.4);\n    box-shadow: 0 2px 8px rgba(239, 68, 68, 0.15);\n}\n\n.period-controls .btn.small.danger:active,\n.period-controls-desktop .btn.small.danger:active {\n    background: rgba(239, 68, 68, 0.15);\n}\n\n.btn.danger:hover {\n    background: #c82333;\n}\n\n/* 导出下拉菜单样式 */\n.export-dropdown {\n    position: relative;\n    display: inline-block;\n    z-index: 99998; /* 确保下拉按钮本身也有高z-index */\n}\n\n/* PC端下拉菜单基础样式 */\n.export-menu,\n.backup-menu {\n    display: none;\n    position: absolute;\n    top: 100%;\n    right: 0;\n    background: var(--light-color);\n    border: 1px solid var(--border-color);\n    border-radius: 6px;\n    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);\n    z-index: 9999;\n    min-width: 150px;\n    opacity: 0;\n    visibility: hidden;\n    transform: translateY(-10px);\n    transition: all 0.3s ease;\n}\n\n/* 深色主题下的下拉菜单样式 */\nbody.theme-dark .export-menu,\nbody.theme-dark .backup-menu {\n    background: var(--background-color);\n    border-color: var(--border-color);\n    color: var(--text-color);\n    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);\n}\n\n/* 深色主题下的下拉菜单项样式 */\nbody.theme-dark .export-item,\nbody.theme-dark .backup-item {\n    color: var(--text-color);\n    background: transparent;\n    border-bottom-color: var(--border-color);\n}\n\nbody.theme-dark .export-item:hover,\nbody.theme-dark .backup-item:hover {\n    background: var(--light-color);\n    color: var(--primary-color);\n}\n\n/* 深色主题下的主题菜单样式 */\nbody.theme-dark #themeMenu {\n    background: var(--background-color);\n    border-color: var(--border-color);\n    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);\n}\n\nbody.theme-dark .theme-item {\n    color: var(--text-color);\n    background: transparent;\n}\n\nbody.theme-dark .theme-item:hover {\n    background: var(--light-color);\n    color: var(--primary-color);\n}\n\n/* 深色主题下的字体菜单样式 */\nbody.theme-dark #fontMenu {\n    background: var(--background-color);\n    border-color: var(--border-color);\n    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);\n}\n\nbody.theme-dark .font-item {\n    color: var(--text-color);\n    background: transparent;\n}\n\nbody.theme-dark .font-item:hover {\n    background: var(--light-color);\n    color: var(--primary-color);\n}\n\n/* 深色主题下自定义颜色区域样式 */\nbody.theme-dark .custom-color {\n    background: var(--light-color);\n    border-color: var(--border-color);\n}\n\nbody.theme-dark .custom-color span {\n    color: var(--text-color);\n}\n\n.export-menu.show,\n.backup-menu.show {\n    display: block;\n    opacity: 1;\n    visibility: visible;\n    transform: translateY(0);\n}\n\n/* 确保所有可能干扰下拉菜单的元素都有较低的z-index */\n.fixed-top-area,\n.period-controls,\n.period-control-line,\n.period-control-item,\n.period-control-label,\n.period-control-input,\n.period-control-button {\n    z-index: 1000 !important;\n    position: relative !important;\n}\n\n/* 特别保护下拉按钮容器 */\n.export-dropdown,\n.backup-dropdown {\n    z-index: 99998 !important;\n    position: relative !important;\n    isolation: isolate !important;\n}\n\n/* 创建新的层叠上下文，确保下拉菜单不被其他元素影响 */\n.export-dropdown::before,\n.backup-dropdown::before {\n    content: '';\n    position: absolute;\n    top: 0;\n    left: 0;\n    right: 0;\n    bottom: 0;\n    z-index: -1;\n    pointer-events: none;\n}\n\n/* 手机端汉堡菜单按钮样式 */\n@media (max-width: 768px) {\n    /* 隐藏手机端的controls菜单栏 */\n    .controls {\n        display: none !important;\n    }\n    \n    .hamburger-btn {\n        display: flex !important;\n        flex-direction: column !important;\n        justify-content: center !important;\n        align-items: center !important;\n        width: 40px !important;\n        height: 40px !important;\n        background: none !important;\n        border: none !important;\n        cursor: pointer !important;\n        padding: 0 !important;\n        margin: 0 !important;\n        z-index: 1000001 !important;\n        position: relative !important;\n        transition: all 0.3s ease !important;\n        flex-shrink: 0 !important; /* 防止按钮被压缩 */\n        order: 2 !important; /* 确保在右侧 */\n    }\n    \n    .hamburger-line {\n        width: 24px !important;\n        height: 3px !important;\n        background-color: var(--text-color) !important;\n        margin: 2px 0 !important;\n        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;\n        border-radius: 2px !important;\n        transform-origin: center !important;\n    }\n    \n    /* 汉堡按钮激活状态 */\n    .hamburger-btn.active .hamburger-line:nth-child(1) {\n        transform: rotate(45deg) translate(6px, 6px) !important;\n    }\n    \n    .hamburger-btn.active .hamburger-line:nth-child(2) {\n        opacity: 0 !important;\n        transform: scaleX(0) !important;\n    }\n    \n    .hamburger-btn.active .hamburger-line:nth-child(3) {\n        transform: rotate(-45deg) translate(6px, -6px) !important;\n    }\n    \n    /* 侧边栏样式 */\n    .mobile-sidebar {\n        position: fixed !important;\n        top: 0 !important;\n        right: 0 !important;\n        width: 320px !important;\n        max-width: 85vw !important;\n        height: 100vh !important;\n        background: var(--light-color) !important;\n        box-shadow: -5px 0 20px rgba(0,0,0,0.15) !important;\n        z-index: 1000000 !important;\n        transform: translateX(100%) !important;\n        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;\n        display: flex !important;\n        flex-direction: column !important;\n        overflow: hidden !important;\n    }\n    \n    .mobile-sidebar.show {\n        transform: translateX(0) !important;\n    }\n    \n    .sidebar-header {\n        display: flex !important;\n        justify-content: space-between !important;\n        align-items: center !important;\n        padding: 20px 25px 15px !important;\n        border-bottom: 1px solid #eee !important;\n        background: #f8f9fa !important;\n        position: sticky !important;\n        top: 0 !important;\n        z-index: 1 !important;\n    }\n    \n    .sidebar-header h3 {\n        margin: 0 !important;\n        font-size: 20px !important;\n        font-weight: 600 !important;\n        color: #333 !important;\n    }\n    \n    .close-sidebar-btn {\n        background: none !important;\n        border: none !important;\n        font-size: 28px !important;\n        cursor: pointer !important;\n        color: #999 !important;\n        padding: 0 !important;\n        width: 30px !important;\n        height: 30px !important;\n        display: flex !important;\n        align-items: center !important;\n        justify-content: center !important;\n        border-radius: 50% !important;\n        transition: all 0.2s !important;\n    }\n    \n    .close-sidebar-btn:hover {\n        background: #f0f0f0 !important;\n        color: #333 !important;\n    }\n    \n    .sidebar-content {\n        flex: 1 !important;\n        padding: 20px 0 !important;\n        overflow-y: auto !important;\n    }\n    \n    .sidebar-section {\n        margin-bottom: 25px !important;\n        padding: 0 25px !important;\n    }\n    \n    .sidebar-section h4 {\n        margin: 0 0 15px 0 !important;\n        font-size: 16px !important;\n        font-weight: 600 !important;\n        color: #666 !important;\n        text-transform: uppercase !important;\n        letter-spacing: 0.5px !important;\n    }\n    \n    .sidebar-btn {\n        display: flex !important;\n        align-items: center !important;\n        width: 100% !important;\n        padding: 15px 20px !important;\n        margin-bottom: 8px !important;\n        background: white !important;\n        border: 1px solid #eee !important;\n        border-radius: 8px !important;\n        cursor: pointer !important;\n        transition: all 0.2s !important;\n        font-size: 15px !important;\n        color: #333 !important;\n        text-align: left !important;\n        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;\n    }\n    \n    .sidebar-btn:hover {\n        background: #f8f9fa !important;\n        border-color: #007bff !important;\n        transform: translateY(-1px) !important;\n        box-shadow: 0 2px 8px rgba(0, 123, 255, 0.15) !important;\n    }\n    \n    .sidebar-btn:active {\n        transform: translateY(0) !important;\n        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;\n    }\n    \n    .sidebar-btn .icon {\n        width: 20px !important;\n        height: 20px !important;\n        margin-right: 12px !important;\n        flex-shrink: 0 !important;\n    }\n    \n    /* 侧边栏主题网格 */\n    .sidebar-theme-grid,\n    .sidebar-font-grid {\n        display: grid !important;\n        grid-template-columns: repeat(3, 1fr) !important;\n        gap: 8px !important;\n        padding: 0 5px !important;\n        margin-bottom: 10px !important;\n    }\n    \n    .sidebar-theme-btn,\n    .sidebar-font-btn {\n        padding: 10px 8px !important;\n        border: 1px solid #e0e0e0 !important;\n        border-radius: 8px !important;\n        background: white !important;\n        color: #333 !important;\n        font-size: 12px !important;\n        cursor: pointer !important;\n        transition: all 0.2s ease !important;\n        text-align: center !important;\n    }\n    \n    .sidebar-theme-btn:hover,\n    .sidebar-font-btn:hover {\n        background: var(--light-color) !important;\n        border-color: var(--primary-color) !important;\n    }\n    \n    .sidebar-theme-btn.active,\n    .sidebar-font-btn.active {\n        background: var(--primary-color) !important;\n        color: white !important;\n        border-color: var(--primary-color) !important;\n    }\n    \n    /* 侧边栏自定义颜色 */\n    .sidebar-custom-color {\n        display: flex !important;\n        align-items: center !important;\n        gap: 10px !important;\n        padding: 10px 5px !important;\n        background: #f8f9fa !important;\n        border-radius: 8px !important;\n    }\n    \n    .sidebar-custom-color input[type=\"color\"] {\n        width: 36px !important;\n        height: 36px !important;\n        border: none !important;\n        border-radius: 6px !important;\n        cursor: pointer !important;\n    }\n    \n    .sidebar-custom-color span {\n        font-size: 13px !important;\n        color: #666 !important;\n    }\n    \n    /* 侧边栏遮罩层 */\n    .sidebar-overlay {\n        position: fixed !important;\n        top: 0 !important;\n        left: 0 !important;\n        width: 100% !important;\n        height: 100% !important;\n        background: rgba(0, 0, 0, 0.5) !important;\n        z-index: 999999 !important;\n        opacity: 0 !important;\n        visibility: hidden !important;\n        transition: all 0.3s ease !important;\n        backdrop-filter: blur(2px) !important;\n    }\n    \n    .sidebar-overlay.show {\n        opacity: 1 !important;\n        visibility: visible !important;\n    }\n}\n\n/* PC端隐藏汉堡按钮 */\n@media (min-width: 769px) {\n    .hamburger-btn {\n        display: none !important;\n    }\n    \n    .mobile-sidebar {\n        display: none !important;\n    }\n    \n    .sidebar-overlay {\n        display: none !important;\n    }\n}\n\n/* 深色主题下的侧边栏样式 */\n@media (max-width: 768px) {\n    body.theme-dark .mobile-sidebar {\n        background: var(--background-color) !important;\n        border-left: 1px solid var(--border-color) !important;\n    }\n    \n    body.theme-dark .sidebar-header {\n        background: var(--light-color) !important;\n        border-bottom-color: var(--border-color) !important;\n    }\n    \n    body.theme-dark .sidebar-header h3 {\n        color: var(--text-color) !important;\n    }\n    \n    body.theme-dark .close-sidebar-btn {\n        color: var(--text-color) !important;\n    }\n    \n    body.theme-dark .close-sidebar-btn:hover {\n        background: var(--background-color) !important;\n    }\n    \n    body.theme-dark .sidebar-section h4 {\n        color: var(--text-color) !important;\n    }\n    \n    body.theme-dark .sidebar-btn {\n        background: var(--light-color) !important;\n        border-color: var(--border-color) !important;\n        color: var(--text-color) !important;\n    }\n    \n    body.theme-dark .sidebar-btn:hover {\n        background: var(--primary-color) !important;\n        color: white !important;\n        border-color: var(--primary-color) !important;\n    }\n    \n    body.theme-dark .sidebar-theme-btn,\n    body.theme-dark .sidebar-font-btn {\n        background: var(--light-color) !important;\n        border-color: var(--border-color) !important;\n        color: var(--text-color) !important;\n    }\n    \n    body.theme-dark .sidebar-theme-btn:hover,\n    body.theme-dark .sidebar-font-btn:hover {\n        background: var(--background-color) !important;\n        border-color: var(--primary-color) !important;\n        color: var(--primary-color) !important;\n    }\n    \n    body.theme-dark .sidebar-custom-color {\n        background: var(--light-color) !important;\n    }\n    \n    body.theme-dark .sidebar-custom-color span {\n        color: var(--text-color) !important;\n    }\n    \n    /* 深色主题下移动端下拉菜单样式 */\n    body.theme-dark .export-menu,\n    body.theme-dark .backup-menu {\n        background: var(--background-color) !important;\n        border-color: var(--border-color) !important;\n    }\n    \n    body.theme-dark .export-item,\n    body.theme-dark .backup-item {\n        color: var(--text-color) !important;\n    }\n    \n    body.theme-dark .export-item:hover,\n    body.theme-dark .backup-item:hover {\n        background: var(--light-color) !important;\n        color: var(--primary-color) !important;\n    }\n}\n\n/* 移动端下拉菜单样式 */\n@media (max-width: 768px) {\n    .export-menu,\n    .backup-menu {\n        position: fixed !important;\n        top: auto !important;\n        bottom: 20px !important;\n        left: 20px !important;\n        right: 20px !important;\n        width: auto !important;\n        min-width: auto !important;\n        max-height: 50vh !important;\n        overflow-y: auto !important;\n        border-radius: 12px !important;\n        box-shadow: 0 -8px 32px rgba(0,0,0,0.25) !important;\n        z-index: 999999 !important;\n        transform: translateY(120%) !important;\n        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;\n        /* 确保不会被键盘遮挡 */\n        margin-bottom: env(keyboard-inset-height, 0px);\n        /* 添加背景模糊效果 */\n        backdrop-filter: blur(10px) !important;\n        background: rgba(255, 255, 255, 0.95) !important;\n        border: 1px solid rgba(255, 255, 255, 0.2) !important;\n        /* 确保菜单在最顶层 */\n        isolation: isolate !important;\n        contain: layout style paint !important;\n        /* 强制创建新的层叠上下文 */\n        will-change: transform !important;\n        /* 确保菜单始终可见 */\n        pointer-events: auto !important;\n    }\n    \n    .export-menu.show,\n    .backup-menu.show {\n        transform: translateY(0) !important;\n    }\n    \n    /* 确保保存图片按钮在移动端可见且易操作 */\n    .export-item,\n    .backup-item {\n        padding: 18px 24px !important;\n        font-size: 16px !important;\n        min-height: 56px !important;\n        display: flex !important;\n        align-items: center !important;\n        justify-content: flex-start !important;\n        border-bottom: 1px solid rgba(0,0,0,0.05) !important;\n        transition: background-color 0.2s ease !important;\n        /* 增加触摸区域 */\n        touch-action: manipulation !important;\n        -webkit-tap-highlight-color: rgba(0,0,0,0.1) !important;\n    }\n    \n    .export-item:last-child,\n    .backup-item:last-child {\n        border-bottom: none !important;\n        border-radius: 0 0 12px 12px !important;\n    }\n    \n    .export-item:first-child,\n    .backup-item:first-child {\n        border-radius: 12px 12px 0 0 !important;\n    }\n    \n    .export-item:active,\n    .backup-item:active {\n        background-color: rgba(0,0,0,0.05) !important;\n        transform: scale(0.98) !important;\n    }\n    \n    /* 确保下拉按钮在移动端也有足够的层级 */\n    .export-dropdown,\n    .backup-dropdown {\n        z-index: 999999 !important;\n        position: relative !important;\n        /* 确保按钮容器不会影响菜单的层级 */\n        isolation: isolate !important;\n    }\n    \n    /* 移动端菜单遮罩层 */\n    .dropdown-overlay {\n        position: fixed !important;\n        top: 0 !important;\n        left: 0 !important;\n        right: 0 !important;\n        bottom: 0 !important;\n        background: rgba(0, 0, 0, 0.3) !important;\n        z-index: 999997 !important;\n        opacity: 0 !important;\n        visibility: hidden !important;\n        transition: opacity 0.3s ease, visibility 0.3s ease !important;\n        backdrop-filter: blur(2px) !important;\n    }\n    \n    .dropdown-overlay.show {\n        opacity: 1 !important;\n        visibility: visible !important;\n    }\n}\n\n\n.export-item {\n    display: flex;\n    align-items: center;\n    gap: 10px;\n    width: 100%;\n    padding: 10px 15px;\n    border: none;\n    background: none;\n    text-align: left;\n    cursor: pointer;\n    font-size: 14px;\n    color: var(--text-color);\n    transition: background-color 0.2s ease;\n    border-bottom: 1px solid #f0f0f0;\n}\n\n.export-item:last-child {\n    border-bottom: none;\n}\n\n.export-item:hover {\n    background-color: var(--light-color);\n}\n\n.export-item .icon {\n    width: 16px;\n    height: 16px;\n    stroke: currentColor;\n}\n\n/* SVG图标通用样式 */\n.icon {\n    width: 18px;\n    height: 18px;\n    stroke: currentColor;\n    stroke-width: 2;\n    fill: none;\n    stroke-linecap: round;\n    stroke-linejoin: round;\n}\n\n/* 备份数据下拉菜单样式 */\n.backup-dropdown {\n    position: relative;\n    display: inline-block;\n    z-index: 99998; /* 确保下拉按钮本身也有高z-index */\n}\n\n\n.backup-item {\n    display: block;\n    width: 100%;\n    padding: 10px 15px;\n    border: none;\n    background: none;\n    text-align: left;\n    cursor: pointer;\n    font-size: 14px;\n    color: #333;\n    transition: background-color 0.2s ease;\n    border-radius: 0;\n}\n\n.backup-item:first-child {\n    border-radius: 6px 6px 0 0;\n}\n\n.backup-item:last-child {\n    border-radius: 0 0 6px 6px;\n}\n\n.backup-item:hover {\n    background: #f8f9fa;\n    color: #007bff;\n}\n\n.backup-item:active {\n    background: #e9ecef;\n}\n\n@keyframes fadeInDown {\n    from {\n        opacity: 0;\n        transform: translateY(-10px);\n    }\n    to {\n        opacity: 1;\n        transform: translateY(0);\n    }\n}\n\n/* 通知动画 */\n@keyframes slideInRight {\n    from {\n        opacity: 0;\n        transform: translateX(100%);\n    }\n    to {\n        opacity: 1;\n        transform: translateX(0);\n    }\n}\n\n@keyframes slideOutRight {\n    from {\n        opacity: 1;\n        transform: translateX(0);\n    }\n    to {\n        opacity: 0;\n        transform: translateX(100%);\n    }\n}\n\n\n\n/* PC端左右两栏布局 */\n@media (min-width: 769px) {\n    .main-content {\n        display: flex;\n        gap: 30px;\n        align-items: flex-start;\n    }\n    \n    /* 左侧栏：课时控制和科目池 */\n    .left-sidebar {\n        flex: 0 0 300px;\n        display: flex;\n        flex-direction: column;\n        gap: 20px;\n    }\n    \n    /* 右侧栏：课程表格 */\n    .right-content {\n        flex: 1;\n        min-width: 0;\n    }\n    \n    /* PC端课时控制区域 */\n    .period-controls-desktop {\n        display: block;\n        padding: 20px;\n        background-color: var(--background-color);\n        border-radius: 8px;\n        border: 1px solid var(--border-color);\n        margin-bottom: 16px;\n        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);\n    }\n    \n    /* 统一科目池模块样式 */\n/* 科目池样式 - 确保使用主题色变量 */\n.subject-pool {\n    background-color: var(--background-color);\n    border-radius: 8px;\n    border: 1px solid var(--border-color);\n    box-shadow: 0 2px 8px var(--shadow-color);\n    overflow: hidden;\n}\n\n.subject-pool-header {\n    background-color: var(--background-color);\n    border-bottom: 1px solid var(--border-color);\n}\n\n.subjects {\n    background-color: var(--background-color);\n}\n\n.subject-card {\n    background-color: var(--light-color);\n    border: 1px solid var(--border-color);\n    color: var(--text-color);\n    transition: all 0.3s ease;\n}\n\n.subject-card:hover {\n    box-shadow: 0 4px 12px var(--shadow-color);\n    transform: translateY(-1px);\n}\n\n/* 编辑和删除按钮样式 */\n.subject-actions .btn-text {\n    color: var(--text-color);\n    background-color: transparent;\n    border: 1px solid var(--border-color);\n    transition: all 0.3s ease;\n}\n\n.subject-actions .btn-text:hover {\n    background-color: var(--primary-color);\n    color: white;\n}\n\n/* 深色主题下的科目卡片样式 */\nbody.theme-dark .subject-card {\n    background-color: var(--light-color) !important;\n    border: 1px solid var(--border-color) !important;\n    color: var(--text-color) !important;\n}\n\nbody.theme-dark .subject-card:hover {\n    background-color: rgba(32, 201, 151, 0.1) !important;\n    box-shadow: 0 4px 12px var(--shadow-color) !important;\n}\n\nbody.theme-dark .subject-actions .btn-text {\n    color: var(--text-color) !important;\n    background-color: transparent !important;\n    border: 1px solid var(--border-color) !important;\n}\n\nbody.theme-dark .subject-actions .btn-text:hover {\n    background-color: var(--primary-color) !important;\n    color: white !important;\n}\n\n/* 为所有主题添加科目池样式 */\n.theme-blue .subject-card:hover {\n    background-color: rgba(0, 123, 255, 0.1);\n}\n\n.theme-purple .subject-card:hover {\n    background-color: rgba(111, 66, 193, 0.1);\n}\n\n.theme-pink .subject-card:hover {\n    background-color: rgba(233, 30, 99, 0.1);\n}\n\n.theme-orange .subject-card:hover {\n    background-color: rgba(253, 126, 20, 0.1);\n}\n\n.theme-dark .subject-card:hover {\n    background-color: rgba(32, 201, 151, 0.1);\n}\n    \n    .period-controls-desktop .period-control-line {\n        display: flex;\n        align-items: center;\n        justify-content: flex-start;\n        gap: 15px;\n        margin-bottom: 12px;\n        padding: 8px 0;\n        border-bottom: 1px solid var(--border-color);\n    }\n    \n    .period-controls-desktop .period-control-line:last-child {\n        margin-bottom: 0;\n        border-bottom: none;\n    }\n    \n    .period-controls-desktop span {\n        font-weight: 500;\n        color: var(--text-color);\n        min-width: 80px;\n        font-size: 14px;\n    }\n    \n    /* 优化按钮样式 */\n    .period-controls-desktop .btn {\n        margin-left: 0;\n        margin-right: 0;\n        padding: 8px 16px;\n        font-size: 14px;\n        border-radius: 6px;\n    }\n    \n    .period-controls-desktop .btn.danger {\n        margin-left: 8px;\n    }\n    \n    /* 调整科目池内部间距 */\n    .subject-pool-header {\n        margin-bottom: 8px;\n    }\n    \n    .subjects {\n        padding: 0 20px 20px 20px;\n    }\n    \n    /* PC端科目池样式调整 */\n    .subject-pool {\n        width: 100%;\n        max-height: 700px;\n        min-height: 500px;\n    }\n    \n    /* PC端隐藏fixed-top-area中的period-controls */\n    .fixed-top-area .period-controls {\n        display: none;\n    }\n}\n\n/* 微信浏览器特殊优化 */\n@supports (-webkit-touch-callout: none) {\n    /* iOS Safari 和微信浏览器 */\n    body {\n        padding-top: env(safe-area-inset-top);\n        padding-bottom: env(safe-area-inset-bottom);\n        -webkit-overflow-scrolling: touch;\n    }\n    \n    .fixed-top-area {\n        padding-top: env(safe-area-inset-top);\n    }\n    \n    /* 微信浏览器科目池特殊优化 */\n    .subject-pool {\n        -webkit-overflow-scrolling: touch;\n        -webkit-transform: translateZ(0);\n        transform: translateZ(0);\n    }\n    \n    .subjects {\n        -webkit-overflow-scrolling: touch;\n        -webkit-transform: translateZ(0);\n        transform: translateZ(0);\n    }\n    \n    /* 微信浏览器课时控制按钮优化 */\n    .fixed-top-area .period-controls .period-control-line .btn.small {\n        -webkit-appearance: none !important; /* 移除默认样式 */\n        -webkit-tap-highlight-color: transparent !important; /* 移除触摸高亮 */\n        -webkit-user-select: none !important; /* 防止文本选择 */\n        user-select: none !important;\n        -webkit-touch-callout: none !important; /* 防止长按菜单 */\n    }\n    \n    /* 确保在微信浏览器中按钮内容居中 */\n    @supports (-webkit-touch-callout: none) {\n        .fixed-top-area .period-controls .period-control-line .btn.small {\n            display: -webkit-flex !important;\n            -webkit-align-items: center !important;\n            -webkit-justify-content: center !important;\n        }\n    }\n}\n\n/* 移动端保持原有布局 */\n@media (max-width: 768px) {\n    /* 微信浏览器viewport优化 */\n    @supports (-webkit-touch-callout: none) {\n        .container {\n            padding-top: 220px !important; /* 增加顶部间距防止被遮挡 */\n        }\n    }\n    \n    .main-content {\n        display: flex;\n        flex-direction: column;\n        gap: 0;\n    }\n    \n    .left-sidebar {\n        display: block;\n        width: 100%;\n    }\n    \n    .right-content {\n        display: block;\n        width: 100%;\n    }\n    \n    .period-controls-desktop {\n        display: none !important;\n    }\n    \n    /* 隐藏移动端左侧栏的课时设置标题 */\n    .left-sidebar .section-title:nth-child(1) {\n        display: none !important;\n    }\n}\n\n/* PC端样式 - 保持原有布局 */\n.fixed-top-area {\n    position: static;\n    background: transparent;\n    box-shadow: none;\n    max-width: 1200px;\n    margin: 0 auto;\n    padding: 20px;\n}\n\n/* 移动端顶部固定区域优化 */\n@media (max-width: 768px) {\n    .fixed-top-area {\n        position: fixed !important;\n        top: 0 !important;\n        left: 0 !important;\n        right: 0 !important;\n        z-index: 1000 !important;\n        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%) !important;\n        box-shadow: 0 2px 15px rgba(0,0,0,0.08) !important;\n        border-radius: 0 !important;\n        margin: 0 !important;\n        padding: 0 !important;\n        max-width: 100vw !important;\n        width: 100vw !important;\n        box-sizing: border-box !important;\n        overflow-x: hidden !important;\n        transform: translateX(0) !important;\n        backdrop-filter: blur(10px) !important;\n        -webkit-backdrop-filter: blur(10px) !important;\n    }\n    \n    /* 微信浏览器安全区域适配 */\n    @supports (-webkit-touch-callout: none) {\n        .fixed-top-area {\n            padding-top: env(safe-area-inset-top) !important;\n        }\n    }\n}\n\n/* PC端header保持原有样式 */\n.fixed-top-area .header {\n    background: white;\n    border-radius: 8px;\n    padding: 20px;\n    margin-bottom: 20px;\n    box-shadow: 0 2px 10px rgba(0,0,0,0.1);\n    display: flex;\n    justify-content: space-between;\n    align-items: center;\n    flex-wrap: nowrap;\n    min-height: 60px;\n}\n\n/* 标题区域优化 */\n.fixed-top-area .header .title-section {\n    flex: 0 0 auto;\n    min-width: 200px;\n    margin-right: 20px;\n}\n\n/* 控制按钮区域优化 */\n.fixed-top-area .header .controls {\n    display: flex;\n    gap: 8px;\n    align-items: center;\n    flex-wrap: nowrap;\n    justify-content: flex-end;\n    flex: 1;\n    min-width: 0;\n}\n\n/* 按钮样式优化 */\n.fixed-top-area .header .btn {\n    white-space: nowrap;\n    flex-shrink: 0;\n}\n\n/* 移动端header优化 */\n@media (max-width: 768px) {\n    .fixed-top-area .header {\n        background: transparent !important;\n        border-radius: 0 !important;\n        padding: 15px 20px !important;\n        margin: 0 !important;\n        box-shadow: none !important;\n        border-bottom: 1px solid rgba(0,0,0,0.1) !important;\n        backdrop-filter: blur(5px) !important;\n        -webkit-backdrop-filter: blur(5px) !important;\n        display: flex !important;\n        justify-content: space-between !important; /* 左右分布：标题在左，汉堡按钮在右 */\n        align-items: center !important;\n        flex-wrap: nowrap !important;\n        min-height: 50px !important;\n    }\n    \n    /* 确保标题在左侧 */\n    .fixed-top-area .header h1 {\n        margin: 0 !important;\n        font-size: 18px !important;\n        font-weight: 600 !important;\n        color: #333 !important;\n        flex: 1 !important;\n        text-align: left !important;\n        white-space: nowrap !important;\n        overflow: hidden !important;\n        text-overflow: ellipsis !important;\n    }\n}\n\n/* PC端period-controls保持原有样式 */\n.fixed-top-area .period-controls {\n    margin-bottom: 15px;\n    padding: 12px;\n    background: white;\n    border-radius: 8px;\n    box-shadow: 0 1px 3px rgba(0,0,0,0.1);\n    text-align: center;\n}\n\n/* 移动端课时控制优化 */\n@media (max-width: 768px) {\n    .fixed-top-area .period-controls {\n        background: rgba(255,255,255,0.9) !important;\n        border-radius: 0 !important;\n        margin: 0 !important;\n        padding: 12px 15px !important; /* 减少垂直内边距 */\n        box-shadow: none !important;\n        border-bottom: 1px solid rgba(0,0,0,0.1) !important;\n        backdrop-filter: blur(5px) !important;\n        -webkit-backdrop-filter: blur(5px) !important;\n        display: flex !important;\n        flex-direction: row !important; /* 改为水平布局 */\n        justify-content: space-around !important;\n        align-items: center !important;\n        gap: 8px !important; /* 减少间距 */\n        z-index: 1000 !important; /* 确保课时控制区域层级低于下拉菜单 */\n        position: relative !important;\n    }\n    \n    .fixed-top-area .period-controls .period-control-line {\n        display: flex !important;\n        align-items: center !important;\n        gap: 10px !important;\n        margin-bottom: 0 !important;\n        font-size: 14px !important;\n        color: #333 !important;\n    }\n    \n    .fixed-top-area .period-controls .btn {\n        padding: 8px 12px !important;\n        font-size: 14px !important;\n        border-radius: 20px !important;\n        background: rgba(74, 124, 89, 0.1) !important;\n        color: #4a7c59 !important;\n        border: 1px solid rgba(74, 124, 89, 0.2) !important;\n        transition: all 0.3s ease !important;\n    }\n    \n    .fixed-top-area .period-controls .btn:hover {\n        background: rgba(74, 124, 89, 0.2) !important;\n        transform: translateY(-1px) !important;\n    }\n    \n    .fixed-top-area .period-controls .btn.danger {\n        background: rgba(220, 53, 69, 0.1) !important;\n        color: #dc3545 !important;\n        border-color: rgba(220, 53, 69, 0.2) !important;\n    }\n    \n    .fixed-top-area .period-controls .btn.danger:hover {\n        background: rgba(220, 53, 69, 0.2) !important;\n    }\n}\n\n/* PC端容器保持原有样式 */\n.container {\n    max-width: 1200px;\n    margin: 0 auto;\n    padding: 20px;\n}\n\n    /* 移动端容器优化 */\n    @media (max-width: 768px) {\n        .container {\n            padding-top: 280px !important; /* 增加顶部间距，确保科目池不被遮挡 */\n            padding-left: 15px !important;\n            padding-right: 15px !important;\n            padding-bottom: 20px !important;\n            max-width: none !important;\n            width: auto !important;\n            margin: 0 !important;\n            box-sizing: border-box !important;\n        }\n        \n        /* 微信浏览器特殊优化 */\n        @supports (-webkit-touch-callout: none) {\n            .container {\n                padding-top: 320px !important; /* 微信浏览器需要更多间距 */\n            }\n        }\n    }\n\n@media (max-width: 768px) {\n    /* 移动端表格样式优化 */\n    .timetable th,\n    .timetable td {\n        min-width: 70px; /* 设置最小宽度确保内容可读 */\n        max-width: 100px; /* 设置最大宽度防止过宽 */\n        font-size: 12px; /* 减小字体大小 */\n        padding: 8px 4px; /* 减小内边距 */\n    }\n    \n    .timetable .time-header,\n    .timetable .period-header {\n        min-width: 60px; /* 时间和课时列更窄 */\n        max-width: 80px;\n    }\n    \n    .timetable .weekday-col,\n    .timetable .weekend-col {\n        min-width: 75px; /* 周一到周日列宽度 */\n        max-width: 90px;\n    }\n    \n    /* 移动端固定顶部区域 */\n    .fixed-top-area {\n        position: fixed !important;\n        top: 0 !important;\n        left: 0 !important;\n        right: 0 !important;\n        z-index: 1000 !important;\n        background: white !important;\n        box-shadow: 0 2px 10px rgba(0,0,0,0.1) !important;\n        width: 100% !important;\n        max-width: 100% !important;\n    }\n    \n    /* 移动端header样式 */\n    .fixed-top-area .header {\n        padding: 10px 15px !important;\n        margin: 0 !important;\n        border-radius: 0 !important;\n        box-shadow: none !important;\n        border-bottom: 1px solid #e9ecef !important;\n        display: flex !important;\n        flex-direction: row !important;\n        justify-content: space-between !important;\n        align-items: center !important;\n        gap: 8px !important;\n        min-height: 50px !important;\n    }\n    \n    .fixed-top-area .title-section {\n        flex: 1 !important;\n        text-align: left !important;\n    }\n    \n    .fixed-top-area .title-section h1 {\n        margin: 0 !important;\n        font-size: 18px !important;\n        font-weight: 600 !important;\n        color: #333 !important;\n        text-align: left !important;\n        white-space: nowrap !important;\n        overflow: hidden !important;\n        text-overflow: ellipsis !important;\n    }\n    \n    .fixed-top-area .timetable-title {\n        font-size: 18px !important;\n        width: 100% !important;\n        text-align: center !important;\n        padding: 5px !important;\n    }\n    \n    .fixed-top-area .controls {\n        display: none !important; /* 在手机端隐藏controls */\n    }\n    \n    /* 手机端controls已隐藏，不需要按钮样式 */\n    /*\n    .fixed-top-area .controls .btn {\n        padding: 8px 12px !important;\n        font-size: 12px !important;\n        white-space: nowrap !important;\n        min-width: auto !important;\n        flex: 0 0 auto !important;\n    }\n    */\n    \n    /* 移动端period-controls样式 */\n    .fixed-top-area .period-controls {\n        margin: 0 !important;\n        padding: 10px 15px !important;\n        border-radius: 0 !important;\n        box-shadow: none !important;\n        border-bottom: 1px solid #e9ecef !important;\n        background: #f8f9fa !important;\n        display: flex !important;\n        justify-content: space-around !important;\n        align-items: center !important;\n    }\n    \n    .fixed-top-area .period-controls .period-control-line {\n        display: flex !important;\n        flex-direction: column !important; /* 改为垂直布局，文字在上，按钮在下 */\n        align-items: center !important;\n        justify-content: center !important;\n        gap: 6px !important; /* 减少间距 */\n        margin-bottom: 0 !important;\n        font-size: 13px !important; /* 减少字体大小 */\n        text-align: center !important;\n        flex-wrap: nowrap !important;\n        min-width: 80px !important; /* 设置最小宽度 */\n    }\n    \n    .fixed-top-area .period-controls .period-control-line span {\n        flex: 0 0 auto !important; /* 防止文字被压缩 */\n        white-space: nowrap !important; /* 防止文字换行 */\n        font-weight: 600 !important;\n        color: #333 !important;\n        font-size: 12px !important; /* 减少字体大小 */\n        line-height: 1.2 !important; /* 减少行高 */\n        margin-bottom: 2px !important; /* 减少底部间距 */\n    }\n    \n    .fixed-top-area .period-controls .period-control-line .btn.small {\n        flex: 0 0 auto !important; /* 防止按钮被压缩 */\n        display: flex !important;\n        align-items: center !important;\n        justify-content: center !important; /* 按钮内容居中 */\n        min-width: 50px !important; /* 增加按钮宽度适应文字 */\n        height: 36px !important; /* 增加按钮高度 */\n        padding: 8px 12px !important; /* 恢复内边距 */\n        font-size: 11px !important; /* 适合文字的字体大小 */\n        font-weight: 500 !important; /* 适中的字重 */\n        border-radius: 8px !important; /* 圆角矩形，更现代 */\n        margin: 0 3px !important; /* 增加按钮间距 */\n        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important; /* 更流畅的动画 */\n        text-transform: uppercase !important; /* 大写字母 */\n        letter-spacing: 0.5px !important; /* 字母间距 */\n        border: 1px solid rgba(59, 130, 246, 0.2) !important; /* 恢复边框 */\n        background: transparent !important; /* 透明背景 */\n        color: #3b82f6 !important; /* 蓝色文字 */\n        text-align: center !important; /* 文本居中 */\n        line-height: 1 !important; /* 行高为1 */\n        vertical-align: middle !important; /* 垂直居中 */\n        position: relative !important; /* 为伪元素定位 */\n        overflow: hidden !important; /* 隐藏溢出内容 */\n        box-sizing: border-box !important; /* 盒模型 */\n    }\n    \n    /* 增加按钮现代化样式 */\n    .fixed-top-area .period-controls .period-control-line .btn.small:not(.danger) {\n        background: transparent !important; /* 透明背景 */\n        color: #3b82f6 !important; /* 蓝色文字 */\n        border: 1px solid rgba(59, 130, 246, 0.2) !important; /* 蓝色边框 */\n    }\n    \n    .fixed-top-area .period-controls .period-control-line .btn.small:not(.danger):hover,\n    .fixed-top-area .period-controls .period-control-line .btn.small:not(.danger):focus {\n        background: rgba(59, 130, 246, 0.1) !important; /* 悬停背景 */\n        color: #1d4ed8 !important; /* 深蓝色文字 */\n        border-color: rgba(59, 130, 246, 0.4) !important; /* 深蓝色边框 */\n        transform: translateY(-1px) !important; /* 轻微上移 */\n        box-shadow: 0 2px 8px rgba(59, 130, 246, 0.15) !important; /* 蓝色阴影 */\n    }\n    \n    .fixed-top-area .period-controls .period-control-line .btn.small:not(.danger):active {\n        transform: translateY(0) !important; /* 点击时恢复位置 */\n        background: rgba(59, 130, 246, 0.15) !important; /* 点击背景 */\n    }\n    \n    /* 减少按钮现代化样式 */\n    .fixed-top-area .period-controls .period-control-line .btn.small.danger {\n        background: transparent !important; /* 透明背景 */\n        color: #ef4444 !important; /* 红色文字 */\n        border: 1px solid rgba(239, 68, 68, 0.2) !important; /* 红色边框 */\n    }\n    \n    .fixed-top-area .period-controls .period-control-line .btn.small.danger:hover,\n    .fixed-top-area .period-controls .period-control-line .btn.small.danger:focus {\n        background: rgba(239, 68, 68, 0.1) !important; /* 悬停背景 */\n        color: #dc2626 !important; /* 深红色文字 */\n        border-color: rgba(239, 68, 68, 0.4) !important; /* 深红色边框 */\n        transform: translateY(-1px) !important; /* 轻微上移 */\n        box-shadow: 0 2px 8px rgba(239, 68, 68, 0.15) !important; /* 红色阴影 */\n    }\n    \n    .fixed-top-area .period-controls .period-control-line .btn.small.danger:active {\n        transform: translateY(0) !important; /* 点击时恢复位置 */\n        background: rgba(239, 68, 68, 0.15) !important; /* 点击背景 */\n    }\n    \n    /* 移除光泽效果，使用现代化设计 */\n    \n    /* 移动端课时控制响应式优化 */\n    @media (max-width: 480px) {\n        .fixed-top-area .period-controls {\n            padding: 15px 10px !important; /* 小屏幕减少内边距 */\n            gap: 12px !important; /* 减少间距 */\n        }\n        \n        .fixed-top-area .period-controls .period-control-line {\n            gap: 8px !important; /* 减少按钮间距 */\n        }\n        \n        .fixed-top-area .period-controls .period-control-line .btn.small {\n            min-width: 45px !important; /* 小屏幕适应文字按钮 */\n            height: 32px !important;\n            font-size: 10px !important;\n            padding: 6px 10px !important;\n        }\n    }\n    \n    /* 超小屏幕优化 */\n    @media (max-width: 360px) {\n        .fixed-top-area .period-controls {\n            padding: 12px 8px !important;\n            gap: 10px !important;\n        }\n        \n        .fixed-top-area .period-controls .period-control-line {\n            gap: 6px !important;\n        }\n        \n        .fixed-top-area .period-controls .period-control-line span {\n            font-size: 13px !important;\n        }\n        \n        .fixed-top-area .period-controls .period-control-line .btn.small {\n            min-width: 40px !important;\n            height: 30px !important;\n            font-size: 9px !important;\n            padding: 5px 8px !important;\n        }\n    }\n    \n    /* 确保按钮在触摸设备上有足够的触摸区域 */\n    @media (hover: none) and (pointer: coarse) {\n        .fixed-top-area .period-controls .period-control-line .btn.small {\n            min-width: 50px !important; /* 触摸设备适应文字按钮 */\n            height: 36px !important;\n            font-size: 11px !important;\n            padding: 8px 12px !important;\n        }\n    }\n    \n    /* 移动端按钮触摸优化 */\n    .fixed-top-area .period-controls .period-control-line .btn.small:active {\n        transform: scale(0.95) !important; /* 触摸时的缩放效果 */\n    }\n    \n    .fixed-top-area .period-controls .period-control-line .btn.small:not(.danger):active {\n        background: rgba(59, 130, 246, 0.2) !important; /* 增加按钮触摸时的背景色 */\n    }\n    \n    .fixed-top-area .period-controls .period-control-line .btn.small.danger:active {\n        background: rgba(239, 68, 68, 0.2) !important; /* 减少按钮触摸时的背景色 */\n    }\n    \n    /* 确保按钮内容完美居中 */\n    .fixed-top-area .period-controls .period-control-line .btn.small::before {\n        content: '';\n        display: inline-block;\n        height: 100%;\n        vertical-align: middle;\n    }\n    \n    /* 移动端按钮悬停效果（支持悬停的设备） */\n    @media (hover: hover) {\n        .fixed-top-area .period-controls .period-control-line .btn.small:hover {\n            transform: translateY(-2px) !important;\n            box-shadow: 0 4px 12px rgba(0,0,0,0.15) !important;\n        }\n    }\n    \n    /* 移动端按钮焦点状态优化 */\n    .fixed-top-area .period-controls .period-control-line .btn.small:focus {\n        outline: 2px solid rgba(74, 124, 89, 0.5) !important;\n        outline-offset: 2px !important;\n    }\n    \n    .fixed-top-area .period-controls .period-control-line .btn.small.danger:focus {\n        outline-color: rgba(220, 53, 69, 0.5) !important;\n    }\n    \n    /* 横屏模式优化 */\n    @media (orientation: landscape) and (max-width: 768px) {\n        .fixed-top-area .period-controls {\n            flex-direction: row !important; /* 横屏时改为水平布局 */\n            justify-content: space-around !important;\n            align-items: center !important;\n            padding: 15px 20px !important;\n            gap: 20px !important;\n        }\n        \n        .fixed-top-area .period-controls .period-control-line {\n            flex-direction: column !important; /* 每行改为垂直布局 */\n            gap: 8px !important;\n            align-items: center !important;\n            justify-content: center !important;\n        }\n        \n        .fixed-top-area .period-controls .period-control-line span {\n            font-size: 12px !important;\n            text-align: center !important;\n        }\n        \n        .fixed-top-area .period-controls .period-control-line .btn.small {\n            min-width: 45px !important;\n            height: 32px !important;\n            font-size: 10px !important;\n            padding: 6px 10px !important;\n        }\n    }\n    \n    /* 确保按钮内容完美居中 */\n    .fixed-top-area .period-controls .period-control-line .btn.small {\n        position: relative !important;\n        overflow: hidden !important;\n        display: flex !important;\n        align-items: center !important;\n        justify-content: center !important;\n        text-align: center !important;\n        line-height: 1 !important;\n    }\n    \n    .fixed-top-area .period-controls .period-control-line .btn.small > * {\n        margin: 0 !important;\n        line-height: 1 !important;\n        display: flex !important;\n        align-items: center !important;\n        justify-content: center !important;\n    }\n    \n    /* 移动端容器样式 */\n    .container {\n        padding-top: 200px !important; /* 增加顶部间距确保科目池完全不被遮挡 */\n        max-width: 100vw !important;\n        width: 100vw !important;\n        margin: 0 !important;\n        padding-left: 0 !important;\n        padding-right: 0 !important;\n    }\n    \n    /* 移动端主内容区域样式 */\n    .main-content {\n        display: flex !important;\n        flex-direction: column !important;\n        gap: 0 !important;\n        width: 100vw !important;\n        max-width: 100vw !important;\n        margin: 0 !important;\n        padding: 10px 0 0 0 !important; /* 顶部留出间距 */\n    }\n    \n    /* 移动端科目池样式 */\n    .subject-pool {\n        order: 1;\n        width: 100vw !important;\n        margin: 0 !important;\n        padding: 15px 0 0 0 !important; /* 确保顶部有足够间距 */\n        border-radius: 0 !important;\n        box-shadow: none !important;\n        display: flex;\n        flex-direction: column;\n    }\n    \n    .timetable-container {\n        order: 2;\n        width: 100vw !important;\n        max-width: 100vw !important;\n        margin: 0 !important;\n        padding: 0 !important;\n        overflow-x: auto !important; /* 改为横向滚动 */\n        -webkit-overflow-scrolling: touch; /* 优化iOS滚动体验 */\n    }\n    \n    .timetable-wrapper {\n        min-width: max-content; /* 确保表格内容不被压缩 */\n    }\n    \n    .timetable {\n        min-width: max-content; /* 确保表格可以横向滚动 */\n    }\n}\n\n.subject-pool {\n    background: white;\n    border-radius: 12px;\n    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);\n    max-height: 600px;\n    min-height: 400px;\n    display: flex;\n    flex-direction: column;\n}\n\n.period-controls {\n    margin-bottom: 15px;\n    padding: 12px;\n    background: white;\n    border-radius: 8px;\n    box-shadow: 0 1px 3px rgba(0,0,0,0.1);\n    text-align: center;\n}\n\n.period-controls h4 {\n    margin: 0 0 10px 0;\n    font-size: 14px;\n    font-weight: 600;\n    color: #495057;\n}\n\n.period-controls .period-control-line {\n    display: flex;\n    align-items: center;\n    justify-content: space-between;\n    margin-bottom: 8px;\n    font-size: 14px;\n}\n\n.period-controls .period-control-line:last-child {\n    margin-bottom: 0;\n}\n\n.period-controls .period-control-line span {\n    color: #495057;\n    font-weight: 600;\n}\n\n.period-controls .period-control-line .btn.small {\n    padding: 4px 8px;\n    min-width: 24px;\n    height: 24px;\n    font-size: 13px;\n    border-radius: 4px;\n    margin-left: 4px;\n}\n\n.subject-pool-header {\n        display: flex;\n        justify-content: space-between;\n        align-items: center;\n        padding: 20px 20px 8px 20px;\n        gap: 6px;\n        flex-shrink: 0;\n        border-bottom: 1px solid #f0f0f0;\n    }\n\n.subject-pool h3 {\n    font-size: 16px;\n    font-weight: 600;\n    margin: 0;\n}\n\n.subjects {\n        display: flex;\n        flex-direction: column;\n        gap: 6px;\n        padding: 0 20px 20px 20px;\n        overflow-y: auto;\n        flex: 1;\n    }\n\n.subject-card {\n    background: #f8f9fa;\n    border-radius: 4px;\n    padding: 8px 10px;\n    cursor: grab;\n    transition: all 0.3s ease;\n    border: 1px solid transparent;\n    user-select: none;\n    display: flex;\n    justify-content: space-between;\n    align-items: center;\n}\n\n.subject-card:hover {\n    transform: translateY(-2px);\n    box-shadow: 0 4px 8px rgba(0,0,0,0.1);\n}\n\n.subject-card:active {\n    cursor: grabbing;\n}\n\n.subject-card.dragging {\n    opacity: 0.5;\n    cursor: grabbing;\n    transform: rotate(5deg);\n}\n\n.subject-info {\n    flex: 1;\n}\n\n.subject-info .subject-name {\n    font-size: 14px;\n    font-weight: 600;\n    margin-bottom: 1px;\n    color: var(--text-color);\n    transition: color 0.3s ease;\n}\n\n.subject-info .teacher-name {\n    font-size: 12px;\n    color: var(--text-color);\n    opacity: 0.8;\n    transition: color 0.3s ease;\n}\n\n.subject-actions {\n    display: flex;\n    gap: 4px;\n    margin-left: 8px;\n}\n\n/* 现代化文字按钮设计 */\n.btn-text {\n    background: transparent;\n    border: none;\n    cursor: pointer;\n    padding: 6px 12px;\n    border-radius: 6px;\n    font-size: 12px;\n    font-weight: 500;\n    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);\n    display: inline-flex;\n    align-items: center;\n    justify-content: center;\n    margin: 0 2px;\n    position: relative;\n    overflow: hidden;\n    text-transform: uppercase;\n    letter-spacing: 0.5px;\n    min-width: 50px;\n    height: 28px;\n    box-sizing: border-box;\n}\n\n.btn-text:hover {\n    transform: translateY(-1px);\n}\n\n.btn-text:active {\n    transform: translateY(0);\n}\n\n/* 编辑按钮现代化设计 */\n.edit-btn {\n    color: #3b82f6;\n    border: 1px solid rgba(59, 130, 246, 0.2);\n    background: rgba(59, 130, 246, 0.05);\n}\n\n.edit-btn:hover {\n    background: rgba(59, 130, 246, 0.1);\n    color: #1d4ed8;\n    border-color: rgba(59, 130, 246, 0.4);\n    box-shadow: 0 2px 8px rgba(59, 130, 246, 0.15);\n}\n\n.edit-btn:active {\n    background: rgba(59, 130, 246, 0.15);\n    transform: translateY(0);\n}\n\n/* 删除按钮现代化设计 */\n.delete-btn {\n    color: #ef4444;\n    border: 1px solid rgba(239, 68, 68, 0.2);\n    background: rgba(239, 68, 68, 0.05);\n}\n\n.delete-btn:hover {\n    background: rgba(239, 68, 68, 0.1);\n    color: #dc2626;\n    border-color: rgba(239, 68, 68, 0.4);\n    box-shadow: 0 2px 8px rgba(239, 68, 68, 0.15);\n}\n\n.delete-btn:active {\n    background: rgba(239, 68, 68, 0.15);\n    transform: translateY(0);\n}\n\n/* 简洁设计不需要光泽效果 */\n\n/* 按钮图标优化 */\n.btn-icon i {\n    font-size: 16px;\n    line-height: 1;\n}\n\n.timetable-container {\n    background: white;\n    border-radius: 12px;\n    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);\n    padding: 20px;\n}\n\n.timetable {\n    width: 100%;\n    border-collapse: collapse;\n}\n\n.timetable th,\n.timetable td {\n    border: 1px solid var(--border-color);\n    padding: 12px;\n    text-align: center;\n    vertical-align: middle;\n}\n\n.timetable th {\n    background: var(--light-color);\n    font-weight: 700;\n    font-size: 16px;\n    color: var(--text-color);\n}\n\n.time-header {\n    width: 60px;\n}\n\n.period-header {\n    width: 80px;\n}\n\n.section-header .section-title {\n    background: #e9ecef;\n    font-weight: 600;\n    text-align: center;\n    padding: 8px;\n}\n\n.section-controls {\n    margin-bottom: 15px;\n    display: flex;\n    gap: 30px;\n    justify-content: center;\n    align-items: center;\n}\n\n.timetable-title-section {\n    text-align: center;\n    margin-bottom: 20px;\n}\n\n.table-title-input {\n    font-size: 20px;\n    font-weight: bold;\n    text-align: center;\n    border: none;\n    background: var(--light-color);\n    padding: 8px 16px;\n    outline: none;\n    transition: all 0.3s ease;\n    width: 300px;\n    color: var(--text-color);\n    border-radius: 4px;\n}\n\n.table-title-input:focus {\n    background: var(--primary-color);\n    color: white;\n    border-radius: 4px;\n}\n\n.control-group {\n    display: flex;\n    align-items: center;\n    gap: 8px;\n}\n\n.control-group span {\n    font-weight: bold;\n    min-width: 50px;\n}\n\n.btn.danger {\n    background-color: #dc3545;\n    color: white;\n    border-color: #dc3545;\n}\n\n.btn.danger:hover {\n    background-color: #c82333;\n    border-color: #bd2130;\n}\n\n.time-cell {\n    background: var(--light-color);\n    text-align: center;\n    font-weight: bold;\n    color: var(--text-color);\n    border-right: 1px solid var(--border-color);\n    width: 40px;\n    min-width: 40px;\n    vertical-align: middle;\n}\n\n.vertical-text {\n    display: flex;\n    flex-direction: column;\n    align-items: center;\n    justify-content: center;\n    font-size: 16px;\n    font-weight: bold;\n    color: var(--primary-color);\n    height: 100%;\n    gap: 2px;\n}\n\n.period-cell {\n    background: var(--light-color);\n    font-weight: 600;\n    font-size: 14px;\n    color: var(--text-color);\n}\n\n.time-display {\n    font-size: 12px;\n    color: var(--secondary-color);\n    margin-top: 4px;\n    cursor: pointer;\n}\n\n.time-display:hover {\n    color: var(--primary-color);\n    text-decoration: underline;\n}\n\n.section-row {\n    background: #e9ecef;\n    font-weight: 600;\n    text-align: center;\n}\n\n.section-row td {\n    padding: 8px;\n    font-size: 16px;\n}\n\n.cell {\n    width: 120px;\n    height: 80px;\n    position: relative;\n    transition: all 0.3s ease;\n    background: white;\n    border: 1px solid var(--border-color);\n    color: var(--text-color);\n}\n\n.cell:hover {\n    background: var(--light-color);\n}\n\n.cell.drag-over {\n    background: #d4edda;\n    border: 2px dashed var(--primary-color);\n}\n\n.cell.occupied {\n    cursor: default;\n}\n\n.cell-content {\n    width: 100%;\n    height: 100%;\n    border-radius: 6px;\n    padding: 8px;\n    display: flex;\n    flex-direction: column;\n    justify-content: center;\n    align-items: center;\n    font-weight: 600;\n    position: relative;\n    box-sizing: border-box;\n    overflow: hidden;\n}\n\n.delete-cell-btn {\n    position: absolute;\n    top: 2px;\n    right: 2px;\n    width: 20px;\n    height: 20px;\n    background: rgba(255, 255, 255, 0.9);\n    color: var(--danger-color);\n    border: none;\n    border-radius: 50%;\n    font-size: 14px;\n    font-weight: bold;\n    cursor: pointer;\n    display: none;\n    align-items: center;\n    justify-content: center;\n    z-index: 10;\n    transition: all 0.2s ease;\n}\n\n.cell:hover .delete-cell-btn {\n    display: flex;\n}\n\n.delete-cell-btn:hover {\n    background: var(--danger-color);\n    color: white;\n    transform: scale(1.1);\n}\n\n.cell-content .subject-name {\n    font-size: 16px;\n    margin-bottom: 3px;\n    text-align: center;\n    line-height: 1.3;\n    font-weight: 700;\n    color: inherit;\n}\n\n.cell-content .teacher-name {\n    font-size: 13px;\n    opacity: 0.9;\n    text-align: center;\n    line-height: 1.2;\n    color: inherit;\n}\n\n.modal {\n    display: none;\n    position: fixed;\n    top: 0;\n    left: 0;\n    width: 100%;\n    height: 100%;\n    background: rgba(0, 0, 0, 0.5);\n    z-index: 10000;\n    align-items: center;\n    justify-content: center;\n    overflow-y: auto;\n    padding: 20px;\n    box-sizing: border-box;\n}\n\n.modal-content {\n    position: relative;\n    background: var(--light-color);\n    color: var(--text-color);\n    border: 1px solid var(--border-color);\n    border-radius: 12px;\n    padding: 24px;\n    min-width: 300px;\n    max-width: 90vw;\n    max-height: calc(100vh - 40px);\n    overflow-y: auto;\n    overflow-x: hidden;\n    box-shadow: 0 8px 32px var(--shadow-color);\n    margin: auto;\n    display: block;\n}\n\n/* 移除所有弹窗的滚动条 - 使用美化的滚动条 */\n.modal-content::-webkit-scrollbar {\n    width: 6px;\n}\n\n.modal-content::-webkit-scrollbar-track {\n    background: transparent;\n}\n\n.modal-content::-webkit-scrollbar-thumb {\n    background: var(--border-color);\n    border-radius: 3px;\n}\n\n.modal-content::-webkit-scrollbar-thumb:hover {\n    background: var(--primary-color);\n}\n\n.modal-content {\n    scrollbar-width: thin;\n    scrollbar-color: var(--border-color) transparent;\n}\n\n/* 调整科目设置弹窗样式 - PC端宽屏不需要滚动条 */\n#subjectModal .modal-content {\n    min-width: 500px;\n    max-width: 600px;\n    max-height: none;\n    overflow: visible;\n    padding: 24px 28px;\n    margin: 20px auto;\n    display: flex;\n    flex-direction: column;\n}\n\n/* PC端颜色选择区域横向布局 */\n#subjectModal .color-group {\n    margin-bottom: 12px;\n}\n\n#subjectModal .color-options {\n    display: flex;\n    flex-direction: column;\n    gap: 10px;\n}\n\n#subjectModal .preset-colors {\n    display: grid;\n    grid-template-columns: repeat(9, 1fr);\n    gap: 6px;\n}\n\n#subjectModal .color-option {\n    width: 28px;\n    height: 28px;\n}\n\n#subjectModal .custom-color-inline {\n    display: flex;\n    gap: 8px;\n    align-items: center;\n}\n\n#subjectModal .custom-color-inline input[type=\"color\"] {\n    width: 36px;\n    height: 28px;\n}\n\n#subjectModal .custom-color-inline input[type=\"text\"] {\n    width: 80px;\n    padding: 4px 8px;\n    font-size: 12px;\n}\n\n/* 颜色预览区域紧凑 */\n#subjectModal .color-preview-section {\n    margin-bottom: 12px;\n}\n\n#subjectModal .color-preview-section .color-preview {\n    padding: 12px 16px;\n    font-size: 14px;\n}\n\n/* 颜色模式选择器样式 - 简洁风格 */\n.form-group:has(.color-mode-selector) {\n    display: flex;\n    align-items: center;\n    gap: 12px;\n    flex-wrap: nowrap;\n}\n\n.form-group:has(.color-mode-selector) > label {\n    margin-bottom: 0 !important;\n    white-space: nowrap;\n    flex-shrink: 0;\n}\n\n.color-mode-selector {\n    display: inline-flex;\n    gap: 8px;\n}\n\n.color-mode-option {\n    position: relative;\n    display: flex;\n    align-items: center;\n    justify-content: center;\n    cursor: pointer;\n    font-size: 13px;\n    padding: 6px 14px;\n    border-radius: 6px;\n    transition: all 0.25s ease;\n    background: transparent;\n    border: none;\n    color: #333333;\n    font-weight: 500;\n    white-space: nowrap;\n}\n\n.color-mode-option:hover {\n    background: rgba(0, 0, 0, 0.08);\n}\n\n.color-mode-option input[type=\"radio\"] {\n    position: absolute;\n    opacity: 0;\n    width: 0;\n    height: 0;\n    pointer-events: none;\n}\n\n.color-mode-option span {\n    position: relative;\n    z-index: 1;\n    color: #333333;\n}\n\n/* 选中状态样式 */\n.color-mode-option.selected {\n    background: var(--primary-color);\n}\n\n.color-mode-option.selected span {\n    color: #ffffff !important;\n}\n\n.color-mode-option.selected:hover {\n    background: var(--primary-color);\n    filter: brightness(1.1);\n}\n\n/* :has() 选择器支持 */\n.color-mode-option:has(input[type=\"radio\"]:checked) {\n    background: var(--primary-color);\n}\n\n.color-mode-option:has(input[type=\"radio\"]:checked) span {\n    color: #ffffff !important;\n}\n\n.color-mode-option:has(input[type=\"radio\"]:checked):hover {\n    background: var(--primary-color);\n    filter: brightness(1.1);\n}\n\n/* 深色主题适配 */\nbody.theme-dark .color-mode-option {\n    background: transparent !important;\n}\n\nbody.theme-dark .color-mode-option span {\n    color: #ffffff !important;\n}\n\nbody.theme-dark .color-mode-option:hover {\n    background: rgba(255, 255, 255, 0.1) !important;\n}\n\nbody.theme-dark .color-mode-option.selected,\nbody.theme-dark .color-mode-option:has(input[type=\"radio\"]:checked) {\n    background: #20c997 !important;\n}\n\nbody.theme-dark .color-mode-option.selected span,\nbody.theme-dark .color-mode-option:has(input[type=\"radio\"]:checked) span {\n    color: #ffffff !important;\n}\n\n/* 颜色组样式 */\n.color-group {\n    margin-bottom: 10px !important;\n}\n\n.color-group label {\n    font-weight: 600;\n    font-size: 13px;\n    color: var(--text-color);\n    margin-bottom: 6px;\n    display: block;\n}\n\n.color-group .color-options {\n    padding: 10px;\n    background: var(--light-color);\n    border: 1px solid var(--border-color);\n    border-radius: 8px;\n}\n\n.color-group .preset-colors {\n    margin-bottom: 8px;\n}\n\n/* 内联自定义颜色选择器 */\n.custom-color-inline {\n    display: flex;\n    align-items: center;\n    gap: 8px;\n    padding-top: 8px;\n    border-top: 1px solid var(--border-color);\n}\n\n.custom-color-inline input[type=\"color\"] {\n    width: 36px;\n    height: 36px;\n    border: 2px solid var(--border-color);\n    border-radius: 6px;\n    cursor: pointer;\n    padding: 0;\n    background: white;\n}\n\n.custom-color-inline input[type=\"color\"]::-webkit-color-swatch-wrapper {\n    padding: 2px;\n}\n\n.custom-color-inline input[type=\"color\"]::-webkit-color-swatch {\n    border: none;\n    border-radius: 3px;\n}\n\n.custom-color-inline input[type=\"text\"] {\n    flex: 1;\n    padding: 8px 10px;\n    border: 1px solid var(--border-color);\n    border-radius: 6px;\n    font-size: 13px;\n    font-family: monospace;\n    text-transform: uppercase;\n}\n\n/* 颜色预览区域 */\n.color-preview-section {\n    margin-bottom: 16px;\n}\n\n.color-preview-section label {\n    font-weight: 600;\n    font-size: 13px;\n    color: var(--text-color);\n    margin-bottom: 6px;\n    display: block;\n}\n\n.color-preview-section .color-preview {\n    padding: 16px 20px;\n    border-radius: 8px;\n    text-align: center;\n    font-size: 16px;\n    font-weight: 600;\n    min-height: 20px;\n    /* 默认样式，会被JS覆盖 */\n}\n\n#colorPreview span {\n    color: inherit;\n}\n\n/* 优化表单元素间距 */\n.form-group {\n    margin-bottom: 12px !important;\n}\n\n/* 科目弹窗表单组更紧凑 */\n#subjectModal .form-group {\n    margin-bottom: 10px !important;\n}\n\n/* 优化自定义颜色区域 */\n.custom-color {\n    display: flex;\n    flex-direction: column;\n    align-items: center;\n    gap: 10px;\n    margin-top: 12px;\n    padding: 12px;\n    background: white;\n    border: 1px solid var(--border-color);\n    border-radius: 8px;\n    box-shadow: 0 1px 4px var(--shadow-color);\n    transition: all 0.3s ease;\n}\n\n.custom-color:hover {\n    box-shadow: 0 2px 8px var(--shadow-color);\n    border-color: var(--primary-color);\n}\n\n.custom-color label {\n    font-weight: 600;\n    font-size: 14px;\n    color: #333333 !important;\n    text-align: center;\n}\n\n/* 自定义颜色按钮样式 */\n#customColorBtn {\n    padding: 8px 20px;\n    font-size: 14px;\n    border-radius: 6px;\n    min-width: 100px;\n}\n\n.custom-color input[type=\"color\"] {\n    width: 40px;\n    height: 40px;\n    border: 2px solid #ddd;\n    border-radius: 6px;\n    cursor: pointer;\n    background: white;\n    transition: all 0.3s ease;\n    -webkit-appearance: none;\n    -moz-appearance: none;\n    appearance: none;\n    padding: 0;\n    outline: none;\n    display: none;\n}\n\n.custom-color input[type=\"color\"]::-webkit-color-swatch-wrapper {\n    padding: 0;\n}\n\n.custom-color input[type=\"color\"]::-webkit-color-swatch {\n    border: none;\n    border-radius: 4px;\n}\n\n.custom-color input[type=\"color\"]::-moz-color-swatch {\n    border: none;\n    border-radius: 4px;\n}\n\n.custom-color input[type=\"color\"]:hover {\n    border-color: var(--primary-color);\n    box-shadow: 0 0 0 4px var(--shadow-color);\n    transform: scale(1.15);\n}\n\n/* 修复颜色选择器弹窗位置 */\n#customColor {\n    position: fixed;\n    top: 50%;\n    left: 50%;\n    transform: translate(-50%, -50%);\n    z-index: 10000;\n}\n\n/* 自定义颜色选择器样式 */\n#customColorPickerDialog {\n    position: fixed;\n    top: 50% !important;\n    left: 50% !important;\n    transform: translate(-50%, -50%) !important;\n    background: var(--light-color) !important;\n    border: 2px solid var(--border-color) !important;\n    border-radius: 12px !important;\n    padding: 20px !important;\n    box-shadow: 0 8px 32px var(--shadow-color) !important;\n    z-index: 10000 !important;\n    width: 300px !important;\n    max-width: 95vw !important;\n    box-sizing: border-box !important;\n}\n\n#customColorPickerDialog h4 {\n    margin-bottom: 15px !important;\n    color: var(--text-color) !important;\n    font-size: 16px !important;\n    font-weight: 700 !important;\n    text-align: center !important;\n}\n\n#customColorPickerDialog input[type=\"color\"] {\n    width: 100% !important;\n    height: 60px !important;\n    border: 2px solid var(--border-color) !important;\n    border-radius: 8px !important;\n    cursor: pointer !important;\n    background: white !important;\n    margin-bottom: 15px !important;\n    display: block !important;\n}\n\n#customColorPickerDialog input[type=\"text\"] {\n    width: 100% !important;\n    padding: 10px 16px !important;\n    border: 2px solid var(--border-color) !important;\n    border-radius: 8px !important;\n    font-size: 14px !important;\n    font-weight: 600 !important;\n    background-color: white !important;\n    color: var(--text-color) !important;\n    margin-bottom: 15px !important;\n    box-sizing: border-box !important;\n}\n\n#customColorPickerDialog button {\n    padding: 8px 16px !important;\n    border: none !important;\n    border-radius: 6px !important;\n    cursor: pointer !important;\n    font-size: 14px !important;\n    font-weight: 600 !important;\n    transition: all 0.3s ease !important;\n    box-sizing: border-box !important;\n}\n\n#customColorPickerDialog #pickerCancel {\n    background: var(--secondary-color) !important;\n    color: white !important;\n}\n\n#customColorPickerDialog #pickerCancel:hover {\n    background: var(--secondary-hover-color) !important;\n}\n\n#customColorPickerDialog #pickerConfirm {\n    background: var(--primary-color) !important;\n    color: white !important;\n}\n\n#customColorPickerDialog #pickerConfirm:hover {\n    background: var(--primary-hover-color) !important;\n}\n\n/* 深色主题适配 */\nbody.theme-dark #customColorPickerDialog {\n    background: var(--background-color) !important;\n    border-color: var(--border-color) !important;\n    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4) !important;\n}\n\nbody.theme-dark #customColorPickerDialog h4 {\n    color: var(--text-color) !important;\n}\n\nbody.theme-dark #customColorPickerDialog input[type=\"text\"] {\n    background: var(--background-color) !important;\n    color: var(--text-color) !important;\n    border-color: var(--border-color) !important;\n}\n\nbody.theme-dark #customColorPickerDialog input[type=\"text\"]:focus {\n    background: white !important;\n    color: #333 !important;\n}\n\nbody.theme-dark #customColorPickerDialog input[type=\"color\"] {\n    background: var(--background-color) !important;\n    border-color: var(--border-color) !important;\n}\n\n/* 手机端弹窗适配 */\n@media (max-width: 768px) {\n    /* 弹窗容器优化 */\n    #subjectModal .modal-content {\n        min-width: auto !important;\n        max-width: 92vw !important;\n        width: 92vw !important;\n        max-height: 90vh !important;\n        margin: 5vh auto !important;\n        padding: 16px !important;\n        position: relative !important;\n        overflow-y: auto !important;\n        overflow-x: hidden !important;\n        box-sizing: border-box !important;\n    }\n    \n    /* 弹窗标题优化 */\n    #subjectModal h3 {\n        margin-bottom: 16px !important;\n        padding-bottom: 10px !important;\n        font-size: 18px !important;\n        text-align: center !important;\n    }\n    \n    /* 表单组优化 */\n    .form-group {\n        flex-direction: column;\n        align-items: stretch;\n        gap: 6px !important;\n        margin-bottom: 12px !important;\n    }\n    \n    .form-group label {\n        min-width: auto;\n        max-width: 100%;\n        font-size: 14px !important;\n        margin-bottom: 4px !important;\n        font-weight: 600 !important;\n    }\n    \n    .form-group input {\n        width: 100%;\n        padding: 10px 12px !important;\n        font-size: 14px !important;\n        border-radius: 6px !important;\n    }\n    \n    /* 颜色模式选择器移动端优化 */\n    .color-mode-selector {\n        flex-direction: row !important;\n        gap: 10px !important;\n        justify-content: center !important;\n    }\n    \n    .color-mode-option {\n        padding: 6px 10px !important;\n        font-size: 13px !important;\n    }\n    \n    /* 颜色组移动端优化 */\n    .color-group {\n        margin-bottom: 10px !important;\n    }\n    \n    .color-group .color-options {\n        padding: 8px !important;\n    }\n    \n    /* 内联自定义颜色选择器移动端优化 */\n    .custom-color-inline {\n        padding-top: 6px !important;\n        gap: 6px !important;\n    }\n    \n    .custom-color-inline input[type=\"color\"] {\n        width: 32px !important;\n        height: 32px !important;\n    }\n    \n    .custom-color-inline input[type=\"text\"] {\n        padding: 6px 8px !important;\n        font-size: 12px !important;\n    }\n    \n    /* 颜色预览移动端优化 */\n    .color-preview-section {\n        margin-bottom: 12px !important;\n    }\n    \n    .color-preview-section .color-preview,\n    #colorPreview {\n        padding: 12px 16px !important;\n        font-size: 14px !important;\n    }\n    \n    /* 颜色选项区域优化 */\n    .color-options {\n        padding: 10px !important;\n        gap: 8px !important;\n        margin-top: 8px !important;\n        border-radius: 8px !important;\n    }\n    \n    /* 颜色类型选择器优化 */\n    .color-type-selector {\n        flex-direction: row !important;\n        justify-content: center !important;\n        gap: 20px !important;\n        padding: 8px 12px !important;\n        margin-bottom: 10px !important;\n        border-radius: 6px !important;\n    }\n    \n    /* 预设颜色区域优化 */\n    .preset-colors {\n        grid-template-columns: repeat(6, 1fr) !important;\n        gap: 8px !important;\n        padding: 10px !important;\n        margin-bottom: 10px !important;\n        border-radius: 6px !important;\n    }\n    \n    /* 颜色选项优化 */\n    .color-option {\n        width: 32px !important;\n        height: 32px !important;\n        margin: 0 !important;\n    }\n    \n    /* 自定义颜色区域优化 */\n    .custom-color {\n        flex-direction: column !important;\n        align-items: center !important;\n        gap: 10px !important;\n        margin-top: 10px !important;\n        padding: 12px !important;\n        border-radius: 8px !important;\n    }\n    \n    .custom-color label {\n        font-size: 14px !important;\n        text-align: center !important;\n    }\n    \n    /* 自定义颜色按钮优化 */\n    #customColorBtn {\n        width: auto !important;\n        min-width: 120px !important;\n        padding: 10px 20px !important;\n        font-size: 14px !important;\n    }\n    \n    /* 自定义颜色输入框优化 */\n    .custom-color input[type=\"text\"] {\n        width: 100% !important;\n        max-width: 150px !important;\n        padding: 8px 12px !important;\n        font-size: 14px !important;\n        text-align: center !important;\n        border-radius: 6px !important;\n    }\n    \n    /* 表单按钮优化 */\n    .form-actions {\n        display: flex !important;\n        flex-direction: row !important;\n        justify-content: center !important;\n        align-items: center !important;\n        gap: 10px !important;\n        margin-top: 16px !important;\n        padding-top: 16px !important;\n        border-top: 1px solid var(--border-color) !important;\n        width: 100% !important;\n        box-sizing: border-box !important;\n        flex-wrap: nowrap !important;\n    }\n    \n    /* 按钮样式优化 */\n    #subjectModal .btn {\n        flex: 0 1 auto !important;\n        min-width: 60px !important;\n        max-width: 85px !important;\n        padding: 10px 12px !important;\n        font-size: 14px !important;\n        box-sizing: border-box !important;\n        margin: 0 !important;\n        white-space: nowrap !important;\n    }\n    \n    /* 删除按钮特殊处理 */\n    #subjectModal #deleteSubjectBtn {\n        min-width: 60px !important;\n        max-width: 80px !important;\n    }\n    \n    /* 自定义颜色选择器弹窗优化 */\n    #customColorPickerDialog {\n        width: 280px !important;\n        padding: 15px !important;\n    }\n    \n    #customColorPickerDialog h4 {\n        margin-bottom: 12px !important;\n        font-size: 15px !important;\n    }\n    \n    #customColorPickerDialog input[type=\"color\"] {\n        height: 50px !important;\n        margin-bottom: 12px !important;\n    }\n    \n    #customColorPickerDialog input[type=\"text\"] {\n        padding: 8px 14px !important;\n        margin-bottom: 12px !important;\n    }\n    \n    #customColorPickerDialog button {\n        padding: 8px 14px !important;\n        font-size: 13px !important;\n    }\n}\n\n.custom-color input[type=\"text\"] {\n    width: 120px;\n    max-width: 150px;\n    padding: 8px 12px;\n    border: 1px solid var(--border-color);\n    border-radius: 6px;\n    font-size: 14px;\n    font-weight: 600;\n    background-color: white;\n    color: #333333 !important;\n    text-align: center;\n    transition: all 0.3s ease;\n}\n\n.custom-color input[type=\"text\"]:hover {\n    border-color: var(--primary-color);\n}\n\n.custom-color input[type=\"text\"]:focus {\n    outline: none;\n    border-color: var(--primary-color);\n    box-shadow: 0 0 0 3px var(--shadow-color);\n    background-color: white;\n}\n\n/* 深色主题下的自定义颜色区域优化 */\nbody.theme-dark .custom-color {\n    background: var(--background-color);\n    border-color: var(--border-color);\n    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);\n}\n\nbody.theme-dark .custom-color:hover {\n    border-color: var(--primary-color);\n    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);\n}\n\nbody.theme-dark .custom-color label {\n    color: var(--text-color) !important;\n}\n\nbody.theme-dark .custom-color input[type=\"color\"] {\n    background: var(--background-color);\n    border-color: var(--border-color);\n}\n\nbody.theme-dark .custom-color input[type=\"text\"] {\n    background: var(--background-color);\n    border-color: var(--border-color);\n    color: var(--text-color) !important;\n}\n\nbody.theme-dark .custom-color input[type=\"text\"]:focus {\n    background: white;\n    color: #333333 !important;\n}\n\n/* 调整预设颜色区域的间距 */\n.preset-colors {\n    gap: 6px;\n    padding: 10px;\n    margin-bottom: 8px;\n    display: grid;\n    grid-template-columns: repeat(6, 1fr);\n    background: white;\n    border: 1px solid var(--border-color);\n    border-radius: 8px;\n    box-shadow: none;\n}\n\n/* 调整颜色选项区域的内边距 */\n.color-options {\n    padding: 12px;\n    gap: 10px;\n    margin-top: 8px;\n    background: var(--light-color);\n    border: 1px solid var(--border-color);\n    border-radius: 8px;\n    box-shadow: 0 1px 4px var(--shadow-color);\n}\n\n/* 调整颜色类型选择器 */\n.color-type-selector {\n    display: flex;\n    justify-content: center;\n    padding: 8px 12px;\n    margin-bottom: 10px;\n    gap: 20px;\n    background: white;\n    border: 1px solid var(--border-color);\n    border-radius: 6px;\n    box-shadow: none;\n}\n\n.color-type-selector label {\n    display: flex;\n    align-items: center;\n    gap: 6px;\n    cursor: pointer;\n    font-size: 14px;\n    padding: 4px 8px;\n    border-radius: 4px;\n    transition: all 0.2s ease;\n}\n\n.color-type-selector label:hover {\n    background: var(--light-color);\n}\n\n/* 调整颜色选项 */\n.color-option {\n    width: 32px !important;\n    height: 32px !important;\n    margin: 0 !important;\n    border: 2px solid transparent !important;\n    border-radius: 50% !important;\n    cursor: pointer !important;\n    transition: all 0.2s ease !important;\n    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15) !important;\n    position: relative !important;\n    overflow: hidden !important;\n}\n\n.color-option:hover {\n    transform: scale(1.1) !important;\n    border-color: rgba(0, 0, 0, 0.2) !important;\n    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2) !important;\n}\n\n.color-option.selected {\n    transform: scale(1.05) !important;\n    border-color: var(--primary-color) !important;\n    box-shadow: 0 0 0 2px var(--primary-color), 0 2px 8px rgba(0, 0, 0, 0.2) !important;\n}\n\n.color-option.selected::after {\n    content: '✓' !important;\n    position: absolute !important;\n    top: 50% !important;\n    left: 50% !important;\n    transform: translate(-50%, -50%) !important;\n    color: white !important;\n    font-size: 14px !important;\n    font-weight: bold !important;\n    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5) !important;\n    z-index: 1 !important;\n}\n\n/* 调整自定义颜色输入区域 */\n.custom-color .color-input-group {\n    gap: 8px;\n}\n\n/* 调整模态框标题 */\n.modal-content h3 {\n    margin-bottom: 20px !important;\n    padding-bottom: 10px;\n}\n\n/* 调整表单按钮间距 */\n.form-actions {\n    display: flex;\n    justify-content: center;\n    gap: 12px;\n    margin-top: 20px;\n    padding-top: 16px;\n    flex-wrap: nowrap;\n    border-top: 1px solid var(--border-color);\n    width: 100%;\n    box-sizing: border-box;\n}\n\n.form-actions .btn {\n    flex: 0 1 auto;\n    min-width: 70px;\n    max-width: 100px;\n    padding: 10px 16px;\n    font-size: 14px;\n    white-space: nowrap;\n}\n\n/* 确保科目设置弹窗的按钮不会溢出 */\n#subjectModal .form-actions {\n    display: flex;\n    justify-content: center;\n    gap: 10px;\n    margin-top: 20px;\n    padding-top: 16px;\n    flex-wrap: nowrap;\n    border-top: 1px solid var(--border-color);\n    width: 100%;\n    box-sizing: border-box;\n}\n\n#subjectModal .btn {\n    flex: 0 1 auto;\n    min-width: 65px;\n    max-width: 90px;\n    padding: 10px 14px;\n    font-size: 14px;\n    white-space: nowrap;\n}\n\n/* 确保科目信息中的字体颜色与主题色匹配 */\n.subject-info .subject-name,\n.subject-info .teacher-name {\n    color: var(--text-color) !important;\n    opacity: 1;\n}\n\n/* 强化深色主题下的科目名称颜色 */\nbody.theme-dark .subject-info .subject-name,\nbody.theme-dark .subject-info .teacher-name {\n    color: var(--text-color) !important;\n    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);\n}\n\n/* 确保模态框内所有文字颜色与主题匹配 */\n.modal-content h3,\n.modal-content h4,\n.modal-content label,\n.modal-content span:not(#colorPreview span),\n.modal-content input,\n.modal-content textarea,\n.modal-content select {\n    color: var(--text-color) !important;\n}\n\n/* 颜色预览区域的文字颜色由JavaScript控制 - 不使用!important */\n#colorPreview {\n    /* 颜色由JS动态设置 */\n}\n\n/* 确保颜色类型选择器的文字颜色正确 */\n.color-type-selector label {\n    color: var(--text-color) !important;\n}\n\n/* 确保自定义颜色区域的文字颜色正确 */\n.custom-color label {\n    color: var(--text-color) !important;\n}\n\n/* 优化颜色类型选择器的样式 */\n.color-type-selector {\n    background: var(--light-color) !important;\n    border: 1px solid var(--border-color) !important;\n}\n\n.color-type-selector label {\n    color: var(--text-color) !important;\n}\n\n.color-type-selector label:hover {\n    background: rgba(0, 0, 0, 0.05) !important;\n}\n\n/* 优化预设颜色区域样式 */\n.preset-colors {\n    background: var(--light-color) !important;\n    border: 1px solid var(--border-color) !important;\n}\n\n/* 确保所有弹窗内容都能正确居中 */\n.modal-content > * {\n    display: block;\n}\n\n/* 确保设置弹窗也能正确居中 */\n#settingsModal .modal-content {\n    display: block;\n}\n\n/* 为教程弹窗设置更大的最小宽度 */\n#tutorialModal .modal-content {\n    min-width: 500px;\n    max-width: 800px;\n}\n\n/* 为小弹窗设置更小的内边距和宽度 */\n#timeModal .modal-content,\n#confirmModal .modal-content,\n#importSubjectModal .modal-content {\n    min-width: 300px;\n    max-width: 450px;\n    padding: 25px;\n}\n\n/* 为添加科目弹窗设置更大的宽度 - PC端宽屏 */\n#subjectModal .modal-content {\n    min-width: 520px;\n    max-width: 620px;\n    padding: 24px 28px;\n    max-height: none;\n    overflow: visible;\n}\n\n/* 确认对话框样式 */\n.confirm-message {\n    font-size: 16px;\n    line-height: 1.6;\n    margin: 20px 0;\n    text-align: center;\n    color: var(--text-color);\n}\n\n/* 左侧栏主标题样式 */\n.section-title {\n    font-size: 18px;\n    font-weight: 700;\n    color: var(--text-color);\n    margin: 0 0 16px 0;\n    padding: 12px 20px;\n    background-color: var(--background-color);\n    border-radius: 8px;\n    text-align: center;\n    border: 1px solid var(--border-color);\n    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);\n    transition: all 0.3s ease;\n}\n\n.section-title:hover {\n    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);\n}\n\n/* 统一左侧栏模块样式 */\n.left-sidebar > div {\n    margin-bottom: 16px;\n}\n\n/* 将课时设置标题和内容合并成一个模块 */\n.left-sidebar > .section-title:nth-child(1) {\n    margin-bottom: 0 !important;\n    padding-bottom: 12px !important;\n    border-bottom: none !important;\n    border-radius: 8px 8px 0 0 !important;\n    box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.08), -2px 0 8px rgba(0, 0, 0, 0.08), 2px 0 8px rgba(0, 0, 0, 0.08) !important;\n    position: relative;\n    z-index: 1;\n}\n\n/* 课时控制区域样式 - 与标题合并，间距为0 */\n.period-controls-desktop {\n    margin-top: 0 !important;\n    border-radius: 0 0 8px 8px !important;\n    border-top: 1px solid var(--border-color) !important;\n    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08) !important;\n    position: relative;\n    z-index: 0;\n}\n\n/* 科目池模块样式 */\n.subject-pool {\n    margin-top: 16px !important;\n}\n\n/* 确保其他section-title正常显示 */\n.left-sidebar > .section-title:not(:nth-child(1)) {\n    margin-bottom: 8px !important;\n}\n\n/* 科目池头部美化 */\n.subject-pool-header {\n    display: flex;\n    justify-content: space-between;\n    align-items: center;\n    padding: 20px;\n    background-color: var(--background-color);\n    border-bottom: 2px solid var(--border-color);\n    margin-bottom: 16px;\n    border-radius: 8px;\n}\n\n/* 导入科目按钮美化 */\n#importSubjectBtn {\n    padding: 10px 20px;\n    font-size: 14px;\n    font-weight: 600;\n    border: 2px solid var(--secondary-color);\n    border-radius: 8px;\n    cursor: pointer;\n    transition: all 0.3s ease;\n    background-color: var(--secondary-color);\n    color: white !important;\n    display: flex;\n    align-items: center;\n    justify-content: center;\n    gap: 8px;\n    min-width: 100px;\n    text-align: center;\n    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);\n}\n\n#importSubjectBtn:hover {\n    transform: translateY(-1px);\n    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);\n    background-color: var(--secondary-hover-color);\n    border-color: var(--secondary-hover-color);\n    color: white !important;\n}\n\n#importSubjectBtn:active {\n    transform: translateY(0);\n    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);\n}\n\n/* 添加科目按钮美化 */\n#addSubjectBtn {\n    padding: 10px 24px;\n    font-size: 14px;\n    font-weight: 700;\n    border: 2px solid var(--primary-color);\n    border-radius: 8px;\n    cursor: pointer;\n    transition: all 0.3s ease;\n    background-color: var(--primary-color);\n    color: white !important;\n    display: flex;\n    align-items: center;\n    justify-content: center;\n    gap: 8px;\n    min-width: 100px;\n    text-align: center;\n    box-shadow: 0 2px 8px rgba(74, 124, 89, 0.2);\n}\n\n#addSubjectBtn:hover {\n    transform: translateY(-1px);\n    box-shadow: 0 4px 12px rgba(74, 124, 89, 0.3);\n    background-color: var(--primary-hover-color);\n    border-color: var(--primary-hover-color);\n    color: white !important;\n}\n\n#addSubjectBtn:active {\n    transform: translateY(0);\n    box-shadow: 0 2px 4px rgba(74, 124, 89, 0.2);\n}\n\n/* 导入科目弹窗美化 */\n#importSubjectModal h3 {\n    font-size: 20px;\n    font-weight: 600;\n    color: var(--primary-color);\n    margin: 0 0 24px 0;\n    text-align: center;\n    padding-bottom: 12px;\n    border-bottom: 2px solid var(--primary-color);\n}\n\n#importSubjectModal .form-group {\n    margin-bottom: 24px;\n}\n\n#importSubjectModal label {\n    display: block;\n    font-size: 14px;\n    font-weight: 500;\n    color: var(--text-color);\n    margin-bottom: 8px;\n}\n\n#importSubjectModal .form-control {\n    width: 100%;\n    padding: 12px 16px;\n    border: 2px solid var(--border-color);\n    border-radius: 8px;\n    font-size: 14px;\n    color: var(--text-color);\n    background-color: var(--background-color);\n    transition: all 0.3s ease;\n    box-sizing: border-box;\n}\n\n#importSubjectModal .form-control:focus {\n    outline: none;\n    border-color: var(--primary-color);\n    box-shadow: 0 0 0 3px rgba(74, 124, 89, 0.1);\n}\n\n#importSubjectModal .form-actions {\n    display: flex;\n    justify-content: flex-end;\n    gap: 12px;\n    margin-top: 32px;\n    padding-top: 20px;\n    border-top: 1px solid var(--border-color);\n}\n\n#importSubjectModal .btn {\n    padding: 10px 24px;\n    font-size: 14px;\n    font-weight: 500;\n    border: none;\n    border-radius: 8px;\n    cursor: pointer;\n    transition: all 0.3s ease;\n    min-width: 80px;\n    text-align: center;\n}\n\n#importSubjectModal .btn.primary {\n    background-color: var(--primary-color);\n    color: white;\n}\n\n#importSubjectModal .btn.primary:hover {\n    background-color: var(--primary-hover-color);\n    transform: translateY(-1px);\n    box-shadow: 0 4px 12px rgba(74, 124, 89, 0.3);\n}\n\n#importSubjectModal .btn.secondary {\n    background-color: var(--light-color);\n    color: var(--text-color);\n    border: 1px solid var(--border-color);\n}\n\n#importSubjectModal .btn.secondary:hover {\n    background-color: var(--border-color);\n    transform: translateY(-1px);\n    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);\n}\n\n/* 深色主题适配 */\nbody.theme-dark #importSubjectModal .modal-content {\n    background-color: var(--light-color);\n    color: var(--text-color);\n}\n\nbody.theme-dark #importSubjectModal h3 {\n    color: var(--primary-color);\n    border-bottom-color: var(--border-color);\n}\n\nbody.theme-dark #importSubjectModal .form-control {\n    background-color: var(--background-color);\n    color: var(--text-color);\n    border-color: var(--border-color);\n}\n\nbody.theme-dark #importSubjectModal .form-control:focus {\n    border-color: var(--primary-color);\n    box-shadow: 0 0 0 3px rgba(74, 124, 89, 0.2);\n}\n\nbody.theme-dark #importSubjectModal .form-actions {\n    border-top-color: var(--border-color);\n}\n\nbody.theme-dark #importSubjectModal .btn.secondary {\n    background-color: var(--background-color);\n    color: var(--text-color);\n    border-color: var(--border-color);\n}\n\nbody.theme-dark #importSubjectModal .btn.secondary:hover {\n    background-color: var(--border-color);\n    color: var(--text-color);\n}\n\n/* 深色主题下的按钮样式 */\nbody.theme-dark #importSubjectBtn {\n    background-color: var(--secondary-color);\n    border-color: var(--secondary-color);\n    color: white !important;\n    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);\n}\n\nbody.theme-dark #importSubjectBtn:hover {\n    background-color: var(--secondary-hover-color);\n    border-color: var(--secondary-hover-color);\n    color: white !important;\n    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);\n}\n\nbody.theme-dark #addSubjectBtn {\n    background-color: var(--primary-color);\n    border-color: var(--primary-color);\n    color: white !important;\n    box-shadow: 0 2px 8px rgba(74, 124, 89, 0.3);\n}\n\nbody.theme-dark #addSubjectBtn:hover {\n    background-color: var(--primary-hover-color);\n    border-color: var(--primary-hover-color);\n    color: white !important;\n    box-shadow: 0 4px 12px rgba(74, 124, 89, 0.4);\n}\n\nbody.theme-dark .subject-pool-header {\n    background-color: var(--light-color);\n    border-bottom-color: var(--border-color);\n}\n\nbody.theme-dark .section-title {\n    background-color: var(--light-color);\n    color: var(--text-color);\n    border-color: var(--border-color);\n    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);\n}\n\nbody.theme-dark .section-title:hover {\n    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);\n}\n\n/* 确保表单操作区域居中对齐 */\n.form-actions {\n    display: flex;\n    justify-content: center;\n    gap: 15px;\n    margin-top: 25px;\n    padding-top: 20px;\n    border-top: 1px solid rgba(255, 255, 255, 0.3);\n}\n\n.modal-content h3 {\n    margin-bottom: 24px;\n    font-size: 20px;\n    font-weight: 700;\n    color: var(--primary-color);\n    text-align: center;\n    position: relative;\n    padding-bottom: 12px;\n}\n\n.modal-content h3::after {\n    content: '';\n    position: absolute;\n    bottom: 0;\n    left: 50%;\n    transform: translateX(-50%);\n    width: 50px;\n    height: 3px;\n    background: linear-gradient(90deg, var(--primary-color) 0%, var(--secondary-color) 100%);\n    border-radius: 2px;\n}\n\n.form-group {\n    margin-bottom: 16px;\n    display: flex;\n    align-items: center;\n    gap: 12px;\n}\n\n.form-group label {\n    display: flex;\n    align-items: center;\n    min-width: 70px;\n    max-width: 80px;\n    font-weight: 600;\n    font-size: 14px;\n    color: var(--text-color);\n    cursor: pointer;\n    transition: all 0.3s ease;\n    flex-shrink: 0;\n}\n\n.form-group input {\n    flex: 1;\n    width: 100%;\n    min-width: 0;\n    padding: 10px 14px;\n    border: 1px solid var(--border-color);\n    border-radius: 8px;\n    font-size: 14px;\n    background-color: var(--light-color);\n    color: var(--text-color);\n    transition: all 0.3s ease;\n}\n\n.form-group input:focus {\n    outline: none;\n    border-color: var(--primary-color);\n    box-shadow: 0 0 0 2px var(--shadow-color);\n    background-color: white;\n}\n\n.color-options {\n    display: flex;\n    flex-direction: column;\n    gap: 15px;\n    background: var(--light-color);\n    padding: 20px;\n    border-radius: 10px;\n    border: 1px solid var(--border-color);\n    box-shadow: 0 4px 12px var(--shadow-color);\n}\n\n.color-type-selector {\n    display: flex;\n    flex-direction: row;\n    gap: 30px;\n    margin-bottom: 15px;\n    justify-content: center;\n    padding: 12px;\n    background: var(--light-color);\n    border-radius: 8px;\n    width: 100%;\n    border: 1px solid var(--border-color);\n    box-shadow: 0 2px 8px var(--shadow-color);\n}\n\n.color-type-selector label {\n    display: flex;\n    align-items: center;\n    gap: 8px;\n    cursor: pointer;\n    font-weight: 600;\n    color: var(--text-color);\n    font-size: 15px;\n    transition: all 0.3s ease;\n    padding: 6px 12px;\n    border-radius: 6px;\n    white-space: nowrap;\n    background: transparent;\n    border: 1px solid transparent;\n}\n\n.color-type-selector label:hover {\n    background: var(--background-color);\n    color: var(--text-color);\n    border-color: var(--border-color);\n    box-shadow: 0 2px 6px var(--shadow-color);\n}\n\n.color-type-selector input[type=\"radio\"] {\n    display: none;\n}\n\n.color-type-selector input[type=\"radio\"] + span {\n    position: relative;\n    padding-left: 28px;\n}\n\n.color-type-selector input[type=\"radio\"] + span::before {\n    content: '';\n    position: absolute;\n    left: 0;\n    top: 50%;\n    transform: translateY(-50%);\n    width: 20px;\n    height: 20px;\n    border: 2px solid var(--border-color);\n    border-radius: 4px;\n    background: white;\n    transition: all 0.2s ease;\n}\n\n.color-type-selector input[type=\"radio\"] + span::after {\n    content: '✓';\n    position: absolute;\n    left: 4px;\n    top: 50%;\n    transform: translateY(-50%);\n    font-size: 14px;\n    font-weight: bold;\n    color: white;\n    opacity: 0;\n    transition: all 0.2s ease;\n}\n\n.color-type-selector input[type=\"radio\"]:checked + span::before {\n    background: var(--primary-color);\n    border-color: var(--primary-color);\n}\n\n.color-type-selector input[type=\"radio\"]:checked + span::after {\n    opacity: 1;\n}\n\n.color-type-selector label:hover input[type=\"radio\"] + span::before {\n    border-color: var(--primary-color);\n}\n\n.color-type-selector input[type=\"radio\"]:checked + span {\n    color: var(--primary-color);\n    font-weight: bold;\n}\n\n/* 修复预设颜色选中状态的文字颜色 */\n.color-option.selected::after {\n    color: white;\n    text-shadow: 0 0 2px rgba(0, 0, 0, 0.8);\n}\n\n/* 美化自定义颜色输入区域 */\n.custom-color {\n    display: flex;\n    flex-direction: column;\n    gap: 15px;\n    padding: 20px;\n    background: rgba(255, 255, 255, 0.2);\n    border: 1px solid rgba(255, 255, 255, 0.3);\n    border-radius: 10px;\n    box-shadow: 0 4px 12px var(--shadow-color);\n    backdrop-filter: blur(10px);\n    margin-top: 15px;\n}\n\n.custom-color label {\n    display: block;\n    font-weight: 600;\n    color: white;\n    margin-bottom: 5px;\n    font-size: 16px;\n}\n\n.custom-color .color-input-group {\n    display: flex;\n    gap: 12px;\n    align-items: center;\n    flex-wrap: wrap;\n    justify-content: center;\n}\n\n.custom-color input[type=\"color\"] {\n    width: 60px;\n    height: 60px;\n    border: 2px solid rgba(255, 255, 255, 0.3);\n    border-radius: 8px;\n    cursor: pointer;\n    background: transparent;\n    transition: all 0.3s ease;\n    flex-shrink: 0;\n}\n\n.custom-color input[type=\"color\"]:hover {\n    transform: scale(1.1);\n    border-color: white;\n    box-shadow: 0 0 15px rgba(255, 255, 255, 0.3);\n}\n\n.custom-color input[type=\"color\"]::-webkit-color-swatch-wrapper {\n    padding: 0;\n    border-radius: 6px;\n    overflow: hidden;\n}\n\n.custom-color input[type=\"color\"]::-webkit-color-swatch {\n    border: none;\n    border-radius: 6px;\n    padding: 0;\n}\n\n.custom-color input[type=\"color\"]::-moz-color-swatch {\n    border: none;\n    border-radius: 6px;\n    padding: 0;\n}\n\n.custom-color input[type=\"text\"] {\n    flex: 1;\n    min-width: 200px;\n    padding: 12px 16px;\n    border: 1px solid rgba(255, 255, 255, 0.3);\n    border-radius: 8px;\n    font-size: 14px;\n    background-color: rgba(255, 255, 255, 0.2);\n    color: white;\n    transition: all 0.3s ease;\n    font-family: 'Courier New', monospace;\n    letter-spacing: 1px;\n}\n\n.custom-color .color-preview {\n    width: 40px;\n    height: 40px;\n    border-radius: 6px;\n    border: 2px solid rgba(255, 255, 255, 0.3);\n    background-color: var(--primary-color);\n    transition: all 0.3s ease;\n    flex-shrink: 0;\n}\n\n.custom-color .color-preview:hover {\n    transform: scale(1.1);\n    border-color: white;\n}\n\n/* 添加颜色信息说明 */\n.custom-color .color-info {\n    font-size: 13px;\n    color: rgba(255, 255, 255, 0.8);\n    text-align: center;\n    margin-top: 5px;\n    line-height: 1.4;\n}\n\n\n\n/* 美化弹窗底部按钮 */\n.modal-footer {\n    display: flex;\n    justify-content: flex-end;\n    gap: 12px;\n    margin-top: 25px;\n    padding-top: 20px;\n    border-top: 1px solid rgba(255, 255, 255, 0.3);\n}\n\n.modal-footer .btn {\n    padding: 10px 24px;\n    font-size: 14px;\n    font-weight: 600;\n    border-radius: 8px;\n    transition: all 0.3s ease;\n    border: none;\n    cursor: pointer;\n}\n\n.modal-footer .btn-primary {\n    background-color: var(--primary-color);\n    color: white;\n}\n\n.modal-footer .btn-primary:hover {\n    background-color: var(--primary-hover-color);\n    box-shadow: 0 4px 12px var(--shadow-color);\n    transform: translateY(-1px);\n}\n\n.modal-footer .btn-secondary {\n    background-color: var(--secondary-color);\n    color: white;\n}\n\n.modal-footer .btn-secondary:hover {\n    background-color: var(--secondary-hover-color);\n    box-shadow: 0 4px 12px var(--shadow-color);\n    transform: translateY(-1px);\n}\n\n.preset-colors {\n    display: grid;\n    grid-template-columns: repeat(6, 1fr);\n    gap: 12px;\n    margin-bottom: 15px;\n    background: rgba(255, 255, 255, 0.1);\n    padding: 15px;\n    border-radius: 8px;\n    backdrop-filter: blur(10px);\n}\n\n.color-option {\n    width: 32px;\n    height: 32px;\n    border-radius: 50%;\n    cursor: pointer;\n    border: 2px solid transparent;\n    transition: all 0.3s ease;\n    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);\n    position: relative;\n    overflow: hidden;\n}\n\n.color-option:hover,\n.color-option.selected {\n    border-color: var(--text-color);\n    transform: scale(1.15);\n    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);\n}\n\n.color-option.selected::after {\n    content: '✓';\n    position: absolute;\n    top: 50%;\n    left: 50%;\n    transform: translate(-50%, -50%);\n    color: white;\n    font-size: 14px;\n    font-weight: bold;\n    text-shadow: 0 0 2px rgba(0, 0, 0, 0.8);\n}\n\n.color-option[data-color*=\"linear-gradient\"] {\n    border-radius: 6px;\n}\n\n.color-option[data-color*=\"linear-gradient\"]::before {\n    content: '';\n    position: absolute;\n    top: 0;\n    left: 0;\n    right: 0;\n    bottom: 0;\n    background: inherit;\n    border-radius: 6px;\n    z-index: 1;\n}\n\n.color-option[data-color*=\"linear-gradient\"].selected::after {\n    z-index: 2;\n}\n\n/* 主题切换按钮样式 */\n.theme-dropdown {\n    position: relative;\n    display: inline-block;\n    margin-right: 10px;\n}\n\n#themeMenu {\n    display: none;\n    position: absolute;\n    top: 100%;\n    left: 0;\n    background-color: white;\n    border: 1px solid var(--border-color);\n    border-radius: 4px;\n    box-shadow: 0 2px 10px var(--shadow-color);\n    z-index: 1000;\n    min-width: 150px;\n}\n\n#themeMenu.show {\n    display: block;\n}\n\n.theme-item {\n    display: block;\n    width: 100%;\n    padding: 10px 15px;\n    text-align: left;\n    border: none;\n    background: none;\n    cursor: pointer;\n    color: var(--text-color);\n    transition: background-color 0.3s ease;\n}\n\n.theme-item:hover {\n    background-color: var(--light-color);\n}\n\n.theme-item.active {\n    background-color: var(--primary-color);\n    color: white;\n}\n\n/* 字体切换按钮样式 */\n.font-dropdown {\n    position: relative;\n    display: inline-block;\n    margin-right: 10px;\n}\n\n#fontMenu {\n    display: none;\n    position: absolute;\n    top: 100%;\n    left: 0;\n    background-color: white;\n    border: 1px solid var(--border-color);\n    border-radius: 4px;\n    box-shadow: 0 2px 10px var(--shadow-color);\n    z-index: 1000;\n    min-width: 150px;\n    max-height: 300px;\n    overflow-y: auto;\n}\n\n#fontMenu.show {\n    display: block;\n}\n\n.font-item {\n    display: block;\n    width: 100%;\n    padding: 10px 15px;\n    text-align: left;\n    border: none;\n    background: none;\n    cursor: pointer;\n    color: var(--text-color);\n    transition: background-color 0.3s ease;\n    font-family: inherit;\n}\n\n.font-item:hover {\n    background-color: var(--light-color);\n}\n\n.font-item.active {\n    background-color: var(--primary-color);\n    color: white;\n.custom-color {\n    display: flex;\n    gap: 10px;\n    align-items: center;\n    background: rgba(255, 255, 255, 0.2);\n    padding: 10px;\n    border-radius: 8px;\n    backdrop-filter: blur(10px);\n}   align-items: center;\n}\n\n.custom-color input[type=\"color\"] {\n    width: 50px;\n    height: 30px;\n    border: none;\n    border-radius: 6px;\n    cursor: pointer;\n}\n\n.custom-color input[type=\"text\"] {\n    flex: 1;\n    max-width: 100px;\n}\n\n.form-actions {\n    display: flex;\n    gap: 12px;\n    justify-content: flex-end;\n    margin-top: 30px;\n    padding-top: 20px;\n    border-top: 1px solid #e9ecef;\n}\n\n.btn {\n    padding: 10px 20px;\n    border: none;\n    border-radius: 6px;\n    font-size: 14px;\n    font-weight: 500;\n    cursor: pointer;\n    min-width: 80px;\n    transition: background-color 0.2s;\n}\n\n.btn.primary {\n    background: #007bff;\n    color: white;\n}\n\n.btn.primary:hover {\n    background: #0056b3;\n}\n\n.btn.secondary {\n    background: #6c757d;\n    color: white;\n}\n\n.btn.secondary:hover {\n    background: #545b62;\n}\n\n@media print {\n    @page {\n        size: A4 portrait;\n        margin: 15mm 10mm;\n    }\n    \n    /* 高级打印优化 - 强制彩色打印 */\n    * {\n        -webkit-print-color-adjust: exact !important;\n        print-color-adjust: exact !important;\n        color-adjust: exact !important;\n        box-sizing: border-box !important;\n        -webkit-filter: none !important;\n        filter: none !important;\n    }\n    \n    body {\n        background: var(--background-color) !important;\n        background-image: var(--pattern-background) !important;\n        margin: 0 !important;\n        padding: 0 !important;\n        font-family: \"Microsoft YaHei\", \"微软雅黑\", \"SimSun\", \"宋体\", serif !important;\n        line-height: 1.4 !important;\n    }\n    \n    /* 隐藏控制元素 */\n    .header, .subject-pool, .section-controls {\n        display: none !important;\n    }\n    \n    /* 隐藏标题区域 */\n    .timetable-title-section {\n        display: none !important;\n    }\n    \n    .table-title-input {\n        display: block !important;\n        background: var(--light-color) !important;\n        color: var(--text-color) !important;\n        margin: 20px auto !important;\n        text-align: center !important;\n        width: 100% !important;\n        max-width: 400px !important;\n        font-size: 24px !important;\n        font-weight: bold !important;\n        border: none !important;\n        padding: 10px !important;\n        border-radius: 4px !important;\n    }\n    \n    /* 强化表格边框 */\n    .timetable {\n        width: 100% !important;\n        border-collapse: collapse !important;\n        margin: 0 auto !important;\n        border: 2px solid var(--text-color) !important;\n        font-size: 13px !important;\n        table-layout: fixed !important;\n        background: transparent !important;\n    }\n    \n    .timetable thead {\n        display: table-header-group !important;\n    }\n    \n    /* 优化表头打印效果 */\n    .timetable th {\n        background: var(--light-color) !important;\n        color: var(--text-color) !important;\n        font-weight: 700 !important;\n        font-size: 16px !important;\n        padding: 12px 8px !important;\n        text-align: center !important;\n        vertical-align: middle !important;\n        border: 1px solid var(--text-color) !important;\n        border-bottom: 2px solid var(--text-color) !important;\n        -webkit-print-color-adjust: exact !important;\n        print-color-adjust: exact !important;\n    }\n    \n    .timetable th:first-child,\n    .timetable th:nth-child(2) {\n        background: var(--light-color) !important;\n        color: var(--text-color) !important;\n    }\n    \n    /* 强化单元格边框 */\n    .timetable td {\n        border: 1px solid var(--text-color) !important;\n        border-bottom: 1px solid var(--text-color) !important;\n        border-right: 1px solid var(--text-color) !important;\n        padding: 8px 4px !important;\n        text-align: center !important;\n        vertical-align: middle !important;\n        background: white !important;\n        color: var(--text-color) !important;\n    }\n    \n    /* 确保所有边框可见 */\n    .timetable tr {\n        border-bottom: 1px solid var(--text-color) !important;\n    }\n    \n    .timetable tbody tr:last-child td {\n        border-bottom: 2px solid var(--text-color) !important;\n    }\n    \n    /* 时间列样式 */\n    .time-header {\n        width: 50px !important;\n        background: var(--light-color) !important;\n        color: var(--text-color) !important;\n        font-weight: 600 !important;\n    }\n    \n    /* 课时列样式 */\n    .period-cell {\n        background: var(--light-color) !important;\n        color: var(--text-color) !important;\n        font-weight: 600 !important;\n    }\n    \n    .period-header {\n        width: 75px !important;\n        background: linear-gradient(135deg, #34495e, #2c3e50) !important;\n        color: white !important;\n        font-weight: 600 !important;\n    }\n    \n    /* 优化时间单元格打印 */\n    .time-cell {\n        width: 40px !important;\n        font-size: 14px !important;\n        font-weight: 600 !important;\n        color: var(--text-color) !important;\n        background: var(--light-color) !important;\n        border: 1px solid var(--text-color) !important;\n        padding: 8px 4px !important;\n        white-space: nowrap !important;\n        line-height: 1.3 !important;\n        -webkit-print-color-adjust: exact !important;\n        print-color-adjust: exact !important;\n    }\n    \n    /* 优化节数单元格打印 */\n    .period-cell {\n        white-space: nowrap !important;\n        line-height: 1.4 !important;\n        background: var(--light-color) !important;\n        border: 1px solid var(--text-color) !important;\n        -webkit-print-color-adjust: exact !important;\n        print-color-adjust: exact !important;\n    }\n    \n    .period-name {\n        font-size: 13px !important;\n        font-weight: 700 !important;\n        color: var(--text-color) !important;\n        margin-bottom: 3px !important;\n        white-space: nowrap !important;\n    }\n    \n    .time-display {\n        font-size: 10px !important;\n        color: var(--text-color) !important;\n        font-weight: 500 !important;\n    }\n    \n    /* 强化课程单元格边框 - 支持彩色 */\n    .cell {\n        height: 65px !important;\n        width: 105px !important;\n        border: 1px solid var(--text-color) !important;\n        background: white !important;\n        box-sizing: border-box !important;\n        -webkit-print-color-adjust: exact !important;\n        print-color-adjust: exact !important;\n        -webkit-filter: none !important;\n        filter: none !important;\n    }\n    \n    .cell-content {\n        width: 100% !important;\n        height: 100% !important;\n        display: flex !important;\n        flex-direction: column !important;\n        justify-content: center !important;\n        align-items: center !important;\n        padding: 4px !important;\n        border: 1px solid #000 !important;\n        box-sizing: border-box !important;\n        -webkit-print-color-adjust: exact !important;\n        print-color-adjust: exact !important;\n        -webkit-filter: none !important;\n        filter: none !important;\n    }\n    \n    .cell-content .subject-name {\n        font-size: 14px !important;\n        font-weight: 700 !important;\n        line-height: 1.4 !important;\n        margin-bottom: 3px !important;\n        text-align: center !important;\n        /* 颜色继承自父元素 */\n    }\n    \n    .cell-content .teacher-name {\n        font-size: 12px !important;\n        line-height: 1.3 !important;\n        text-align: center !important;\n        font-weight: 500 !important;\n        /* 颜色继承自父元素 */\n    }\n    \n    .delete-cell-btn {\n        display: none !important;\n    }\n    \n    /* 强制显示所有边框 */\n    .timetable * {\n        border-color: #000 !important;\n    }\n    \n    /* 优化彩色打印模式 */\n    .timetable th {\n        background: #e6f3ff !important;\n        color: #000 !important;\n        -webkit-print-color-adjust: exact !important;\n        print-color-adjust: exact !important;\n        -webkit-filter: none !important;\n        filter: none !important;\n    }\n    \n    .timetable th:first-child,\n    .timetable th:nth-child(2) {\n        background: #f0f0f0 !important;\n        color: #000 !important;\n        -webkit-print-color-adjust: exact !important;\n        print-color-adjust: exact !important;\n        -webkit-filter: none !important;\n        filter: none !important;\n    }\n    \n    /* 周一到周五表头彩色背景 */\n    .timetable th:nth-child(n+3) {\n        background: #fff2e6 !important;\n        color: #000 !important;\n        -webkit-print-color-adjust: exact !important;\n        print-color-adjust: exact !important;\n        -webkit-filter: none !important;\n        filter: none !important;\n    }\n    \n    /* 优化黑白打印模式 */\n    .bw-mode .timetable th {\n        background: #e8e8e8 !important;\n        color: #000 !important;\n        -webkit-print-color-adjust: exact !important;\n        print-color-adjust: exact !important;\n    }\n    \n    .bw-mode .timetable td {\n        border: 1px solid #000 !important;\n        background: white !important;\n        -webkit-print-color-adjust: exact !important;\n        print-color-adjust: exact !important;\n    }\n    \n    .bw-mode .cell {\n        background: white !important;\n        border: 1px solid #000 !important;\n        -webkit-print-color-adjust: exact !important;\n        print-color-adjust: exact !important;\n    }\n\n\n\n/* 移动端额外样式优化 */\n@media (max-width: 768px) {\n    body {\n        padding-top: 0;\n    }\n    \n    \n    \n    \n    /* 确保固定顶部区域在移动端正常显示 */\n    .fixed-top-area {\n        width: 100%;\n        max-width: 100%;\n    }\n    \n    /* 优化移动端滚动体验 */\n    .main-content {\n        overflow-y: auto;\n        -webkit-overflow-scrolling: touch;\n    }\n    \n    /* 超强科目池 - 精确滚动控制 */\n    .subject-pool {\n        flex: 0 0 auto !important;\n        display: flex !important;\n        flex-direction: column !important;\n        max-height: 180px !important;\n        min-height: 100px !important;\n        margin: 0 !important;\n        padding: 0 !important;\n        border-bottom: 1px solid #e9ecef !important;\n        background: #fff !important;\n        box-shadow: 0 1px 3px rgba(0,0,0,0.1) !important;\n        overflow: hidden !important;\n    }\n    \n    .subject-pool-header {\n        flex-shrink: 0 !important;\n        padding: 8px 12px !important;\n        margin: 0 !important;\n        border-bottom: 1px solid #f1f3f4 !important;\n        background: #fafbfc !important;\n        font-size: 14px !important;\n        font-weight: 600 !important;\n        color: #495057 !important;\n    }\n    \n    .subject-cards {\n        flex: 1 !important;\n        overflow-y: auto !important;\n        overflow-x: hidden !important;\n        padding: 8px 12px !important;\n        margin: 0 !important;\n        background: #fff !important;\n        -webkit-overflow-scrolling: touch !important;\n    }\n    \n    .subject-card {\n        padding: 4px 8px !important;\n        font-size: 12px !important;\n        margin: 2px 0 !important;\n        border-radius: 4px !important;\n        border: 1px solid #e9ecef !important;\n        background: #fff !important;\n        cursor: pointer !important;\n        transition: all 0.2s ease !important;\n    }\n    \n    .subject-card:hover {\n        transform: translateY(-1px) !important;\n        box-shadow: 0 2px 4px rgba(0,0,0,0.1) !important;\n    }\n    \n    /* 超强课程表容器 - 独立滚动系统 */\n    .timetable-container {\n        flex: 1 !important;\n        overflow-y: auto !important;\n        overflow-x: auto !important;\n        margin: 0 !important;\n        padding: 0 !important;\n        background: #fff !important;\n        -webkit-overflow-scrolling: touch !important;\n        position: relative !important;\n    }\n    \n    /* 确保表格最小宽度 */\n    .timetable-wrapper {\n        min-width: 100% !important;\n        min-height: 100% !important;\n        padding: 10px !important;\n    }\n    \n    .timetable {\n        font-size: 12px !important;\n        margin: 0 !important;\n        padding: 0 !important;\n        border: none !important;\n        width: 100% !important;\n        table-layout: fixed !important;\n        min-width: 100% !important;\n    }\n    \n    .cell {\n        width: 80px !important;\n        height: 60px !important;\n        min-width: 80px !important;\n        min-height: 60px !important;\n    }\n    \n    /* 隐藏手机端+号按钮 */\n    .mobile-add-btn {\n        display: none !important;\n    }\n    \n    /* 优化标题样式 */\n    .header .title-section {\n        margin: 0 !important;\n        flex: 1 !important;\n        display: flex !important;\n        align-items: center !important;\n        justify-content: flex-start !important; /* 标题左对齐 */\n        order: 1 !important; /* 确保在左侧 */\n    }\n    \n    .header .timetable-title {\n        font-size: 16px !important;\n        font-weight: 600 !important;\n        color: #333 !important;\n        margin: 0 !important;\n        padding: 0 !important;\n        text-align: left !important; /* 标题左对齐 */\n    }\n    \n    /* 手机端controls已隐藏，不需要额外样式 */\n    \n    /* 超强滚动优化系统 */\n    .period-controls {\n        justify-content: space-around !important;\n        align-items: center !important;\n        position: fixed !important;\n        top: 48px !important;\n        left: 0 !important;\n        right: 0 !important;\n        z-index: 9998 !important;\n        background: #f8f9fa !important;\n        padding: 6px 12px !important;\n        margin: 0 !important;\n        box-shadow: 0 1px 4px rgba(0,0,0,0.1) !important;\n        display: flex !important;\n        height: 42px !important;\n        border-bottom: 1px solid #dee2e6 !important;\n        transform: translate3d(0, 0, 0) !important;\n        backface-visibility: hidden !important;\n        perspective: 1000px !important;\n    }\n    \n    .period-controls .period-control-line {\n        display: flex !important;\n        align-items: center !important;\n        gap: 6px !important;\n        margin: 0 !important;\n    }\n    \n    .period-controls .period-control-line span {\n        font-size: 13px !important;\n        font-weight: 500 !important;\n        margin: 0 !important;\n        white-space: nowrap !important;\n        color: #495057 !important;\n    }\n    \n    .period-controls .period-control-line .btn {\n        padding: 3px 8px !important;\n        font-size: 13px !important;\n        margin: 0 !important;\n        min-width: 28px !important;\n        height: 26px !important;\n        line-height: 1 !important;\n    }\n    \n    /* 超强触摸优化 */\n    .subject-cards {\n        -webkit-overflow-scrolling: touch !important;\n        scrollbar-width: thin !important;\n        scrollbar-color: #cbd5e0 #f7fafc !important;\n    }\n    \n    .subject-cards::-webkit-scrollbar {\n        width: 4px !important;\n    }\n    \n    .subject-cards::-webkit-scrollbar-track {\n        background: #f7fafc !important;\n    }\n    \n    .subject-cards::-webkit-scrollbar-thumb {\n        background: #cbd5e0 !important;\n        border-radius: 2px !important;\n    }\n    \n    .timetable-container {\n        -webkit-overflow-scrolling: touch !important;\n        scrollbar-width: thin !important;\n        scrollbar-color: #cbd5e0 #f7fafc !important;\n    }\n    \n    .timetable-container::-webkit-scrollbar {\n        width: 4px !important;\n        height: 4px !important;\n    }\n    \n    .timetable-container::-webkit-scrollbar-track {\n        background: #f7fafc !important;\n    }\n    \n    .timetable-container::-webkit-scrollbar-thumb {\n        background: #cbd5e0 !important;\n        border-radius: 2px !important;\n    }\n    \n    /* 防止iOS橡皮筋效果 */\n    .container {\n        -webkit-overflow-scrolling: touch !important;\n        overscroll-behavior: contain !important;\n    }\n    \n    /* 增强触摸目标 */\n    .subject-card, .btn {\n        -webkit-tap-highlight-color: transparent !important;\n        -webkit-touch-callout: none !important;\n        -webkit-user-select: none !important;\n        user-select: none !important;\n    }\n        \n        /* 课程表区域 - 强制100vw宽度，移除所有边距和滚动 */\n        .timetable-container {\n            order: 2;\n            width: 100vw !important;\n            margin: 0 !important;\n            padding: 0 !important;\n            overflow: hidden !important;\n            background: white;\n            border-radius: 0 !important;\n            box-shadow: none !important;\n        }\n        \n        .timetable-wrapper {\n            width: 100vw !important;\n            margin: 0 !important;\n            padding: 0 !important;\n            overflow: hidden !important;\n        }\n        \n        /* 7列表格精确布局 - 极致压缩 */\n        .timetable {\n            width: 100vw !important;\n            table-layout: fixed !important;\n            border-collapse: collapse !important;\n            margin: 0 !important;\n            border-spacing: 0 !important;\n            border: none !important;\n            font-size: 7px !important;\n        }\n        \n        .timetable th,\n        .timetable td {\n            padding: 0 !important;\n            margin: 0 !important;\n            border: 1px solid #ddd !important;\n            box-sizing: border-box !important;\n            line-height: 1 !important;\n            overflow: hidden !important;\n            white-space: nowrap !important;\n        }\n        \n        /* 移除表格标题区域边距 */\n        .timetable-title-section {\n            margin: 0 !important;\n            padding: 0 !important;\n        }\n        \n        .table-title-input {\n            margin: 0 !important;\n            padding: 1px !important;\n            font-size: 10px !important;\n            border: none !important;\n        }\n        \n        /* 7列精确宽度分配：时间列8% + 课时列8% + 周一到周五各16.8% */\n        .timetable th:nth-child(1),\n        .timetable td:nth-child(1) {\n            width: 8% !important;\n            min-width: 20px !important;\n            max-width: 25px !important;\n            font-size: 7px !important;\n            padding: 0 !important;\n        }\n        \n        .timetable th:nth-child(2),\n        .timetable td:nth-child(2) {\n            width: 8% !important;\n            min-width: 25px !important;\n            max-width: 30px !important;\n            font-size: 7px !important;\n            padding: 0 !important;\n        }\n        \n        .timetable th:nth-child(n+3),\n        .timetable td:nth-child(n+3) {\n            width: 16.8% !important;\n            min-width: 0 !important;\n            padding: 0 !important;\n        }\n        \n        /* 单元格高度压缩 */\n        .cell {\n            height: 35px !important;\n            min-height: 35px !important;\n            max-height: 35px !important;\n            padding: 0 !important;\n            margin: 0 !important;\n            border: 1px solid #ccc !important;\n            overflow: hidden !important;\n        }\n        \n        /* 垂直文本极致压缩 */\n        .vertical-text {\n            font-size: 7px !important;\n            padding: 0 !important;\n            letter-spacing: 0 !important;\n            line-height: 1 !important;\n            writing-mode: vertical-rl !important;\n            transform: rotate(180deg) !important;\n            white-space: nowrap !important;\n            overflow: hidden !important;\n            text-overflow: ellipsis !important;\n        }\n        \n        /* 内容显示极致压缩 */\n        .cell-content {\n            font-size: 6px !important;\n            padding: 0 !important;\n            width: 100% !important;\n            height: 100% !important;\n            display: flex !important;\n            flex-direction: column !important;\n            justify-content: center !important;\n            align-items: center !important;\n            text-align: center !important;\n            line-height: 1 !important;\n            overflow: hidden !important;\n        }\n        \n        .subject-name {\n            font-size: 6px !important;\n            font-weight: 600 !important;\n            margin: 0 !important;\n            padding: 0 !important;\n            line-height: 1 !important;\n            word-break: break-word !important;\n            overflow: hidden !important;\n            text-overflow: ellipsis !important;\n            display: -webkit-box !important;\n            -webkit-line-clamp: 2 !important;\n            -webkit-box-orient: vertical !important;\n            max-height: 12px !important;\n        }\n        \n        .teacher-name {\n            font-size: 5px !important;\n            opacity: 0.8 !important;\n            margin: 0 !important;\n            padding: 0 !important;\n            line-height: 1 !important;\n            word-break: break-word !important;\n            overflow: hidden !important;\n            text-overflow: ellipsis !important;\n            white-space: nowrap !important;\n            max-height: 5px !important;\n        }\n        \n        /* 空单元格+号 */\n        .cell.empty-cell,\n        .cell:not(.has-subject) {\n            background-color: #f5f5f5 !important;\n            border: 1px dashed #bbb !important;\n            display: flex !important;\n            align-items: center !important;\n            justify-content: center !important;\n            padding: 0 !important;\n            margin: 0 !important;\n        }\n        \n        .plus-indicator,\n        .cell:not(.has-subject):after {\n            content: '+' !important;\n            font-size: 10px !important;\n            color: #aaa !important;\n            display: flex !important;\n            align-items: center !important;\n            justify-content: center !important;\n            line-height: 1 !important;\n            margin: 0 !important;\n            padding: 0 !important;\n        }\n        \n        /* 控制区域压缩 - 已被固定定位样式覆盖 */\n        .controls {\n            justify-content: center;\n            gap: 2px !important;\n            flex-wrap: wrap !important;\n            padding: 1px !important;\n        }\n        \n        .btn {\n            padding: 2px 4px !important;\n            font-size: 9px !important;\n            margin: 0 !important;\n        }\n        \n        /* 移除所有可能的溢出 */\n        * {\n            max-width: 100vw !important;\n        }\n    }\n    \n    /* PC端空单元格默认显示+号 */\n    @media (min-width: 769px) {\n        .main-content {\n            display: flex;\n            flex-direction: row !important;\n            gap: 20px;\n        }\n        \n        .subject-pool {\n            width: 250px;\n            flex-shrink: 0;\n        }\n        \n        .timetable-container {\n            flex: 1;\n            margin-left: 20px;\n        }\n        \n        .cell.empty-cell,\n        .cell:not(.has-subject) {\n            background-color: #f9f9f9 !important;\n            border: 1px dashed #ddd !important;\n            display: flex !important;\n            align-items: center !important;\n            justify-content: center !important;\n            cursor: pointer !important;\n            transition: all 0.3s ease !important;\n        }\n        \n        .plus-indicator,\n        .cell:not(.has-subject):after {\n            content: '+' !important;\n            font-size: 24px !important;\n            color: #ccc !important;\n            display: flex !important;\n            align-items: center !important;\n            justify-content: center !important;\n            line-height: 1 !important;\n        }\n        \n        .cell.empty-cell:hover,\n        .cell:not(.has-subject):hover {\n            background-color: #e9ecef !important;\n        }\n        \n        .cell.empty-cell:hover .plus-indicator,\n        .cell:not(.has-subject):hover:after {\n            color: #007bff !important;\n        }\n    }\n}\n\n.bw-mode .cell-content {\n    filter: grayscale(100%);\n}\n\n/* 时间设置弹窗 */\n.time-modal {\n    display: none;\n    position: fixed;\n    z-index: 1000;\n    left: 0;\n    top: 0;\n    width: 100%;\n    height: 100%;\n    background-color: rgba(0,0,0,0.4);\n}\n\n.time-modal-content {\n    background-color: #fefefe;\n    margin: 15% auto;\n    padding: 20px;\n    border: 1px solid var(--border-color);\n    width: 80%;\n    max-width: 500px;\n    border-radius: 10px;\n}\n\n.close {\n    color: #aaa;\n    float: right;\n    font-size: 28px;\n    font-weight: bold;\n    cursor: pointer;\n}\n\n.close:hover {\n    color: var(--primary-color);\n}\n\n/* 设置弹窗样式 */\n.settings-modal {\n    display: none;\n    position: fixed;\n    z-index: 1000;\n    left: 0;\n    top: 0;\n    width: 100%;\n    height: 100%;\n    background-color: rgba(0,0,0,0.4);\n    align-items: center;\n    justify-content: center;\n}\n\n.settings-modal-content {\n    background-color: white;\n    margin: auto;\n    padding: 30px;\n    border: 1px solid var(--border-color);\n    width: 90%;\n    max-width: 400px;\n    border-radius: 10px;\n    box-shadow: 0 4px 20px var(--shadow-color);\n}\n\n.settings-modal-content h2 {\n    color: var(--primary-color);\n    margin-top: 0;\n    margin-bottom: 20px;\n    text-align: center;\n}\n\n.settings-form {\n    display: flex;\n    flex-direction: column;\n    gap: 15px;\n}\n\n.settings-form label {\n    display: flex;\n    align-items: center;\n    gap: 10px;\n    font-weight: 500;\n    color: var(--text-color);\n    cursor: pointer;\n}\n\n.settings-form input[type=\"checkbox\"] {\n    width: 20px;\n    height: 20px;\n    cursor: pointer;\n    appearance: none;\n    border: 2px solid #dee2e6;\n    border-radius: 4px;\n    position: relative;\n    transition: all 0.3s ease;\n    background: white;\n}\n\n.settings-form input[type=\"checkbox\"]:checked {\n    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);\n    border-color: #667eea;\n}\n\n.settings-form input[type=\"checkbox\"]:checked::after {\n    content: '✓';\n    position: absolute;\n    top: 50%;\n    left: 50%;\n    transform: translate(-50%, -50%);\n    color: white;\n    font-size: 12px;\n    font-weight: bold;\n}\n\n.settings-form input[type=\"checkbox\"]:hover {\n    border-color: #667eea;\n    transform: scale(1.05);\n}\n\n.settings-form label:hover {\n    color: #667eea;\n    transform: translateX(2px);\n}\n\n/* 简化设置界面样式 */\n.modal-header {\n    display: flex;\n    justify-content: space-between;\n    align-items: center;\n    margin-bottom: 25px;\n    padding-bottom: 12px;\n    border-bottom: 1px solid #e9ecef;\n}\n\n.modal-header h3 {\n    margin: 0;\n    font-size: 20px;\n    font-weight: 600;\n    color: #333;\n}\n\n.modal-close {\n    background: none;\n    border: none;\n    font-size: 24px;\n    cursor: pointer;\n    color: #666;\n    width: 32px;\n    height: 32px;\n    display: flex;\n    align-items: center;\n    justify-content: center;\n    border-radius: 50%;\n    line-height: 1;\n}\n\n.modal-close:hover {\n    background: #f5f5f5;\n    color: #333;\n}\n\n.settings-content {\n    margin-bottom: 15px;\n    padding: 0 5px;\n}\n\n.setting-item {\n    margin-bottom: 0;\n    padding: 10px 12px;\n    border-bottom: 1px solid #f0f0f0;\n    border-radius: 8px;\n    margin-bottom: 6px;\n    background: #fafafa;\n    transition: background 0.2s ease;\n}\n\n.setting-item:hover {\n    background: #f0f0f0;\n}\n\n.setting-item:last-child {\n    border-bottom: none;\n    margin-bottom: 0;\n}\n\n.setting-label {\n    display: flex;\n    align-items: center;\n    margin: 0;\n    cursor: pointer;\n    width: 100%;\n    gap: 10px;\n}\n\n.setting-checkbox {\n    display: none;\n}\n\n.setting-label .checkmark {\n    width: 20px;\n    height: 20px;\n    border: 2px solid var(--border-color);\n    border-radius: 4px;\n    background: white;\n    display: flex;\n    align-items: center;\n    justify-content: center;\n    flex-shrink: 0;\n    transition: all 0.2s ease;\n}\n\n.setting-label .checkmark::after {\n    content: '✓';\n    color: white;\n    font-size: 12px;\n    font-weight: bold;\n    opacity: 0;\n    transition: opacity 0.2s ease;\n}\n\n.setting-checkbox:checked + .checkmark {\n    background: var(--primary-color);\n    border-color: var(--primary-color);\n}\n\n.setting-checkbox:checked + .checkmark::after {\n    opacity: 1;\n}\n\n.setting-text {\n    flex: 1;\n}\n\n.setting-text strong {\n    display: block;\n    font-size: 14px;\n    color: #333;\n    margin-bottom: 1px;\n}\n\n.setting-text small {\n    display: block;\n    font-size: 11px;\n    color: #888;\n    font-weight: normal;\n}\n\n.settings-form .button-group {\n    display: flex;\n    gap: 10px;\n    justify-content: flex-end;\n    margin-top: 20px;\n}\n\n/* 移动端弹窗动画 */\n@keyframes fadeIn {\n    from { opacity: 0; }\n    to { opacity: 1; }\n}\n\n@keyframes slideUp {\n    from { \n        opacity: 0;\n        transform: translateY(20px);\n    }\n    to { \n        opacity: 1;\n        transform: translateY(0);\n    }\n}\n\n@keyframes fadeOut {\n    from { opacity: 1; }\n    to { opacity: 0; }\n}\n\n@keyframes slideDown {\n    from { \n        opacity: 1;\n        transform: translateY(0);\n    }\n    to { \n        opacity: 0;\n        transform: translateY(20px);\n    }\n}\n\n/* 教程弹窗样式 - 全新设计 */\n/* 教程弹窗特定样式 - 仅应用于教程弹窗 */\n#tutorialModal .modal-content,\n#tutorialModal .tutorial-modal-content {\n    background: linear-gradient(135deg, #ffffff 0%, #f8f9ff 100%);\n    border: 2px solid rgba(var(--primary-color-rgb), 0.2);\n    border-radius: 20px;\n    box-shadow: \n        0 0 0 1px rgba(var(--primary-color-rgb), 0.1),\n        0 10px 30px rgba(0, 0, 0, 0.15),\n        0 0 40px rgba(var(--primary-color-rgb), 0.1);\n    overflow: hidden;\n    animation: modalSlideIn 0.2s ease-out;\n    will-change: transform, opacity;\n    transform: translateZ(0);\n    backface-visibility: hidden;\n    max-height: 90vh;\n    display: flex;\n    flex-direction: column;\n}\n\n/* 确保其他弹窗不使用flex布局 */\n#subjectModal .modal-content,\n#timeModal .modal-content,\n#settingsModal .modal-content {\n    display: block;\n    background: white;\n    border: 1px solid var(--border-color);\n    border-radius: 12px;\n    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);\n}\n\n/* 教程弹窗底部样式 */\n.tutorial-footer {\n    padding: 20px 30px;\n    background: rgba(var(--primary-color-rgb), 0.05);\n    border-top: 1px solid rgba(var(--primary-color-rgb), 0.1);\n    border-radius: 0 0 20px 20px;\n    margin-top: auto;\n}\n\n.tutorial-hint {\n    text-align: center;\n    margin-bottom: 15px;\n    color: var(--text-color);\n    font-size: 14px;\n}\n\n.tutorial-actions {\n    display: flex;\n    justify-content: center;\n    gap: 15px;\n}\n\n/* 确保内容区域能自适应高度 */\n#tutorialModal .tutorial-content {\n    flex: 1;\n    overflow-y: auto;\n    padding: 20px 30px;\n}\n\n/* 保留一个统一的modalSlideIn动画 */\n@keyframes modalSlideIn {\n    from {\n        opacity: 0;\n        transform: scale(0.8);\n    }\n    to {\n        opacity: 1;\n        transform: scale(1);\n    }\n}\n\n#tutorialModal .tutorial-header {\n    background: linear-gradient(135deg, var(--primary-color) 0%, var(--dark-color) 100%);\n    color: white;\n    padding: 20px 25px;\n    border-radius: 20px 20px 0 0;\n    position: relative;\n    overflow: hidden;\n    display: flex;\n    align-items: center;\n    justify-content: space-between;\n}\n\n#tutorialModal .tutorial-header h3 {\n    margin: 0;\n    font-size: 20px;\n    flex: 1;\n    text-align: center;\n    color: white !important;\n    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);\n    position: relative;\n    z-index: 2;\n}\n\n/* 教程弹窗关闭按钮样式 */\n#tutorialModal .tutorial-close-btn {\n    background: transparent;\n    border: none;\n    color: white;\n    font-size: 24px;\n    cursor: pointer;\n    width: 30px;\n    height: 30px;\n    display: flex;\n    align-items: center;\n    justify-content: center;\n    border-radius: 50%;\n    transition: all 0.3s ease;\n    z-index: 10;\n}\n\n#tutorialModal .tutorial-close-btn:hover {\n    background: rgba(255, 255, 255, 0.2);\n    transform: rotate(90deg);\n}\n\n#tutorialModal .tutorial-header-icon {\n    font-size: 24px;\n    margin-right: 15px;\n    position: relative;\n    z-index: 2;\n}\n\n#tutorialModal .tutorial-header::before {\n    content: '';\n    position: absolute;\n    top: 0;\n    left: 0;\n    right: 0;\n    bottom: 0;\n    background: linear-gradient(45deg, transparent 30%, rgba(255,255,255,0.1) 50%, transparent 70%);\n    animation: shimmer 2s infinite;\n}\n\n@keyframes shimmer {\n    0% { transform: translateX(-100%); }\n    100% { transform: translateX(100%); }\n}\n\n.tutorial-step {\n    margin-bottom: 20px;\n    background: linear-gradient(135deg, #ffffff 0%, #f9fbfd 100%);\n    padding: 18px;\n    border-radius: 12px;\n    border: 1px solid rgba(var(--primary-color-rgb), 0.1);\n    border-left: 4px solid var(--primary-color);\n    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);\n    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);\n    will-change: transform, box-shadow;\n}\n\n.tutorial-step:hover {\n    transform: translateY(-1px);\n    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);\n    border-color: rgba(var(--primary-color-rgb), 0.2);\n}\n\n.tutorial-section {\n    margin-bottom: 25px;\n    padding-bottom: 15px;\n    border-bottom: 1px solid rgba(var(--primary-color-rgb), 0.1);\n}\n\n.tutorial-section:last-child {\n    border-bottom: none;\n    margin-bottom: 0;\n    padding-bottom: 0;\n}\n\n/* 教程内容视觉层次优化 - 重新设计 */\n.tutorial-section-title {\n    font-size: 20px;\n    font-weight: 700;\n    color: var(--primary-color);\n    margin-bottom: 18px;\n    display: flex;\n    align-items: center;\n    gap: 10px;\n    padding-bottom: 12px;\n    border-bottom: 2px solid rgba(var(--primary-color-rgb), 0.2);\n}\n\n.tutorial-section-title svg {\n    flex-shrink: 0;\n}\n\n/* 教程卡片网格布局 */\n.tutorial-grid {\n    display: grid;\n    grid-template-columns: repeat(2, 1fr);\n    gap: 14px;\n    margin-bottom: 10px;\n}\n\n.tutorial-card {\n    display: flex;\n    align-items: center;\n    gap: 14px;\n    padding: 16px;\n    background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);\n    border-radius: 12px;\n    border: 1px solid #e8e8e8;\n    transition: all 0.2s ease;\n}\n\n.tutorial-card:hover {\n    transform: translateY(-2px);\n    box-shadow: 0 4px 12px rgba(0,0,0,0.08);\n    border-color: var(--primary-color);\n}\n\n.tutorial-card-icon {\n    flex-shrink: 0;\n    display: flex;\n    align-items: center;\n    justify-content: center;\n}\n\n.tutorial-card-content {\n    display: flex;\n    flex-direction: column;\n    gap: 4px;\n}\n\n.tutorial-card-content strong {\n    font-size: 16px;\n    color: #333;\n}\n\n.tutorial-card-content span {\n    font-size: 14px;\n    color: #666;\n    line-height: 1.4;\n}\n\n/* 教程功能列表 */\n.tutorial-features {\n    display: flex;\n    flex-direction: column;\n    gap: 12px;\n}\n\n.tutorial-feature {\n    display: flex;\n    align-items: center;\n    gap: 14px;\n    padding: 14px 18px;\n    background: #f9f9f9;\n    border-radius: 10px;\n    border-left: 4px solid var(--primary-color);\n}\n\n.tutorial-feature .feature-icon {\n    display: flex;\n    align-items: center;\n    justify-content: center;\n    flex-shrink: 0;\n}\n\n.tutorial-feature .feature-text {\n    display: flex;\n    flex-direction: column;\n    gap: 2px;\n}\n\n.tutorial-feature .feature-text strong {\n    font-size: 16px;\n    color: #333;\n}\n\n.tutorial-feature .feature-text span {\n    font-size: 14px;\n    color: #666;\n}\n\n/* 教程小技巧 */\n.tutorial-tips {\n    display: grid;\n    grid-template-columns: repeat(2, 1fr);\n    gap: 10px;\n}\n\n.tip-item {\n    padding: 12px 14px;\n    background: linear-gradient(135deg, var(--light-color) 0%, #ffffff 100%);\n    border-radius: 8px;\n    font-size: 14px;\n    color: #555;\n    border: 1px solid rgba(var(--primary-color-rgb), 0.15);\n}\n\n.tip-item kbd {\n    background: var(--primary-color);\n    color: white;\n    padding: 3px 8px;\n    border-radius: 4px;\n    font-size: 12px;\n    margin-right: 6px;\n    font-weight: 600;\n}\n\n.tutorial-section-content {\n    background: linear-gradient(135deg, #ffffff 0%, #f9fbfd 100%);\n    padding: 25px;\n    border-radius: 16px;\n    border: 1px solid rgba(var(--primary-color-rgb), 0.15);\n    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);\n    margin-bottom: 20px;\n}\n\n.tutorial-step-title {\n    font-size: 17px;\n    font-weight: 700;\n    color: var(--dark-color);\n    margin-bottom: 12px;\n    display: flex;\n    align-items: center;\n    gap: 8px;\n}\n\n.tutorial-step-title::before {\n    content: \"▶\";\n    color: var(--primary-color);\n    font-size: 14px;\n}\n\n.tutorial-step-list {\n    list-style: none;\n    padding: 0;\n    margin: 0;\n}\n\n.tutorial-step-list li {\n    padding: 10px 0;\n    padding-left: 32px;\n    position: relative;\n    line-height: 1.7;\n    font-size: 15px;\n    color: #444;\n    border-bottom: 1px dashed rgba(var(--primary-color-rgb), 0.1);\n}\n\n.tutorial-step-list li:last-child {\n    border-bottom: none;\n}\n\n.tutorial-step-list li::before {\n    content: \"✨\";\n    position: absolute;\n    left: 0;\n    top: 10px;\n    font-size: 16px;\n    color: var(--primary-color);\n    background: rgba(var(--primary-color-rgb), 0.1);\n    width: 24px;\n    height: 24px;\n    border-radius: 50%;\n    display: flex;\n    align-items: center;\n    justify-content: center;\n}\n\n/* 快捷键网格布局 - 优化 */\n.shortcut-grid {\n    display: grid;\n    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));\n    gap: 12px;\n    margin-top: 20px;\n}\n\n.shortcut-item {\n    background: linear-gradient(135deg, #ffffff 0%, #f9fbfd 100%);\n    padding: 16px 12px;\n    border-radius: 12px;\n    border: 1px solid rgba(var(--primary-color-rgb), 0.1);\n    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);\n    text-align: center;\n    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);\n    will-change: transform, box-shadow;\n}\n\n.shortcut-item:hover {\n    transform: translateY(-2px) scale(1.02);\n    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);\n    border-color: rgba(var(--primary-color-rgb), 0.3);\n}\n\n.shortcut-key {\n    display: block;\n    font-size: 16px;\n    font-weight: 700;\n    color: var(--primary-color);\n    margin-bottom: 6px;\n    background: linear-gradient(135deg, rgba(var(--primary-color-rgb), 0.1) 0%, rgba(var(--primary-color-rgb), 0.05) 100%);\n    padding: 8px 10px;\n    border-radius: 8px;\n    font-family: 'Courier New', monospace;\n    border: 1px solid rgba(var(--primary-color-rgb), 0.2);\n    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);\n}\n\n.shortcut-desc {\n    display: block;\n    font-size: 13px;\n    color: #555;\n    font-weight: 500;\n}\n\n/* FAQ样式 - 重新设计 */\n.faq-item {\n    margin-bottom: 20px;\n    background: linear-gradient(135deg, #ffffff 0%, #f9fbfd 100%);\n    padding: 20px;\n    border-radius: 16px;\n    border: 1px solid rgba(var(--primary-color-rgb), 0.15);\n    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);\n    transition: all 0.2s ease;\n}\n\n.faq-item:hover {\n    transform: translateY(-2px);\n    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.12);\n}\n\n.faq-question {\n    font-size: 17px;\n    font-weight: 700;\n    color: var(--dark-color);\n    margin-bottom: 12px;\n    display: flex;\n    align-items: center;\n    gap: 8px;\n}\n\n.faq-question::before {\n    content: \"❓\";\n    color: var(--primary-color);\n    font-size: 18px;\n}\n\n.faq-answer {\n    font-size: 15px;\n    color: #555;\n    line-height: 1.7;\n    padding-left: 26px;\n    border-left: 3px solid rgba(var(--primary-color-rgb), 0.3);\n    margin-left: 8px;\n}\n\n/* 教程弹窗样式优化 - 重新设计 */\n@media (max-width: 768px) {\n    #tutorialModal .modal-content {\n        margin: 8px;\n        max-width: calc(100vw - 16px);\n        max-height: calc(100vh - 16px);\n        border-radius: 16px;\n        box-shadow: \n            0 0 0 1px rgba(var(--primary-color-rgb), 0.1),\n            0 8px 25px rgba(0, 0, 0, 0.15),\n            0 0 30px rgba(var(--primary-color-rgb), 0.08);\n    }\n    \n    #tutorialModal .modal-header {\n        padding: 18px 20px;\n        border-radius: 16px 16px 0 0;\n    }\n    \n    #tutorialModal .tutorial-content {\n        padding: 0 20px 20px;\n        max-height: calc(100vh - 140px);\n        overflow-y: auto;\n        -webkit-overflow-scrolling: touch;\n    }\n    \n    #tutorialModal .form-actions {\n        flex-direction: column;\n        gap: 12px;\n        padding: 15px 20px;\n    }\n    \n    #tutorialModal .form-actions button {\n        width: 100%;\n        min-width: auto;\n        font-size: 16px;\n        padding: 12px 20px;\n        border-radius: 10px;\n    }\n    \n    /* 手机端教程弹窗标题优化 */\n    #tutorialModal h3 {\n        font-size: 22px !important;\n        text-align: center;\n        margin: 0;\n    }\n    \n    /* 手机端教程内容优化 */\n    #tutorialModal .tutorial-content {\n        font-size: 15px;\n        line-height: 1.6;\n    }\n    \n    .tutorial-section-title {\n        font-size: 18px !important;\n        margin-bottom: 12px;\n    }\n    \n    .tutorial-step-title {\n        font-size: 15px !important;\n    }\n    \n    .tutorial-section-content {\n        padding: 18px;\n        margin-bottom: 15px;\n    }\n    \n    .tutorial-step-list li {\n        font-size: 14px;\n        padding: 8px 0;\n        padding-left: 28px;\n    }\n    \n    .tutorial-step-list li::before {\n        width: 20px;\n        height: 20px;\n        font-size: 14px;\n    }\n    \n    .shortcut-grid {\n        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));\n        gap: 10px;\n    }\n    \n    .shortcut-item {\n        padding: 12px 8px;\n    }\n    \n    .shortcut-key {\n        font-size: 14px;\n        padding: 6px 8px;\n    }\n    \n    .shortcut-desc {\n        font-size: 12px;\n    }\n    \n    .faq-item {\n        padding: 15px;\n    }\n    \n    .faq-question {\n        font-size: 15px;\n    }\n    \n    .faq-answer {\n        font-size: 13px;\n        padding-left: 20px;\n    }\n    \n    /* 移动端性能优化 */\n    .tutorial-step,\n    .shortcut-item,\n    .faq-item {\n        will-change: auto;\n    }\n    \n    /* 移动端科目池完整显示优化 */\n    .subject-pool {\n        margin-top: 35px !important; /* 增加顶部间距 */\n        margin-bottom: 30px !important;\n        min-height: 400px !important; /* 增加最小高度 */\n        max-height: calc(100vh - 350px) !important; /* 调整最大高度计算 */\n        overflow: hidden !important;\n        background: white !important;\n        border-radius: 12px !important;\n        box-shadow: 0 4px 20px rgba(0,0,0,0.1) !important;\n        border: 1px solid rgba(0,0,0,0.05) !important;\n    }\n    \n    .subjects {\n        min-height: 300px !important; /* 增加最小高度 */\n        max-height: calc(100vh - 350px - 60px) !important; /* 调整最大高度计算 */\n        overflow-y: auto !important;\n        padding: 15px 20px !important; /* 减少垂直内边距，保持水平内边距 */\n        background: white !important;\n        border-radius: 0 0 12px 12px !important;\n    }\n}\n\n/* 教程内容样式 */\n.tutorial-content {\n    padding: 20px 30px 20px;\n    background: transparent;\n    max-height: 500px;\n    overflow-y: auto;\n}\n\n/* 教程内容滚动条样式 */\n.tutorial-content::-webkit-scrollbar {\n    width: 8px;\n}\n\n.tutorial-content::-webkit-scrollbar-track {\n    background: rgba(var(--primary-color-rgb), 0.1);\n    border-radius: 4px;\n}\n\n.tutorial-content::-webkit-scrollbar-thumb {\n    background: rgba(var(--primary-color-rgb), 0.4);\n    border-radius: 4px;\n}\n\n.tutorial-content::-webkit-scrollbar-thumb:hover {\n    background: rgba(var(--primary-color-rgb), 0.6);\n}\n\n.tutorial-section {\n    margin-bottom: 35px;\n    padding-bottom: 25px;\n    border-bottom: 1px solid rgba(74, 124, 89, 0.1);\n    position: relative;\n}\n\n.tutorial-section::before {\n    content: '';\n    position: absolute;\n    left: 0;\n    top: 0;\n    width: 4px;\n    height: 100%;\n    background: linear-gradient(180deg, var(--primary-color) 0%, var(--info-color) 100%);\n    border-radius: 2px;\n    opacity: 0.3;\n}\n\n.tutorial-section:last-child {\n    border-bottom: none;\n    margin-bottom: 0;\n}\n\n.tutorial-section h4 {\n    color: var(--primary-color);\n    font-size: 20px;\n    margin-bottom: 20px;\n    padding-bottom: 10px;\n    border-bottom: 3px solid var(--primary-color);\n    display: inline-block;\n    font-weight: 700;\n    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);\n}\n\n.tutorial-step {\n    margin-bottom: 25px;\n    background: white;\n    padding: 20px;\n    border-radius: 12px;\n    border-left: 5px solid var(--primary-color);\n    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);\n    transition: all 0.3s ease;\n}\n\n.tutorial-step:hover {\n    transform: translateY(-2px);\n    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);\n}\n\n.tutorial-step h5 {\n    color: var(--text-color);\n    font-size: 17px;\n    margin-bottom: 12px;\n    font-weight: 600;\n    display: flex;\n    align-items: center;\n    gap: 8px;\n}\n\n.tutorial-step h5::before {\n    content: '✓';\n    color: var(--primary-color);\n    font-weight: 700;\n}\n\n.tutorial-step ul {\n    margin: 0;\n    padding-left: 25px;\n}\n\n.tutorial-step li {\n    margin-bottom: 10px;\n    line-height: 1.6;\n    color: #555;\n    font-size: 15px;\n    position: relative;\n}\n\n.tutorial-step li::before {\n    content: '•';\n    color: var(--primary-color);\n    font-weight: bold;\n    position: absolute;\n    left: -18px;\n    top: 0;\n}\n\n.faq-item {\n    margin-bottom: 25px;\n    background: white;\n    padding: 20px;\n    border-radius: 12px;\n    border-left: 5px solid var(--info-color);\n    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);\n    transition: all 0.3s ease;\n}\n\n.faq-item:hover {\n    transform: translateY(-2px);\n    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);\n}\n\n.faq-item h5 {\n    color: var(--info-color);\n    font-size: 16px;\n    margin-bottom: 10px;\n    font-weight: 600;\n}\n\n.faq-item p {\n    color: #555;\n    line-height: 1.6;\n    margin: 0;\n    font-size: 15px;\n}\n\n.tutorial-content kbd {\n    background: linear-gradient(135deg, #f0f0f0 0%, #e0e0e0 100%);\n    padding: 4px 8px;\n    border-radius: 6px;\n    font-family: 'Consolas', 'Monaco', monospace;\n    font-size: 13px;\n    border: 1px solid #ddd;\n    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);\n    color: #333;\n    font-weight: 600;\n}\n\n/* 教程底部操作区优化 */\n#tutorialModal .form-actions {\n    background: rgba(74, 124, 89, 0.05);\n    padding: 25px 30px;\n    margin: 30px -30px 0;\n    border-radius: 0 0 16px 16px;\n    border-top: 1px solid rgba(74, 124, 89, 0.1);\n}\n\n#tutorialModal .form-actions button {\n    border-radius: 8px;\n    font-weight: 600;\n    transition: all 0.3s ease;\n    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);\n}\n\n#tutorialModal .btn.primary {\n    background: linear-gradient(135deg, var(--primary-color) 0%, var(--dark-color) 100%);\n    border: none;\n    color: white;\n    padding: 12px 24px;\n    font-size: 15px;\n}\n\n#tutorialModal .btn.primary:hover {\n    transform: translateY(-2px);\n    box-shadow: 0 6px 16px rgba(74, 124, 89, 0.4);\n}\n\n#tutorialModal .btn.secondary {\n    background: white;\n    color: var(--text-color);\n    border: 1px solid var(--border-color);\n    padding: 12px 24px;\n    font-size: 15px;\n}\n\n#tutorialModal .btn.secondary:hover {\n    background: var(--light-color);\n    transform: translateY(-2px);\n    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);\n}\n\n/* 移动端教程内容优化 */\n@media (max-width: 768px) {\n    #tutorialModal .modal-content {\n        margin: 10px;\n        max-width: calc(100vw - 20px);\n        max-height: calc(100vh - 20px);\n        border-radius: 12px;\n    }\n    \n    #tutorialModal .modal-header {\n        padding: 20px 25px;\n        margin: 0 -15px 20px;\n    }\n    \n    #tutorialModal h3 {\n        font-size: 22px !important;\n        text-align: center;\n    }\n    \n    .tutorial-content {\n        padding: 0 20px 15px;\n    }\n    \n    .tutorial-section h4 {\n        font-size: 18px;\n    }\n    \n    .tutorial-step {\n        padding: 15px;\n        margin-bottom: 20px;\n    }\n    \n    .tutorial-step h5 {\n        font-size: 16px;\n    }\n    \n    .tutorial-step li {\n        font-size: 14px;\n    }\n    \n    .faq-item {\n        padding: 15px;\n        margin-bottom: 20px;\n    }\n    \n    .faq-item h5 {\n        font-size: 15px;\n    }\n    \n    .faq-item p {\n        font-size: 14px;\n    }\n    \n    #tutorialModal .form-actions {\n        flex-direction: column;\n        gap: 10px;\n        padding: 20px;\n    }\n    \n    #tutorialModal .form-actions button {\n        width: 100%;\n        min-width: auto;\n    }\n}\n    \n    /* 确保科目卡片完整显示 */\n    .subject-card {\n        margin: 6px 0 !important; /* 减少科目卡片间距 */\n        padding: 12px 15px !important; /* 减少内边距 */\n        min-height: 55px !important; /* 减少最小高度 */\n        border: 1px solid var(--border-color) !important;\n        background: var(--light-color) !important;\n        box-shadow: 0 2px 6px var(--shadow-color) !important; /* 减少阴影 */\n        border-radius: 8px !important; /* 减少圆角 */\n        transition: all 0.3s ease !important;\n    }\n    \n    .subject-card:hover {\n        transform: translateY(-2px) !important;\n        box-shadow: 0 5px 15px rgba(0,0,0,0.12) !important;\n    }\n    \n    /* 科目信息样式 */\n    .subject-info .subject-name {\n        font-size: 15px !important; /* 减少字体大小 */\n        font-weight: 600 !important;\n        color: var(--text-color) !important;\n        margin-bottom: 3px !important; /* 减少底部间距 */\n        line-height: 1.3 !important; /* 减少行高 */\n    }\n    \n    .subject-info .teacher-name {\n        font-size: 13px !important; /* 减少字体大小 */\n        color: var(--text-color) !important;\n        opacity: 0.9 !important;\n        line-height: 1.1 !important; /* 减少行高 */\n    }\n    \n    /* 科目操作按钮优化 */\n    .subject-actions {\n        gap: 6px !important; /* 减少按钮间距 */\n    }\n    \n    /* 移动端现代化文字按钮优化 */\n    .btn-text {\n        padding: 8px 14px !important;\n        font-size: 11px !important;\n        min-width: 45px !important;\n        height: 32px !important;\n        border-radius: 8px !important;\n        margin: 0 3px !important;\n        letter-spacing: 0.3px !important;\n        font-weight: 600 !important;\n    }\n    \n    .btn-text:hover {\n        transform: translateY(-1px) !important;\n    }\n    \n    .btn-text:active {\n        transform: translateY(0) !important;\n    }\n    \n    /* 移动端编辑按钮优化 - 使用主题色变量 */\n    .edit-btn {\n        background: rgba(143, 188, 143, 0.08) !important;\n        border-color: rgba(143, 188, 143, 0.3) !important;\n    }\n    \n    .edit-btn:hover {\n        background: rgba(143, 188, 143, 0.15) !important;\n        border-color: rgba(143, 188, 143, 0.5) !important;\n    }\n    \n    /* 移动端删除按钮优化 - 使用主题色变量 */\n    .delete-btn {\n        background: rgba(239, 68, 68, 0.08) !important;\n        border-color: rgba(239, 68, 68, 0.3) !important;\n    }\n    \n    .delete-btn:hover {\n        background: rgba(239, 68, 68, 0.15) !important;\n        border-color: rgba(239, 68, 68, 0.5) !important;\n    }\n    \n    /* 为不同主题添加移动端按钮样式 */\n    .theme-blue .edit-btn {\n        background: rgba(0, 123, 255, 0.08) !important;\n        border-color: rgba(0, 123, 255, 0.3) !important;\n    }\n    \n    .theme-blue .edit-btn:hover {\n        background: rgba(0, 123, 255, 0.15) !important;\n        border-color: rgba(0, 123, 255, 0.5) !important;\n    }\n    \n    .theme-purple .edit-btn {\n        background: rgba(111, 66, 193, 0.08) !important;\n        border-color: rgba(111, 66, 193, 0.3) !important;\n    }\n    \n    .theme-purple .edit-btn:hover {\n        background: rgba(111, 66, 193, 0.15) !important;\n        border-color: rgba(111, 66, 193, 0.5) !important;\n    }\n    \n    .theme-pink .edit-btn {\n        background: rgba(233, 30, 99, 0.08) !important;\n        border-color: rgba(233, 30, 99, 0.3) !important;\n    }\n    \n    .theme-pink .edit-btn:hover {\n        background: rgba(233, 30, 99, 0.15) !important;\n        border-color: rgba(233, 30, 99, 0.5) !important;\n    }\n    \n    .theme-orange .edit-btn {\n        background: rgba(253, 126, 20, 0.08) !important;\n        border-color: rgba(253, 126, 20, 0.3) !important;\n    }\n    \n    .theme-orange .edit-btn:hover {\n        background: rgba(253, 126, 20, 0.15) !important;\n        border-color: rgba(253, 126, 20, 0.5) !important;\n    }\n    \n    .theme-dark .edit-btn {\n        background: rgba(32, 201, 151, 0.08) !important;\n        border-color: rgba(32, 201, 151, 0.3) !important;\n    }\n    \n    .theme-dark .edit-btn:hover {\n        background: rgba(32, 201, 151, 0.15) !important;\n        border-color: rgba(32, 201, 151, 0.5) !important;\n    }\n}",
-      "tools/kechengbiao2/js/script.js": "class TimetableApp {\n    constructor() {\n        this.subjects = [];\n        this.timetable = {};\n        this.periods = {\n            morning: [\n                { name: '第1节', time: '08:00-08:40' },\n                { name: '第2节', time: '08:50-09:30' },\n                { name: '第3节', time: '10:00-10:40' },\n                { name: '第4节', time: '10:50-11:30' }\n            ],\n            afternoon: [\n                { name: '第1节', time: '14:00-14:40' },\n                { name: '第2节', time: '14:50-15:30' },\n                { name: '第3节', time: '15:40-16:20' }\n            ],\n            evening: [\n                { name: '第1节', time: '19:00-19:40' },\n                { name: '第2节', time: '19:50-20:30' }\n            ]\n        };\n        this.sectionNames = {\n            morning: '上午',\n            afternoon: '下午',\n            evening: '晚上'\n        };\n        this.settings = {\n            showEvening: true,\n            showSaturday: true,\n            showSunday: true,\n            showPeriodTime: true\n        };\n        this.editingSubject = null;\n        this.editingCell = null;\n        this.editingPeriod = null;\n        this.draggedSubject = null;\n        \n        this.init();\n    }\n\n    init() {\n        this.loadData();\n        this.loadSettings();\n        this.bindEvents();\n        this.renderSubjects();\n        this.renderTimetable();\n        this.loadTimetableTitle();\n        this.loadTableTitle();\n        this.applySettings();\n    }\n\n    bindEvents() {\n        // 科目相关\n        document.getElementById('addSubjectBtn').addEventListener('click', () => this.openSubjectModal());\n        document.getElementById('importSubjectBtn').addEventListener('click', () => this.openImportSubjectModal());\n        document.getElementById('subjectForm').addEventListener('submit', (e) => this.saveSubject(e));\n        document.getElementById('cancelBtn').addEventListener('click', () => this.closeSubjectModal());\n        document.getElementById('deleteSubjectBtn').addEventListener('click', () => this.deleteSubject());\n        document.getElementById('importSubjectForm').addEventListener('submit', (e) => this.importSubjects(e));\n        document.getElementById('cancelImportBtn').addEventListener('click', () => this.closeImportSubjectModal());\n        \n        // 课程表标题\n        document.getElementById('timetableTitle').addEventListener('input', (e) => this.saveTimetableTitle(e.target.value));\n        document.getElementById('tableTitle').addEventListener('input', (e) => this.saveTableTitle(e.target.value));\n        \n        // 课时管理\n        document.getElementById('addMorningBtn').addEventListener('click', () => this.addPeriod('morning'));\n        document.getElementById('addAfternoonBtn').addEventListener('click', () => this.addPeriod('afternoon'));\n        document.getElementById('addEveningBtn').addEventListener('click', () => this.addPeriod('evening'));\n        document.getElementById('removeMorningBtn').addEventListener('click', () => this.removePeriod('morning'));\n        document.getElementById('removeAfternoonBtn').addEventListener('click', () => this.removePeriod('afternoon'));\n        document.getElementById('removeEveningBtn').addEventListener('click', () => this.removePeriod('evening'));\n        \n        // PC端课时管理按钮\n        document.getElementById('addMorningBtn2').addEventListener('click', () => this.addPeriod('morning'));\n        document.getElementById('addAfternoonBtn2').addEventListener('click', () => this.addPeriod('afternoon'));\n        document.getElementById('addEveningBtn2').addEventListener('click', () => this.addPeriod('evening'));\n        document.getElementById('removeMorningBtn2').addEventListener('click', () => this.removePeriod('morning'));\n        document.getElementById('removeAfternoonBtn2').addEventListener('click', () => this.removePeriod('afternoon'));\n        document.getElementById('removeEveningBtn2').addEventListener('click', () => this.removePeriod('evening'));\n        \n        // 时间相关\n        document.getElementById('timeForm').addEventListener('submit', (e) => this.savePeriodTime(e));\n        document.getElementById('cancelTimeBtn').addEventListener('click', () => this.closeTimeModal());\n        \n        // 初始化时间选择器\n        this.initTimeSelectors();\n        \n        // 教程事件\n        document.getElementById('tutorialBtn').addEventListener('click', () => this.openTutorialModal());\n        document.getElementById('closeTutorialBtn').addEventListener('click', () => this.closeTutorialModal());\n        \n        // 重置和导出\n        document.getElementById('resetBtn').addEventListener('click', () => this.resetTimetable());\n        \n        // 导出下拉菜单\n        document.getElementById('exportBtn').addEventListener('click', (e) => this.toggleExportDropdown(e));\n        document.getElementById('saveImageBtn').addEventListener('click', () => this.saveAsImage());\n        document.getElementById('exportWordBtn').addEventListener('click', () => this.exportToWord());\n        document.getElementById('exportExcelBtn').addEventListener('click', () => this.exportToExcel());\n        \n        // 设置相关\n        document.getElementById('settingsBtn').addEventListener('click', () => this.openSettingsModal());\n        document.getElementById('settingsForm').addEventListener('submit', (e) => this.saveSettings(e));\n        document.getElementById('cancelSettingsBtn').addEventListener('click', () => this.closeSettingsModal());\n        \n        // 备份数据相关\n        document.getElementById('backupBtn').addEventListener('click', (e) => this.toggleBackupMenu(e));\n        document.getElementById('exportDataBtn').addEventListener('click', () => this.exportData());\n        document.getElementById('importDataBtn').addEventListener('click', () => this.importData());\n        document.getElementById('importFileInput').addEventListener('change', (e) => this.handleFileImport(e));\n        \n        // 手机端汉堡菜单相关\n        document.getElementById('hamburgerBtn').addEventListener('click', () => this.toggleMobileSidebar());\n        document.getElementById('closeSidebarBtn').addEventListener('click', () => this.closeMobileSidebar());\n        document.getElementById('sidebarOverlay').addEventListener('click', () => this.closeMobileSidebar());\n        \n        // 侧边栏菜单按钮事件\n        document.addEventListener('click', (e) => {\n            if (e.target.classList.contains('sidebar-btn')) {\n                const action = e.target.dataset.action;\n                this.handleSidebarAction(action);\n            }\n            // 侧边栏主题按钮\n            if (e.target.classList.contains('sidebar-theme-btn')) {\n                const theme = e.target.dataset.theme;\n                setTheme(theme);\n                this.updateSidebarThemeButtons(theme);\n            }\n            // 侧边栏字体按钮\n            if (e.target.classList.contains('sidebar-font-btn')) {\n                const font = e.target.dataset.font;\n                setFont(font);\n                this.updateSidebarFontButtons(font);\n            }\n        });\n        \n        // 手机端自定义颜色选择器\n        const mobileColorPicker = document.getElementById('mobileCustomColorPicker');\n        if (mobileColorPicker) {\n            mobileColorPicker.addEventListener('input', (e) => {\n                applyCustomColor(e.target.value);\n            });\n            mobileColorPicker.addEventListener('change', (e) => {\n                localStorage.setItem('timetable-custom-color', e.target.value);\n            });\n        }\n        \n        // 全局点击事件监听器 - 点击外部区域隐藏下拉菜单\n        document.addEventListener('click', (e) => this.handleGlobalClick(e));\n        \n        // 窗口大小改变时重新调整下拉菜单\n        window.addEventListener('resize', () => this.handleWindowResize());\n        \n        // 颜色选择 - 背景色\n        document.querySelectorAll('.color-option.bg-color').forEach(option => {\n            option.addEventListener('click', (e) => this.selectBgColor(e));\n        });\n        \n        // 颜色选择 - 字体色\n        document.querySelectorAll('.color-option.text-color').forEach(option => {\n            option.addEventListener('click', (e) => this.selectTextColor(e));\n        });\n        \n        // 背景色自定义颜色选择器\n        const bgColorPicker = document.getElementById('bgColorPicker');\n        const bgColorText = document.getElementById('bgColorText');\n        \n        if (bgColorPicker) {\n            bgColorPicker.addEventListener('input', (e) => {\n                if (bgColorText) bgColorText.value = e.target.value;\n                this.updateColorPreview();\n                // 取消预设颜色的选中状态\n                document.querySelectorAll('.color-option.bg-color').forEach(opt => opt.classList.remove('selected'));\n            });\n        }\n        \n        if (bgColorText) {\n            bgColorText.addEventListener('input', (e) => {\n                if (/^#[0-9A-Fa-f]{6}$/.test(e.target.value)) {\n                    if (bgColorPicker) bgColorPicker.value = e.target.value;\n                    this.updateColorPreview();\n                }\n            });\n        }\n        \n        // 字体色自定义颜色选择器\n        const textColorPicker = document.getElementById('textColorPicker');\n        const textColorText = document.getElementById('textColorText');\n        \n        if (textColorPicker) {\n            textColorPicker.addEventListener('input', (e) => {\n                if (textColorText) textColorText.value = e.target.value;\n                this.updateColorPreview();\n                // 取消预设颜色的选中状态\n                document.querySelectorAll('.color-option.text-color').forEach(opt => opt.classList.remove('selected'));\n            });\n        }\n        \n        if (textColorText) {\n            textColorText.addEventListener('input', (e) => {\n                if (/^#[0-9A-Fa-f]{6}$/.test(e.target.value)) {\n                    if (textColorPicker) textColorPicker.value = e.target.value;\n                    this.updateColorPreview();\n                }\n            });\n        }\n        \n        // 颜色模式选择事件\n        document.querySelectorAll('input[name=\"colorMode\"]').forEach(radio => {\n            radio.addEventListener('change', (e) => {\n                this.handleColorModeChange(e.target.value);\n            });\n        });\n        \n        // 拖拽相关\n        this.setupDragAndDrop();\n        \n        // 键盘事件\n        document.addEventListener('keydown', (e) => {\n            if (e.key === 'Delete' && this.editingCell) {\n                this.removeSubjectFromCell(this.editingCell);\n            }\n            if (e.key === 'Escape') {\n                // 关闭所有弹窗（优先级：手机端侧边栏 > 手机端科目选择 > 科目编辑 > 时间设置 > 教程）\n                const sidebar = document.getElementById('mobileSidebar');\n                if (sidebar && sidebar.classList.contains('show')) {\n                    this.closeMobileSidebar();\n                } else if (this.currentMobileModal) {\n                    this.closeMobileSubjectModal(this.currentMobileModal);\n                } else {\n                    this.closeSubjectModal();\n                    this.closeTimeModal();\n                    this.closeTutorialModal();\n                }\n            }\n        });\n    }\n\n    setupDragAndDrop() {\n        // 科目池拖拽\n        document.getElementById('subjectPool').addEventListener('dragstart', (e) => {\n            if (e.target.classList.contains('subject-card')) {\n                this.draggedSubject = e.target.dataset.subjectId;\n                e.target.classList.add('dragging');\n            }\n        });\n        \n        document.getElementById('subjectPool').addEventListener('dragend', (e) => {\n            if (e.target.classList.contains('subject-card')) {\n                e.target.classList.remove('dragging');\n            }\n        });\n        \n        // 使用事件委托处理表格拖拽\n        const timetable = document.getElementById('timetable');\n        \n        timetable.addEventListener('dragover', (e) => {\n            const cell = e.target.closest('.cell');\n            if (cell && !cell.classList.contains('occupied')) {\n                e.preventDefault();\n                cell.classList.add('drag-over');\n            }\n        });\n        \n        timetable.addEventListener('dragleave', (e) => {\n            const cell = e.target.closest('.cell');\n            if (cell) {\n                cell.classList.remove('drag-over');\n            }\n        });\n        \n        timetable.addEventListener('drop', (e) => {\n            const cell = e.target.closest('.cell');\n            if (cell && !cell.classList.contains('occupied')) {\n                e.preventDefault();\n                cell.classList.remove('drag-over');\n                \n                if (this.draggedSubject) {\n                    const day = cell.dataset.day;\n                    const section = cell.dataset.section;\n                    const period = cell.dataset.period;\n                    this.addSubjectToCell(this.draggedSubject, day, section, period);\n                }\n            }\n        });\n        \n        // 双击删除课程\n        timetable.addEventListener('dblclick', (e) => {\n            const cell = e.target.closest('.cell');\n            if (cell && cell.classList.contains('occupied')) {\n                this.removeSubjectFromCell(cell);\n            }\n        });\n    }\n\n    openSubjectModal(subject = null) {\n        this.editingSubject = subject;\n        const modal = document.getElementById('subjectModal');\n        const nameInput = document.getElementById('subjectName');\n        const teacherInput = document.getElementById('teacherName');\n        const deleteBtn = document.getElementById('deleteSubjectBtn');\n        \n        if (subject) {\n            nameInput.value = subject.name;\n            teacherInput.value = subject.teacher || '';\n            \n            // 设置颜色模式和颜色值\n            const colorMode = subject.colorMode || 'both';\n            document.querySelector(`input[name=\"colorMode\"][value=\"${colorMode}\"]`).checked = true;\n            this.handleColorModeChange(colorMode);\n            \n            // 设置背景色\n            const bgColor = subject.bgColor || subject.color || '#3498DB';\n            document.getElementById('bgColorPicker').value = bgColor;\n            document.getElementById('bgColorText').value = bgColor;\n            this.selectBgColorByValue(bgColor);\n            \n            // 设置字体色\n            const textColor = subject.textColor || '#FFFFFF';\n            document.getElementById('textColorPicker').value = textColor;\n            document.getElementById('textColorText').value = textColor;\n            this.selectTextColorByValue(textColor);\n            \n            this.updateColorPreview();\n            deleteBtn.style.display = 'block';\n        } else {\n            nameInput.value = '';\n            teacherInput.value = '';\n            \n            // 默认选择背景+字体模式\n            document.querySelector('input[name=\"colorMode\"][value=\"both\"]').checked = true;\n            this.handleColorModeChange('both');\n            \n            // 默认颜色\n            document.getElementById('bgColorPicker').value = '#3498DB';\n            document.getElementById('bgColorText').value = '#3498DB';\n            document.getElementById('textColorPicker').value = '#FFFFFF';\n            document.getElementById('textColorText').value = '#FFFFFF';\n            \n            this.selectBgColorByValue('#3498DB');\n            this.selectTextColorByValue('#FFFFFF');\n            \n            deleteBtn.style.display = 'none';\n        }\n        \n        modal.style.display = 'flex';\n        \n        // 确保预览在弹窗显示后更新\n        setTimeout(() => {\n            this.updateColorPreview();\n        }, 50);\n    }\n\n    closeSubjectModal() {\n        document.getElementById('subjectModal').style.display = 'none';\n        this.editingSubject = null;\n    }\n\n    openImportSubjectModal() {\n        document.getElementById('importSubjectModal').style.display = 'flex';\n    }\n\n    closeImportSubjectModal() {\n        document.getElementById('importSubjectModal').style.display = 'none';\n    }\n\n    importSubjects(e) {\n        e.preventDefault();\n        \n        const stageSelect = document.getElementById('stageSelect');\n        const stage = stageSelect.value;\n        \n        if (!stage) return;\n        \n        // 定义各阶段的科目数据\n        const stageSubjects = {\n            primary: [\n                { id: Date.now() + '_1', name: '语文', teacher: '', color: '#000000', colorType: 'text' },\n                { id: Date.now() + '_2', name: '数学', teacher: '', color: '#000000', colorType: 'text' },\n                { id: Date.now() + '_3', name: '英语', teacher: '', color: '#000000', colorType: 'text' },\n                { id: Date.now() + '_4', name: '道德与法治', teacher: '', color: '#000000', colorType: 'text' },\n                { id: Date.now() + '_5', name: '科学', teacher: '', color: '#000000', colorType: 'text' },\n                { id: Date.now() + '_6', name: '体育与健康', teacher: '', color: '#000000', colorType: 'text' },\n                { id: Date.now() + '_7', name: '音乐', teacher: '', color: '#000000', colorType: 'text' },\n                { id: Date.now() + '_8', name: '美术', teacher: '', color: '#000000', colorType: 'text' },\n                { id: Date.now() + '_9', name: '信息技术', teacher: '', color: '#000000', colorType: 'text' },\n                { id: Date.now() + '_10', name: '劳动', teacher: '', color: '#000000', colorType: 'text' },\n                { id: Date.now() + '_11', name: '综合实践活动', teacher: '', color: '#000000', colorType: 'text' },\n                { id: Date.now() + '_12', name: '地方与学校课程', teacher: '', color: '#000000', colorType: 'text' }\n            ],\n            junior: [\n                { id: Date.now() + '_1', name: '语文', teacher: '', color: '#000000', colorType: 'text' },\n                { id: Date.now() + '_2', name: '数学', teacher: '', color: '#000000', colorType: 'text' },\n                { id: Date.now() + '_3', name: '英语', teacher: '', color: '#000000', colorType: 'text' },\n                { id: Date.now() + '_4', name: '道德与法治', teacher: '', color: '#000000', colorType: 'text' },\n                { id: Date.now() + '_5', name: '历史', teacher: '', color: '#000000', colorType: 'text' },\n                { id: Date.now() + '_6', name: '地理', teacher: '', color: '#000000', colorType: 'text' },\n                { id: Date.now() + '_7', name: '物理', teacher: '', color: '#000000', colorType: 'text' },\n                { id: Date.now() + '_8', name: '化学', teacher: '', color: '#000000', colorType: 'text' },\n                { id: Date.now() + '_9', name: '生物', teacher: '', color: '#000000', colorType: 'text' },\n                { id: Date.now() + '_10', name: '体育与健康', teacher: '', color: '#000000', colorType: 'text' },\n                { id: Date.now() + '_11', name: '音乐', teacher: '', color: '#000000', colorType: 'text' },\n                { id: Date.now() + '_12', name: '美术', teacher: '', color: '#000000', colorType: 'text' },\n                { id: Date.now() + '_13', name: '信息技术', teacher: '', color: '#000000', colorType: 'text' },\n                { id: Date.now() + '_14', name: '劳动技术', teacher: '', color: '#000000', colorType: 'text' },\n                { id: Date.now() + '_15', name: '综合实践活动', teacher: '', color: '#000000', colorType: 'text' }\n            ],\n            senior: [\n                { id: Date.now() + '_1', name: '语文', teacher: '', color: '#000000', colorType: 'text' },\n                { id: Date.now() + '_2', name: '数学', teacher: '', color: '#000000', colorType: 'text' },\n                { id: Date.now() + '_3', name: '英语', teacher: '', color: '#000000', colorType: 'text' },\n                { id: Date.now() + '_4', name: '思想政治', teacher: '', color: '#000000', colorType: 'text' },\n                { id: Date.now() + '_5', name: '历史', teacher: '', color: '#000000', colorType: 'text' },\n                { id: Date.now() + '_6', name: '地理', teacher: '', color: '#000000', colorType: 'text' },\n                { id: Date.now() + '_7', name: '物理', teacher: '', color: '#000000', colorType: 'text' },\n                { id: Date.now() + '_8', name: '化学', teacher: '', color: '#000000', colorType: 'text' },\n                { id: Date.now() + '_9', name: '生物', teacher: '', color: '#000000', colorType: 'text' },\n                { id: Date.now() + '_10', name: '体育与健康', teacher: '', color: '#000000', colorType: 'text' },\n                { id: Date.now() + '_11', name: '音乐', teacher: '', color: '#000000', colorType: 'text' },\n                { id: Date.now() + '_12', name: '美术', teacher: '', color: '#000000', colorType: 'text' },\n                { id: Date.now() + '_13', name: '信息技术', teacher: '', color: '#000000', colorType: 'text' },\n                { id: Date.now() + '_14', name: '通用技术', teacher: '', color: '#000000', colorType: 'text' },\n                { id: Date.now() + '_15', name: '综合实践活动', teacher: '', color: '#000000', colorType: 'text' },\n                { id: Date.now() + '_16', name: '校本课程', teacher: '', color: '#000000', colorType: 'text' }\n            ],\n            university: [\n                // 公共基础课\n                { id: Date.now() + '_1', name: '大学语文', teacher: '', color: '#000000', colorType: 'text' },\n                { id: Date.now() + '_2', name: '高等数学', teacher: '', color: '#000000', colorType: 'text' },\n                { id: Date.now() + '_3', name: '大学英语', teacher: '', color: '#000000', colorType: 'text' },\n                { id: Date.now() + '_4', name: '大学物理', teacher: '', color: '#000000', colorType: 'text' },\n                { id: Date.now() + '_5', name: '大学化学', teacher: '', color: '#000000', colorType: 'text' },\n                { id: Date.now() + '_6', name: '思想政治理论', teacher: '', color: '#000000', colorType: 'text' },\n                { id: Date.now() + '_7', name: '体育', teacher: '', color: '#000000', colorType: 'text' },\n                { id: Date.now() + '_8', name: '军事理论', teacher: '', color: '#000000', colorType: 'text' },\n                { id: Date.now() + '_9', name: '心理健康教育', teacher: '', color: '#000000', colorType: 'text' },\n                // 专业基础课\n                { id: Date.now() + '_10', name: '线性代数', teacher: '', color: '#000000', colorType: 'text' },\n                { id: Date.now() + '_11', name: '概率论与数理统计', teacher: '', color: '#000000', colorType: 'text' },\n                { id: Date.now() + '_12', name: '程序设计基础', teacher: '', color: '#000000', colorType: 'text' },\n                { id: Date.now() + '_13', name: '数据结构', teacher: '', color: '#000000', colorType: 'text' },\n                { id: Date.now() + '_14', name: '电路分析', teacher: '', color: '#000000', colorType: 'text' },\n                { id: Date.now() + '_15', name: '机械制图', teacher: '', color: '#000000', colorType: 'text' },\n                { id: Date.now() + '_16', name: '经济学原理', teacher: '', color: '#000000', colorType: 'text' },\n                { id: Date.now() + '_17', name: '管理学原理', teacher: '', color: '#000000', colorType: 'text' },\n                { id: Date.now() + '_18', name: '心理学导论', teacher: '', color: '#000000', colorType: 'text' },\n                // 计算机类专业课程\n                { id: Date.now() + '_19', name: '操作系统', teacher: '', color: '#000000', colorType: 'text' },\n                { id: Date.now() + '_20', name: '计算机网络', teacher: '', color: '#000000', colorType: 'text' },\n                { id: Date.now() + '_21', name: '数据库原理', teacher: '', color: '#000000', colorType: 'text' },\n                { id: Date.now() + '_22', name: '软件工程', teacher: '', color: '#000000', colorType: 'text' },\n                // 经济类专业课程\n                { id: Date.now() + '_23', name: '微观经济学', teacher: '', color: '#000000', colorType: 'text' },\n                { id: Date.now() + '_24', name: '宏观经济学', teacher: '', color: '#000000', colorType: 'text' },\n                { id: Date.now() + '_25', name: '金融学', teacher: '', color: '#000000', colorType: 'text' },\n                { id: Date.now() + '_26', name: '会计学', teacher: '', color: '#000000', colorType: 'text' },\n                // 管理类专业课程\n                { id: Date.now() + '_27', name: '市场营销', teacher: '', color: '#000000', colorType: 'text' },\n                { id: Date.now() + '_28', name: '人力资源管理', teacher: '', color: '#000000', colorType: 'text' },\n                { id: Date.now() + '_29', name: '财务管理', teacher: '', color: '#000000', colorType: 'text' },\n                // 工程类专业课程\n                { id: Date.now() + '_30', name: '材料力学', teacher: '', color: '#000000', colorType: 'text' },\n                { id: Date.now() + '_31', name: '工程热力学', teacher: '', color: '#000000', colorType: 'text' },\n                { id: Date.now() + '_32', name: '自动控制原理', teacher: '', color: '#000000', colorType: 'text' },\n                // 文学类专业课程\n                { id: Date.now() + '_33', name: '古代文学', teacher: '', color: '#000000', colorType: 'text' },\n                { id: Date.now() + '_34', name: '现代文学', teacher: '', color: '#000000', colorType: 'text' },\n                { id: Date.now() + '_35', name: '外国文学', teacher: '', color: '#000000', colorType: 'text' },\n                // 法学类专业课程\n                { id: Date.now() + '_36', name: '宪法学', teacher: '', color: '#000000', colorType: 'text' },\n                { id: Date.now() + '_37', name: '民法学', teacher: '', color: '#000000', colorType: 'text' },\n                { id: Date.now() + '_38', name: '刑法学', teacher: '', color: '#000000', colorType: 'text' }\n            ]\n        };\n\n        // 清除现有科目和课程表\n        this.subjects = [];\n        this.timetable = {};\n        \n        // 添加新科目\n        this.subjects = stageSubjects[stage];\n        \n        // 保存数据并重新渲染\n        this.saveData();\n        this.renderSubjects();\n        this.renderTimetable();\n        \n        // 关闭模态框\n        this.closeImportSubjectModal();\n        \n        // 显示成功提示\n        this.showNotification('科目导入成功！', 'success');\n    }\n\n    saveSubject(e) {\n        e.preventDefault();\n        \n        const name = document.getElementById('subjectName').value.trim();\n        const teacher = document.getElementById('teacherName').value.trim();\n        const colorMode = document.querySelector('input[name=\"colorMode\"]:checked').value;\n        const bgColor = document.getElementById('bgColorPicker').value;\n        const textColor = document.getElementById('textColorPicker').value;\n        \n        if (!name) return;\n        \n        if (this.editingSubject) {\n            this.editingSubject.name = name;\n            this.editingSubject.teacher = teacher;\n            this.editingSubject.colorMode = colorMode;\n            this.editingSubject.bgColor = bgColor;\n            this.editingSubject.textColor = textColor;\n            // 保持向后兼容\n            this.editingSubject.color = bgColor;\n            this.editingSubject.colorType = colorMode === 'textOnly' ? 'text' : 'background';\n        } else {\n            const subject = {\n                id: Date.now().toString(),\n                name,\n                teacher,\n                colorMode,\n                bgColor,\n                textColor,\n                // 保持向后兼容\n                color: bgColor,\n                colorType: colorMode === 'textOnly' ? 'text' : 'background'\n            };\n            this.subjects.push(subject);\n        }\n        \n        this.saveData();\n        this.renderSubjects();\n        this.renderTimetable();\n        this.closeSubjectModal();\n    }\n\n    deleteSubject() {\n        if (this.editingSubject) {\n            this.deleteSubjectFromPool(this.editingSubject.id);\n            this.closeSubjectModal();\n        }\n    }\n\n    deleteSubjectFromPool(subjectId) {\n        const subject = this.subjects.find(s => s.id === subjectId);\n        if (subject) {\n            // 从科目列表中删除\n            this.subjects = this.subjects.filter(s => s.id !== subjectId);\n            \n            // 从课程表中移除该科目的所有实例\n            Object.keys(this.timetable).forEach(key => {\n                if (this.timetable[key] === subjectId) {\n                    delete this.timetable[key];\n                }\n            });\n            \n            this.saveData();\n            this.renderSubjects();\n            this.renderTimetable();\n        }\n    }\n\n    // 选择背景色\n    selectBgColor(e) {\n        const color = e.target.dataset.color;\n        if (!color) return;\n        \n        const bgColorPicker = document.getElementById('bgColorPicker');\n        const bgColorText = document.getElementById('bgColorText');\n        \n        if (bgColorPicker) bgColorPicker.value = color;\n        if (bgColorText) bgColorText.value = color;\n        \n        document.querySelectorAll('.color-option.bg-color').forEach(opt => {\n            opt.classList.remove('selected');\n        });\n        e.target.classList.add('selected');\n        this.updateColorPreview();\n    }\n    \n    // 选择字体色\n    selectTextColor(e) {\n        const color = e.target.dataset.color;\n        if (!color) return;\n        \n        const textColorPicker = document.getElementById('textColorPicker');\n        const textColorText = document.getElementById('textColorText');\n        \n        if (textColorPicker) textColorPicker.value = color;\n        if (textColorText) textColorText.value = color;\n        \n        document.querySelectorAll('.color-option.text-color').forEach(opt => {\n            opt.classList.remove('selected');\n        });\n        e.target.classList.add('selected');\n        this.updateColorPreview();\n    }\n    \n    // 根据值选择背景色\n    selectBgColorByValue(color) {\n        document.querySelectorAll('.color-option.bg-color').forEach(opt => {\n            opt.classList.toggle('selected', opt.dataset.color === color);\n        });\n    }\n    \n    // 根据值选择字体色\n    selectTextColorByValue(color) {\n        document.querySelectorAll('.color-option.text-color').forEach(opt => {\n            opt.classList.toggle('selected', opt.dataset.color === color);\n        });\n    }\n    \n    // 处理颜色模式切换\n    handleColorModeChange(mode) {\n        const bgColorGroup = document.getElementById('bgColorGroup');\n        const textColorGroup = document.getElementById('textColorGroup');\n        \n        if (!bgColorGroup || !textColorGroup) return;\n        \n        // 更新选中状态的样式类\n        document.querySelectorAll('.color-mode-option').forEach(option => {\n            const radio = option.querySelector('input[type=\"radio\"]');\n            if (radio && radio.checked) {\n                option.classList.add('selected');\n            } else {\n                option.classList.remove('selected');\n            }\n        });\n        \n        if (mode === 'both') {\n            // 背景+字体模式：显示背景色选择，显示字体色选择\n            bgColorGroup.style.display = 'block';\n            textColorGroup.style.display = 'block';\n        } else {\n            // 仅字体色模式：隐藏背景色选择，显示字体色选择\n            bgColorGroup.style.display = 'none';\n            textColorGroup.style.display = 'block';\n        }\n        this.updateColorPreview();\n    }\n    \n    // 更新颜色预览\n    updateColorPreview() {\n        const preview = document.getElementById('colorPreview');\n        if (!preview) return;\n        \n        const colorModeRadio = document.querySelector('input[name=\"colorMode\"]:checked');\n        const colorMode = colorModeRadio ? colorModeRadio.value : 'both';\n        const bgColorPicker = document.getElementById('bgColorPicker');\n        const textColorPicker = document.getElementById('textColorPicker');\n        \n        const bgColor = bgColorPicker ? bgColorPicker.value : '#3498DB';\n        const textColor = textColorPicker ? textColorPicker.value : '#FFFFFF';\n        \n        // 直接设置样式，使用 cssText 确保覆盖\n        if (colorMode === 'both') {\n            preview.style.cssText = `\n                padding: 16px 20px;\n                border-radius: 8px;\n                text-align: center;\n                font-size: 16px;\n                font-weight: 600;\n                min-height: 20px;\n                background-color: ${bgColor};\n                color: ${textColor};\n                border: 1px solid ${bgColor};\n            `;\n        } else {\n            preview.style.cssText = `\n                padding: 16px 20px;\n                border-radius: 8px;\n                text-align: center;\n                font-size: 16px;\n                font-weight: 600;\n                min-height: 20px;\n                background-color: transparent;\n                color: ${textColor};\n                border: 1px solid #ddd;\n            `;\n        }\n    }\n\n    // 保留旧函数以兼容\n    selectColor(e) {\n        const color = e.target.dataset.color;\n        if (e.target.classList.contains('bg-color')) {\n            this.selectBgColor(e);\n        } else if (e.target.classList.contains('text-color')) {\n            this.selectTextColor(e);\n        }\n    }\n\n    selectColorByValue(color) {\n        // 兼容旧数据\n        document.getElementById('bgColorPicker').value = color;\n        document.getElementById('bgColorText').value = color;\n        this.selectBgColorByValue(color);\n    }\n\n    getCurrentColorType() {\n        const radio = document.querySelector('input[name=\"colorMode\"]:checked');\n        return radio && radio.value === 'textOnly' ? 'text' : 'background';\n    }\n\n    showColorOptions(type) {\n        // 保留兼容性，但不再使用\n    }\n\n    openTimeModal(e) {\n        const timeText = e.target;\n        const period = timeText.dataset.period;\n        const modal = document.getElementById('timeModal');\n        const timeInput = document.getElementById('timeRange');\n        \n        timeInput.value = timeText.textContent;\n        timeInput.dataset.period = period;\n        modal.style.display = 'flex';\n    }\n\n    closeTimeModal() {\n        document.getElementById('timeModal').style.display = 'none';\n    }\n\n    // 打开时段名称编辑弹窗\n    openSectionNameModal(section) {\n        this.editingSection = section;\n        \n        const sectionName = this.sectionNames[section];\n        const sectionLabel = { morning: '上午', afternoon: '下午', evening: '晚上' }[section];\n        \n        const modal = document.createElement('div');\n        modal.className = 'modal';\n        modal.style.display = 'flex';\n        modal.style.position = 'fixed';\n        modal.style.top = '0';\n        modal.style.left = '0';\n        modal.style.width = '100%';\n        modal.style.height = '100%';\n        modal.style.background = 'rgba(0, 0, 0, 0.5)';\n        modal.style.zIndex = '2000';\n        modal.style.alignItems = 'center';\n        modal.style.justifyContent = 'center';\n        \n        const content = document.createElement('div');\n        content.className = 'modal-content';\n        content.style.cssText = `\n            background: white;\n            border-radius: 12px;\n            padding: 25px;\n            max-width: 400px;\n            width: 90%;\n            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);\n        `;\n        \n        content.innerHTML = `\n            <h3 style=\"margin: 0 0 20px 0; font-size: 18px; color: #333;\">修改时段名称<\/h3>\n            <form id=\"sectionNameForm\">\n                <div class=\"form-group\">\n                    <label style=\"display: block; margin-bottom: 8px; color: #666;\">时段名称（当前：${sectionLabel}）<\/label>\n                    <input type=\"text\" id=\"sectionNameInput\" value=\"${sectionName}\" required \n                           style=\"width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; box-sizing: border-box;\" \n                           placeholder=\"请输入旰的名称\">\n                <\/div>\n                <div class=\"form-actions\" style=\"margin-top: 20px; display: flex; gap: 10px; justify-content: flex-end;\">\n                    <button type=\"button\" id=\"cancelSectionBtn\" class=\"btn secondary\" \n                            style=\"padding: 8px 16px; background: #6c757d; color: white; border: none; border-radius: 6px; cursor: pointer;\">取消<\/button>\n                    <button type=\"submit\" class=\"btn primary\" \n                            style=\"padding: 8px 16px; background: #4a7c59; color: white; border: none; border-radius: 6px; cursor: pointer;\">保存<\/button>\n                <\/div>\n            <\/form>\n        `;\n        \n        modal.appendChild(content);\n        document.body.appendChild(modal);\n        \n        // 焦点输入框\n        setTimeout(() => {\n            const input = document.getElementById('sectionNameInput');\n            input.focus();\n            input.select();\n        }, 100);\n        \n        // 保存事件\n        const form = document.getElementById('sectionNameForm');\n        form.addEventListener('submit', (e) => {\n            e.preventDefault();\n            const newName = document.getElementById('sectionNameInput').value.trim();\n            if (newName) {\n                this.sectionNames[section] = newName;\n                this.saveData();\n                this.renderTimetable();\n                document.body.removeChild(modal);\n            }\n        });\n        \n        // 取消事件\n        document.getElementById('cancelSectionBtn').addEventListener('click', () => {\n            document.body.removeChild(modal);\n        });\n        \n        // 点击背景关闭\n        modal.addEventListener('click', (e) => {\n            if (e.target === modal) {\n                document.body.removeChild(modal);\n            }\n        });\n        \n        // ESC关闭\n        const handleEsc = (e) => {\n            if (e.key === 'Escape') {\n                if (modal.parentNode) {\n                    document.body.removeChild(modal);\n                }\n                document.removeEventListener('keydown', handleEsc);\n            }\n        };\n        document.addEventListener('keydown', handleEsc);\n    }\n\n    openTutorialModal() {\n        this.generateTutorialContent();\n        document.getElementById('tutorialModal').style.display = 'flex';\n    }\n\n    closeTutorialModal() {\n        document.getElementById('tutorialModal').style.display = 'none';\n    }\n\n    generateTutorialContent() {\n        const tutorialContent = document.getElementById('tutorialContent');\n        if (!tutorialContent) return;\n    \n        const content = `\n            <div class=\"tutorial-section\">\n                <h4 class=\"tutorial-section-title\">\n                    <svg width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"><path d=\"M13 2L3 14h9l-1 8 10-12h-9l1-8z\"/><\/svg>\n                    快速开始\n                <\/h4>\n                <div class=\"tutorial-grid\">\n                    <div class=\"tutorial-card\">\n                        <div class=\"tutorial-card-icon\">\n                            <svg width=\"32\" height=\"32\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"var(--primary-color)\" stroke-width=\"2\"><circle cx=\"12\" cy=\"12\" r=\"10\"/><line x1=\"12\" y1=\"8\" x2=\"12\" y2=\"16\"/><line x1=\"8\" y1=\"12\" x2=\"16\" y2=\"12\"/><\/svg>\n                        <\/div>\n                        <div class=\"tutorial-card-content\">\n                            <strong>添加科目<\/strong>\n                            <span>点击“+ 科目”按钮创建课程<\/span>\n                        <\/div>\n                    <\/div>\n                    <div class=\"tutorial-card\">\n                        <div class=\"tutorial-card-icon\">\n                            <svg width=\"32\" height=\"32\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"var(--primary-color)\" stroke-width=\"2\"><path d=\"M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z\"/><polyline points=\"14,2 14,8 20,8\"/><line x1=\"12\" y1=\"18\" x2=\"12\" y2=\"12\"/><line x1=\"9\" y1=\"15\" x2=\"15\" y2=\"15\"/><\/svg>\n                        <\/div>\n                        <div class=\"tutorial-card-content\">\n                            <strong>导入预设<\/strong>\n                            <span>按学习阶段快速导入课程<\/span>\n                        <\/div>\n                    <\/div>\n                    <div class=\"tutorial-card\">\n                        <div class=\"tutorial-card-icon\">\n                            <svg width=\"32\" height=\"32\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"var(--primary-color)\" stroke-width=\"2\"><polyline points=\"5,9 2,12 5,15\"/><polyline points=\"9,5 12,2 15,5\"/><polyline points=\"19,9 22,12 19,15\"/><polyline points=\"9,19 12,22 15,19\"/><line x1=\"2\" y1=\"12\" x2=\"22\" y2=\"12\"/><line x1=\"12\" y1=\"2\" x2=\"12\" y2=\"22\"/><\/svg>\n                        <\/div>\n                        <div class=\"tutorial-card-content\">\n                            <strong>拖拽排课<\/strong>\n                            <span>将科目拖到课程表对应位置<\/span>\n                        <\/div>\n                    <\/div>\n                    <div class=\"tutorial-card\">\n                        <div class=\"tutorial-card-icon\">\n                            <svg width=\"32\" height=\"32\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"var(--primary-color)\" stroke-width=\"2\"><circle cx=\"12\" cy=\"12\" r=\"10\"/><polyline points=\"12,6 12,12 16,14\"/><\/svg>\n                        <\/div>\n                        <div class=\"tutorial-card-content\">\n                            <strong>设置时间<\/strong>\n                            <span>点击课时标签修改上课时间<\/span>\n                        <\/div>\n                    <\/div>\n                    <div class=\"tutorial-card\">\n                        <div class=\"tutorial-card-icon\">\n                            <svg width=\"32\" height=\"32\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"var(--primary-color)\" stroke-width=\"2\"><path d=\"M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4\"/><polyline points=\"7,10 12,15 17,10\"/><line x1=\"12\" y1=\"15\" x2=\"12\" y2=\"3\"/><\/svg>\n                        <\/div>\n                        <div class=\"tutorial-card-content\">\n                            <strong>导出保存<\/strong>\n                            <span>支持图片/Word/Excel格式<\/span>\n                        <\/div>\n                    <\/div>\n                    <div class=\"tutorial-card\">\n                        <div class=\"tutorial-card-icon\">\n                            <svg width=\"32\" height=\"32\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"var(--primary-color)\" stroke-width=\"2\"><path d=\"M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z\"/><polyline points=\"17,21 17,13 7,13 7,21\"/><polyline points=\"7,3 7,8 15,8\"/><\/svg>\n                        <\/div>\n                        <div class=\"tutorial-card-content\">\n                            <strong>备份数据<\/strong>\n                            <span>导出/导入JSON数据文件<\/span>\n                        <\/div>\n                    <\/div>\n                <\/div>\n            <\/div>\n    \n            <div class=\"tutorial-section\">\n                <h4 class=\"tutorial-section-title\">\n                    <svg width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"><circle cx=\"12\" cy=\"12\" r=\"3\"/><path d=\"M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z\"/><\/svg>\n                    个性化设置\n                <\/h4>\n                <div class=\"tutorial-features\">\n                    <div class=\"tutorial-feature\">\n                        <span class=\"feature-icon\">\n                            <svg width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"var(--primary-color)\" stroke-width=\"2\"><circle cx=\"13.5\" cy=\"6.5\" r=\"2.5\"/><circle cx=\"17.5\" cy=\"10.5\" r=\"2.5\"/><circle cx=\"8.5\" cy=\"7.5\" r=\"2.5\"/><circle cx=\"6.5\" cy=\"12.5\" r=\"2.5\"/><path d=\"M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.93 0 1.5-.68 1.5-1.5 0-.38-.1-.74-.33-1.05-.21-.27-.33-.67-.33-1.05 0-.83.67-1.5 1.5-1.5H16c3.31 0 6-2.69 6-6 0-5.52-4.48-10-10-10z\"/><\/svg>\n                        <\/span>\n                        <div class=\"feature-text\">\n                            <strong>主题切换<\/strong>\n                            <span>6种预设主题 + 自定义颜色<\/span>\n                        <\/div>\n                    <\/div>\n                    <div class=\"tutorial-feature\">\n                        <span class=\"feature-icon\">\n                            <svg width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"var(--primary-color)\" stroke-width=\"2\"><polyline points=\"4,7 4,4 20,4 20,7\"/><line x1=\"9\" y1=\"20\" x2=\"15\" y2=\"20\"/><line x1=\"12\" y1=\"4\" x2=\"12\" y2=\"20\"/><\/svg>\n                        <\/span>\n                        <div class=\"feature-text\">\n                            <strong>字体选择<\/strong>\n                            <span>多种中英文字体可选<\/span>\n                        <\/div>\n                    <\/div>\n                    <div class=\"tutorial-feature\">\n                        <span class=\"feature-icon\">\n                            <svg width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"var(--primary-color)\" stroke-width=\"2\"><rect x=\"3\" y=\"3\" width=\"7\" height=\"7\"/><rect x=\"14\" y=\"3\" width=\"7\" height=\"7\"/><rect x=\"14\" y=\"14\" width=\"7\" height=\"7\"/><rect x=\"3\" y=\"14\" width=\"7\" height=\"7\"/><\/svg>\n                        <\/span>\n                        <div class=\"feature-text\">\n                            <strong>显示设置<\/strong>\n                            <span>控制晚间/周末/时间显示<\/span>\n                        <\/div>\n                    <\/div>\n                <\/div>\n            <\/div>\n    \n            <div class=\"tutorial-section\">\n                <h4 class=\"tutorial-section-title\">\n                    <svg width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"><circle cx=\"12\" cy=\"12\" r=\"10\"/><line x1=\"12\" y1=\"16\" x2=\"12\" y2=\"12\"/><line x1=\"12\" y1=\"8\" x2=\"12.01\" y2=\"8\"/><\/svg>\n                    小技巧\n                <\/h4>\n                <div class=\"tutorial-tips\">\n                    <div class=\"tip-item\"><kbd>ESC<\/kbd> 快速关闭弹窗<\/div>\n                    <div class=\"tip-item\">右键点击课程可删除<\/div>\n                    <div class=\"tip-item\">数据自动保存到浏览器<\/div>\n                    <div class=\"tip-item\">建议定期备份数据<\/div>\n                <\/div>\n            <\/div>\n        `;\n    \n        tutorialContent.innerHTML = content;\n        \n        // 绑定\"我知道了\"按钮事件\n        const closeTutorialBtn = document.getElementById('closeTutorialBtn');\n        if (closeTutorialBtn) {\n            closeTutorialBtn.onclick = () => this.closeTutorialModal();\n        }\n    }\n\n    // 设置相关方法\n    loadSettings() {\n        const savedSettings = localStorage.getItem('timetableSettings');\n        if (savedSettings) {\n            this.settings = { ...this.settings, ...JSON.parse(savedSettings) };\n        }\n    }\n\n    saveSettings() {\n        localStorage.setItem('timetableSettings', JSON.stringify(this.settings));\n    }\n\n    applySettings() {\n        // 应用晚上课时显示设置 - 直接通过ID查找并隐藏整个控制行\n        const eveningControlLines = document.querySelectorAll('.period-control-line');\n        \n        eveningControlLines.forEach(controlLine => {\n            const span = controlLine.querySelector('span');\n            if (span && span.textContent.trim() === '晚上课时') {\n                // 隐藏整个控制行（包括文本和按钮）\n                controlLine.style.display = this.settings.showEvening ? 'flex' : 'none';\n                controlLine.style.visibility = this.settings.showEvening ? 'visible' : 'hidden';\n            }\n        });\n\n        // 应用周六、周日显示设置\n        const saturdayCol = document.getElementById('saturdayCol');\n        const sundayCol = document.getElementById('sundayCol');\n        \n        if (saturdayCol) {\n            saturdayCol.style.display = this.settings.showSaturday ? 'table-cell' : 'none';\n        }\n        if (sundayCol) {\n            sundayCol.style.display = this.settings.showSunday ? 'table-cell' : 'none';\n        }\n\n        // 更新课程表中的周末列 - 重新渲染后应用设置\n        setTimeout(() => {\n            const weekendCols = document.querySelectorAll('.weekend-col');\n            weekendCols.forEach(col => {\n                if (col.dataset.day === '6') {\n                    col.style.display = this.settings.showSaturday ? 'table-cell' : 'none';\n                } else if (col.dataset.day === '7') {\n                    col.style.display = this.settings.showSunday ? 'table-cell' : 'none';\n                }\n            });\n        }, 0);\n\n        // 应用时间显示设置\n        setTimeout(() => {\n            const timeDisplays = document.querySelectorAll('.time-display');\n            timeDisplays.forEach(display => {\n                display.style.display = this.settings.showPeriodTime ? 'block' : 'none';\n            });\n        }, 0);\n\n        this.renderTimetable();\n    }\n\n    openSettingsModal() {\n        const modal = document.getElementById('settingsModal');\n        const showEveningCheckbox = document.getElementById('showEvening');\n        const showSaturdayCheckbox = document.getElementById('showSaturday');\n        const showSundayCheckbox = document.getElementById('showSunday');\n        const showPeriodTimeCheckbox = document.getElementById('showPeriodTime');\n\n        showEveningCheckbox.checked = this.settings.showEvening;\n        showSaturdayCheckbox.checked = this.settings.showSaturday;\n        showSundayCheckbox.checked = this.settings.showSunday;\n        showPeriodTimeCheckbox.checked = this.settings.showPeriodTime;\n\n        modal.style.display = 'flex';\n    }\n\n    closeSettingsModal() {\n        document.getElementById('settingsModal').style.display = 'none';\n    }\n\n    // 备份数据相关方法\n    toggleBackupMenu(e) {\n        e.stopPropagation();\n        const menu = document.getElementById('backupMenu');\n        const isVisible = menu.classList.contains('show');\n        \n        // 关闭所有其他下拉菜单\n        this.closeAllDropdowns();\n        \n        if (!isVisible) {\n            menu.classList.add('show');\n            this.positionDropdown(menu, e.target);\n        }\n    }\n\n    closeBackupMenu(e) {\n        const menu = document.getElementById('backupMenu');\n        const button = document.getElementById('backupBtn');\n        \n        if (!menu.contains(e.target) && !button.contains(e.target)) {\n            menu.classList.remove('show');\n            document.removeEventListener('click', this.closeBackupMenu.bind(this));\n        }\n    }\n\n    // 导出数据\n    exportData() {\n        try {\n            const data = {\n                timetable: this.timetable,\n                subjects: this.subjects,\n                periods: this.periods,\n                sectionNames: this.sectionNames,\n                settings: this.settings,\n                exportTime: new Date().toISOString(),\n                version: '1.0'\n            };\n            \n            const dataStr = JSON.stringify(data, null, 2);\n            const dataBlob = new Blob([dataStr], { type: 'application/json' });\n            \n            const url = URL.createObjectURL(dataBlob);\n            const link = document.createElement('a');\n            link.href = url;\n            link.download = `课程表备份_${new Date().toLocaleDateString().replace(/\\//g, '-')}.json`;\n            \n            document.body.appendChild(link);\n            link.click();\n            document.body.removeChild(link);\n            URL.revokeObjectURL(url);\n            \n            this.showNotification('数据导出成功！', 'success');\n            this.closeBackupMenu({ target: null });\n        } catch (error) {\n            console.error('导出数据失败:', error);\n            this.showNotification('导出数据失败，请重试', 'error');\n        }\n    }\n\n    // 导入数据\n    importData() {\n        document.getElementById('importFileInput').click();\n        this.closeBackupMenu({ target: null });\n    }\n\n    // 处理文件导入\n    handleFileImport(event) {\n        const file = event.target.files[0];\n        if (!file) return;\n\n        console.log('开始导入文件:', file.name, '大小:', file.size, 'bytes');\n\n        if (!file.name.endsWith('.json')) {\n            this.showNotification('请选择JSON格式的备份文件', 'error');\n            return;\n        }\n\n        if (file.size === 0) {\n            this.showNotification('文件为空，请选择有效的备份文件', 'error');\n            return;\n        }\n\n        if (file.size > 10 * 1024 * 1024) { // 10MB限制\n            this.showNotification('文件过大，请选择小于10MB的备份文件', 'error');\n            return;\n        }\n\n        const reader = new FileReader();\n        reader.onload = (e) => {\n            try {\n                console.log('文件读取成功，文件内容长度:', e.target.result.length);\n                console.log('文件内容前100字符:', e.target.result.substring(0, 100));\n                \n                // 检查文件内容是否为空\n                if (!e.target.result || e.target.result.trim() === '') {\n                    this.showNotification('文件内容为空，请选择有效的备份文件', 'error');\n                    return;\n                }\n                \n                console.log('开始解析JSON...');\n                const data = JSON.parse(e.target.result);\n                console.log('JSON解析成功，数据类型:', typeof data);\n                console.log('数据内容:', data);\n                \n                // 验证数据格式\n                if (!this.validateImportData(data)) {\n                    this.showNotification('备份文件格式不正确，请检查文件内容', 'error');\n                    return;\n                }\n                \n                // 确认导入\n                if (confirm('导入数据将覆盖当前课表，是否继续？')) {\n                    console.log('用户确认导入，开始加载数据...');\n                    this.loadImportedData(data);\n                    this.showNotification('数据导入成功！', 'success');\n                } else {\n                    console.log('用户取消导入');\n                }\n            } catch (error) {\n                console.error('导入数据失败:', error);\n                console.error('错误详情:', {\n                    name: error.name,\n                    message: error.message,\n                    stack: error.stack\n                });\n                \n                let errorMessage = '文件解析失败';\n                if (error instanceof SyntaxError) {\n                    errorMessage = `JSON格式错误: ${error.message}`;\n                    console.error('JSON解析错误位置:', error.message);\n                } else if (error.message) {\n                    errorMessage = `导入失败: ${error.message}`;\n                }\n                this.showNotification(errorMessage, 'error');\n            }\n        };\n        \n        reader.onerror = (error) => {\n            console.error('文件读取失败:', error);\n            this.showNotification('文件读取失败，请重试', 'error');\n        };\n        \n        reader.readAsText(file, 'UTF-8');\n        // 清空文件输入，允许重复选择同一文件\n        event.target.value = '';\n    }\n\n    // 验证导入数据格式\n    validateImportData(data) {\n        try {\n            console.log('开始验证导入数据:', data);\n            \n            // 基本结构检查\n            if (!data || typeof data !== 'object') {\n                console.error('数据格式错误: 不是有效的对象');\n                return false;\n            }\n            \n            // 检查必要字段\n            if (!Array.isArray(data.subjects)) {\n                console.error('数据格式错误: subjects 不是数组，实际类型:', typeof data.subjects);\n                return false;\n            }\n            \n            if (typeof data.timetable !== 'object') {\n                console.error('数据格式错误: timetable 不是对象，实际类型:', typeof data.timetable);\n                return false;\n            }\n            \n            if (typeof data.periods !== 'object') {\n                console.error('数据格式错误: periods 不是对象，实际类型:', typeof data.periods);\n                return false;\n            }\n            \n            // 检查periods结构 - 更宽松的验证\n            if (data.periods.morning && !Array.isArray(data.periods.morning)) {\n                console.error('数据格式错误: periods.morning 不是数组');\n                return false;\n            }\n            \n            if (data.periods.afternoon && !Array.isArray(data.periods.afternoon)) {\n                console.error('数据格式错误: periods.afternoon 不是数组');\n                return false;\n            }\n            \n            if (data.periods.evening && !Array.isArray(data.periods.evening)) {\n                console.error('数据格式错误: periods.evening 不是数组');\n                return false;\n            }\n            \n            // 检查科目数据格式 - 更宽松的验证\n            for (let i = 0; i < data.subjects.length; i++) {\n                const subject = data.subjects[i];\n                if (!subject || typeof subject !== 'object') {\n                    console.error(`数据格式错误: 科目[${i}]不是对象:`, subject);\n                    return false;\n                }\n                if (!subject.id && !subject.name) {\n                    console.error(`数据格式错误: 科目[${i}]缺少必要字段:`, subject);\n                    return false;\n                }\n            }\n            \n            console.log('数据验证通过，包含字段:', Object.keys(data));\n            return true;\n        } catch (error) {\n            console.error('验证数据时出错:', error);\n            return false;\n        }\n    }\n\n    // 加载导入的数据\n    loadImportedData(data) {\n        try {\n            console.log('开始加载导入数据...');\n            \n            // 恢复课表数据 - 确保是对象\n            this.timetable = (data.timetable && typeof data.timetable === 'object') ? data.timetable : {};\n            console.log('课表数据加载:', Object.keys(this.timetable).length, '个时间段');\n            \n            // 恢复科目数据 - 确保是数组并验证完整性\n            this.subjects = Array.isArray(data.subjects) ? data.subjects : [];\n            this.subjects = this.subjects.filter(subject => {\n                if (!subject || typeof subject !== 'object') {\n                    console.warn('过滤掉无效的科目数据:', subject);\n                    return false;\n                }\n                if (!subject.id) {\n                    subject.id = 'subject_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);\n                    console.log('为科目生成新ID:', subject.name, subject.id);\n                }\n                return true;\n            });\n            console.log('科目数据加载:', this.subjects.length, '个科目');\n            \n            // 恢复时间段数据 - 提供默认值\n            this.periods = {\n                morning: Array.isArray(data.periods?.morning) ? data.periods.morning : [\n                    { name: '第1节', time: '08:00-08:40' },\n                    { name: '第2节', time: '08:50-09:30' },\n                    { name: '第3节', time: '10:00-10:40' },\n                    { name: '第4节', time: '10:50-11:30' }\n                ],\n                afternoon: Array.isArray(data.periods?.afternoon) ? data.periods.afternoon : [\n                    { name: '第1节', time: '14:00-14:40' },\n                    { name: '第2节', time: '14:50-15:30' },\n                    { name: '第3节', time: '15:40-16:20' }\n                ],\n                evening: Array.isArray(data.periods?.evening) ? data.periods.evening : [\n                    { name: '第1节', time: '19:00-19:40' },\n                    { name: '第2节', time: '19:50-20:30' }\n                ]\n            };\n            console.log('时间段数据加载完成');\n            \n            // 恢复时段名称\n            this.sectionNames = data.sectionNames || {\n                morning: '上午',\n                afternoon: '下午',\n                evening: '晚上'\n            };\n            console.log('时段名称加载:', this.sectionNames);\n            \n            // 恢复设置数据 - 提供默认值\n            if (data.settings && typeof data.settings === 'object') {\n                this.settings = { ...this.settings, ...data.settings };\n                console.log('设置数据加载:', this.settings);\n                // 应用设置\n                this.applySettings();\n            }\n            \n            // 重新渲染界面\n            this.renderTimetable();\n            this.renderSubjects();\n            \n            // 保存到本地存储\n            this.saveData();\n            localStorage.setItem('timetableSettings', JSON.stringify(this.settings));\n            \n            console.log('数据导入成功，界面已更新');\n        } catch (error) {\n            console.error('加载导入数据时出错:', error);\n            this.showNotification('导入数据时发生错误', 'error');\n        }\n    }\n\n    // 显示通知\n    showNotification(message, type = 'info') {\n        const notification = document.createElement('div');\n        notification.style.cssText = `\n            position: fixed;\n            top: 20px;\n            right: 20px;\n            padding: 12px 20px;\n            border-radius: 6px;\n            color: white;\n            font-weight: 500;\n            z-index: 10000;\n            animation: slideInRight 0.3s ease-out;\n            max-width: 300px;\n            word-wrap: break-word;\n        `;\n        \n        // 根据类型设置颜色\n        switch (type) {\n            case 'success':\n                notification.style.backgroundColor = '#28a745';\n                break;\n            case 'error':\n                notification.style.backgroundColor = '#dc3545';\n                break;\n            case 'warning':\n                notification.style.backgroundColor = '#ffc107';\n                notification.style.color = '#333';\n                break;\n            default:\n                notification.style.backgroundColor = '#007bff';\n        }\n        \n        notification.textContent = message;\n        document.body.appendChild(notification);\n        \n        // 3秒后自动移除\n        setTimeout(() => {\n            if (notification.parentNode) {\n                notification.style.animation = 'slideOutRight 0.3s ease-in';\n                setTimeout(() => {\n                    if (notification.parentNode) {\n                        notification.parentNode.removeChild(notification);\n                    }\n                }, 300);\n            }\n        }, 3000);\n    }\n\n    saveSettings(e) {\n        e.preventDefault();\n        \n        const showEveningCheckbox = document.getElementById('showEvening');\n        const showSaturdayCheckbox = document.getElementById('showSaturday');\n        const showSundayCheckbox = document.getElementById('showSunday');\n        const showPeriodTimeCheckbox = document.getElementById('showPeriodTime');\n\n        this.settings.showEvening = showEveningCheckbox.checked;\n        this.settings.showSaturday = showSaturdayCheckbox.checked;\n        this.settings.showSunday = showSundayCheckbox.checked;\n        this.settings.showPeriodTime = showPeriodTimeCheckbox.checked;\n\n        // 保存设置到本地存储\n        localStorage.setItem('timetableSettings', JSON.stringify(this.settings));\n        \n        // 应用设置并重新渲染\n        this.applySettings();\n        this.closeSettingsModal();\n    }\n\n    // 立即开始创建课程表功能\n    startCreatingTimetable() {\n        // 关闭教程弹窗\n        this.closeTutorialModal();\n        \n        // 如果在手机端，确保显示科目池\n        if (window.innerWidth <= 768) {\n            const subjectPool = document.querySelector('.subject-pool');\n            if (subjectPool) {\n                subjectPool.style.display = 'block';\n            }\n        }\n        \n        // 滚动到课程表顶部，确保用户看到操作区域\n        const timetableContainer = document.querySelector('.timetable-container');\n        if (timetableContainer) {\n            timetableContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });\n        }\n        \n        // 如果没有科目，提示用户添加\n        if (this.subjects.length === 0) {\n            // 显示一个简短提示\n            const hint = document.createElement('div');\n            hint.innerHTML = `\n                <div style=\"position: fixed; top: 20px; left: 50%; transform: translateX(-50%); \n                background: #4CAF50; color: white; padding: 15px 25px; border-radius: 8px; \n                box-shadow: 0 4px 12px rgba(0,0,0,0.15); z-index: 10000; \n                animation: fadeInOut 3s ease-in-out;\">\n                    请点击左侧「+ 科目」按钮开始添加科目\n                <\/div>\n                <style>\n                @keyframes fadeInOut {\n                    0% { opacity: 0; top: 0; }\n                    10% { opacity: 1; top: 20px; }\n                    90% { opacity: 1; top: 20px; }\n                    100% { opacity: 0; top: 0; }\n                }\n                <\/style>\n            `;\n            document.body.appendChild(hint);\n            \n            // 3秒后自动移除提示\n            setTimeout(() => {\n                if (hint.parentNode) {\n                    hint.parentNode.removeChild(hint);\n                }\n            }, 3000);\n        }\n        \n        // 如果有科目，但科目池在手机端被隐藏，提示用户如何操作\n        if (this.subjects.length > 0 && window.innerWidth <= 768) {\n            // 检查科目池是否可见\n            const subjectPool = document.querySelector('.subject-pool');\n            // 使用getComputedStyle来准确判断元素是否可见\n            const computedStyle = window.getComputedStyle(subjectPool);\n            if (subjectPool && (subjectPool.style.display === 'none' || computedStyle.display === 'none')) {\n                // 显示一个简短提示\n                const hint = document.createElement('div');\n                hint.innerHTML = `\n                    <div style=\"position: fixed; top: 20px; left: 50%; transform: translateX(-50%); \n                    background: #2196F3; color: white; padding: 15px 25px; border-radius: 8px; \n                    box-shadow: 0 4px 12px rgba(0,0,0,0.15); z-index: 10000; \n                    animation: fadeInOut 3s ease-in-out;\">\n                        请从上方科目池中拖拽科目到课程表中\n                    <\/div>\n                    <style>\n                    @keyframes fadeInOut {\n                        0% { opacity: 0; top: 0; }\n                        10% { opacity: 1; top: 20px; }\n                        90% { opacity: 1; top: 20px; }\n                        100% { opacity: 0; top: 0; }\n                    }\n                    <\/style>\n                `;\n                document.body.appendChild(hint);\n                \n                // 3秒后自动移除提示\n                setTimeout(() => {\n                    if (hint.parentNode) {\n                        hint.parentNode.removeChild(hint);\n                    }\n                }, 3000);\n            }\n        }\n    }\n\n    saveTime(e) {\n        e.preventDefault();\n        \n        const timeInput = document.getElementById('timeRange');\n        const period = timeInput.dataset.period;\n        const newTime = timeInput.value.trim();\n        \n        if (!newTime) return;\n        \n        document.querySelector(`[data-period=\"${period}\"]`).textContent = newTime;\n        this.saveData();\n        this.closeTimeModal();\n    }\n\n    addSubjectToCell(subjectId, day, section, period) {\n        const key = `${day}-${section}-${period}`;\n        this.timetable[key] = subjectId;\n        this.saveData();\n        this.renderTimetable();\n    }\n\n    removeSubjectFromCell(cell) {\n        if (cell.classList.contains('occupied')) {\n            const day = cell.dataset.day;\n            const section = cell.dataset.section;\n            const period = cell.dataset.period;\n            const key = `${day}-${section}-${period}`;\n            delete this.timetable[key];\n            this.saveData();\n            this.renderTimetable();\n        }\n    }\n\n    renderSubjects() {\n        const pool = document.getElementById('subjectPool');\n        pool.innerHTML = '';\n        \n        this.subjects.forEach(subject => {\n            const card = document.createElement('div');\n            card.className = 'subject-card';\n            card.draggable = true;\n            card.dataset.subjectId = subject.id;\n            \n            // 使用新的颜色模式\n            const colorMode = subject.colorMode || (subject.colorType === 'text' ? 'textOnly' : 'both');\n            const bgColor = subject.bgColor || subject.color || '#3498DB';\n            const textColor = subject.textColor || (colorMode === 'both' ? '#FFFFFF' : subject.color || '#000000');\n            \n            if (colorMode === 'both') {\n                card.style.borderLeft = `4px solid ${bgColor}`;\n            } else {\n                card.style.borderLeft = `4px solid ${textColor}`;\n            }\n            \n            const teacherHtml = subject.teacher ? `<div class=\"teacher-name\">${subject.teacher}<\/div>` : '';\n            const subjectStyle = !subject.teacher ? 'style=\"line-height: 40px;\"' : '';\n            \n            card.innerHTML = `\n                <div class=\"subject-info\">\n                    <div class=\"subject-name\" ${subjectStyle}>${subject.name}<\/div>\n                    ${teacherHtml}\n                <\/div>\n                <div class=\"subject-actions\">\n                    <button class=\"btn-text edit-btn\" title=\"编辑\" data-action=\"edit\">编辑<\/button>\n                    <button class=\"btn-text delete-btn\" title=\"删除\" data-action=\"delete\">删除<\/button>\n                <\/div>\n            `;\n            \n            // 编辑按钮事件\n            card.querySelector('.edit-btn').addEventListener('click', (e) => {\n                e.stopPropagation();\n                this.openSubjectModal(subject);\n            });\n            \n            // 删除按钮事件\n            card.querySelector('.delete-btn').addEventListener('click', (e) => {\n                e.stopPropagation();\n                this.deleteSubjectFromPool(subject.id);\n            });\n            \n            pool.appendChild(card);\n        });\n    }\n\n    addPeriod(section) {\n        const periods = this.periods[section];\n        let defaultTime = '15:00-15:40';\n        switch(section) {\n            case 'morning':\n                defaultTime = '09:00-09:40';\n                break;\n            case 'afternoon':\n                defaultTime = '15:00-15:40';\n                break;\n            case 'evening':\n                defaultTime = '19:00-19:40';\n                break;\n        }\n        const newPeriod = {\n            name: `第${periods.length + 1}节`,\n            time: defaultTime\n        };\n        periods.push(newPeriod);\n        this.saveData();\n        this.renderTimetable();\n    }\n\n    // 自定义确认对话框\n    confirm(message, callback) {\n        const modal = document.getElementById('confirmModal');\n        const messageEl = modal.querySelector('.confirm-message');\n        const okBtn = document.getElementById('confirmOkBtn');\n        const cancelBtn = document.getElementById('confirmCancelBtn');\n        \n        messageEl.textContent = message;\n        modal.style.display = 'flex';\n        \n        // 移除之前的事件监听器\n        okBtn.removeEventListener('click', this.confirmOkHandler);\n        cancelBtn.removeEventListener('click', this.confirmCancelHandler);\n        \n        // 创建新的事件监听器\n        this.confirmOkHandler = () => {\n            modal.style.display = 'none';\n            if (callback) callback(true);\n        };\n        \n        this.confirmCancelHandler = () => {\n            modal.style.display = 'none';\n            if (callback) callback(false);\n        };\n        \n        // 添加事件监听器\n        okBtn.addEventListener('click', this.confirmOkHandler);\n        cancelBtn.addEventListener('click', this.confirmCancelHandler);\n        \n        // 点击模态框背景关闭\n        modal.addEventListener('click', (e) => {\n            if (e.target === modal) {\n                this.confirmCancelHandler();\n            }\n        });\n    }\n    \n    removePeriod(section) {\n        if (this.periods[section].length <= 1) {\n            this.confirm('至少需要保留一节课！');\n            return;\n        }\n        \n        let sectionName = '下午';\n        switch(section) {\n            case 'morning':\n                sectionName = '上午';\n                break;\n            case 'afternoon':\n                sectionName = '下午';\n                break;\n            case 'evening':\n                sectionName = '晚上';\n                break;\n        }\n        \n        this.confirm(`确定要删除${sectionName}的最后一节课吗？`, (confirmed) => {\n            if (confirmed) {\n                this.periods[section].pop();\n                \n                // 清理对应的课程表数据\n                const keysToDelete = [];\n                for (let key in this.timetable) {\n                    if (key.includes(`-${section}-`)) {\n                        const parts = key.split('-');\n                        const periodIndex = parseInt(parts[2]);\n                        if (periodIndex >= this.periods[section].length) {\n                            keysToDelete.push(key);\n                        }\n                    }\n                }\n                \n                keysToDelete.forEach(key => {\n                    delete this.timetable[key];\n                });\n                \n                this.saveData();\n                this.renderTimetable();\n            }\n        });\n    }\n\n    renderTimetable() {\n        const tbody = document.getElementById('timetableBody');\n        tbody.innerHTML = '';\n        \n        // 渲染上午\n        if (this.periods.morning.length > 0) {\n            this.periods.morning.forEach((period, index) => {\n                const row = this.createPeriodRow('morning', index, period);\n                tbody.appendChild(row);\n            });\n        }\n        \n        // 渲染下午\n        if (this.periods.afternoon.length > 0) {\n            this.periods.afternoon.forEach((period, index) => {\n                const row = this.createPeriodRow('afternoon', index, period);\n                tbody.appendChild(row);\n            });\n        }\n\n        // 渲染晚上\n        if (this.settings.showEvening && this.periods.evening.length > 0) {\n            this.periods.evening.forEach((period, index) => {\n                const row = this.createPeriodRow('evening', index, period);\n                tbody.appendChild(row);\n            });\n        }\n    }\n\n    // 手机端选择科目功能\n    showMobileSubjectSelector(day, section, period) {\n        const cellKey = `${day}-${section}-${period}`;\n        \n        // 创建弹窗\n        const modal = document.createElement('div');\n        modal.className = 'mobile-subject-modal';\n        modal.style.cssText = `\n            position: fixed;\n            top: 0;\n            left: 0;\n            width: 100%;\n            height: 100%;\n            background: rgba(0, 0, 0, 0.5);\n            z-index: 2000;\n            display: flex;\n            align-items: center;\n            justify-content: center;\n        `;\n        \n        const content = document.createElement('div');\n        // PC端和移动端响应式宽度\n        const isMobile = window.innerWidth <= 768;\n        content.style.cssText = `\n            background: white;\n            border-radius: 12px;\n            padding: 0;\n            max-width: ${isMobile ? '90%' : '600px'};\n            width: ${isMobile ? '90%' : '600px'};\n            max-height: 80vh;\n            overflow: hidden;\n            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);\n        `;\n        \n        // 头部区域\n        const header = document.createElement('div');\n        header.style.cssText = `\n            display: flex;\n            justify-content: space-between;\n            align-items: center;\n            padding: 20px 20px 15px;\n            border-bottom: 1px solid #eee;\n        `;\n        \n        const title = document.createElement('h3');\n        title.textContent = '选择科目';\n        title.style.cssText = 'margin: 0; font-size: 18px; color: #333; font-weight: 600;';\n        \n        const closeBtn = document.createElement('button');\n        closeBtn.innerHTML = '×';\n        closeBtn.style.cssText = `\n            background: none;\n            border: none;\n            font-size: 24px;\n            cursor: pointer;\n            color: #999;\n            width: 30px;\n            height: 30px;\n            display: flex;\n            align-items: center;\n            justify-content: center;\n            border-radius: 50%;\n            transition: all 0.2s;\n        `;\n        closeBtn.onmouseover = () => closeBtn.style.background = '#f5f5f5';\n        closeBtn.onmouseout = () => closeBtn.style.background = 'none';\n        \n        header.appendChild(title);\n        header.appendChild(closeBtn);\n        \n        // 搜索框区域\n        const searchContainer = document.createElement('div');\n        searchContainer.style.cssText = 'padding: 15px 20px; border-bottom: 1px solid #eee;';\n        \n        const searchInput = document.createElement('input');\n        searchInput.type = 'text';\n        searchInput.placeholder = '搜索科目或老师...';\n        searchInput.style.cssText = `\n            width: 100%;\n            padding: 10px 15px;\n            border: 1px solid #ddd;\n            border-radius: 8px;\n            font-size: 14px;\n            outline: none;\n            transition: border-color 0.2s;\n            box-sizing: border-box;\n        `;\n        searchInput.onfocus = () => searchInput.style.borderColor = '#007bff';\n        searchInput.onblur = () => searchInput.style.borderColor = '#ddd';\n        \n        searchContainer.appendChild(searchInput);\n        \n        // 科目列表区域\n        const listContainer = document.createElement('div');\n        listContainer.style.cssText = 'max-height: 50vh; overflow-y: auto; padding: 15px 20px;';\n        \n        const list = document.createElement('div');\n        // 2个课程一行，响应式网格布局\n        list.style.cssText = `\n            display: grid;\n            grid-template-columns: ${isMobile ? '1fr' : 'repeat(2, 1fr)'};\n            gap: 10px;\n        `;\n        \n        // 渲染科目列表\n        const renderSubjects = (filterText = '') => {\n            list.innerHTML = '';\n            \n            const filteredSubjects = this.subjects.filter(subject => {\n                if (!filterText) return true;\n                const searchLower = filterText.toLowerCase();\n                return subject.name.toLowerCase().includes(searchLower) || \n                       (subject.teacher && subject.teacher.toLowerCase().includes(searchLower));\n            });\n            \n            if (filteredSubjects.length === 0) {\n                const emptyMessage = document.createElement('div');\n                emptyMessage.style.cssText = `\n                    text-align: center;\n                    padding: 40px 20px;\n                    color: #999;\n                    font-size: 14px;\n                    grid-column: 1 / -1;\n                `;\n                emptyMessage.innerHTML = filterText \n                    ? `<div style=\"font-size: 48px; margin-bottom: 10px;\">🔍<\/div><div>未找到匹配的科目<\/div>`\n                    : `<div style=\"font-size: 48px; margin-bottom: 10px;\">📚<\/div>\n                       <div>暂无科目，请先添加科目<\/div>\n                       <button onclick=\"document.getElementById('addSubjectBtn').click(); this.closest('.mobile-subject-modal').remove();\" \n                               style=\"margin-top: 10px; padding: 8px 16px; background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer;\">\n                           添加科目\n                       <\/button>`;\n                list.appendChild(emptyMessage);\n            } else {\n                filteredSubjects.forEach(subject => {\n                    const item = document.createElement('div');\n                    item.style.cssText = `\n                        padding: 12px;\n                        border: 1px solid #eee;\n                        border-radius: 8px;\n                        cursor: pointer;\n                        display: flex;\n                        align-items: center;\n                        gap: 10px;\n                        transition: all 0.2s;\n                        background: white;\n                    `;\n                    item.onmouseover = () => {\n                        item.style.background = '#f8f9fa';\n                        item.style.borderColor = '#007bff';\n                    };\n                    item.onmouseout = () => {\n                        item.style.background = 'white';\n                        item.style.borderColor = '#eee';\n                    };\n                    \n                    const colorBox = document.createElement('div');\n                    // 使用新的颜色模式\n                    const colorMode = subject.colorMode || (subject.colorType === 'text' ? 'textOnly' : 'both');\n                    const bgColor = subject.bgColor || subject.color || '#3498DB';\n                    const textColor = subject.textColor || (colorMode === 'both' ? '#FFFFFF' : subject.color || '#000000');\n                    const displayColor = colorMode === 'both' ? bgColor : textColor;\n                    \n                    colorBox.style.cssText = `\n                        width: 20px;\n                        height: 20px;\n                        border-radius: 50%;\n                        background: ${displayColor};\n                        flex-shrink: 0;\n                        ${displayColor === '#FFFFFF' || displayColor === '#ffffff' ? 'border: 1px solid #ddd;' : ''}\n                    `;\n                    \n                    const textContainer = document.createElement('div');\n                    textContainer.style.cssText = 'flex: 1; min-width: 0;';\n                    \n                    const subjectName = document.createElement('div');\n                    subjectName.textContent = subject.name;\n                    subjectName.style.cssText = 'font-weight: 600; color: #333; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;';\n                    \n                    const teacherName = document.createElement('div');\n                    teacherName.textContent = subject.teacher || '暂无老师';\n                    teacherName.style.cssText = 'font-size: 11px; color: #666; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;';\n                    \n                    textContainer.appendChild(subjectName);\n                    textContainer.appendChild(teacherName);\n                    \n                    item.appendChild(colorBox);\n                    item.appendChild(textContainer);\n                    \n                    item.addEventListener('click', () => {\n                        this.addSubjectToCell(subject.id, day, section, period);\n                        this.closeMobileSubjectModal(modal);\n                    });\n                    \n                    list.appendChild(item);\n                });\n            }\n        };\n        \n        // 初始渲染\n        renderSubjects();\n        \n        // 搜索功能\n        searchInput.addEventListener('input', (e) => {\n            renderSubjects(e.target.value);\n        });\n        \n        listContainer.appendChild(list);\n        \n        if (this.subjects.length === 0) {\n            const emptyMessage = document.createElement('div');\n            emptyMessage.style.cssText = `\n                text-align: center;\n                padding: 40px 20px;\n                color: #999;\n                font-size: 14px;\n            `;\n            emptyMessage.innerHTML = `\n                <div style=\"font-size: 48px; margin-bottom: 10px;\">📚<\/div>\n                <div>暂无科目，请先添加科目<\/div>\n                <button onclick=\"document.getElementById('addSubjectBtn').click(); this.closest('.mobile-subject-modal').remove();\" \n                        style=\"margin-top: 10px; padding: 8px 16px; background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer;\">\n                    添加科目\n                <\/button>\n            `;\n            listContainer.appendChild(emptyMessage);\n        }\n        \n        // 底部按钮区域\n        const footer = document.createElement('div');\n        footer.style.cssText = `\n            padding: 15px 20px 20px;\n            border-top: 1px solid #eee;\n            display: flex;\n            gap: 10px;\n        `;\n        \n        const addSubjectBtn = document.createElement('button');\n        addSubjectBtn.textContent = '添加新科目';\n        addSubjectBtn.style.cssText = `\n            flex: 1;\n            padding: 10px;\n            background: #007bff;\n            color: white;\n            border: none;\n            border-radius: 6px;\n            cursor: pointer;\n            font-size: 14px;\n            transition: all 0.2s;\n        `;\n        addSubjectBtn.onmouseover = () => addSubjectBtn.style.background = '#0056b3';\n        addSubjectBtn.onmouseout = () => addSubjectBtn.style.background = '#007bff';\n        addSubjectBtn.addEventListener('click', () => {\n            this.closeMobileSubjectModal(modal);\n            setTimeout(() => this.openSubjectModal(), 300);\n        });\n        \n        const cancelBtn = document.createElement('button');\n        cancelBtn.textContent = '取消';\n        cancelBtn.style.cssText = `\n            flex: 1;\n            padding: 10px;\n            background: #6c757d;\n            color: white;\n            border: none;\n            border-radius: 6px;\n            cursor: pointer;\n            font-size: 14px;\n            transition: all 0.2s;\n        `;\n        cancelBtn.onmouseover = () => cancelBtn.style.background = '#545b62';\n        cancelBtn.onmouseout = () => cancelBtn.style.background = '#6c757d';\n        cancelBtn.addEventListener('click', () => {\n            this.closeMobileSubjectModal(modal);\n        });\n        \n        footer.appendChild(addSubjectBtn);\n        footer.appendChild(cancelBtn);\n        \n        // 组装弹窗\n        content.appendChild(header);\n        content.appendChild(searchContainer);\n        content.appendChild(listContainer);\n        content.appendChild(footer);\n        modal.appendChild(content);\n        \n        // CSS动画已在styles.css中定义，无需动态添加\n        \n        // 多种关闭方式\n        const closeModal = () => this.closeMobileSubjectModal(modal);\n        \n        // 1. 点击关闭按钮\n        closeBtn.addEventListener('click', closeModal);\n        \n        // 2. 点击背景区域\n        modal.addEventListener('click', (e) => {\n            if (e.target === modal) {\n                closeModal();\n            }\n        });\n        \n        // 3. 按ESC键关闭\n        const handleEscape = (e) => {\n            if (e.key === 'Escape') {\n                closeModal();\n                document.removeEventListener('keydown', handleEscape);\n            }\n        };\n        document.addEventListener('keydown', handleEscape);\n        \n        // 4. 点击取消按钮\n        cancelBtn.addEventListener('click', closeModal);\n        \n        // 防止滚动穿透，同时避免页面晃动\n        const scrollBarWidth = window.innerWidth - document.documentElement.clientWidth;\n        document.body.style.overflow = 'hidden';\n        if (scrollBarWidth > 0) {\n            document.body.style.paddingRight = scrollBarWidth + 'px';\n        }\n        \n        // 显示弹窗\n        document.body.appendChild(modal);\n        \n        // 保存引用以便关闭\n        this.currentMobileModal = modal;\n    }\n    \n    // 关闭手机端选择科目弹窗\n    closeMobileSubjectModal(modal) {\n        if (!modal) return;\n        \n        // 直接关闭弹窗，无动画效果\n        if (modal.parentNode) {\n            document.body.removeChild(modal);\n        }\n        document.body.style.overflow = '';\n        document.body.style.paddingRight = '';\n        \n        this.currentMobileModal = null;\n    }\n\n    createPeriodRow(section, periodIndex, period) {\n        const row = document.createElement('tr');\n        \n        // 时间列 - 只在第一节创建，使用rowSpan合并单元格\n        if (periodIndex === 0) {\n            const timeCell = document.createElement('td');\n            timeCell.className = 'time-cell';\n            timeCell.style.cursor = 'pointer';\n            timeCell.dataset.section = section;\n            \n            // 获取自定义名称，如果没有则使用默认名称\n            const sectionName = this.sectionNames[section] || '上午';\n            const chars = sectionName.split('');\n            let timeText = '<div class=\"vertical-text\">';\n            chars.forEach(char => {\n                timeText += `<span>${char}<\/span>`;\n            });\n            timeText += '<\/div>';\n            \n            timeCell.innerHTML = timeText;\n            timeCell.rowSpan = this.periods[section].length;\n            \n            // 添加点击事件编辑时段名称\n            timeCell.addEventListener('click', () => {\n                this.openSectionNameModal(section);\n            });\n            \n            row.appendChild(timeCell);\n        }\n        \n        // 课时列\n        const periodCell = document.createElement('td');\n        periodCell.className = 'period-cell';\n        const timeDisplayStyle = this.settings.showPeriodTime ? 'display: block;' : 'display: none;';\n        periodCell.innerHTML = `\n                        <div class=\"period-name\" data-section=\"${section}\" data-period=\"${periodIndex}\" style=\"cursor: pointer; font-weight: bold; color: var(--text-color);\">\n                            ${period.name}\n                        <\/div>\n                        <div class=\"time-display\" data-section=\"${section}\" data-period=\"${periodIndex}\" style=\"cursor: pointer; font-size: 12px; color: var(--text-color); ${timeDisplayStyle}\">\n                            ${period.time}\n                        <\/div>\n                    `;\n        \n        // 添加课时名称和时间段点击事件\n        periodCell.querySelector('.period-name').addEventListener('click', (e) => {\n            this.openTimeModal(e, section, periodIndex);\n        });\n        periodCell.querySelector('.time-display').addEventListener('click', (e) => {\n            this.openTimeModal(e, section, periodIndex);\n        });\n        \n        row.appendChild(periodCell);\n        \n        // 周一到周日的格子\n        const days = [1, 2, 3, 4, 5];\n        if (this.settings.showSaturday) days.push(6);\n        if (this.settings.showSunday) days.push(7);\n\n        for (let day of days) {\n            const cell = document.createElement('td');\n            cell.className = 'cell';\n            if (day >= 6) {\n                cell.classList.add('weekend-col');\n            }\n            cell.dataset.day = day;\n            cell.dataset.section = section;\n            cell.dataset.period = periodIndex;\n            \n            const key = `${day}-${section}-${periodIndex}`;\n            const subjectId = this.timetable[key];\n            \n            if (subjectId) {\n                const subject = this.subjects.find(s => s.id === subjectId);\n                if (subject) {\n                    cell.classList.add('occupied');\n                    const content = document.createElement('div');\n                    content.className = 'cell-content';\n                    \n                    // 根据颜色模式应用颜色\n                    const colorMode = subject.colorMode || (subject.colorType === 'text' ? 'textOnly' : 'both');\n                    const bgColor = subject.bgColor || subject.color || '#3498DB';\n                    const textColor = subject.textColor || (colorMode === 'both' ? '#FFFFFF' : subject.color || '#000000');\n                    \n                    if (colorMode === 'both') {\n                        // 背景+字体模式\n                        content.style.backgroundColor = bgColor;\n                        content.style.color = textColor;\n                    } else {\n                        // 仅字体色模式 - 透明背景\n                        content.style.backgroundColor = 'transparent';\n                        content.style.color = textColor;\n                    }\n                    \n                    const teacherHtml = subject.teacher ? `<div class=\"teacher-name\">${subject.teacher}<\/div>` : '';\n                    const subjectStyle = !subject.teacher ? 'style=\"margin-bottom: 0;\"' : '';\n                    content.innerHTML = `\n                        <div class=\"subject-name\" ${subjectStyle}>${subject.name}<\/div>\n                        ${teacherHtml}\n                        <button class=\"delete-cell-btn\" title=\"删除课程\">×<\/button>\n                    `;\n                    cell.appendChild(content);\n                    \n                    // 添加删除按钮事件\n                    content.querySelector('.delete-cell-btn').addEventListener('click', (e) => {\n                        e.stopPropagation();\n                        this.removeSubjectFromCell(cell);\n                    });\n                }\n            } else {\n                // 所有设备默认显示+号\n                cell.classList.add('empty-cell');\n                cell.style.cssText = 'position: relative; cursor: pointer;';\n                \n                // 使用CSS伪元素显示+号，确保默认显示\n                const plusIndicator = document.createElement('div');\n                plusIndicator.className = 'plus-indicator';\n                plusIndicator.textContent = '+';\n                plusIndicator.style.cssText = 'font-size: 24px; color: #ccc; display: flex; align-items: center; justify-content: center; width: 100%; height: 100%;';\n                cell.appendChild(plusIndicator);\n            }\n            \n            // 添加双击删除课程事件\n            cell.addEventListener('dblclick', () => {\n                if (cell.classList.contains('occupied')) {\n                    this.removeSubjectFromCell(cell);\n                }\n            });\n            \n            // 添加点击选择\n            cell.addEventListener('click', () => {\n                this.editingCell = cell;\n                document.querySelectorAll('.cell').forEach(c => c.classList.remove('selected'));\n                cell.classList.add('selected');\n                \n                // 所有设备点击选择科目\n                if (!cell.classList.contains('occupied')) {\n                    this.showMobileSubjectSelector(day, section, periodIndex);\n                }\n            });\n            \n            row.appendChild(cell);\n        }\n        \n        return row;\n    }\n\n    openTimeModal(e, section, periodIndex) {\n        this.editingPeriod = { section, periodIndex };\n        const modal = document.getElementById('timeModal');\n        const nameInput = document.getElementById('periodName');\n        const startHourSelect = document.getElementById('startHour');\n        const startMinuteSelect = document.getElementById('startMinute');\n        const endHourSelect = document.getElementById('endHour');\n        const endMinuteSelect = document.getElementById('endMinute');\n        \n        const period = this.periods[section][periodIndex];\n        nameInput.value = period.name;\n        \n        // 解析现有时间\n        const [startTime, endTime] = period.time.split('-');\n        const [startH, startM] = startTime.split(':');\n        const [endH, endM] = endTime.split(':');\n        \n        startHourSelect.value = startH;\n        startMinuteSelect.value = startM;\n        endHourSelect.value = endH;\n        endMinuteSelect.value = endM;\n        \n        modal.style.display = 'flex';\n    }\n\n    savePeriodTime(e) {\n        e.preventDefault();\n        \n        if (!this.editingPeriod) return;\n        \n        const { section, periodIndex } = this.editingPeriod;\n        const nameInput = document.getElementById('periodName');\n        const startHourSelect = document.getElementById('startHour');\n        const startMinuteSelect = document.getElementById('startMinute');\n        const endHourSelect = document.getElementById('endHour');\n        const endMinuteSelect = document.getElementById('endMinute');\n        \n        const newName = nameInput.value.trim();\n        const startHour = startHourSelect.value;\n        const startMinute = startMinuteSelect.value;\n        const endHour = endHourSelect.value;\n        const endMinute = endMinuteSelect.value;\n        \n        if (!newName || !startHour || !startMinute || !endHour || !endMinute) return;\n        \n        const newTime = `${startHour}:${startMinute}-${endHour}:${endMinute}`;\n        this.periods[section][periodIndex].time = newTime;\n        this.periods[section][periodIndex].name = newName;\n        this.saveData();\n        this.renderTimetable();\n        this.closeTimeModal();\n    }\n\n    resetTimetable() {\n        if (confirm('确定要重置整个课程表吗？这将清空课程表内容但保留科目')) {\n            // 只重置课程表内容，保留科目池\n            this.timetable = {};\n            this.periods = {\n                morning: [\n                { name: '第1节', time: '08:00-08:40' },\n                { name: '第2节', time: '08:50-09:30' },\n                { name: '第3节', time: '10:00-10:40' },\n                { name: '第4节', time: '10:50-11:30' }\n            ],\n            afternoon: [\n                { name: '第1节', time: '14:00-14:40' },\n                { name: '第2节', time: '14:50-15:30' },\n                { name: '第3节', time: '15:40-16:20' }\n            ],\n            evening: [\n                { name: '第1节', time: '19:00-19:40' },\n                { name: '第2节', time: '19:50-20:30' }\n            ]\n            };\n            \n            // 重置时段名称\n            this.sectionNames = {\n                morning: '上午',\n                afternoon: '下午',\n                evening: '晚上'\n            };\n            \n            // 重置课程表标题\n            const defaultTitle = '我的课程表';\n            document.getElementById('timetableTitle').value = defaultTitle;\n            localStorage.setItem('timetableTitle', defaultTitle);\n            \n            this.saveData();\n            this.renderTimetable();\n        }\n    }\n\n    toggleExportDropdown(e) {\n        e.stopPropagation();\n        const dropdown = document.getElementById('exportMenu');\n        const isVisible = dropdown.classList.contains('show');\n        \n        // 关闭所有其他下拉菜单\n        this.closeAllDropdowns();\n        \n        // 切换当前下拉菜单\n        if (!isVisible) {\n            dropdown.classList.add('show');\n            this.positionDropdown(dropdown, e.target);\n        }\n    }\n\n    closeAllDropdowns() {\n        // 调用全局关闭函数\n        closeAllMenus();\n        \n        // 关闭其他下拉菜单\n        const dropdowns = document.querySelectorAll('.dropdown-content');\n        dropdowns.forEach(dropdown => {\n            dropdown.style.display = 'none';\n        });\n        \n        // 隐藏移动端遮罩层\n        this.hideMobileOverlay();\n    }\n    \n    // 处理全局点击事件\n    handleGlobalClick(e) {\n        const exportMenu = document.getElementById('exportMenu');\n        const backupMenu = document.getElementById('backupMenu');\n        const exportBtn = document.getElementById('exportBtn');\n        const backupBtn = document.getElementById('backupBtn');\n        \n        // 检查是否点击在下拉菜单或按钮上\n        const isClickOnExportMenu = exportMenu && (exportMenu.contains(e.target) || exportBtn.contains(e.target));\n        const isClickOnBackupMenu = backupMenu && (backupMenu.contains(e.target) || backupBtn.contains(e.target));\n        \n        // 如果点击在外部区域，隐藏所有下拉菜单\n        if (!isClickOnExportMenu && !isClickOnBackupMenu) {\n            this.closeAllDropdowns();\n        }\n    }\n    \n    // 智能定位下拉菜单\n    positionDropdown(dropdown, button) {\n        if (!dropdown || !button) return;\n        \n        const isMobile = window.innerWidth <= 768;\n        \n        if (isMobile) {\n            // 手机端：固定定位，避免被遮挡\n            this.positionMobileDropdown(dropdown, button);\n        } else {\n            // PC端：相对定位\n            this.positionDesktopDropdown(dropdown, button);\n        }\n    }\n    \n    // PC端下拉菜单定位\n    positionDesktopDropdown(dropdown, button) {\n        const rect = button.getBoundingClientRect();\n        const dropdownRect = dropdown.getBoundingClientRect();\n        \n        // 重置样式\n        dropdown.style.position = 'absolute';\n        dropdown.style.top = '100%';\n        dropdown.style.left = '0';\n        dropdown.style.right = 'auto';\n        dropdown.style.bottom = 'auto';\n        dropdown.style.transform = 'none';\n        dropdown.style.zIndex = '9999';\n        \n        // 检查是否需要调整位置避免超出屏幕\n        const viewportWidth = window.innerWidth;\n        const viewportHeight = window.innerHeight;\n        \n        if (rect.left + dropdownRect.width > viewportWidth) {\n            dropdown.style.left = 'auto';\n            dropdown.style.right = '0';\n        }\n        \n        if (rect.bottom + dropdownRect.height > viewportHeight) {\n            dropdown.style.top = 'auto';\n            dropdown.style.bottom = '100%';\n        }\n    }\n    \n    // 手机端下拉菜单定位\n    positionMobileDropdown(dropdown, button) {\n        // 手机端使用固定定位，从底部弹出\n        dropdown.style.position = 'fixed';\n        dropdown.style.top = 'auto';\n        dropdown.style.bottom = '20px';\n        dropdown.style.left = '20px';\n        dropdown.style.right = '20px';\n        dropdown.style.width = 'auto';\n        dropdown.style.transform = 'translateY(120%)';\n        dropdown.style.zIndex = '999999';\n        dropdown.style.transition = 'transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)';\n        dropdown.style.maxHeight = '50vh';\n        dropdown.style.overflowY = 'auto';\n        \n        // 创建或显示遮罩层\n        this.createMobileOverlay();\n    }\n    \n    // 创建移动端遮罩层\n    createMobileOverlay() {\n        let overlay = document.querySelector('.dropdown-overlay');\n        if (!overlay) {\n            overlay = document.createElement('div');\n            overlay.className = 'dropdown-overlay';\n            document.body.appendChild(overlay);\n            \n            // 点击遮罩层关闭菜单\n            overlay.addEventListener('click', () => {\n                this.closeAllDropdowns();\n            });\n        }\n        overlay.classList.add('show');\n    }\n    \n    // 隐藏移动端遮罩层\n    hideMobileOverlay() {\n        const overlay = document.querySelector('.dropdown-overlay');\n        if (overlay) {\n            overlay.classList.remove('show');\n        }\n    }\n\n\n    // 处理窗口大小改变\n    handleWindowResize() {\n        // 检查是否有打开的下拉菜单，重新定位\n        const exportMenu = document.getElementById('exportMenu');\n        const backupMenu = document.getElementById('backupMenu');\n        const exportBtn = document.getElementById('exportBtn');\n        const backupBtn = document.getElementById('backupBtn');\n        \n        if (exportMenu && exportMenu.classList.contains('show') && exportBtn) {\n            this.positionDropdown(exportMenu, exportBtn);\n        }\n        \n        if (backupMenu && backupMenu.classList.contains('show') && backupBtn) {\n            this.positionDropdown(backupMenu, backupBtn);\n        }\n        \n        // 如果窗口变大，关闭手机端侧边栏\n        if (window.innerWidth > 768) {\n            this.closeMobileSidebar();\n        }\n    }\n    \n    // 手机端侧边栏相关方法\n    toggleMobileSidebar() {\n        const sidebar = document.getElementById('mobileSidebar');\n        const overlay = document.getElementById('sidebarOverlay');\n        const hamburgerBtn = document.getElementById('hamburgerBtn');\n        \n        if (sidebar.classList.contains('show')) {\n            this.closeMobileSidebar();\n        } else {\n            this.openMobileSidebar();\n        }\n    }\n    \n    openMobileSidebar() {\n        const sidebar = document.getElementById('mobileSidebar');\n        const overlay = document.getElementById('sidebarOverlay');\n        const hamburgerBtn = document.getElementById('hamburgerBtn');\n        \n        sidebar.classList.add('show');\n        overlay.classList.add('show');\n        hamburgerBtn.classList.add('active');\n        \n        // 防止背景滚动\n        document.body.style.overflow = 'hidden';\n    }\n    \n    closeMobileSidebar() {\n        const sidebar = document.getElementById('mobileSidebar');\n        const overlay = document.getElementById('sidebarOverlay');\n        const hamburgerBtn = document.getElementById('hamburgerBtn');\n        \n        sidebar.classList.remove('show');\n        overlay.classList.remove('show');\n        hamburgerBtn.classList.remove('active');\n        \n        // 恢复背景滚动\n        document.body.style.overflow = '';\n    }\n    \n    // 处理侧边栏菜单按钮点击\n    handleSidebarAction(action) {\n        // 关闭侧边栏\n        this.closeMobileSidebar();\n        \n        // 根据action执行相应功能\n        switch (action) {\n            case 'tutorial':\n                this.openTutorialModal();\n                break;\n            case 'reset':\n                this.resetTimetable();\n                break;\n            case 'saveImage':\n                this.saveAsImage();\n                break;\n            case 'exportWord':\n                this.exportToWord();\n                break;\n            case 'exportExcel':\n                this.exportToExcel();\n                break;\n            case 'exportData':\n                this.exportData();\n                break;\n            case 'importData':\n                this.importData();\n                break;\n            case 'settings':\n                this.openSettingsModal();\n                break;\n            default:\n                console.warn('未知的侧边栏操作:', action);\n        }\n    }\n    \n    // 更新侧边栏主题按钮状态\n    updateSidebarThemeButtons(theme) {\n        document.querySelectorAll('.sidebar-theme-btn').forEach(btn => {\n            btn.classList.toggle('active', btn.dataset.theme === theme);\n        });\n    }\n    \n    // 更新侧边栏字体按钮状态\n    updateSidebarFontButtons(font) {\n        document.querySelectorAll('.sidebar-font-btn').forEach(btn => {\n            btn.classList.toggle('active', btn.dataset.font === font);\n        });\n    }\n\n    saveAsImage() {\n        let cleanContainer = null;\n        try {\n            const isMobile = window.innerWidth <= 768;\n            \n            // 获取主题色\n            const getThemeColor = (variableName, defaultValue) => {\n                const computedValue = getComputedStyle(document.body).getPropertyValue(variableName).trim();\n                return computedValue || defaultValue;\n            };\n            \n            const primaryColor = getThemeColor('--primary-color', '#4a7c59');\n            const primaryRgb = this.hexToRgb(primaryColor);\n            const lightPrimary = primaryRgb ? `rgba(${primaryRgb.r}, ${primaryRgb.g}, ${primaryRgb.b}, 0.1)` : '#f0f8f0';\n            const mediumPrimary = primaryRgb ? `rgba(${primaryRgb.r}, ${primaryRgb.g}, ${primaryRgb.b}, 0.15)` : '#e8f5e9';\n            \n            // 获取当前字体设置\n            const currentFont = getComputedStyle(document.body).fontFamily || '\"Microsoft YaHei\", \"PingFang SC\", Arial, sans-serif';\n            \n            // 获取标题\n            const titleInput = document.getElementById('tableTitle');\n            const titleText = titleInput.value || '课程表';\n            \n            // 创建干净导出容器\n            cleanContainer = document.createElement('div');\n            cleanContainer.style.cssText = `\n                position: absolute; \n                top: -9999px; \n                left: -9999px; \n                width: 900px; \n                padding: 40px 50px; \n                background: #ffffff;\n                font-family: ${currentFont};\n            `;\n\n            // 创建标题区域\n            const headerDiv = document.createElement('div');\n            headerDiv.style.cssText = `\n                text-align: center; \n                margin-bottom: 30px; \n                padding-bottom: 20px;\n                border-bottom: 3px solid ${primaryColor};\n            `;\n            \n            const mainTitle = document.createElement('h1');\n            mainTitle.textContent = titleText;\n            mainTitle.style.cssText = `\n                margin: 0 0 8px 0; \n                font-size: 32px; \n                font-weight: bold; \n                color: ${primaryColor}; \n                letter-spacing: 4px;\n                font-family: ${currentFont};\n            `;\n            headerDiv.appendChild(mainTitle);\n            \n            // 添加日期\n            const dateDiv = document.createElement('div');\n            const now = new Date();\n            const dateStr = `${now.getFullYear()}年${now.getMonth() + 1}月${now.getDate()}日`;\n            dateDiv.textContent = dateStr;\n            dateDiv.style.cssText = `font-size: 14px; color: #888; margin-top: 5px; font-family: ${currentFont};`;\n            headerDiv.appendChild(dateDiv);\n            \n            cleanContainer.appendChild(headerDiv);\n\n            // 创建表格容器\n            const tableWrapper = document.createElement('div');\n            tableWrapper.style.cssText = `\n                border-radius: 12px;\n                overflow: hidden;\n                box-shadow: 0 4px 20px rgba(0,0,0,0.08);\n                border: 1px solid #e0e0e0;\n            `;\n            \n            // 克隆课程表\n            const originalContainer = document.querySelector('.timetable-container');\n            const containerClone = originalContainer.cloneNode(true);\n\n            // 移除不需要的元素\n            const removeSelectors = '.section-controls, .edit-btn, .delete-btn, .timetable-title-section, .table-title-input, .delete-cell-btn, .plus-indicator';\n            containerClone.querySelectorAll(removeSelectors).forEach(el => el.remove());\n\n            // 设置表格样式\n            const table = containerClone.querySelector('.timetable');\n            if (table) {\n                table.style.cssText = `\n                    border-collapse: collapse;\n                    width: 100%;\n                    table-layout: fixed;\n                    font-size: 14px;\n                    background: #ffffff;\n                    font-family: ${currentFont};\n                `;\n            }\n            \n            // 处理表头（星期行）\n            const headerCells = containerClone.querySelectorAll('th');\n            headerCells.forEach(cell => {\n                cell.style.cssText = `\n                    background: ${primaryColor};\n                    color: #ffffff;\n                    padding: 14px 8px;\n                    font-weight: 600;\n                    font-size: 15px;\n                    border: none;\n                    text-align: center;\n                    font-family: ${currentFont};\n                `;\n            });\n            \n            // 处理所有单元格\n            const allCells = containerClone.querySelectorAll('td');\n            allCells.forEach((cell, index) => {\n                const isTimeCell = cell.classList.contains('time-cell') || cell.classList.contains('period-cell');\n                const isSection = cell.textContent.includes('上午') || cell.textContent.includes('下午') || cell.textContent.includes('晚上');\n                const isOccupied = cell.classList.contains('occupied');\n                \n                let bgColor = '#ffffff';\n                let fontWeight = 'normal';\n                let textColor = '#333333';\n                \n                if (isSection) {\n                    bgColor = mediumPrimary;\n                    fontWeight = '600';\n                    textColor = primaryColor;\n                } else if (isTimeCell) {\n                    bgColor = lightPrimary;\n                    fontWeight = '500';\n                }\n                \n                cell.style.cssText = `\n                    padding: 12px 8px;\n                    text-align: center;\n                    vertical-align: middle;\n                    border: 1px solid #e8e8e8;\n                    font-size: 13px;\n                    color: ${textColor};\n                    background: ${bgColor};\n                    font-weight: ${fontWeight};\n                    font-family: ${currentFont};\n                `;\n                \n                // 处理已占用单元格 - 保留科目颜色\n                if (isOccupied) {\n                    const cellContent = cell.querySelector('.cell-content');\n                    if (cellContent) {\n                        const subjectBg = cellContent.style.backgroundColor;\n                        const subjectColor = cellContent.style.color || '#333333';\n                        \n                        // 获取科目名称和老师名称元素\n                        const subjectName = cell.querySelector('.subject-name');\n                        const teacherName = cell.querySelector('.teacher-name');\n                        \n                        // 设置 cell-content 的基础样式\n                        cellContent.style.cssText = `\n                            width: 100%;\n                            height: 100%;\n                            display: flex;\n                            flex-direction: column;\n                            justify-content: center;\n                            align-items: center;\n                            padding: 8px;\n                            box-sizing: border-box;\n                            background-color: ${subjectBg || 'transparent'};\n                            color: ${subjectColor};\n                            border-radius: 6px;\n                            font-family: ${currentFont};\n                        `;\n                        \n                        if (subjectBg && subjectBg !== 'transparent' && subjectBg !== 'rgba(0, 0, 0, 0)') {\n                            // 背景+字体模式\n                            cell.style.backgroundColor = 'transparent';\n                            cell.style.padding = '4px';\n                            cellContent.style.boxShadow = '0 2px 8px rgba(0,0,0,0.1)';\n                            \n                            // 设置文字颜色和字体\n                            if (subjectName) {\n                                subjectName.style.cssText = `color: ${subjectColor}; font-weight: 600; font-size: 14px; display: block; margin-bottom: 3px; text-align: center; font-family: ${currentFont};`;\n                            }\n                            if (teacherName) {\n                                teacherName.style.cssText = `color: ${subjectColor}; opacity: 0.9; font-size: 12px; display: block; text-align: center; font-family: ${currentFont};`;\n                            }\n                        } else {\n                            // 仅字体色模式 - 透明背景\n                            cellContent.style.backgroundColor = 'transparent';\n                            cell.style.backgroundColor = '#ffffff';\n                            cell.style.border = '1px solid #e8e8e8';\n                            \n                            // 设置文字颜色和字体\n                            if (subjectName) {\n                                subjectName.style.cssText = `color: ${subjectColor}; font-weight: 600; font-size: 14px; display: block; margin-bottom: 3px; text-align: center; font-family: ${currentFont};`;\n                            }\n                            if (teacherName) {\n                                teacherName.style.cssText = `color: ${subjectColor}; opacity: 0.9; font-size: 12px; display: block; text-align: center; font-family: ${currentFont};`;\n                            }\n                        }\n                    }\n                }\n            });\n            \n            // 根据设置隐藏周六和周日列\n            const rows = containerClone.querySelectorAll('tr');\n            rows.forEach(row => {\n                const cells = row.querySelectorAll('td, th');\n                let cellIndex = 0;\n                cells.forEach(cell => {\n                    if (cellIndex >= 2) {\n                        const dayIndex = cellIndex - 2;\n                        if ((dayIndex === 5 && !this.settings.showSaturday) || \n                            (dayIndex === 6 && !this.settings.showSunday)) {\n                            cell.style.display = 'none';\n                        }\n                    }\n                    cellIndex++;\n                });\n            });\n            \n            tableWrapper.appendChild(containerClone);\n            cleanContainer.appendChild(tableWrapper);\n            \n            document.body.appendChild(cleanContainer);\n            \n            // 生成图片\n            html2canvas(cleanContainer, {\n                backgroundColor: '#ffffff',\n                scale: isMobile ? 3 : 2,\n                useCORS: true,\n                allowTaint: true,\n                width: 900,\n                height: cleanContainer.scrollHeight,\n                windowWidth: 900,\n                logging: false\n            }).then(canvas => {\n                const link = document.createElement('a');\n                link.download = `${titleText}.png`;\n                link.href = canvas.toDataURL('image/png', 1.0);\n                link.click();\n                document.body.removeChild(cleanContainer);\n            }).catch(error => {\n                console.error('生成图片失败:', error);\n                alert('生成图片失败，请重试');\n                if (cleanContainer && document.body.contains(cleanContainer)) {\n                    document.body.removeChild(cleanContainer);\n                }\n            });\n        } catch (error) {\n            console.error('保存图片出错:', error);\n            alert('保存图片出错，请重试');\n            if (cleanContainer && document.body.contains(cleanContainer)) {\n                document.body.removeChild(cleanContainer);\n            }\n        }\n    }\n    \n    // 辅助函数：十六进制转RGB\n    hexToRgb(hex) {\n        if (!hex) return null;\n        const result = /^#?([a-f\\d]{2})([a-f\\d]{2})([a-f\\d]{2})$/i.exec(hex);\n        return result ? {\n            r: parseInt(result[1], 16),\n            g: parseInt(result[2], 16),\n            b: parseInt(result[3], 16)\n        } : null;\n    }\n\n\n\n    saveData() {\n        const data = {\n            subjects: this.subjects,\n            timetable: this.timetable,\n            periods: this.periods,\n            sectionNames: this.sectionNames\n        };\n        localStorage.setItem('timetableData', JSON.stringify(data));\n    }\n\n    loadData() {\n        const data = localStorage.getItem('timetableData');\n            \n        if (data) {\n            const parsed = JSON.parse(data);\n                \n            // 恢复科目数据\n            if (parsed.subjects && Array.isArray(parsed.subjects) && parsed.subjects.length > 0) {\n                this.subjects = parsed.subjects;\n            } else {\n                this.subjects = [];\n            }\n                \n            // 恢复课程表数据\n            this.timetable = parsed.timetable || {};\n                \n            // 恢复课时数据\n            this.periods = parsed.periods || {\n                morning: [\n                    { name: '第1节', time: '08:00-08:40' },\n                    { name: '第2节', time: '08:50-09:30' },\n                    { name: '第3节', time: '10:00-10:40' },\n                    { name: '第4节', time: '10:50-11:30' }\n                ],\n                afternoon: [\n                    { name: '第1节', time: '14:00-14:40' },\n                    { name: '第2节', time: '14:50-15:30' },\n                    { name: '第3节', time: '15:40-16:20' }\n                ],\n                evening: [\n                    { name: '第1节', time: '19:00-19:40' },\n                    { name: '第2节', time: '19:50-20:30' }\n                ]\n            };\n                \n            // 加载时段名称\n            this.sectionNames = parsed.sectionNames || {\n                morning: '上午',\n                afternoon: '下午',\n                evening: '晚上'\n            };\n                \n            // 确保 evening 存在\n            if (!this.periods.evening) {\n                this.periods.evening = [\n                    { name: '第1节', time: '19:00-19:40' },\n                    { name: '第2节', time: '19:50-20:30' }\n                ];\n            }\n        } else {\n            // 如果没有数据，初始化所有时段\n            this.subjects = [];\n            this.timetable = {};\n            this.periods = {\n                morning: [\n                    { name: '第1节', time: '08:00-08:40' },\n                    { name: '第2节', time: '08:50-09:30' },\n                    { name: '第3节', time: '10:00-10:40' },\n                    { name: '第4节', time: '10:50-11:30' }\n                ],\n                afternoon: [\n                    { name: '第1节', time: '14:00-14:40' },\n                    { name: '第2节', time: '14:50-15:30' },\n                    { name: '第3节', time: '15:40-16:20' }\n                ],\n                evening: [\n                    { name: '第1节', time: '19:00-19:40' },\n                    { name: '第2节', time: '19:50-20:30' }\n                ]\n            };\n            this.sectionNames = {\n                morning: '上午',\n                afternoon: '下午',\n                evening: '晚上'\n            };\n        }\n    }\n\n    loadTimetableTitle() {\n        const savedTitle = localStorage.getItem('timetableTitle');\n        const titleInput = document.getElementById('timetableTitle');\n        if (savedTitle) {\n            titleInput.value = savedTitle;\n        }\n    }\n\n    saveTimetableTitle(title) {\n        localStorage.setItem('timetableTitle', title);\n    }\n\n    saveTableTitle(title) {\n        localStorage.setItem('tableTitle', title);\n    }\n\n    loadTableTitle() {\n        const savedTitle = localStorage.getItem('tableTitle');\n        const titleInput = document.getElementById('tableTitle');\n        if (savedTitle) {\n            titleInput.value = savedTitle;\n        }\n    }\n\n    initTimeSelectors() {\n        // 生成小时选项 (0-23) - 24小时制\n        const startHourSelect = document.getElementById('startHour');\n        const endHourSelect = document.getElementById('endHour');\n        \n        for (let i = 0; i <= 23; i++) {\n            const hour = i.toString().padStart(2, '0');\n            startHourSelect.appendChild(new Option(hour, hour));\n            endHourSelect.appendChild(new Option(hour, hour));\n        }\n        \n        // 生成分钟选项 (00-55，间隔5分钟)\n        const startMinuteSelect = document.getElementById('startMinute');\n        const endMinuteSelect = document.getElementById('endMinute');\n        \n        for (let i = 0; i < 60; i += 5) {\n            const minute = i.toString().padStart(2, '0');\n            startMinuteSelect.appendChild(new Option(minute, minute));\n            endMinuteSelect.appendChild(new Option(minute, minute));\n        }\n    }\n\n    // Word导出功能 - 移动端PC端统一效果\n    exportToWord() {\n        const title = document.getElementById('tableTitle').value || '课程表';\n        \n        // 检测是否为移动端\n        const isMobile = window.innerWidth <= 768;\n        \n        // 创建兼容Word的HTML格式（移动端PC端统一）\n        let wordContent = `<html xmlns:o=\"urn:schemas-microsoft-com:office:office\" xmlns:w=\"urn:schemas-microsoft-com:office:word\" xmlns=\"http://www.w3.org/TR/REC-html40\">\n        <head>\n            <meta charset=\"utf-8\">\n            <title>${title}<\/title>\n            <!--[if gte mso 9]>\n            <xml>\n                <w:WordDocument>\n                    <w:View>Print<\/w:View>\n                    <w:Zoom>100<\/w:Zoom>\n                    <w:DoNotOptimizeForBrowser/>\n                <\/w:WordDocument>\n            <\/xml>\n            <![endif]-->\n            <style>\n                @page { \n                    margin: 1.2cm 1cm;\n                    size: A4 portrait;\n                }\n                body { \n                    font-family: 'Microsoft YaHei', 'SimSun', Arial, sans-serif; \n                    margin: 0;\n                    padding: 10px;\n                    background: white;\n                }\n                .main-title { \n                    text-align: center; \n                    color: #000; \n                    margin-bottom: 15px; \n                    font-size: 22px; \n                    font-weight: bold;\n                    letter-spacing: 1px;\n                }\n                table { \n                    border-collapse: collapse; \n                    width: 100%; \n                    margin: 0 auto; \n                    table-layout: fixed;\n                    border: 2px solid #000;\n                }\n                th, td { \n                    border: 1px solid #000;\n                    padding: 8px 6px;\n                    text-align: center;\n                    font-size: 13px;\n                    vertical-align: middle;\n                    height: auto;\n                    line-height: 1.4;\n                    word-wrap: break-word;\n                    word-break: break-all;\n                    overflow-wrap: break-word;\n                    color: #000;\n                }\n                td {\n                    width: 110px;\n                    min-width: 110px;\n                    max-width: 110px;\n                }\n                th {\n                    width: 110px;\n                }\n                th { \n                    background-color: #fff;\n                    color: #000;\n                    font-weight: bold;\n                    font-size: 14px;\n                }\n                .time-header { \n                    background-color: #fff;\n                    color: #000;\n                    font-weight: bold;\n                    width: 50px;\n                    min-width: 50px;\n                    max-width: 50px;\n                    font-size: 13px;\n                    writing-mode: vertical-rl;\n                    text-orientation: mixed;\n                    padding: 10px 0;\n                }\n                .period-header { \n                    background-color: #fff;\n                    color: #000;\n                    font-weight: bold;\n                    width: 90px;\n                    min-width: 90px;\n                    max-width: 90px;\n                    font-size: 13px;\n                }\n                .subject { \n                    font-weight: bold;\n                    color: #000;\n                    font-size: 14px;\n                    margin-bottom: 2px;\n                }\n                .teacher { \n                    font-size: 12px;\n                    color: #000;\n                    margin-top: 2px;\n                    display: block;\n                }\n                .period-time { \n                    font-size: 11px;\n                    color: #666;\n                    display: block;\n                    margin-top: 2px;\n                }\n                td {\n                    background-color: #fff;\n                }\n            <\/style>\n        <\/head>\n        <body>\n            <div class=\"main-title\">${title}<\/div>\n            <table>\n                <thead>\n                    <tr>\n                        <th class=\"time-header\">时段<\/th>\n                        <th class=\"period-header\">课时<\/th>\n                        ${(() => {\n                            let headers = ['周一', '周二', '周三', '周四', '周五'];\n                            if (this.settings.showSaturday) headers.push('周六');\n                            if (this.settings.showSunday) headers.push('周日');\n                            return headers.map(day => `<th>${day}<\/th>`).join('');\n                        })()}\n                    <\/tr>\n                <\/thead>\n                <tbody>`;\n\n        // 构建表格内容\n        \n        // 添加上午部分\n        if (this.periods.morning && this.periods.morning.length > 0) {\n            this.periods.morning.forEach((period, periodIndex) => {\n                wordContent += `<tr>`;\n                \n                // 时间列（只在第一节显示，竭排显示）\n                if (periodIndex === 0) {\n                    const sectionText = this.sectionNames.morning.split('').join('<br>');\n                    wordContent += `<td class=\"time-header\" rowspan=\"${this.periods.morning.length}\">${sectionText}<\/td>`;\n                }\n                \n                // 节数和时间（时间段换行显示）\n                let periodTimeHtml = period.name;\n                if (this.settings.showPeriodTime && period.time) {\n                    // 将时间段从中间的-分割，换行显示\n                    const timeFormatted = period.time.replace('-', '-<br>');\n                    periodTimeHtml += `<br><span class=\"period-time\">${timeFormatted}<\/span>`;\n                }\n                wordContent += `<td class=\"period-header\">${periodTimeHtml}<\/td>`;\n                \n                // 每天的课程（根据设置动态显示）\n                const dayCount = 5 + (this.settings.showSaturday ? 1 : 0) + (this.settings.showSunday ? 1 : 0);\n                for (let day = 1; day <= dayCount; day++) {\n                    const key = `${day}-morning-${periodIndex}`;\n                    const subjectId = this.timetable[key];\n                    \n                    if (subjectId) {\n                        const subject = this.subjects.find(s => s.id === subjectId);\n                        if (subject) {\n                            wordContent += `<td>\n                                <div class=\"subject\">${subject.name}<\/div>\n                                ${subject.teacher ? `<div class=\"teacher\">${subject.teacher}<\/div>` : ''}\n                            <\/td>`;\n                        } else {\n                            wordContent += `<td><\/td>`;\n                        }\n                    } else {\n                        wordContent += `<td><\/td>`;\n                    }\n                }\n                \n                wordContent += `<\/tr>`;\n            });\n        }\n        \n        // 添加下午部分\n        if (this.periods.afternoon && this.periods.afternoon.length > 0) {\n            this.periods.afternoon.forEach((period, periodIndex) => {\n                wordContent += `<tr>`;\n                \n                // 时间列（只在第一节显示，竭排显示）\n                if (periodIndex === 0) {\n                    const sectionText = this.sectionNames.afternoon.split('').join('<br>');\n                    wordContent += `<td class=\"time-header\" rowspan=\"${this.periods.afternoon.length}\">${sectionText}<\/td>`;\n                }\n                \n                // 节数和时间（时间段换行显示）\n                let periodTimeHtml = period.name;\n                if (this.settings.showPeriodTime && period.time) {\n                    const timeFormatted = period.time.replace('-', '-<br>');\n                    periodTimeHtml += `<br><span class=\"period-time\">${timeFormatted}<\/span>`;\n                }\n                wordContent += `<td class=\"period-header\">${periodTimeHtml}<\/td>`;\n                \n                // 每天的课程（根据设置动态显示）\n                const dayCount = 5 + (this.settings.showSaturday ? 1 : 0) + (this.settings.showSunday ? 1 : 0);\n                for (let day = 1; day <= dayCount; day++) {\n                    const key = `${day}-afternoon-${periodIndex}`;\n                    const subjectId = this.timetable[key];\n                    \n                    if (subjectId) {\n                        const subject = this.subjects.find(s => s.id === subjectId);\n                        if (subject) {\n                            wordContent += `<td>\n                                <div class=\"subject\">${subject.name}<\/div>\n                                ${subject.teacher ? `<div class=\"teacher\">${subject.teacher}<\/div>` : ''}\n                            <\/td>`;\n                        } else {\n                            wordContent += `<td><\/td>`;\n                        }\n                    } else {\n                        wordContent += `<td><\/td>`;\n                    }\n                }\n                \n                wordContent += `<\/tr>`;\n            });\n        }\n\n        \n        // 添加晚上部分（如果显示）\n        if (this.settings.showEvening && this.periods.evening && this.periods.evening.length > 0) {\n            this.periods.evening.forEach((period, periodIndex) => {\n                wordContent += `<tr>`;\n                \n                // 时间列（只在第一节显示，竭排显示）\n                if (periodIndex === 0) {\n                    const sectionText = this.sectionNames.evening.split('').join('<br>');\n                    wordContent += `<td class=\"time-header\" rowspan=\"${this.periods.evening.length}\">${sectionText}<\/td>`;\n                }\n                \n                // 节数和时间（时间段换行显示）\n                let periodTimeHtml = period.name;\n                if (this.settings.showPeriodTime && period.time) {\n                    const timeFormatted = period.time.replace('-', '-<br>');\n                    periodTimeHtml += `<br><span class=\"period-time\">${timeFormatted}<\/span>`;\n                }\n                wordContent += `<td class=\"period-header\">${periodTimeHtml}<\/td>`;\n                \n                // 每天的课程（根据设置动态显示）\n                const dayCount = 5 + (this.settings.showSaturday ? 1 : 0) + (this.settings.showSunday ? 1 : 0);\n                for (let day = 1; day <= dayCount; day++) {\n                    const key = `${day}-evening-${periodIndex}`;\n                    const subjectId = this.timetable[key];\n                    \n                    if (subjectId) {\n                        const subject = this.subjects.find(s => s.id === subjectId);\n                        if (subject) {\n                            wordContent += `<td>\n                                <div class=\"subject\">${subject.name}<\/div>\n                                ${subject.teacher ? `<div class=\"teacher\">${subject.teacher}<\/div>` : ''}\n                            <\/td>`;\n                        } else {\n                            wordContent += `<td><\/td>`;\n                        }\n                    } else {\n                        wordContent += `<td><\/td>`;\n                    }\n                }\n                \n                wordContent += `<\/tr>`;\n            });\n        }\n\n        wordContent += `<\/tbody><\/table><\/body><\/html>`;\n\n        // 创建Blob并下载（使用正确的HTML格式）\n        const blob = new Blob([wordContent], { type: 'application/msword;charset=utf-8' });\n        const url = URL.createObjectURL(blob);\n        const link = document.createElement('a');\n        link.href = url;\n        link.download = `${title}.doc`;\n        document.body.appendChild(link);\n        link.click();\n        document.body.removeChild(link);\n        URL.revokeObjectURL(url);\n    }\n    \n    // Excel导出功能 - 重写版本，确保数据完整\n    exportToExcel() {\n        try {\n            const title = document.getElementById('tableTitle').value || '课程表';\n            \n            // 生成完整的Excel HTML内容\n            let excelHTML = this.generateExcelHTML(title);\n            \n            // 创建Excel文件\n            const blob = new Blob([excelHTML], { \n                type: 'application/vnd.ms-excel;charset=utf-8' \n            });\n            \n            const link = document.createElement('a');\n            link.download = `${title}.xls`;\n            link.href = URL.createObjectURL(blob);\n            document.body.appendChild(link);\n            link.click();\n            document.body.removeChild(link);\n            URL.revokeObjectURL(link.href);\n            \n        } catch (error) {\n            console.error('导出Excel出错:', error);\n            alert('导出Excel出错：' + error.message);\n        }\n    }\n    \n    // 生成Excel HTML内容\n    generateExcelHTML(title) {\n        // Excel文件头部（移除XML声明，避免冲突）\n        let html = `<html xmlns:o=\"urn:schemas-microsoft-com:office:office\" \n      xmlns:x=\"urn:schemas-microsoft-com:office:excel\" \n      xmlns=\"http://www.w3.org/TR/REC-html40\">\n<head>\n    <meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\">\n    <!--[if gte mso 9]>\n    <xml>\n        <x:ExcelWorkbook>\n            <x:ExcelWorksheets>\n                <x:ExcelWorksheet>\n                    <x:Name>课程表<\/x:Name>\n                    <x:WorksheetOptions>\n                        <x:Print>\n                            <x:ValidPrinterInfo/>\n                            <x:PaperSizeIndex>9<\/x:PaperSizeIndex>\n                        <\/x:Print>\n                        <x:Selected/>\n                        <x:ProtectContents>False<\/x:ProtectContents>\n                    <\/x:WorksheetOptions>\n                <\/x:ExcelWorksheet>\n            <\/x:ExcelWorksheets>\n        <\/x:ExcelWorkbook>\n    <\/xml>\n    <![endif]-->\n    <style>\n        body { \n            font-family: 'Microsoft YaHei', 'SimSun', Arial, sans-serif; \n            margin: 0;\n            padding: 0;\n        }\n        .main-title { \n            text-align: center; \n            color: #333; \n            margin: 15px 0;\n            font-size: 18px; \n            font-weight: bold;\n        }\n        table { \n            border-collapse: collapse; \n            width: auto;\n            margin: 0 auto; \n            table-layout: fixed; \n            border: 1px solid #666;\n            border-spacing: 0;\n        }\n        th, td { \n            border: 1px solid #999;\n            padding: 8px;\n            text-align: center;\n            vertical-align: middle;\n            mso-number-format:'\\@';\n            white-space: normal;\n            word-wrap: break-word;\n            color: #333;\n            mso-protection: unlocked visible;\n        }\n        th {\n            background: #f5f5f5;\n            color: #333;\n            font-weight: bold;\n            font-size: 13px;\n            height: 40px;\n            width: 100px;\n            border: 1px solid #999;\n        }\n        tr {\n            height: 60px;\n        }\n        .time-header {\n            width: 50px;\n            background: #f5f5f5;\n            color: #333;\n            font-weight: bold;\n            border: 1px solid #999;\n        }\n        .period-header {\n            width: 85px;\n            background: #f5f5f5;\n            color: #333;\n            font-weight: bold;\n            border: 1px solid #999;\n        }\n        .time-section { \n            background: #f5f5f5;\n            color: #333;\n            font-weight: bold;\n            font-size: 13px;\n            width: 50px;\n            border: 1px solid #999;\n        }\n        td {\n            width: 100px;\n            font-size: 12px;\n            background: #fff;\n            border: 1px solid #999;\n        }\n        .subject { \n            font-weight: bold;\n            color: #000;\n            font-size: 14px;\n            display: block;\n        }\n        .teacher { \n            font-size: 11px;\n            color: #000;\n            display: block;\n            margin-top: 3px;\n        }\n        .period-time { \n            font-size: 10px;\n            color: #666;\n            display: block;\n        }\n    <\/style>\n<\/head>\n<body>\n    <div class=\"main-title\">${title}<\/div>\n    <table>\n        <thead>\n            <tr style=\"height: 40px;\">\n                <th class=\"time-header\">时段<\/th>\n                <th class=\"period-header\">课时<\/th>`;\n        \n        // 添加星期表头\n        const weekDays = ['周一', '周二', '周三', '周四', '周五'];\n        if (this.settings.showSaturday) weekDays.push('周六');\n        if (this.settings.showSunday) weekDays.push('周日');\n        weekDays.forEach(day => {\n            html += `<th>${day}<\/th>`;\n        });\n        \n        html += `<\/tr>\n        <\/thead>\n        <tbody>`;\n        \n        // 添加上午课程\n        if (this.periods.morning && this.periods.morning.length > 0) {\n            this.periods.morning.forEach((period, index) => {\n                html += '<tr>';\n                \n                // 时段列（仅第一行，合并整个时段）\n                if (index === 0) {\n                    html += `<td rowspan=\"${this.periods.morning.length}\" class=\"time-section\">${this.sectionNames.morning}<\/td>`;\n                }\n                \n                // 课时列\n                html += `<td class=\"period-header\">${period.name}`;\n                if (this.settings.showPeriodTime && period.time) {\n                    html += `<br><span class=\"period-time\">${period.time}<\/span>`;\n                }\n                html += `<\/td>`;\n                \n                // 课程内容\n                const dayCount = weekDays.length;\n                for (let day = 1; day <= dayCount; day++) {\n                    const key = `${day}-morning-${index}`;\n                    const subjectId = this.timetable[key];\n                    \n                    if (subjectId) {\n                        const subject = this.subjects.find(s => s.id === subjectId);\n                        if (subject) {\n                            const colorType = subject.colorType || 'background';\n                            let cellStyle = '';\n                            let subjectStyle = '';\n                            let teacherStyle = '';\n                            \n                            if (colorType === 'background') {\n                                // 背景色模式\n                                cellStyle = `style=\"background-color: ${subject.color}; color: white; border: 1px solid #000 !important;\"`;\n                            } else {\n                                // 字体色模式\n                                subjectStyle = `style=\"color: ${subject.color};\"`;\n                                teacherStyle = `style=\"color: ${subject.color};\"`;\n                            }\n                            \n                            html += `<td ${cellStyle}><span class=\"subject\" ${subjectStyle}>${subject.name}<\/span>`;\n                            if (subject.teacher) {\n                                html += `<br><span class=\"teacher\" ${teacherStyle}>${subject.teacher}<\/span>`;\n                            }\n                            html += `<\/td>`;\n                        } else {\n                            html += '<td><\/td>';\n                        }\n                    } else {\n                        html += '<td><\/td>';\n                    }\n                }\n                \n                html += '<\/tr>';\n            });\n        }\n        \n        // 添加下午课程\n        if (this.periods.afternoon && this.periods.afternoon.length > 0) {\n            this.periods.afternoon.forEach((period, index) => {\n                html += '<tr>';\n                \n                // 时段列（仅第一行，合并整个时段）\n                if (index === 0) {\n                    html += `<td rowspan=\"${this.periods.afternoon.length}\" class=\"time-section\">${this.sectionNames.afternoon}<\/td>`;\n                }\n                \n                // 课时列\n                html += `<td class=\"period-header\">${period.name}`;\n                if (this.settings.showPeriodTime && period.time) {\n                    html += `<br><span class=\"period-time\">${period.time}<\/span>`;\n                }\n                html += `<\/td>`;\n                \n                // 课程内容\n                const dayCount = weekDays.length;\n                for (let day = 1; day <= dayCount; day++) {\n                    const key = `${day}-afternoon-${index}`;\n                    const subjectId = this.timetable[key];\n                    \n                    if (subjectId) {\n                        const subject = this.subjects.find(s => s.id === subjectId);\n                        if (subject) {\n                            const colorType = subject.colorType || 'background';\n                            let cellStyle = '';\n                            let subjectStyle = '';\n                            let teacherStyle = '';\n                            \n                            if (colorType === 'background') {\n                                // 背景色模式\n                                cellStyle = `style=\"background-color: ${subject.color}; color: white; border: 1px solid #000 !important;\"`;\n                            } else {\n                                // 字体色模式\n                                subjectStyle = `style=\"color: ${subject.color};\"`;\n                                teacherStyle = `style=\"color: ${subject.color};\"`;\n                            }\n                            \n                            html += `<td ${cellStyle}><span class=\"subject\" ${subjectStyle}>${subject.name}<\/span>`;\n                            if (subject.teacher) {\n                                html += `<br><span class=\"teacher\" ${teacherStyle}>${subject.teacher}<\/span>`;\n                            }\n                            html += `<\/td>`;\n                        } else {\n                            html += '<td><\/td>';\n                        }\n                    } else {\n                        html += '<td><\/td>';\n                    }\n                }\n                \n                html += '<\/tr>';\n            });\n        }\n        \n        // 添加晚上课程\n        if (this.settings.showEvening && this.periods.evening && this.periods.evening.length > 0) {\n            this.periods.evening.forEach((period, index) => {\n                html += '<tr>';\n                \n                // 时段列（仅第一行，合并整个时段）\n                if (index === 0) {\n                    html += `<td rowspan=\"${this.periods.evening.length}\" class=\"time-section\">${this.sectionNames.evening}<\/td>`;\n                }\n                \n                // 课时列\n                html += `<td class=\"period-header\">${period.name}`;\n                if (this.settings.showPeriodTime && period.time) {\n                    html += `<br><span class=\"period-time\">${period.time}<\/span>`;\n                }\n                html += `<\/td>`;\n                \n                // 课程内容\n                const dayCount = weekDays.length;\n                for (let day = 1; day <= dayCount; day++) {\n                    const key = `${day}-evening-${index}`;\n                    const subjectId = this.timetable[key];\n                    \n                    if (subjectId) {\n                        const subject = this.subjects.find(s => s.id === subjectId);\n                        if (subject) {\n                            const colorType = subject.colorType || 'background';\n                            let cellStyle = '';\n                            let subjectStyle = '';\n                            let teacherStyle = '';\n                            \n                            if (colorType === 'background') {\n                                // 背景色模式\n                                cellStyle = `style=\"background-color: ${subject.color}; color: white; border: 1px solid #000 !important;\"`;\n                            } else {\n                                // 字体色模式\n                                subjectStyle = `style=\"color: ${subject.color};\"`;\n                                teacherStyle = `style=\"color: ${subject.color};\"`;\n                            }\n                            \n                            html += `<td ${cellStyle}><span class=\"subject\" ${subjectStyle}>${subject.name}<\/span>`;\n                            if (subject.teacher) {\n                                html += `<br><span class=\"teacher\" ${teacherStyle}>${subject.teacher}<\/span>`;\n                            }\n                            html += `<\/td>`;\n                        } else {\n                            html += '<td><\/td>';\n                        }\n                    } else {\n                        html += '<td><\/td>';\n                    }\n                }\n                \n                html += '<\/tr>';\n            });\n        }\n        \n        html += `<\/tbody>\n    <\/table>\n<\/body>\n<\/html>`;\n        \n        return html;\n    }\n}\n\n// 初始化应用\nlet app;\ndocument.addEventListener('DOMContentLoaded', () => {\n    app = new TimetableApp();\n    \n    // 初始化主题切换\n    initThemeSwitcher();\n    initCustomColor();\n    initFontSwitcher();\n});\n\n// 全局关闭所有下拉菜单函数\nfunction closeAllMenus() {\n    const exportMenu = document.getElementById('exportMenu');\n    const backupMenu = document.getElementById('backupMenu');\n    const themeMenu = document.getElementById('themeMenu');\n    const fontMenu = document.getElementById('fontMenu');\n    \n    if (exportMenu) exportMenu.classList.remove('show');\n    if (backupMenu) backupMenu.classList.remove('show');\n    if (themeMenu) themeMenu.classList.remove('show');\n    if (fontMenu) fontMenu.classList.remove('show');\n}\n\n// 重写初始化顺序，确保主题正确应用\nfunction initThemeSwitcher() {\n    const themeBtn = document.getElementById('themeBtn');\n    const themeMenu = document.getElementById('themeMenu');\n    const themeItems = document.querySelectorAll('.theme-item');\n    \n    // 从本地存储加载主题\n    const savedTheme = localStorage.getItem('timetable-theme') || 'default';\n    \n    // 初始化主题\n    if (savedTheme === 'custom') {\n        const savedCustomColor = localStorage.getItem('timetable-custom-color');\n        if (savedCustomColor) {\n            applyCustomColor(savedCustomColor);\n        }\n    } else {\n        setTheme(savedTheme);\n    }\n    \n    // 切换主题菜单显示/隐藏\n    themeBtn.addEventListener('click', (e) => {\n        e.stopPropagation();\n        const isVisible = themeMenu.classList.contains('show');\n        closeAllMenus();\n        if (!isVisible) {\n            themeMenu.classList.add('show');\n        }\n    });\n    \n    // 点击菜单项切换主题\n    themeItems.forEach(item => {\n        item.addEventListener('click', () => {\n            const theme = item.dataset.theme;\n            setTheme(theme);\n            themeMenu.classList.remove('show');\n        });\n    });\n    \n    // 点击页面其他地方关闭主题菜单\n    document.addEventListener('click', () => {\n        themeMenu.classList.remove('show');\n    });\n    \n    // 阻止菜单内部点击事件冒泡\n    themeMenu.addEventListener('click', (e) => {\n        e.stopPropagation();\n    });\n}\n\nfunction setTheme(theme) {\n    // 移除所有主题类\n    document.body.classList.remove('theme-blue', 'theme-purple', 'theme-pink', 'theme-orange', 'theme-dark');\n    \n    // 清除自定义颜色样式\n    document.documentElement.removeAttribute('style');\n    \n    // 应用预设主题\n    if (theme !== 'default') {\n        document.body.classList.add(`theme-${theme}`);\n    }\n    \n    // 保存到本地存储\n    localStorage.setItem('timetable-theme', theme);\n    \n    // 更新菜单项状态\n    document.querySelectorAll('.theme-item').forEach(item => {\n        item.classList.toggle('active', item.dataset.theme === theme);\n    });\n}\n\n// 自定义颜色功能\nfunction initCustomColor() {\n    const colorPicker = document.getElementById('customColorPicker');\n    const applyBtn = document.getElementById('applyCustomColor');\n    \n    // 从本地存储加载自定义颜色\n    const savedCustomColor = localStorage.getItem('timetable-custom-color');\n    if (savedCustomColor) {\n        colorPicker.value = savedCustomColor;\n    }\n    \n    // 应用自定义颜色的核心函数\n    function applyColor(color) {\n        // 移除所有主题类\n        document.body.classList.remove('theme-blue', 'theme-purple', 'theme-pink', 'theme-orange', 'theme-dark');\n        \n        // 清除之前的自定义样式\n        document.documentElement.removeAttribute('style');\n        \n        // 应用自定义颜色\n        applyCustomColor(color);\n        \n        // 保存到本地存储\n        localStorage.setItem('timetable-theme', 'custom');\n        localStorage.setItem('timetable-custom-color', color);\n        \n        // 更新主题菜单项状态\n        document.querySelectorAll('.theme-item').forEach(item => {\n            item.classList.remove('active');\n        });\n    }\n    \n    // 直接选择颜色时应用（实时生效）\n    colorPicker.addEventListener('input', () => {\n        const color = colorPicker.value;\n        applyColor(color);\n    });\n    \n    // 颜色选择完成后保存\n    colorPicker.addEventListener('change', () => {\n        const color = colorPicker.value;\n        applyColor(color);\n    });\n    \n    // 隐藏应用按钮，因为不再需要\n    if (applyBtn) {\n        applyBtn.style.display = 'none';\n    }\n}\n\nfunction setTheme(theme) {\n    // 移除所有主题类\n    document.body.classList.remove('theme-blue', 'theme-purple', 'theme-pink', 'theme-orange', 'theme-dark');\n    \n    // 特殊处理自定义主题\n    if (theme === 'custom') {\n        // 加载保存的自定义颜色并应用\n        const savedCustomColor = localStorage.getItem('timetable-custom-color');\n        if (savedCustomColor) {\n            applyCustomColor(savedCustomColor);\n        }\n    } else {\n        // 应用预设主题\n        if (theme !== 'default') {\n            document.body.classList.add(`theme-${theme}`);\n        } else {\n            // 恢复默认主题（豆沙绿）\n            document.documentElement.removeAttribute('style');\n        }\n    }\n    \n    // 保存到本地存储\n    localStorage.setItem('timetable-theme', theme);\n    \n    // 更新菜单项状态\n    document.querySelectorAll('.theme-item').forEach(item => {\n        item.classList.toggle('active', item.dataset.theme === theme);\n    });\n}\n\n// 自定义颜色功能\nfunction initCustomColor() {\n    const colorPicker = document.getElementById('customColorPicker');\n    \n    // 从本地存储加载自定义颜色\n    const savedCustomColor = localStorage.getItem('timetable-custom-color');\n    if (savedCustomColor) {\n        colorPicker.value = savedCustomColor;\n    }\n    \n    // 直接选择颜色时应用（实时生效）\n    colorPicker.addEventListener('input', () => {\n        const color = colorPicker.value;\n        applyCustomColor(color);\n    });\n    \n    // 颜色选择完成后保存\n    colorPicker.addEventListener('change', () => {\n        const color = colorPicker.value;\n        localStorage.setItem('timetable-custom-color', color);\n    });\n}\n\n// 字体切换功能\nfunction initFontSwitcher() {\n    const fontBtn = document.getElementById('fontBtn');\n    const fontMenu = document.getElementById('fontMenu');\n    const fontItems = document.querySelectorAll('.font-item');\n    \n    // 从本地存储加载字体\n    const savedFont = localStorage.getItem('timetable-font') || 'system';\n    setFont(savedFont);\n    \n    // 切换字体菜单显示/隐藏\n    fontBtn.addEventListener('click', (e) => {\n        e.stopPropagation();\n        const isVisible = fontMenu.classList.contains('show');\n        closeAllMenus();\n        if (!isVisible) {\n            fontMenu.classList.add('show');\n        }\n    });\n    \n    // 点击菜单项切换字体\n    fontItems.forEach(item => {\n        item.addEventListener('click', () => {\n            const font = item.dataset.font;\n            setFont(font);\n            fontMenu.classList.remove('show');\n        });\n    });\n    \n    // 点击页面其他地方关闭字体菜单\n    document.addEventListener('click', () => {\n        fontMenu.classList.remove('show');\n    });\n    \n    // 阻止菜单内部点击事件冒泡\n    fontMenu.addEventListener('click', (e) => {\n        e.stopPropagation();\n    });\n}\n\nfunction setFont(font) {\n    // 定义字体映射\n    const fontMap = {\n        'system': 'system-ui, -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, sans-serif',\n        'microsoft-yahei': '\"Microsoft YaHei\", \"微软雅黑\", sans-serif',\n        'simsun': 'SimSun, \"宋体\", serif',\n        'heiti': '\"SimHei\", \"黑体\", sans-serif',\n        'kaiti': 'KaiTi, \"楷体\", serif',\n        'fangsong': 'FangSong, \"仿宋\", serif',\n        'xingkai': '\"STXingkai\", \"华文行楷\", \"STXingkai SC\", \"华文行楷 SC\", \"KaiTi\", \"楷体\", \"SimSun\", \"宋体\", serif',\n        'lishu': '\"LiSu\", \"隶书\", \"STXingkai\", \"华文行楷\", \"KaiTi\", \"楷体\", \"SimSun\", \"宋体\", serif',\n        'kaiti': '\"KaiTi\", \"楷体\", \"STXingkai\", \"华文行楷\", \"SimSun\", \"宋体\", serif',\n        'fangsong': '\"FangSong\", \"仿宋\", \"KaiTi\", \"楷体\", \"SimSun\", \"宋体\", serif',\n        'youyuan': '\"YouYuan\", \"幼圆\", \"Microsoft YaHei\", \"微软雅黑\", sans-serif',\n        'source-han-sans': '\"Source Han Sans\", \"思源黑体\", \"Microsoft YaHei\", sans-serif',\n        'source-han-serif': '\"Source Han Serif\", \"思源宋体\", \"SimSun\", serif',\n        'youyuan': '\"YouYuan\", \"幼圆\", sans-serif',\n        'arial': 'Arial, sans-serif',\n        'helvetica': 'Helvetica, Arial, sans-serif',\n        'georgia': 'Georgia, serif',\n        'times-new-roman': '\"Times New Roman\", Times, serif'\n    };\n    \n    // 应用字体到整个页面\n    document.body.style.fontFamily = fontMap[font] || fontMap['system'];\n    \n    // 保存到本地存储\n    localStorage.setItem('timetable-font', font);\n    \n    // 更新菜单项状态\n    document.querySelectorAll('.font-item').forEach(item => {\n        item.classList.toggle('active', item.dataset.font === font);\n    });\n}\n\nfunction applyCustomColor(color) {\n    // 移除所有主题类\n    document.body.classList.remove('theme-blue', 'theme-purple', 'theme-pink', 'theme-orange', 'theme-dark');\n    \n    // 计算颜色变体\n    const rgb = hexToRgb(color);\n    const lightColor = `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.1)`;\n    const darkColor = darkenColor(color, 0.3);\n    const borderColor = `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.3)`;\n    const shadowColor = `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.15)`;\n    const patternBackground = `radial-gradient(circle at 10% 20%, rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.1) 0%, rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.05) 90%)`;\n    \n    // 设置CSS变量\n    document.documentElement.style.setProperty('--primary-color', color);\n    document.documentElement.style.setProperty('--light-color', lightColor);\n    document.documentElement.style.setProperty('--dark-color', darkColor);\n    document.documentElement.style.setProperty('--border-color', borderColor);\n    document.documentElement.style.setProperty('--background-color', lightColor);\n    document.documentElement.style.setProperty('--text-color', darkColor);\n    document.documentElement.style.setProperty('--shadow-color', shadowColor);\n    document.documentElement.style.setProperty('--pattern-background', patternBackground);\n    \n    // 保存到本地存储\n    localStorage.setItem('timetable-theme', 'custom');\n}\n\n// 辅助函数：十六进制转RGB\nfunction hexToRgb(hex) {\n    const result = /^#?([a-f\\d]{2})([a-f\\d]{2})([a-f\\d]{2})$/i.exec(hex);\n    return result ? {\n        r: parseInt(result[1], 16),\n        g: parseInt(result[2], 16),\n        b: parseInt(result[3], 16)\n    } : { r: 74, g: 124, b: 89 }; // 默认豆沙绿\n}\n\n// 辅助函数：加深颜色\nfunction darkenColor(color, amount) {\n    const rgb = hexToRgb(color);\n    const r = Math.max(0, Math.min(255, rgb.r - rgb.r * amount));\n    const g = Math.max(0, Math.min(255, rgb.g - rgb.g * amount));\n    const b = Math.max(0, Math.min(255, rgb.b - rgb.b * amount));\n    return `rgb(${r}, ${g}, ${b})`;\n}"
+      "assets/js/frame-bridge.js": `/* ============================================================================
+ * iframe 内工具桥 · frame-bridge.js
+ * ============================================================================
+ * 【背景】站点在 file://（离线双击 index.html）下无法用 fetch 读取工具页面
+ * （Chromium 把 file:// 互相视为不透明源，fetch/XHR 一律被 CORS 拦截），于是
+ * 所有自研工具回退为 <iframe> 兜底。跨源带来两个问题：
+ *   ① 父页拿不到 iframe 的 contentDocument → 高度自适应失效，工具页被压成
+ *      固定视口高度（"页面不能自动撑开"）；
+ *   ② file:// 下 iframe 内的 requestFullscreen 被权限策略拒绝 → 工具右上角
+ *      ⛶ 点了没反应（"全屏按钮不能用"）。
+ *
+ * 【方案】本脚本随工具页面一起被 iframe 加载（真实文档环境），通过
+ * postMessage 向父页（站点外壳）上报：
+ *   - height     ：工具内容实际高度（rAF 节流 + ResizeObserver 持续监听）；
+ *   - fullscreen ：工具内部全屏请求被拒时，请父页对 <iframe> 本身发起全屏
+ *                  （postMessage 会把 user activation 一并委托给父页；
+ *                  父页若仍失败，再降级为父页侧 CSS 伪全屏）。
+ *
+ * 【安全阀】用 self !== top 判定「真实运行在 iframe 里」：
+ *   - 独立双击打开工具页 → self === top → 本脚本整体空转；
+ *   - 站点内嵌 Shadow DOM（http 适配器）路径下，脚本在 docShim/winShim 代理里
+ *     执行，self/top 都落到真实顶层 window → self === top → 空转，
+ *     不会向父页发任何消息；
+ *   - 真实 iframe 内（含 file:// 跨源）→ self !== top → 激活。
+ *   ⚠️ 不要用 window.frameElement 判定：跨源 iframe 里访问它会抛 SecurityError
+ *     （实测），一旦 catch 成 null 桥就整体失效。
+ *   ⚠️ self / top 属于跨源 WindowProxy 的「允许访问」属性（不会抛错），
+ *     引用比较即可判定。
+ * 消息一律带 __edutoolboxFrame 命名空间标记，父页校验 e.source 后才处理。
+ * ========================================================================== */
+(function () {
+  "use strict";
+
+  /* 只在真实 iframe 内激活 */
+  var inFrame = false;
+  try {
+    var self = window.self, top = window.top;
+    inFrame = !!(self && top && self !== top && window.parent && window.parent !== window);
+  } catch (e) { inFrame = false; }
+  if (!inFrame) return;
+
+  var raf = 0;
+
+  /** rAF 节流地把当前文档高度报给父页 */
+  function reportHeight() {
+    if (raf) return;
+    raf = (window.requestAnimationFrame || function (f) { return setTimeout(f, 60); })(
+      function () {
+        raf = 0;
+        try {
+          var h = Math.max(
+            document.documentElement ? document.documentElement.scrollHeight : 0,
+            document.body ? document.body.scrollHeight : 0
+          );
+          window.parent.postMessage({
+            __edutoolboxFrame: true,
+            type: "height",
+            h: h
+          }, "*");
+        } catch (e) { /* 父页不可达：静默 */ }
+      }
+    );
+  }
+
+  /** 工具内部全屏请求失败时，委托父页对 iframe 元素本身发起全屏 */
+  function requestParentFullscreen() {
+    try {
+      window.parent.postMessage({
+        __edutoolboxFrame: true,
+        type: "fullscreen"
+      }, "*");
+    } catch (e) { /* 静默 */ }
+  }
+
+  /* 暴露给共享舞台模块（tool-stage-toolbar.js）在全屏失败分支调用 */
+  window.EduToolFrameBridge = {
+    reportHeight: reportHeight,
+    requestParentFullscreen: requestParentFullscreen
+  };
+
+  /* 首帧 + load 后补报，防首报时内容未排完 */
+  reportHeight();
+  window.addEventListener("load", function () {
+    reportHeight();
+    setTimeout(reportHeight, 300);
+  });
+
+  /* 内容持续变化（点名记录增长、生成结果插入等）→ 宿主跟着长高 */
+  if (typeof ResizeObserver === "function") {
+    try {
+      new ResizeObserver(reportHeight).observe(document.documentElement);
+    } catch (e) { /* 老浏览器无此能力：靠 load 兜底 */ }
+  }
+
+  /* 父页通知重新测量（伪全屏退出后恢复常规高度） */
+  window.addEventListener("message", function (e) {
+    var d = e.data;
+    if (d && d.__edutoolboxFrame === true && d.type === "report") reportHeight();
+  });
+})();
+`,
+      "tools/kechengbiao2/css/styles.css": `/* 字体定义 - 使用系统字体 */
+/* 这些字体在大多数Windows系统上都可用 */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    /* 豆沙绿主题配色方案 - 默认主题 */
+    --primary-color: #93c572; /* 豆沙绿主色调 */
+    --primary-hover-color: #7cb342; /* 豆沙绿悬停色 */
+    --secondary-color: #6c757d;
+    --secondary-hover-color: #5a6268; /* 次要色悬停色 */
+    --success-color: #28a745;
+    --danger-color: #dc3545;
+    --warning-color: #ffc107;
+    --info-color: #17a2b8;
+    --light-color: #f0f8f0; /* 浅豆沙绿背景 */
+    --dark-color: #556b2f; /* 深豆沙绿 */
+    --border-color: #a0c49d; /* 豆沙绿边框 */
+    --background-color: #f5faf5; /* 豆沙绿背景 */
+    --text-color: #455a64; /* 深豆沙绿文字 */
+    --shadow-color: rgba(147, 197, 114, 0.2); /* 豆沙绿阴影 */
+    --pattern-background: radial-gradient(circle at 10% 20%, rgba(147, 197, 114, 0.15) 0%, rgba(147, 197, 114, 0.08) 90%); /* 豆沙绿背景图案 */
+}
+
+/* 蓝色主题 */
+body.theme-blue {
+    --primary-color: #007bff;
+    --primary-hover-color: #0056b3;
+    --secondary-color: #6c757d;
+    --secondary-hover-color: #5a6268;
+    --success-color: #28a745;
+    --danger-color: #dc3545;
+    --warning-color: #ffc107;
+    --info-color: #17a2b8;
+    --light-color: #e3f2fd;
+    --dark-color: #0056b3;
+    --border-color: #90caf9;
+    --background-color: #f0f8ff;
+    --text-color: #0056b3;
+    --shadow-color: rgba(0, 123, 255, 0.15);
+    --pattern-background: radial-gradient(circle at 10% 20%, rgba(0, 123, 255, 0.1) 0%, rgba(0, 123, 255, 0.05) 90%);
+}
+
+/* 紫色主题 */
+body.theme-purple {
+    --primary-color: #6f42c1;
+    --primary-hover-color: #5a3d8c;
+    --secondary-hover-color: #5a6268;
+    --secondary-color: #6c757d;
+    --success-color: #28a745;
+    --danger-color: #dc3545;
+    --warning-color: #ffc107;
+    --info-color: #17a2b8;
+    --light-color: #f3e5f5;
+    --dark-color: #5a3d8c;
+    --border-color: #ba68c8;
+    --background-color: #f5f0ff;
+    --text-color: #5a3d8c;
+    --shadow-color: rgba(111, 66, 193, 0.15);
+    --pattern-background: radial-gradient(circle at 10% 20%, rgba(111, 66, 193, 0.1) 0%, rgba(111, 66, 193, 0.05) 90%);
+}
+
+/* 粉色主题 */
+body.theme-pink {
+    --primary-color: #e91e63;
+    --primary-hover-color: #ad1457;
+    --secondary-hover-color: #5a6268;
+    --secondary-color: #6c757d;
+    --success-color: #28a745;
+    --danger-color: #dc3545;
+    --warning-color: #ffc107;
+    --info-color: #17a2b8;
+    --light-color: #fce4ec;
+    --dark-color: #c2185b;
+    --border-color: #f48fb1;
+    --background-color: #fff0f6;
+    --text-color: #c2185b;
+    --shadow-color: rgba(233, 30, 99, 0.15);
+    --pattern-background: radial-gradient(circle at 10% 20%, rgba(233, 30, 99, 0.1) 0%, rgba(233, 30, 99, 0.05) 90%);
+}
+
+/* 橙色主题 */
+body.theme-orange {
+    --primary-color: #fd7e14;
+    --primary-hover-color: #e65100;
+    --secondary-hover-color: #5a6268;
+    --secondary-color: #6c757d;
+    --success-color: #28a745;
+    --danger-color: #dc3545;
+    --warning-color: #ffc107;
+    --info-color: #17a2b8;
+    --light-color: #fff3e0;
+    --dark-color: #e67e22;
+    --border-color: #ffb74d;
+    --background-color: #fff8f0;
+    --text-color: #e67e22;
+    --shadow-color: rgba(253, 126, 20, 0.15);
+    --pattern-background: radial-gradient(circle at 10% 20%, rgba(253, 126, 20, 0.1) 0%, rgba(253, 126, 20, 0.05) 90%);
+}
+
+/* 深色主题 */
+body.theme-dark {
+    --primary-color: #20c997;
+    --primary-hover-color: #1aa580;
+    --secondary-color: #6c757d;
+    --secondary-hover-color: #5a6268;
+    --success-color: #28a745;
+    --danger-color: #dc3545;
+    --warning-color: #ffc107;
+    --info-color: #17a2b8;
+    --light-color: #1a1a1a;
+    --dark-color: #17a673;
+    --border-color: #17a673;
+    --background-color: #121212;
+    --text-color: #20c997;
+    --shadow-color: rgba(32, 201, 151, 0.15);
+    --pattern-background: radial-gradient(circle at 10% 20%, rgba(32, 201, 151, 0.1) 0%, rgba(32, 201, 151, 0.05) 90%);
+}
+
+body.theme-dark .timetable {
+    background-color: var(--background-color);
+    border-color: var(--border-color);
+}
+
+body.theme-dark .timetable-container {
+    background-color: var(--background-color);
+}
+
+body.theme-dark .section-title {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+body.theme-dark .section-controls {
+    background-color: var(--light-color);
+    border-color: var(--border-color);
+}
+
+body.theme-dark .section-controls button {
+    background-color: var(--background-color);
+    color: var(--text-color);
+    border-color: var(--border-color);
+}
+
+body.theme-dark .section-controls button:hover {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+body.theme-dark .cell {
+    background-color: var(--background-color);
+    border-color: var(--border-color);
+    color: var(--text-color);
+}
+
+body.theme-dark .cell:hover {
+    background-color: var(--light-color);
+}
+
+body.theme-dark .cell.occupied {
+    background-color: var(--background-color);
+}
+
+/* 深色主题下cell-content的颜色由JavaScript控制 */
+body.theme-dark .cell-content {
+    /* 颜色继承自内联样式 */
+}
+
+body.theme-dark .period-cell {
+    background-color: var(--light-color);
+    color: var(--text-color);
+}
+
+body.theme-dark .time-cell {
+    background-color: var(--light-color);
+    color: var(--text-color);
+}
+
+body.theme-dark th {
+    background-color: #333;
+    color: var(--text-color);
+}
+
+body.theme-dark .header {
+    background: var(--light-color);
+    border-color: var(--border-color);
+}
+
+body.theme-dark .timetable-title {
+    color: var(--primary-color);
+}
+
+body.theme-dark .btn {
+    background: var(--light-color);
+    color: var(--text-color);
+    border-color: var(--border-color);
+}
+
+body.theme-dark .btn:hover {
+    background: var(--dark-color);
+    color: white;
+}
+
+body.theme-dark .btn.primary {
+    background: var(--primary-color);
+    color: white;
+}
+
+body.theme-dark .btn.primary:hover {
+    background: var(--dark-color);
+}
+
+body.theme-dark .modal-content {
+    background: var(--light-color);
+    color: var(--text-color);
+}
+
+body.theme-dark .modal-header {
+    background: var(--primary-color);
+    color: white;
+}
+
+body.theme-dark .modal-footer {
+    background: var(--light-color);
+    border-top-color: var(--border-color);
+}
+
+body.theme-dark .form-group label {
+    color: var(--text-color);
+}
+
+body.theme-dark .form-control {
+    background: var(--background-color);
+    color: var(--text-color);
+    border-color: var(--border-color);
+}
+
+body.theme-dark .form-control:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 0.2rem var(--shadow-color);
+}
+
+body.theme-dark .subject-item {
+    background: var(--background-color);
+    border-color: var(--border-color);
+}
+
+body.theme-dark .subject-item:hover {
+    background: var(--light-color);
+}
+
+body.theme-dark .color-picker {
+    background: var(--background-color);
+    border-color: var(--border-color);
+}
+
+body.theme-dark .color-options {
+    background: var(--light-color);
+    border-color: var(--border-color);
+}
+
+body.theme-dark .color-type-selector label {
+    color: var(--text-color);
+}
+
+body.theme-dark .settings-panel {
+    background: var(--light-color);
+    border-color: var(--border-color);
+}
+
+body.theme-dark .settings-panel h3 {
+    color: var(--primary-color);
+}
+
+body.theme-dark .settings-panel label {
+    color: var(--text-color);
+}
+
+body.theme-dark .settings-panel .form-control {
+    background: var(--background-color);
+    color: var(--text-color);
+    border-color: var(--border-color);
+}
+
+/* 深色主题下设置弹窗样式 */
+body.theme-dark #settingsModal .modal-content {
+    background: var(--light-color);
+    color: var(--text-color);
+}
+
+/* 深色主题下设置弹窗标题 */
+body.theme-dark #settingsModal .modal-content h3 {
+    color: #ffffff !important;
+}
+
+body.theme-dark .setting-item {
+    background: var(--background-color);
+    border-color: var(--border-color);
+}
+
+body.theme-dark .setting-item:hover {
+    background: rgba(32, 201, 151, 0.1);
+}
+
+body.theme-dark .setting-text strong {
+    color: #ffffff !important;
+}
+
+body.theme-dark .setting-text small {
+    color: #aaaaaa !important;
+}
+
+body.theme-dark .setting-label .checkmark {
+    background: var(--background-color);
+    border-color: var(--border-color);
+}
+
+/* 深色主题下科目弹窗样式 */
+body.theme-dark #subjectModal .modal-content {
+    background: var(--light-color);
+    color: var(--text-color);
+}
+
+body.theme-dark #subjectModal .modal-content h3 {
+    color: #ffffff !important;
+}
+
+body.theme-dark #subjectModal .form-group > label {
+    color: #ffffff !important;
+}
+
+body.theme-dark .period-controls-desktop {
+    background: var(--light-color);
+    border-color: var(--border-color);
+}
+
+body.theme-dark .period-control-line span {
+    color: var(--text-color);
+}
+
+body.theme-dark .period-control-line .btn {
+    background: var(--background-color);
+    color: var(--text-color);
+    border-color: var(--border-color);
+}
+
+body.theme-dark .period-control-line .btn:hover {
+    background: var(--primary-color);
+    color: white;
+}
+
+body.theme-dark .period-control-line .btn.danger {
+    background: var(--danger-color);
+    color: white;
+}
+
+body.theme-dark .period-control-line .btn.danger:hover {
+    background: #c82333;
+}
+
+body.theme-dark .subject-pool-header {
+    background: var(--light-color);
+    border-color: var(--border-color);
+}
+
+body.theme-dark .subject-pool-header h3 {
+    color: var(--primary-color);
+}
+
+/* 深色主题下科目池中的科目名称样式 - 确保清晰可见 */
+body.theme-dark .subject-card .subject-name {
+    color: var(--text-color) !important;
+    font-weight: 600 !important;
+}
+
+/* 深色主题下科目池中的老师姓名样式 - 确保清晰可见 */
+body.theme-dark .subject-card .teacher-name {
+    color: var(--text-color) !important;
+    opacity: 0.8;
+}
+
+/* 深色主题下科目操作按钮样式 - 确保清晰可见 */
+body.theme-dark .subject-actions .btn-text {
+    color: var(--text-color) !important;
+    background-color: transparent !important;
+    border: 1px solid var(--border-color) !important;
+    transition: all 0.3s ease !important;
+}
+
+body.theme-dark .subject-actions .btn-text:hover {
+    background-color: var(--primary-color) !important;
+    color: white !important;
+    border-color: var(--primary-color) !important;
+    box-shadow: 0 2px 8px rgba(32, 201, 151, 0.3) !important;
+}
+
+/* 深色主题下科目卡片内部信息样式 */
+body.theme-dark .subject-info {
+    color: var(--text-color) !important;
+}
+
+body.theme-dark .subject-pool {
+    background-color: var(--background-color);
+    border-color: var(--border-color);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+}
+
+body.theme-dark .subjects {
+    background-color: var(--background-color);
+}
+
+body.theme-dark .subject-card {
+    background-color: var(--light-color);
+    border-color: var(--border-color);
+    color: var(--text-color);
+}
+
+body.theme-dark .subject-card:hover {
+    background-color: var(--dark-color);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    background-color: var(--background-color);
+    background-image: var(--pattern-background);
+    background-attachment: fixed;
+    color: var(--text-color);
+    line-height: 1.6;
+    font-size: 16px;
+    font-weight: 400;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+/* 标题和文本样式优化 */
+h1, h2, h3, h4, h5, h6 {
+    font-weight: 600;
+    line-height: 1.3;
+    margin-bottom: 0.5em;
+    color: var(--text-color);
+}
+
+h1 {
+    font-size: 2.5rem;
+    font-weight: 700;
+}
+
+h2 {
+    font-size: 2rem;
+}
+
+h3 {
+    font-size: 1.5rem;
+}
+
+h4 {
+    font-size: 1.25rem;
+}
+
+h5 {
+    font-size: 1.1rem;
+}
+
+h6 {
+    font-size: 1rem;
+}
+
+/* 段落和文本样式 */
+p {
+    margin-bottom: 1em;
+    line-height: 1.7;
+}
+
+/* 按钮文本优化 */
+.btn {
+    font-weight: 500;
+    letter-spacing: 0.02em;
+}
+
+/* 输入框文本优化 */
+input, textarea, select {
+    font-family: inherit;
+    font-size: 0.95em;
+}
+
+.header {
+    background: white;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 10px var(--shadow-color);
+    border: 1px solid var(--border-color);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.title-section {
+    flex: 1;
+}
+
+.timetable-title {
+    font-size: 28px;
+    font-weight: bold;
+    color: var(--primary-color);
+    border: none;
+    background: transparent;
+    padding: 5px 10px;
+    border-bottom: 2px solid transparent;
+    transition: border-color 0.3s;
+    width: 300px;
+}
+
+.timetable-title:focus {
+    outline: none;
+    border-bottom-color: var(--primary-color);
+}
+
+.controls {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.btn {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    height: 36px;
+    box-sizing: border-box;
+}
+
+.btn.small {
+    padding: 8px 16px;
+    font-size: 12px;
+    height: 36px;
+    font-weight: 500;
+    border-radius: 8px;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    min-width: 60px;
+    box-sizing: border-box;
+}
+
+.btn.primary {
+    background: var(--primary-color);
+    color: white;
+}
+
+.btn.primary:hover {
+    background: var(--dark-color);
+}
+
+.btn.secondary {
+    background: var(--secondary-color);
+    color: white;
+}
+
+.btn.secondary:hover {
+    background: #545b62;
+}
+
+.btn.tertiary {
+    background: var(--success-color);
+    color: white;
+}
+
+.btn.tertiary:hover {
+    background: #1e7e34;
+}
+
+.btn.danger {
+    background: var(--danger-color);
+    color: white;
+}
+
+/* 课时增减按钮现代化设计 */
+.period-controls .btn.small,
+.period-controls-desktop .btn.small {
+    background: transparent;
+    border: 1px solid rgba(59, 130, 246, 0.2);
+    color: #3b82f6;
+    position: relative;
+    overflow: hidden;
+}
+
+.period-controls .btn.small:hover,
+.period-controls-desktop .btn.small:hover {
+    background: rgba(59, 130, 246, 0.1);
+    color: #1d4ed8;
+    border-color: rgba(59, 130, 246, 0.4);
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(59, 130, 246, 0.15);
+}
+
+.period-controls .btn.small:active,
+.period-controls-desktop .btn.small:active {
+    transform: translateY(0);
+    background: rgba(59, 130, 246, 0.15);
+}
+
+/* 减少按钮（危险操作）样式 */
+.period-controls .btn.small.danger,
+.period-controls-desktop .btn.small.danger {
+    border-color: rgba(239, 68, 68, 0.2);
+    color: #ef4444;
+}
+
+.period-controls .btn.small.danger:hover,
+.period-controls-desktop .btn.small.danger:hover {
+    background: rgba(239, 68, 68, 0.1);
+    color: #dc2626;
+    border-color: rgba(239, 68, 68, 0.4);
+    box-shadow: 0 2px 8px rgba(239, 68, 68, 0.15);
+}
+
+.period-controls .btn.small.danger:active,
+.period-controls-desktop .btn.small.danger:active {
+    background: rgba(239, 68, 68, 0.15);
+}
+
+.btn.danger:hover {
+    background: #c82333;
+}
+
+/* 导出下拉菜单样式 */
+.export-dropdown {
+    position: relative;
+    display: inline-block;
+    z-index: 99998; /* 确保下拉按钮本身也有高z-index */
+}
+
+/* PC端下拉菜单基础样式 */
+.export-menu,
+.backup-menu {
+    display: none;
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background: var(--light-color);
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    z-index: 9999;
+    min-width: 150px;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: all 0.3s ease;
+}
+
+/* 深色主题下的下拉菜单样式 */
+body.theme-dark .export-menu,
+body.theme-dark .backup-menu {
+    background: var(--background-color);
+    border-color: var(--border-color);
+    color: var(--text-color);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+/* 深色主题下的下拉菜单项样式 */
+body.theme-dark .export-item,
+body.theme-dark .backup-item {
+    color: var(--text-color);
+    background: transparent;
+    border-bottom-color: var(--border-color);
+}
+
+body.theme-dark .export-item:hover,
+body.theme-dark .backup-item:hover {
+    background: var(--light-color);
+    color: var(--primary-color);
+}
+
+/* 深色主题下的主题菜单样式 */
+body.theme-dark #themeMenu {
+    background: var(--background-color);
+    border-color: var(--border-color);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+body.theme-dark .theme-item {
+    color: var(--text-color);
+    background: transparent;
+}
+
+body.theme-dark .theme-item:hover {
+    background: var(--light-color);
+    color: var(--primary-color);
+}
+
+/* 深色主题下的字体菜单样式 */
+body.theme-dark #fontMenu {
+    background: var(--background-color);
+    border-color: var(--border-color);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+body.theme-dark .font-item {
+    color: var(--text-color);
+    background: transparent;
+}
+
+body.theme-dark .font-item:hover {
+    background: var(--light-color);
+    color: var(--primary-color);
+}
+
+/* 深色主题下自定义颜色区域样式 */
+body.theme-dark .custom-color {
+    background: var(--light-color);
+    border-color: var(--border-color);
+}
+
+body.theme-dark .custom-color span {
+    color: var(--text-color);
+}
+
+.export-menu.show,
+.backup-menu.show {
+    display: block;
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+/* 确保所有可能干扰下拉菜单的元素都有较低的z-index */
+.fixed-top-area,
+.period-controls,
+.period-control-line,
+.period-control-item,
+.period-control-label,
+.period-control-input,
+.period-control-button {
+    z-index: 1000 !important;
+    position: relative !important;
+}
+
+/* 特别保护下拉按钮容器 */
+.export-dropdown,
+.backup-dropdown {
+    z-index: 99998 !important;
+    position: relative !important;
+    isolation: isolate !important;
+}
+
+/* 创建新的层叠上下文，确保下拉菜单不被其他元素影响 */
+.export-dropdown::before,
+.backup-dropdown::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: -1;
+    pointer-events: none;
+}
+
+/* 手机端汉堡菜单按钮样式 */
+@media (max-width: 768px) {
+    /* 隐藏手机端的controls菜单栏 */
+    .controls {
+        display: none !important;
+    }
+    
+    .hamburger-btn {
+        display: flex !important;
+        flex-direction: column !important;
+        justify-content: center !important;
+        align-items: center !important;
+        width: 40px !important;
+        height: 40px !important;
+        background: none !important;
+        border: none !important;
+        cursor: pointer !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        z-index: 1000001 !important;
+        position: relative !important;
+        transition: all 0.3s ease !important;
+        flex-shrink: 0 !important; /* 防止按钮被压缩 */
+        order: 2 !important; /* 确保在右侧 */
+    }
+    
+    .hamburger-line {
+        width: 24px !important;
+        height: 3px !important;
+        background-color: var(--text-color) !important;
+        margin: 2px 0 !important;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+        border-radius: 2px !important;
+        transform-origin: center !important;
+    }
+    
+    /* 汉堡按钮激活状态 */
+    .hamburger-btn.active .hamburger-line:nth-child(1) {
+        transform: rotate(45deg) translate(6px, 6px) !important;
+    }
+    
+    .hamburger-btn.active .hamburger-line:nth-child(2) {
+        opacity: 0 !important;
+        transform: scaleX(0) !important;
+    }
+    
+    .hamburger-btn.active .hamburger-line:nth-child(3) {
+        transform: rotate(-45deg) translate(6px, -6px) !important;
+    }
+    
+    /* 侧边栏样式 */
+    .mobile-sidebar {
+        position: fixed !important;
+        top: 0 !important;
+        right: 0 !important;
+        width: 320px !important;
+        max-width: 85vw !important;
+        height: 100vh !important;
+        background: var(--light-color) !important;
+        box-shadow: -5px 0 20px rgba(0,0,0,0.15) !important;
+        z-index: 1000000 !important;
+        transform: translateX(100%) !important;
+        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+        display: flex !important;
+        flex-direction: column !important;
+        overflow: hidden !important;
+    }
+    
+    .mobile-sidebar.show {
+        transform: translateX(0) !important;
+    }
+    
+    .sidebar-header {
+        display: flex !important;
+        justify-content: space-between !important;
+        align-items: center !important;
+        padding: 20px 25px 15px !important;
+        border-bottom: 1px solid #eee !important;
+        background: #f8f9fa !important;
+        position: sticky !important;
+        top: 0 !important;
+        z-index: 1 !important;
+    }
+    
+    .sidebar-header h3 {
+        margin: 0 !important;
+        font-size: 20px !important;
+        font-weight: 600 !important;
+        color: #333 !important;
+    }
+    
+    .close-sidebar-btn {
+        background: none !important;
+        border: none !important;
+        font-size: 28px !important;
+        cursor: pointer !important;
+        color: #999 !important;
+        padding: 0 !important;
+        width: 30px !important;
+        height: 30px !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        border-radius: 50% !important;
+        transition: all 0.2s !important;
+    }
+    
+    .close-sidebar-btn:hover {
+        background: #f0f0f0 !important;
+        color: #333 !important;
+    }
+    
+    .sidebar-content {
+        flex: 1 !important;
+        padding: 20px 0 !important;
+        overflow-y: auto !important;
+    }
+    
+    .sidebar-section {
+        margin-bottom: 25px !important;
+        padding: 0 25px !important;
+    }
+    
+    .sidebar-section h4 {
+        margin: 0 0 15px 0 !important;
+        font-size: 16px !important;
+        font-weight: 600 !important;
+        color: #666 !important;
+        text-transform: uppercase !important;
+        letter-spacing: 0.5px !important;
+    }
+    
+    .sidebar-btn {
+        display: flex !important;
+        align-items: center !important;
+        width: 100% !important;
+        padding: 15px 20px !important;
+        margin-bottom: 8px !important;
+        background: white !important;
+        border: 1px solid #eee !important;
+        border-radius: 8px !important;
+        cursor: pointer !important;
+        transition: all 0.2s !important;
+        font-size: 15px !important;
+        color: #333 !important;
+        text-align: left !important;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
+    }
+    
+    .sidebar-btn:hover {
+        background: #f8f9fa !important;
+        border-color: #007bff !important;
+        transform: translateY(-1px) !important;
+        box-shadow: 0 2px 8px rgba(0, 123, 255, 0.15) !important;
+    }
+    
+    .sidebar-btn:active {
+        transform: translateY(0) !important;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
+    }
+    
+    .sidebar-btn .icon {
+        width: 20px !important;
+        height: 20px !important;
+        margin-right: 12px !important;
+        flex-shrink: 0 !important;
+    }
+    
+    /* 侧边栏主题网格 */
+    .sidebar-theme-grid,
+    .sidebar-font-grid {
+        display: grid !important;
+        grid-template-columns: repeat(3, 1fr) !important;
+        gap: 8px !important;
+        padding: 0 5px !important;
+        margin-bottom: 10px !important;
+    }
+    
+    .sidebar-theme-btn,
+    .sidebar-font-btn {
+        padding: 10px 8px !important;
+        border: 1px solid #e0e0e0 !important;
+        border-radius: 8px !important;
+        background: white !important;
+        color: #333 !important;
+        font-size: 12px !important;
+        cursor: pointer !important;
+        transition: all 0.2s ease !important;
+        text-align: center !important;
+    }
+    
+    .sidebar-theme-btn:hover,
+    .sidebar-font-btn:hover {
+        background: var(--light-color) !important;
+        border-color: var(--primary-color) !important;
+    }
+    
+    .sidebar-theme-btn.active,
+    .sidebar-font-btn.active {
+        background: var(--primary-color) !important;
+        color: white !important;
+        border-color: var(--primary-color) !important;
+    }
+    
+    /* 侧边栏自定义颜色 */
+    .sidebar-custom-color {
+        display: flex !important;
+        align-items: center !important;
+        gap: 10px !important;
+        padding: 10px 5px !important;
+        background: #f8f9fa !important;
+        border-radius: 8px !important;
+    }
+    
+    .sidebar-custom-color input[type="color"] {
+        width: 36px !important;
+        height: 36px !important;
+        border: none !important;
+        border-radius: 6px !important;
+        cursor: pointer !important;
+    }
+    
+    .sidebar-custom-color span {
+        font-size: 13px !important;
+        color: #666 !important;
+    }
+    
+    /* 侧边栏遮罩层 */
+    .sidebar-overlay {
+        position: fixed !important;
+        top: 0 !important;
+        left: 0 !important;
+        width: 100% !important;
+        height: 100% !important;
+        background: rgba(0, 0, 0, 0.5) !important;
+        z-index: 999999 !important;
+        opacity: 0 !important;
+        visibility: hidden !important;
+        transition: all 0.3s ease !important;
+        backdrop-filter: blur(2px) !important;
+    }
+    
+    .sidebar-overlay.show {
+        opacity: 1 !important;
+        visibility: visible !important;
+    }
+}
+
+/* PC端隐藏汉堡按钮 */
+@media (min-width: 769px) {
+    .hamburger-btn {
+        display: none !important;
+    }
+    
+    .mobile-sidebar {
+        display: none !important;
+    }
+    
+    .sidebar-overlay {
+        display: none !important;
+    }
+}
+
+/* 深色主题下的侧边栏样式 */
+@media (max-width: 768px) {
+    body.theme-dark .mobile-sidebar {
+        background: var(--background-color) !important;
+        border-left: 1px solid var(--border-color) !important;
+    }
+    
+    body.theme-dark .sidebar-header {
+        background: var(--light-color) !important;
+        border-bottom-color: var(--border-color) !important;
+    }
+    
+    body.theme-dark .sidebar-header h3 {
+        color: var(--text-color) !important;
+    }
+    
+    body.theme-dark .close-sidebar-btn {
+        color: var(--text-color) !important;
+    }
+    
+    body.theme-dark .close-sidebar-btn:hover {
+        background: var(--background-color) !important;
+    }
+    
+    body.theme-dark .sidebar-section h4 {
+        color: var(--text-color) !important;
+    }
+    
+    body.theme-dark .sidebar-btn {
+        background: var(--light-color) !important;
+        border-color: var(--border-color) !important;
+        color: var(--text-color) !important;
+    }
+    
+    body.theme-dark .sidebar-btn:hover {
+        background: var(--primary-color) !important;
+        color: white !important;
+        border-color: var(--primary-color) !important;
+    }
+    
+    body.theme-dark .sidebar-theme-btn,
+    body.theme-dark .sidebar-font-btn {
+        background: var(--light-color) !important;
+        border-color: var(--border-color) !important;
+        color: var(--text-color) !important;
+    }
+    
+    body.theme-dark .sidebar-theme-btn:hover,
+    body.theme-dark .sidebar-font-btn:hover {
+        background: var(--background-color) !important;
+        border-color: var(--primary-color) !important;
+        color: var(--primary-color) !important;
+    }
+    
+    body.theme-dark .sidebar-custom-color {
+        background: var(--light-color) !important;
+    }
+    
+    body.theme-dark .sidebar-custom-color span {
+        color: var(--text-color) !important;
+    }
+    
+    /* 深色主题下移动端下拉菜单样式 */
+    body.theme-dark .export-menu,
+    body.theme-dark .backup-menu {
+        background: var(--background-color) !important;
+        border-color: var(--border-color) !important;
+    }
+    
+    body.theme-dark .export-item,
+    body.theme-dark .backup-item {
+        color: var(--text-color) !important;
+    }
+    
+    body.theme-dark .export-item:hover,
+    body.theme-dark .backup-item:hover {
+        background: var(--light-color) !important;
+        color: var(--primary-color) !important;
+    }
+}
+
+/* 移动端下拉菜单样式 */
+@media (max-width: 768px) {
+    .export-menu,
+    .backup-menu {
+        position: fixed !important;
+        top: auto !important;
+        bottom: 20px !important;
+        left: 20px !important;
+        right: 20px !important;
+        width: auto !important;
+        min-width: auto !important;
+        max-height: 50vh !important;
+        overflow-y: auto !important;
+        border-radius: 12px !important;
+        box-shadow: 0 -8px 32px rgba(0,0,0,0.25) !important;
+        z-index: 999999 !important;
+        transform: translateY(120%) !important;
+        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+        /* 确保不会被键盘遮挡 */
+        margin-bottom: env(keyboard-inset-height, 0px);
+        /* 添加背景模糊效果 */
+        backdrop-filter: blur(10px) !important;
+        background: rgba(255, 255, 255, 0.95) !important;
+        border: 1px solid rgba(255, 255, 255, 0.2) !important;
+        /* 确保菜单在最顶层 */
+        isolation: isolate !important;
+        contain: layout style paint !important;
+        /* 强制创建新的层叠上下文 */
+        will-change: transform !important;
+        /* 确保菜单始终可见 */
+        pointer-events: auto !important;
+    }
+    
+    .export-menu.show,
+    .backup-menu.show {
+        transform: translateY(0) !important;
+    }
+    
+    /* 确保保存图片按钮在移动端可见且易操作 */
+    .export-item,
+    .backup-item {
+        padding: 18px 24px !important;
+        font-size: 16px !important;
+        min-height: 56px !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: flex-start !important;
+        border-bottom: 1px solid rgba(0,0,0,0.05) !important;
+        transition: background-color 0.2s ease !important;
+        /* 增加触摸区域 */
+        touch-action: manipulation !important;
+        -webkit-tap-highlight-color: rgba(0,0,0,0.1) !important;
+    }
+    
+    .export-item:last-child,
+    .backup-item:last-child {
+        border-bottom: none !important;
+        border-radius: 0 0 12px 12px !important;
+    }
+    
+    .export-item:first-child,
+    .backup-item:first-child {
+        border-radius: 12px 12px 0 0 !important;
+    }
+    
+    .export-item:active,
+    .backup-item:active {
+        background-color: rgba(0,0,0,0.05) !important;
+        transform: scale(0.98) !important;
+    }
+    
+    /* 确保下拉按钮在移动端也有足够的层级 */
+    .export-dropdown,
+    .backup-dropdown {
+        z-index: 999999 !important;
+        position: relative !important;
+        /* 确保按钮容器不会影响菜单的层级 */
+        isolation: isolate !important;
+    }
+    
+    /* 移动端菜单遮罩层 */
+    .dropdown-overlay {
+        position: fixed !important;
+        top: 0 !important;
+        left: 0 !important;
+        right: 0 !important;
+        bottom: 0 !important;
+        background: rgba(0, 0, 0, 0.3) !important;
+        z-index: 999997 !important;
+        opacity: 0 !important;
+        visibility: hidden !important;
+        transition: opacity 0.3s ease, visibility 0.3s ease !important;
+        backdrop-filter: blur(2px) !important;
+    }
+    
+    .dropdown-overlay.show {
+        opacity: 1 !important;
+        visibility: visible !important;
+    }
+}
+
+
+.export-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    padding: 10px 15px;
+    border: none;
+    background: none;
+    text-align: left;
+    cursor: pointer;
+    font-size: 14px;
+    color: var(--text-color);
+    transition: background-color 0.2s ease;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.export-item:last-child {
+    border-bottom: none;
+}
+
+.export-item:hover {
+    background-color: var(--light-color);
+}
+
+.export-item .icon {
+    width: 16px;
+    height: 16px;
+    stroke: currentColor;
+}
+
+/* SVG图标通用样式 */
+.icon {
+    width: 18px;
+    height: 18px;
+    stroke: currentColor;
+    stroke-width: 2;
+    fill: none;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+/* 备份数据下拉菜单样式 */
+.backup-dropdown {
+    position: relative;
+    display: inline-block;
+    z-index: 99998; /* 确保下拉按钮本身也有高z-index */
+}
+
+
+.backup-item {
+    display: block;
+    width: 100%;
+    padding: 10px 15px;
+    border: none;
+    background: none;
+    text-align: left;
+    cursor: pointer;
+    font-size: 14px;
+    color: #333;
+    transition: background-color 0.2s ease;
+    border-radius: 0;
+}
+
+.backup-item:first-child {
+    border-radius: 6px 6px 0 0;
+}
+
+.backup-item:last-child {
+    border-radius: 0 0 6px 6px;
+}
+
+.backup-item:hover {
+    background: #f8f9fa;
+    color: #007bff;
+}
+
+.backup-item:active {
+    background: #e9ecef;
+}
+
+@keyframes fadeInDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* 通知动画 */
+@keyframes slideInRight {
+    from {
+        opacity: 0;
+        transform: translateX(100%);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes slideOutRight {
+    from {
+        opacity: 1;
+        transform: translateX(0);
+    }
+    to {
+        opacity: 0;
+        transform: translateX(100%);
+    }
+}
+
+
+
+/* PC端左右两栏布局 */
+@media (min-width: 769px) {
+    .main-content {
+        display: flex;
+        gap: 30px;
+        align-items: flex-start;
+    }
+    
+    /* 左侧栏：课时控制和科目池 */
+    .left-sidebar {
+        flex: 0 0 300px;
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+    }
+    
+    /* 右侧栏：课程表格 */
+    .right-content {
+        flex: 1;
+        min-width: 0;
+    }
+    
+    /* PC端课时控制区域 */
+    .period-controls-desktop {
+        display: block;
+        padding: 20px;
+        background-color: var(--background-color);
+        border-radius: 8px;
+        border: 1px solid var(--border-color);
+        margin-bottom: 16px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    }
+    
+    /* 统一科目池模块样式 */
+/* 科目池样式 - 确保使用主题色变量 */
+.subject-pool {
+    background-color: var(--background-color);
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    box-shadow: 0 2px 8px var(--shadow-color);
+    overflow: hidden;
+}
+
+.subject-pool-header {
+    background-color: var(--background-color);
+    border-bottom: 1px solid var(--border-color);
+}
+
+.subjects {
+    background-color: var(--background-color);
+}
+
+.subject-card {
+    background-color: var(--light-color);
+    border: 1px solid var(--border-color);
+    color: var(--text-color);
+    transition: all 0.3s ease;
+}
+
+.subject-card:hover {
+    box-shadow: 0 4px 12px var(--shadow-color);
+    transform: translateY(-1px);
+}
+
+/* 编辑和删除按钮样式 */
+.subject-actions .btn-text {
+    color: var(--text-color);
+    background-color: transparent;
+    border: 1px solid var(--border-color);
+    transition: all 0.3s ease;
+}
+
+.subject-actions .btn-text:hover {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+/* 深色主题下的科目卡片样式 */
+body.theme-dark .subject-card {
+    background-color: var(--light-color) !important;
+    border: 1px solid var(--border-color) !important;
+    color: var(--text-color) !important;
+}
+
+body.theme-dark .subject-card:hover {
+    background-color: rgba(32, 201, 151, 0.1) !important;
+    box-shadow: 0 4px 12px var(--shadow-color) !important;
+}
+
+body.theme-dark .subject-actions .btn-text {
+    color: var(--text-color) !important;
+    background-color: transparent !important;
+    border: 1px solid var(--border-color) !important;
+}
+
+body.theme-dark .subject-actions .btn-text:hover {
+    background-color: var(--primary-color) !important;
+    color: white !important;
+}
+
+/* 为所有主题添加科目池样式 */
+.theme-blue .subject-card:hover {
+    background-color: rgba(0, 123, 255, 0.1);
+}
+
+.theme-purple .subject-card:hover {
+    background-color: rgba(111, 66, 193, 0.1);
+}
+
+.theme-pink .subject-card:hover {
+    background-color: rgba(233, 30, 99, 0.1);
+}
+
+.theme-orange .subject-card:hover {
+    background-color: rgba(253, 126, 20, 0.1);
+}
+
+.theme-dark .subject-card:hover {
+    background-color: rgba(32, 201, 151, 0.1);
+}
+    
+    .period-controls-desktop .period-control-line {
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        gap: 15px;
+        margin-bottom: 12px;
+        padding: 8px 0;
+        border-bottom: 1px solid var(--border-color);
+    }
+    
+    .period-controls-desktop .period-control-line:last-child {
+        margin-bottom: 0;
+        border-bottom: none;
+    }
+    
+    .period-controls-desktop span {
+        font-weight: 500;
+        color: var(--text-color);
+        min-width: 80px;
+        font-size: 14px;
+    }
+    
+    /* 优化按钮样式 */
+    .period-controls-desktop .btn {
+        margin-left: 0;
+        margin-right: 0;
+        padding: 8px 16px;
+        font-size: 14px;
+        border-radius: 6px;
+    }
+    
+    .period-controls-desktop .btn.danger {
+        margin-left: 8px;
+    }
+    
+    /* 调整科目池内部间距 */
+    .subject-pool-header {
+        margin-bottom: 8px;
+    }
+    
+    .subjects {
+        padding: 0 20px 20px 20px;
+    }
+    
+    /* PC端科目池样式调整 */
+    .subject-pool {
+        width: 100%;
+        max-height: 700px;
+        min-height: 500px;
+    }
+    
+    /* PC端隐藏fixed-top-area中的period-controls */
+    .fixed-top-area .period-controls {
+        display: none;
+    }
+}
+
+/* 微信浏览器特殊优化 */
+@supports (-webkit-touch-callout: none) {
+    /* iOS Safari 和微信浏览器 */
+    body {
+        padding-top: env(safe-area-inset-top);
+        padding-bottom: env(safe-area-inset-bottom);
+        -webkit-overflow-scrolling: touch;
+    }
+    
+    .fixed-top-area {
+        padding-top: env(safe-area-inset-top);
+    }
+    
+    /* 微信浏览器科目池特殊优化 */
+    .subject-pool {
+        -webkit-overflow-scrolling: touch;
+        -webkit-transform: translateZ(0);
+        transform: translateZ(0);
+    }
+    
+    .subjects {
+        -webkit-overflow-scrolling: touch;
+        -webkit-transform: translateZ(0);
+        transform: translateZ(0);
+    }
+    
+    /* 微信浏览器课时控制按钮优化 */
+    .fixed-top-area .period-controls .period-control-line .btn.small {
+        -webkit-appearance: none !important; /* 移除默认样式 */
+        -webkit-tap-highlight-color: transparent !important; /* 移除触摸高亮 */
+        -webkit-user-select: none !important; /* 防止文本选择 */
+        user-select: none !important;
+        -webkit-touch-callout: none !important; /* 防止长按菜单 */
+    }
+    
+    /* 确保在微信浏览器中按钮内容居中 */
+    @supports (-webkit-touch-callout: none) {
+        .fixed-top-area .period-controls .period-control-line .btn.small {
+            display: -webkit-flex !important;
+            -webkit-align-items: center !important;
+            -webkit-justify-content: center !important;
+        }
+    }
+}
+
+/* 移动端保持原有布局 */
+@media (max-width: 768px) {
+    /* 微信浏览器viewport优化 */
+    @supports (-webkit-touch-callout: none) {
+        .container {
+            padding-top: 220px !important; /* 增加顶部间距防止被遮挡 */
+        }
+    }
+    
+    .main-content {
+        display: flex;
+        flex-direction: column;
+        gap: 0;
+    }
+    
+    .left-sidebar {
+        display: block;
+        width: 100%;
+    }
+    
+    .right-content {
+        display: block;
+        width: 100%;
+    }
+    
+    .period-controls-desktop {
+        display: none !important;
+    }
+    
+    /* 隐藏移动端左侧栏的课时设置标题 */
+    .left-sidebar .section-title:nth-child(1) {
+        display: none !important;
+    }
+}
+
+/* PC端样式 - 保持原有布局 */
+.fixed-top-area {
+    position: static;
+    background: transparent;
+    box-shadow: none;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+/* 移动端顶部固定区域优化 */
+@media (max-width: 768px) {
+    .fixed-top-area {
+        position: fixed !important;
+        top: 0 !important;
+        left: 0 !important;
+        right: 0 !important;
+        z-index: 1000 !important;
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%) !important;
+        box-shadow: 0 2px 15px rgba(0,0,0,0.08) !important;
+        border-radius: 0 !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        max-width: 100vw !important;
+        width: 100vw !important;
+        box-sizing: border-box !important;
+        overflow-x: hidden !important;
+        transform: translateX(0) !important;
+        backdrop-filter: blur(10px) !important;
+        -webkit-backdrop-filter: blur(10px) !important;
+    }
+    
+    /* 微信浏览器安全区域适配 */
+    @supports (-webkit-touch-callout: none) {
+        .fixed-top-area {
+            padding-top: env(safe-area-inset-top) !important;
+        }
+    }
+}
+
+/* PC端header保持原有样式 */
+.fixed-top-area .header {
+    background: white;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: nowrap;
+    min-height: 60px;
+}
+
+/* 标题区域优化 */
+.fixed-top-area .header .title-section {
+    flex: 0 0 auto;
+    min-width: 200px;
+    margin-right: 20px;
+}
+
+/* 控制按钮区域优化 */
+.fixed-top-area .header .controls {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    flex-wrap: nowrap;
+    justify-content: flex-end;
+    flex: 1;
+    min-width: 0;
+}
+
+/* 按钮样式优化 */
+.fixed-top-area .header .btn {
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+/* 移动端header优化 */
+@media (max-width: 768px) {
+    .fixed-top-area .header {
+        background: transparent !important;
+        border-radius: 0 !important;
+        padding: 15px 20px !important;
+        margin: 0 !important;
+        box-shadow: none !important;
+        border-bottom: 1px solid rgba(0,0,0,0.1) !important;
+        backdrop-filter: blur(5px) !important;
+        -webkit-backdrop-filter: blur(5px) !important;
+        display: flex !important;
+        justify-content: space-between !important; /* 左右分布：标题在左，汉堡按钮在右 */
+        align-items: center !important;
+        flex-wrap: nowrap !important;
+        min-height: 50px !important;
+    }
+    
+    /* 确保标题在左侧 */
+    .fixed-top-area .header h1 {
+        margin: 0 !important;
+        font-size: 18px !important;
+        font-weight: 600 !important;
+        color: #333 !important;
+        flex: 1 !important;
+        text-align: left !important;
+        white-space: nowrap !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
+    }
+}
+
+/* PC端period-controls保持原有样式 */
+.fixed-top-area .period-controls {
+    margin-bottom: 15px;
+    padding: 12px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    text-align: center;
+}
+
+/* 移动端课时控制优化 */
+@media (max-width: 768px) {
+    .fixed-top-area .period-controls {
+        background: rgba(255,255,255,0.9) !important;
+        border-radius: 0 !important;
+        margin: 0 !important;
+        padding: 12px 15px !important; /* 减少垂直内边距 */
+        box-shadow: none !important;
+        border-bottom: 1px solid rgba(0,0,0,0.1) !important;
+        backdrop-filter: blur(5px) !important;
+        -webkit-backdrop-filter: blur(5px) !important;
+        display: flex !important;
+        flex-direction: row !important; /* 改为水平布局 */
+        justify-content: space-around !important;
+        align-items: center !important;
+        gap: 8px !important; /* 减少间距 */
+        z-index: 1000 !important; /* 确保课时控制区域层级低于下拉菜单 */
+        position: relative !important;
+    }
+    
+    .fixed-top-area .period-controls .period-control-line {
+        display: flex !important;
+        align-items: center !important;
+        gap: 10px !important;
+        margin-bottom: 0 !important;
+        font-size: 14px !important;
+        color: #333 !important;
+    }
+    
+    .fixed-top-area .period-controls .btn {
+        padding: 8px 12px !important;
+        font-size: 14px !important;
+        border-radius: 20px !important;
+        background: rgba(74, 124, 89, 0.1) !important;
+        color: #4a7c59 !important;
+        border: 1px solid rgba(74, 124, 89, 0.2) !important;
+        transition: all 0.3s ease !important;
+    }
+    
+    .fixed-top-area .period-controls .btn:hover {
+        background: rgba(74, 124, 89, 0.2) !important;
+        transform: translateY(-1px) !important;
+    }
+    
+    .fixed-top-area .period-controls .btn.danger {
+        background: rgba(220, 53, 69, 0.1) !important;
+        color: #dc3545 !important;
+        border-color: rgba(220, 53, 69, 0.2) !important;
+    }
+    
+    .fixed-top-area .period-controls .btn.danger:hover {
+        background: rgba(220, 53, 69, 0.2) !important;
+    }
+}
+
+/* PC端容器保持原有样式 */
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+    /* 移动端容器优化 */
+    @media (max-width: 768px) {
+        .container {
+            padding-top: 280px !important; /* 增加顶部间距，确保科目池不被遮挡 */
+            padding-left: 15px !important;
+            padding-right: 15px !important;
+            padding-bottom: 20px !important;
+            max-width: none !important;
+            width: auto !important;
+            margin: 0 !important;
+            box-sizing: border-box !important;
+        }
+        
+        /* 微信浏览器特殊优化 */
+        @supports (-webkit-touch-callout: none) {
+            .container {
+                padding-top: 320px !important; /* 微信浏览器需要更多间距 */
+            }
+        }
+    }
+
+@media (max-width: 768px) {
+    /* 移动端表格样式优化 */
+    .timetable th,
+    .timetable td {
+        min-width: 70px; /* 设置最小宽度确保内容可读 */
+        max-width: 100px; /* 设置最大宽度防止过宽 */
+        font-size: 12px; /* 减小字体大小 */
+        padding: 8px 4px; /* 减小内边距 */
+    }
+    
+    .timetable .time-header,
+    .timetable .period-header {
+        min-width: 60px; /* 时间和课时列更窄 */
+        max-width: 80px;
+    }
+    
+    .timetable .weekday-col,
+    .timetable .weekend-col {
+        min-width: 75px; /* 周一到周日列宽度 */
+        max-width: 90px;
+    }
+    
+    /* 移动端固定顶部区域 */
+    .fixed-top-area {
+        position: fixed !important;
+        top: 0 !important;
+        left: 0 !important;
+        right: 0 !important;
+        z-index: 1000 !important;
+        background: white !important;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1) !important;
+        width: 100% !important;
+        max-width: 100% !important;
+    }
+    
+    /* 移动端header样式 */
+    .fixed-top-area .header {
+        padding: 10px 15px !important;
+        margin: 0 !important;
+        border-radius: 0 !important;
+        box-shadow: none !important;
+        border-bottom: 1px solid #e9ecef !important;
+        display: flex !important;
+        flex-direction: row !important;
+        justify-content: space-between !important;
+        align-items: center !important;
+        gap: 8px !important;
+        min-height: 50px !important;
+    }
+    
+    .fixed-top-area .title-section {
+        flex: 1 !important;
+        text-align: left !important;
+    }
+    
+    .fixed-top-area .title-section h1 {
+        margin: 0 !important;
+        font-size: 18px !important;
+        font-weight: 600 !important;
+        color: #333 !important;
+        text-align: left !important;
+        white-space: nowrap !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
+    }
+    
+    .fixed-top-area .timetable-title {
+        font-size: 18px !important;
+        width: 100% !important;
+        text-align: center !important;
+        padding: 5px !important;
+    }
+    
+    .fixed-top-area .controls {
+        display: none !important; /* 在手机端隐藏controls */
+    }
+    
+    /* 手机端controls已隐藏，不需要按钮样式 */
+    /*
+    .fixed-top-area .controls .btn {
+        padding: 8px 12px !important;
+        font-size: 12px !important;
+        white-space: nowrap !important;
+        min-width: auto !important;
+        flex: 0 0 auto !important;
+    }
+    */
+    
+    /* 移动端period-controls样式 */
+    .fixed-top-area .period-controls {
+        margin: 0 !important;
+        padding: 10px 15px !important;
+        border-radius: 0 !important;
+        box-shadow: none !important;
+        border-bottom: 1px solid #e9ecef !important;
+        background: #f8f9fa !important;
+        display: flex !important;
+        justify-content: space-around !important;
+        align-items: center !important;
+    }
+    
+    .fixed-top-area .period-controls .period-control-line {
+        display: flex !important;
+        flex-direction: column !important; /* 改为垂直布局，文字在上，按钮在下 */
+        align-items: center !important;
+        justify-content: center !important;
+        gap: 6px !important; /* 减少间距 */
+        margin-bottom: 0 !important;
+        font-size: 13px !important; /* 减少字体大小 */
+        text-align: center !important;
+        flex-wrap: nowrap !important;
+        min-width: 80px !important; /* 设置最小宽度 */
+    }
+    
+    .fixed-top-area .period-controls .period-control-line span {
+        flex: 0 0 auto !important; /* 防止文字被压缩 */
+        white-space: nowrap !important; /* 防止文字换行 */
+        font-weight: 600 !important;
+        color: #333 !important;
+        font-size: 12px !important; /* 减少字体大小 */
+        line-height: 1.2 !important; /* 减少行高 */
+        margin-bottom: 2px !important; /* 减少底部间距 */
+    }
+    
+    .fixed-top-area .period-controls .period-control-line .btn.small {
+        flex: 0 0 auto !important; /* 防止按钮被压缩 */
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important; /* 按钮内容居中 */
+        min-width: 50px !important; /* 增加按钮宽度适应文字 */
+        height: 36px !important; /* 增加按钮高度 */
+        padding: 8px 12px !important; /* 恢复内边距 */
+        font-size: 11px !important; /* 适合文字的字体大小 */
+        font-weight: 500 !important; /* 适中的字重 */
+        border-radius: 8px !important; /* 圆角矩形，更现代 */
+        margin: 0 3px !important; /* 增加按钮间距 */
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important; /* 更流畅的动画 */
+        text-transform: uppercase !important; /* 大写字母 */
+        letter-spacing: 0.5px !important; /* 字母间距 */
+        border: 1px solid rgba(59, 130, 246, 0.2) !important; /* 恢复边框 */
+        background: transparent !important; /* 透明背景 */
+        color: #3b82f6 !important; /* 蓝色文字 */
+        text-align: center !important; /* 文本居中 */
+        line-height: 1 !important; /* 行高为1 */
+        vertical-align: middle !important; /* 垂直居中 */
+        position: relative !important; /* 为伪元素定位 */
+        overflow: hidden !important; /* 隐藏溢出内容 */
+        box-sizing: border-box !important; /* 盒模型 */
+    }
+    
+    /* 增加按钮现代化样式 */
+    .fixed-top-area .period-controls .period-control-line .btn.small:not(.danger) {
+        background: transparent !important; /* 透明背景 */
+        color: #3b82f6 !important; /* 蓝色文字 */
+        border: 1px solid rgba(59, 130, 246, 0.2) !important; /* 蓝色边框 */
+    }
+    
+    .fixed-top-area .period-controls .period-control-line .btn.small:not(.danger):hover,
+    .fixed-top-area .period-controls .period-control-line .btn.small:not(.danger):focus {
+        background: rgba(59, 130, 246, 0.1) !important; /* 悬停背景 */
+        color: #1d4ed8 !important; /* 深蓝色文字 */
+        border-color: rgba(59, 130, 246, 0.4) !important; /* 深蓝色边框 */
+        transform: translateY(-1px) !important; /* 轻微上移 */
+        box-shadow: 0 2px 8px rgba(59, 130, 246, 0.15) !important; /* 蓝色阴影 */
+    }
+    
+    .fixed-top-area .period-controls .period-control-line .btn.small:not(.danger):active {
+        transform: translateY(0) !important; /* 点击时恢复位置 */
+        background: rgba(59, 130, 246, 0.15) !important; /* 点击背景 */
+    }
+    
+    /* 减少按钮现代化样式 */
+    .fixed-top-area .period-controls .period-control-line .btn.small.danger {
+        background: transparent !important; /* 透明背景 */
+        color: #ef4444 !important; /* 红色文字 */
+        border: 1px solid rgba(239, 68, 68, 0.2) !important; /* 红色边框 */
+    }
+    
+    .fixed-top-area .period-controls .period-control-line .btn.small.danger:hover,
+    .fixed-top-area .period-controls .period-control-line .btn.small.danger:focus {
+        background: rgba(239, 68, 68, 0.1) !important; /* 悬停背景 */
+        color: #dc2626 !important; /* 深红色文字 */
+        border-color: rgba(239, 68, 68, 0.4) !important; /* 深红色边框 */
+        transform: translateY(-1px) !important; /* 轻微上移 */
+        box-shadow: 0 2px 8px rgba(239, 68, 68, 0.15) !important; /* 红色阴影 */
+    }
+    
+    .fixed-top-area .period-controls .period-control-line .btn.small.danger:active {
+        transform: translateY(0) !important; /* 点击时恢复位置 */
+        background: rgba(239, 68, 68, 0.15) !important; /* 点击背景 */
+    }
+    
+    /* 移除光泽效果，使用现代化设计 */
+    
+    /* 移动端课时控制响应式优化 */
+    @media (max-width: 480px) {
+        .fixed-top-area .period-controls {
+            padding: 15px 10px !important; /* 小屏幕减少内边距 */
+            gap: 12px !important; /* 减少间距 */
+        }
+        
+        .fixed-top-area .period-controls .period-control-line {
+            gap: 8px !important; /* 减少按钮间距 */
+        }
+        
+        .fixed-top-area .period-controls .period-control-line .btn.small {
+            min-width: 45px !important; /* 小屏幕适应文字按钮 */
+            height: 32px !important;
+            font-size: 10px !important;
+            padding: 6px 10px !important;
+        }
+    }
+    
+    /* 超小屏幕优化 */
+    @media (max-width: 360px) {
+        .fixed-top-area .period-controls {
+            padding: 12px 8px !important;
+            gap: 10px !important;
+        }
+        
+        .fixed-top-area .period-controls .period-control-line {
+            gap: 6px !important;
+        }
+        
+        .fixed-top-area .period-controls .period-control-line span {
+            font-size: 13px !important;
+        }
+        
+        .fixed-top-area .period-controls .period-control-line .btn.small {
+            min-width: 40px !important;
+            height: 30px !important;
+            font-size: 9px !important;
+            padding: 5px 8px !important;
+        }
+    }
+    
+    /* 确保按钮在触摸设备上有足够的触摸区域 */
+    @media (hover: none) and (pointer: coarse) {
+        .fixed-top-area .period-controls .period-control-line .btn.small {
+            min-width: 50px !important; /* 触摸设备适应文字按钮 */
+            height: 36px !important;
+            font-size: 11px !important;
+            padding: 8px 12px !important;
+        }
+    }
+    
+    /* 移动端按钮触摸优化 */
+    .fixed-top-area .period-controls .period-control-line .btn.small:active {
+        transform: scale(0.95) !important; /* 触摸时的缩放效果 */
+    }
+    
+    .fixed-top-area .period-controls .period-control-line .btn.small:not(.danger):active {
+        background: rgba(59, 130, 246, 0.2) !important; /* 增加按钮触摸时的背景色 */
+    }
+    
+    .fixed-top-area .period-controls .period-control-line .btn.small.danger:active {
+        background: rgba(239, 68, 68, 0.2) !important; /* 减少按钮触摸时的背景色 */
+    }
+    
+    /* 确保按钮内容完美居中 */
+    .fixed-top-area .period-controls .period-control-line .btn.small::before {
+        content: '';
+        display: inline-block;
+        height: 100%;
+        vertical-align: middle;
+    }
+    
+    /* 移动端按钮悬停效果（支持悬停的设备） */
+    @media (hover: hover) {
+        .fixed-top-area .period-controls .period-control-line .btn.small:hover {
+            transform: translateY(-2px) !important;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15) !important;
+        }
+    }
+    
+    /* 移动端按钮焦点状态优化 */
+    .fixed-top-area .period-controls .period-control-line .btn.small:focus {
+        outline: 2px solid rgba(74, 124, 89, 0.5) !important;
+        outline-offset: 2px !important;
+    }
+    
+    .fixed-top-area .period-controls .period-control-line .btn.small.danger:focus {
+        outline-color: rgba(220, 53, 69, 0.5) !important;
+    }
+    
+    /* 横屏模式优化 */
+    @media (orientation: landscape) and (max-width: 768px) {
+        .fixed-top-area .period-controls {
+            flex-direction: row !important; /* 横屏时改为水平布局 */
+            justify-content: space-around !important;
+            align-items: center !important;
+            padding: 15px 20px !important;
+            gap: 20px !important;
+        }
+        
+        .fixed-top-area .period-controls .period-control-line {
+            flex-direction: column !important; /* 每行改为垂直布局 */
+            gap: 8px !important;
+            align-items: center !important;
+            justify-content: center !important;
+        }
+        
+        .fixed-top-area .period-controls .period-control-line span {
+            font-size: 12px !important;
+            text-align: center !important;
+        }
+        
+        .fixed-top-area .period-controls .period-control-line .btn.small {
+            min-width: 45px !important;
+            height: 32px !important;
+            font-size: 10px !important;
+            padding: 6px 10px !important;
+        }
+    }
+    
+    /* 确保按钮内容完美居中 */
+    .fixed-top-area .period-controls .period-control-line .btn.small {
+        position: relative !important;
+        overflow: hidden !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        text-align: center !important;
+        line-height: 1 !important;
+    }
+    
+    .fixed-top-area .period-controls .period-control-line .btn.small > * {
+        margin: 0 !important;
+        line-height: 1 !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+    }
+    
+    /* 移动端容器样式 */
+    .container {
+        padding-top: 200px !important; /* 增加顶部间距确保科目池完全不被遮挡 */
+        max-width: 100vw !important;
+        width: 100vw !important;
+        margin: 0 !important;
+        padding-left: 0 !important;
+        padding-right: 0 !important;
+    }
+    
+    /* 移动端主内容区域样式 */
+    .main-content {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 0 !important;
+        width: 100vw !important;
+        max-width: 100vw !important;
+        margin: 0 !important;
+        padding: 10px 0 0 0 !important; /* 顶部留出间距 */
+    }
+    
+    /* 移动端科目池样式 */
+    .subject-pool {
+        order: 1;
+        width: 100vw !important;
+        margin: 0 !important;
+        padding: 15px 0 0 0 !important; /* 确保顶部有足够间距 */
+        border-radius: 0 !important;
+        box-shadow: none !important;
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .timetable-container {
+        order: 2;
+        width: 100vw !important;
+        max-width: 100vw !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        overflow-x: auto !important; /* 改为横向滚动 */
+        -webkit-overflow-scrolling: touch; /* 优化iOS滚动体验 */
+    }
+    
+    .timetable-wrapper {
+        min-width: max-content; /* 确保表格内容不被压缩 */
+    }
+    
+    .timetable {
+        min-width: max-content; /* 确保表格可以横向滚动 */
+    }
+}
+
+.subject-pool {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    max-height: 600px;
+    min-height: 400px;
+    display: flex;
+    flex-direction: column;
+}
+
+.period-controls {
+    margin-bottom: 15px;
+    padding: 12px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    text-align: center;
+}
+
+.period-controls h4 {
+    margin: 0 0 10px 0;
+    font-size: 14px;
+    font-weight: 600;
+    color: #495057;
+}
+
+.period-controls .period-control-line {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 8px;
+    font-size: 14px;
+}
+
+.period-controls .period-control-line:last-child {
+    margin-bottom: 0;
+}
+
+.period-controls .period-control-line span {
+    color: #495057;
+    font-weight: 600;
+}
+
+.period-controls .period-control-line .btn.small {
+    padding: 4px 8px;
+    min-width: 24px;
+    height: 24px;
+    font-size: 13px;
+    border-radius: 4px;
+    margin-left: 4px;
+}
+
+.subject-pool-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 20px 20px 8px 20px;
+        gap: 6px;
+        flex-shrink: 0;
+        border-bottom: 1px solid #f0f0f0;
+    }
+
+.subject-pool h3 {
+    font-size: 16px;
+    font-weight: 600;
+    margin: 0;
+}
+
+.subjects {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        padding: 0 20px 20px 20px;
+        overflow-y: auto;
+        flex: 1;
+    }
+
+.subject-card {
+    background: #f8f9fa;
+    border-radius: 4px;
+    padding: 8px 10px;
+    cursor: grab;
+    transition: all 0.3s ease;
+    border: 1px solid transparent;
+    user-select: none;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.subject-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.subject-card:active {
+    cursor: grabbing;
+}
+
+.subject-card.dragging {
+    opacity: 0.5;
+    cursor: grabbing;
+    transform: rotate(5deg);
+}
+
+.subject-info {
+    flex: 1;
+}
+
+.subject-info .subject-name {
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 1px;
+    color: var(--text-color);
+    transition: color 0.3s ease;
+}
+
+.subject-info .teacher-name {
+    font-size: 12px;
+    color: var(--text-color);
+    opacity: 0.8;
+    transition: color 0.3s ease;
+}
+
+.subject-actions {
+    display: flex;
+    gap: 4px;
+    margin-left: 8px;
+}
+
+/* 现代化文字按钮设计 */
+.btn-text {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 500;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 2px;
+    position: relative;
+    overflow: hidden;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    min-width: 50px;
+    height: 28px;
+    box-sizing: border-box;
+}
+
+.btn-text:hover {
+    transform: translateY(-1px);
+}
+
+.btn-text:active {
+    transform: translateY(0);
+}
+
+/* 编辑按钮现代化设计 */
+.edit-btn {
+    color: #3b82f6;
+    border: 1px solid rgba(59, 130, 246, 0.2);
+    background: rgba(59, 130, 246, 0.05);
+}
+
+.edit-btn:hover {
+    background: rgba(59, 130, 246, 0.1);
+    color: #1d4ed8;
+    border-color: rgba(59, 130, 246, 0.4);
+    box-shadow: 0 2px 8px rgba(59, 130, 246, 0.15);
+}
+
+.edit-btn:active {
+    background: rgba(59, 130, 246, 0.15);
+    transform: translateY(0);
+}
+
+/* 删除按钮现代化设计 */
+.delete-btn {
+    color: #ef4444;
+    border: 1px solid rgba(239, 68, 68, 0.2);
+    background: rgba(239, 68, 68, 0.05);
+}
+
+.delete-btn:hover {
+    background: rgba(239, 68, 68, 0.1);
+    color: #dc2626;
+    border-color: rgba(239, 68, 68, 0.4);
+    box-shadow: 0 2px 8px rgba(239, 68, 68, 0.15);
+}
+
+.delete-btn:active {
+    background: rgba(239, 68, 68, 0.15);
+    transform: translateY(0);
+}
+
+/* 简洁设计不需要光泽效果 */
+
+/* 按钮图标优化 */
+.btn-icon i {
+    font-size: 16px;
+    line-height: 1;
+}
+
+.timetable-container {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+}
+
+.timetable {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.timetable th,
+.timetable td {
+    border: 1px solid var(--border-color);
+    padding: 12px;
+    text-align: center;
+    vertical-align: middle;
+}
+
+.timetable th {
+    background: var(--light-color);
+    font-weight: 700;
+    font-size: 16px;
+    color: var(--text-color);
+}
+
+.time-header {
+    width: 60px;
+}
+
+.period-header {
+    width: 80px;
+}
+
+.section-header .section-title {
+    background: #e9ecef;
+    font-weight: 600;
+    text-align: center;
+    padding: 8px;
+}
+
+.section-controls {
+    margin-bottom: 15px;
+    display: flex;
+    gap: 30px;
+    justify-content: center;
+    align-items: center;
+}
+
+.timetable-title-section {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.table-title-input {
+    font-size: 20px;
+    font-weight: bold;
+    text-align: center;
+    border: none;
+    background: var(--light-color);
+    padding: 8px 16px;
+    outline: none;
+    transition: all 0.3s ease;
+    width: 300px;
+    color: var(--text-color);
+    border-radius: 4px;
+}
+
+.table-title-input:focus {
+    background: var(--primary-color);
+    color: white;
+    border-radius: 4px;
+}
+
+.control-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.control-group span {
+    font-weight: bold;
+    min-width: 50px;
+}
+
+.btn.danger {
+    background-color: #dc3545;
+    color: white;
+    border-color: #dc3545;
+}
+
+.btn.danger:hover {
+    background-color: #c82333;
+    border-color: #bd2130;
+}
+
+.time-cell {
+    background: var(--light-color);
+    text-align: center;
+    font-weight: bold;
+    color: var(--text-color);
+    border-right: 1px solid var(--border-color);
+    width: 40px;
+    min-width: 40px;
+    vertical-align: middle;
+}
+
+.vertical-text {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    font-weight: bold;
+    color: var(--primary-color);
+    height: 100%;
+    gap: 2px;
+}
+
+.period-cell {
+    background: var(--light-color);
+    font-weight: 600;
+    font-size: 14px;
+    color: var(--text-color);
+}
+
+.time-display {
+    font-size: 12px;
+    color: var(--secondary-color);
+    margin-top: 4px;
+    cursor: pointer;
+}
+
+.time-display:hover {
+    color: var(--primary-color);
+    text-decoration: underline;
+}
+
+.section-row {
+    background: #e9ecef;
+    font-weight: 600;
+    text-align: center;
+}
+
+.section-row td {
+    padding: 8px;
+    font-size: 16px;
+}
+
+.cell {
+    width: 120px;
+    height: 80px;
+    position: relative;
+    transition: all 0.3s ease;
+    background: white;
+    border: 1px solid var(--border-color);
+    color: var(--text-color);
+}
+
+.cell:hover {
+    background: var(--light-color);
+}
+
+.cell.drag-over {
+    background: #d4edda;
+    border: 2px dashed var(--primary-color);
+}
+
+.cell.occupied {
+    cursor: default;
+}
+
+.cell-content {
+    width: 100%;
+    height: 100%;
+    border-radius: 6px;
+    padding: 8px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    font-weight: 600;
+    position: relative;
+    box-sizing: border-box;
+    overflow: hidden;
+}
+
+.delete-cell-btn {
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    width: 20px;
+    height: 20px;
+    background: rgba(255, 255, 255, 0.9);
+    color: var(--danger-color);
+    border: none;
+    border-radius: 50%;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+    transition: all 0.2s ease;
+}
+
+.cell:hover .delete-cell-btn {
+    display: flex;
+}
+
+.delete-cell-btn:hover {
+    background: var(--danger-color);
+    color: white;
+    transform: scale(1.1);
+}
+
+.cell-content .subject-name {
+    font-size: 16px;
+    margin-bottom: 3px;
+    text-align: center;
+    line-height: 1.3;
+    font-weight: 700;
+    color: inherit;
+}
+
+.cell-content .teacher-name {
+    font-size: 13px;
+    opacity: 0.9;
+    text-align: center;
+    line-height: 1.2;
+    color: inherit;
+}
+
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 10000;
+    align-items: center;
+    justify-content: center;
+    overflow-y: auto;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+.modal-content {
+    position: relative;
+    background: var(--light-color);
+    color: var(--text-color);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 24px;
+    min-width: 300px;
+    max-width: 90vw;
+    max-height: calc(100vh - 40px);
+    overflow-y: auto;
+    overflow-x: hidden;
+    box-shadow: 0 8px 32px var(--shadow-color);
+    margin: auto;
+    display: block;
+}
+
+/* 移除所有弹窗的滚动条 - 使用美化的滚动条 */
+.modal-content::-webkit-scrollbar {
+    width: 6px;
+}
+
+.modal-content::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.modal-content::-webkit-scrollbar-thumb {
+    background: var(--border-color);
+    border-radius: 3px;
+}
+
+.modal-content::-webkit-scrollbar-thumb:hover {
+    background: var(--primary-color);
+}
+
+.modal-content {
+    scrollbar-width: thin;
+    scrollbar-color: var(--border-color) transparent;
+}
+
+/* 调整科目设置弹窗样式 - PC端宽屏不需要滚动条 */
+#subjectModal .modal-content {
+    min-width: 500px;
+    max-width: 600px;
+    max-height: none;
+    overflow: visible;
+    padding: 24px 28px;
+    margin: 20px auto;
+    display: flex;
+    flex-direction: column;
+}
+
+/* PC端颜色选择区域横向布局 */
+#subjectModal .color-group {
+    margin-bottom: 12px;
+}
+
+#subjectModal .color-options {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+#subjectModal .preset-colors {
+    display: grid;
+    grid-template-columns: repeat(9, 1fr);
+    gap: 6px;
+}
+
+#subjectModal .color-option {
+    width: 28px;
+    height: 28px;
+}
+
+#subjectModal .custom-color-inline {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+#subjectModal .custom-color-inline input[type="color"] {
+    width: 36px;
+    height: 28px;
+}
+
+#subjectModal .custom-color-inline input[type="text"] {
+    width: 80px;
+    padding: 4px 8px;
+    font-size: 12px;
+}
+
+/* 颜色预览区域紧凑 */
+#subjectModal .color-preview-section {
+    margin-bottom: 12px;
+}
+
+#subjectModal .color-preview-section .color-preview {
+    padding: 12px 16px;
+    font-size: 14px;
+}
+
+/* 颜色模式选择器样式 - 简洁风格 */
+.form-group:has(.color-mode-selector) {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: nowrap;
+}
+
+.form-group:has(.color-mode-selector) > label {
+    margin-bottom: 0 !important;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.color-mode-selector {
+    display: inline-flex;
+    gap: 8px;
+}
+
+.color-mode-option {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 13px;
+    padding: 6px 14px;
+    border-radius: 6px;
+    transition: all 0.25s ease;
+    background: transparent;
+    border: none;
+    color: #333333;
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+.color-mode-option:hover {
+    background: rgba(0, 0, 0, 0.08);
+}
+
+.color-mode-option input[type="radio"] {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+    pointer-events: none;
+}
+
+.color-mode-option span {
+    position: relative;
+    z-index: 1;
+    color: #333333;
+}
+
+/* 选中状态样式 */
+.color-mode-option.selected {
+    background: var(--primary-color);
+}
+
+.color-mode-option.selected span {
+    color: #ffffff !important;
+}
+
+.color-mode-option.selected:hover {
+    background: var(--primary-color);
+    filter: brightness(1.1);
+}
+
+/* :has() 选择器支持 */
+.color-mode-option:has(input[type="radio"]:checked) {
+    background: var(--primary-color);
+}
+
+.color-mode-option:has(input[type="radio"]:checked) span {
+    color: #ffffff !important;
+}
+
+.color-mode-option:has(input[type="radio"]:checked):hover {
+    background: var(--primary-color);
+    filter: brightness(1.1);
+}
+
+/* 深色主题适配 */
+body.theme-dark .color-mode-option {
+    background: transparent !important;
+}
+
+body.theme-dark .color-mode-option span {
+    color: #ffffff !important;
+}
+
+body.theme-dark .color-mode-option:hover {
+    background: rgba(255, 255, 255, 0.1) !important;
+}
+
+body.theme-dark .color-mode-option.selected,
+body.theme-dark .color-mode-option:has(input[type="radio"]:checked) {
+    background: #20c997 !important;
+}
+
+body.theme-dark .color-mode-option.selected span,
+body.theme-dark .color-mode-option:has(input[type="radio"]:checked) span {
+    color: #ffffff !important;
+}
+
+/* 颜色组样式 */
+.color-group {
+    margin-bottom: 10px !important;
+}
+
+.color-group label {
+    font-weight: 600;
+    font-size: 13px;
+    color: var(--text-color);
+    margin-bottom: 6px;
+    display: block;
+}
+
+.color-group .color-options {
+    padding: 10px;
+    background: var(--light-color);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+}
+
+.color-group .preset-colors {
+    margin-bottom: 8px;
+}
+
+/* 内联自定义颜色选择器 */
+.custom-color-inline {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding-top: 8px;
+    border-top: 1px solid var(--border-color);
+}
+
+.custom-color-inline input[type="color"] {
+    width: 36px;
+    height: 36px;
+    border: 2px solid var(--border-color);
+    border-radius: 6px;
+    cursor: pointer;
+    padding: 0;
+    background: white;
+}
+
+.custom-color-inline input[type="color"]::-webkit-color-swatch-wrapper {
+    padding: 2px;
+}
+
+.custom-color-inline input[type="color"]::-webkit-color-swatch {
+    border: none;
+    border-radius: 3px;
+}
+
+.custom-color-inline input[type="text"] {
+    flex: 1;
+    padding: 8px 10px;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    font-size: 13px;
+    font-family: monospace;
+    text-transform: uppercase;
+}
+
+/* 颜色预览区域 */
+.color-preview-section {
+    margin-bottom: 16px;
+}
+
+.color-preview-section label {
+    font-weight: 600;
+    font-size: 13px;
+    color: var(--text-color);
+    margin-bottom: 6px;
+    display: block;
+}
+
+.color-preview-section .color-preview {
+    padding: 16px 20px;
+    border-radius: 8px;
+    text-align: center;
+    font-size: 16px;
+    font-weight: 600;
+    min-height: 20px;
+    /* 默认样式，会被JS覆盖 */
+}
+
+#colorPreview span {
+    color: inherit;
+}
+
+/* 优化表单元素间距 */
+.form-group {
+    margin-bottom: 12px !important;
+}
+
+/* 科目弹窗表单组更紧凑 */
+#subjectModal .form-group {
+    margin-bottom: 10px !important;
+}
+
+/* 优化自定义颜色区域 */
+.custom-color {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    margin-top: 12px;
+    padding: 12px;
+    background: white;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    box-shadow: 0 1px 4px var(--shadow-color);
+    transition: all 0.3s ease;
+}
+
+.custom-color:hover {
+    box-shadow: 0 2px 8px var(--shadow-color);
+    border-color: var(--primary-color);
+}
+
+.custom-color label {
+    font-weight: 600;
+    font-size: 14px;
+    color: #333333 !important;
+    text-align: center;
+}
+
+/* 自定义颜色按钮样式 */
+#customColorBtn {
+    padding: 8px 20px;
+    font-size: 14px;
+    border-radius: 6px;
+    min-width: 100px;
+}
+
+.custom-color input[type="color"] {
+    width: 40px;
+    height: 40px;
+    border: 2px solid #ddd;
+    border-radius: 6px;
+    cursor: pointer;
+    background: white;
+    transition: all 0.3s ease;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    padding: 0;
+    outline: none;
+    display: none;
+}
+
+.custom-color input[type="color"]::-webkit-color-swatch-wrapper {
+    padding: 0;
+}
+
+.custom-color input[type="color"]::-webkit-color-swatch {
+    border: none;
+    border-radius: 4px;
+}
+
+.custom-color input[type="color"]::-moz-color-swatch {
+    border: none;
+    border-radius: 4px;
+}
+
+.custom-color input[type="color"]:hover {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 4px var(--shadow-color);
+    transform: scale(1.15);
+}
+
+/* 修复颜色选择器弹窗位置 */
+#customColor {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 10000;
+}
+
+/* 自定义颜色选择器样式 */
+#customColorPickerDialog {
+    position: fixed;
+    top: 50% !important;
+    left: 50% !important;
+    transform: translate(-50%, -50%) !important;
+    background: var(--light-color) !important;
+    border: 2px solid var(--border-color) !important;
+    border-radius: 12px !important;
+    padding: 20px !important;
+    box-shadow: 0 8px 32px var(--shadow-color) !important;
+    z-index: 10000 !important;
+    width: 300px !important;
+    max-width: 95vw !important;
+    box-sizing: border-box !important;
+}
+
+#customColorPickerDialog h4 {
+    margin-bottom: 15px !important;
+    color: var(--text-color) !important;
+    font-size: 16px !important;
+    font-weight: 700 !important;
+    text-align: center !important;
+}
+
+#customColorPickerDialog input[type="color"] {
+    width: 100% !important;
+    height: 60px !important;
+    border: 2px solid var(--border-color) !important;
+    border-radius: 8px !important;
+    cursor: pointer !important;
+    background: white !important;
+    margin-bottom: 15px !important;
+    display: block !important;
+}
+
+#customColorPickerDialog input[type="text"] {
+    width: 100% !important;
+    padding: 10px 16px !important;
+    border: 2px solid var(--border-color) !important;
+    border-radius: 8px !important;
+    font-size: 14px !important;
+    font-weight: 600 !important;
+    background-color: white !important;
+    color: var(--text-color) !important;
+    margin-bottom: 15px !important;
+    box-sizing: border-box !important;
+}
+
+#customColorPickerDialog button {
+    padding: 8px 16px !important;
+    border: none !important;
+    border-radius: 6px !important;
+    cursor: pointer !important;
+    font-size: 14px !important;
+    font-weight: 600 !important;
+    transition: all 0.3s ease !important;
+    box-sizing: border-box !important;
+}
+
+#customColorPickerDialog #pickerCancel {
+    background: var(--secondary-color) !important;
+    color: white !important;
+}
+
+#customColorPickerDialog #pickerCancel:hover {
+    background: var(--secondary-hover-color) !important;
+}
+
+#customColorPickerDialog #pickerConfirm {
+    background: var(--primary-color) !important;
+    color: white !important;
+}
+
+#customColorPickerDialog #pickerConfirm:hover {
+    background: var(--primary-hover-color) !important;
+}
+
+/* 深色主题适配 */
+body.theme-dark #customColorPickerDialog {
+    background: var(--background-color) !important;
+    border-color: var(--border-color) !important;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4) !important;
+}
+
+body.theme-dark #customColorPickerDialog h4 {
+    color: var(--text-color) !important;
+}
+
+body.theme-dark #customColorPickerDialog input[type="text"] {
+    background: var(--background-color) !important;
+    color: var(--text-color) !important;
+    border-color: var(--border-color) !important;
+}
+
+body.theme-dark #customColorPickerDialog input[type="text"]:focus {
+    background: white !important;
+    color: #333 !important;
+}
+
+body.theme-dark #customColorPickerDialog input[type="color"] {
+    background: var(--background-color) !important;
+    border-color: var(--border-color) !important;
+}
+
+/* 手机端弹窗适配 */
+@media (max-width: 768px) {
+    /* 弹窗容器优化 */
+    #subjectModal .modal-content {
+        min-width: auto !important;
+        max-width: 92vw !important;
+        width: 92vw !important;
+        max-height: 90vh !important;
+        margin: 5vh auto !important;
+        padding: 16px !important;
+        position: relative !important;
+        overflow-y: auto !important;
+        overflow-x: hidden !important;
+        box-sizing: border-box !important;
+    }
+    
+    /* 弹窗标题优化 */
+    #subjectModal h3 {
+        margin-bottom: 16px !important;
+        padding-bottom: 10px !important;
+        font-size: 18px !important;
+        text-align: center !important;
+    }
+    
+    /* 表单组优化 */
+    .form-group {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 6px !important;
+        margin-bottom: 12px !important;
+    }
+    
+    .form-group label {
+        min-width: auto;
+        max-width: 100%;
+        font-size: 14px !important;
+        margin-bottom: 4px !important;
+        font-weight: 600 !important;
+    }
+    
+    .form-group input {
+        width: 100%;
+        padding: 10px 12px !important;
+        font-size: 14px !important;
+        border-radius: 6px !important;
+    }
+    
+    /* 颜色模式选择器移动端优化 */
+    .color-mode-selector {
+        flex-direction: row !important;
+        gap: 10px !important;
+        justify-content: center !important;
+    }
+    
+    .color-mode-option {
+        padding: 6px 10px !important;
+        font-size: 13px !important;
+    }
+    
+    /* 颜色组移动端优化 */
+    .color-group {
+        margin-bottom: 10px !important;
+    }
+    
+    .color-group .color-options {
+        padding: 8px !important;
+    }
+    
+    /* 内联自定义颜色选择器移动端优化 */
+    .custom-color-inline {
+        padding-top: 6px !important;
+        gap: 6px !important;
+    }
+    
+    .custom-color-inline input[type="color"] {
+        width: 32px !important;
+        height: 32px !important;
+    }
+    
+    .custom-color-inline input[type="text"] {
+        padding: 6px 8px !important;
+        font-size: 12px !important;
+    }
+    
+    /* 颜色预览移动端优化 */
+    .color-preview-section {
+        margin-bottom: 12px !important;
+    }
+    
+    .color-preview-section .color-preview,
+    #colorPreview {
+        padding: 12px 16px !important;
+        font-size: 14px !important;
+    }
+    
+    /* 颜色选项区域优化 */
+    .color-options {
+        padding: 10px !important;
+        gap: 8px !important;
+        margin-top: 8px !important;
+        border-radius: 8px !important;
+    }
+    
+    /* 颜色类型选择器优化 */
+    .color-type-selector {
+        flex-direction: row !important;
+        justify-content: center !important;
+        gap: 20px !important;
+        padding: 8px 12px !important;
+        margin-bottom: 10px !important;
+        border-radius: 6px !important;
+    }
+    
+    /* 预设颜色区域优化 */
+    .preset-colors {
+        grid-template-columns: repeat(6, 1fr) !important;
+        gap: 8px !important;
+        padding: 10px !important;
+        margin-bottom: 10px !important;
+        border-radius: 6px !important;
+    }
+    
+    /* 颜色选项优化 */
+    .color-option {
+        width: 32px !important;
+        height: 32px !important;
+        margin: 0 !important;
+    }
+    
+    /* 自定义颜色区域优化 */
+    .custom-color {
+        flex-direction: column !important;
+        align-items: center !important;
+        gap: 10px !important;
+        margin-top: 10px !important;
+        padding: 12px !important;
+        border-radius: 8px !important;
+    }
+    
+    .custom-color label {
+        font-size: 14px !important;
+        text-align: center !important;
+    }
+    
+    /* 自定义颜色按钮优化 */
+    #customColorBtn {
+        width: auto !important;
+        min-width: 120px !important;
+        padding: 10px 20px !important;
+        font-size: 14px !important;
+    }
+    
+    /* 自定义颜色输入框优化 */
+    .custom-color input[type="text"] {
+        width: 100% !important;
+        max-width: 150px !important;
+        padding: 8px 12px !important;
+        font-size: 14px !important;
+        text-align: center !important;
+        border-radius: 6px !important;
+    }
+    
+    /* 表单按钮优化 */
+    .form-actions {
+        display: flex !important;
+        flex-direction: row !important;
+        justify-content: center !important;
+        align-items: center !important;
+        gap: 10px !important;
+        margin-top: 16px !important;
+        padding-top: 16px !important;
+        border-top: 1px solid var(--border-color) !important;
+        width: 100% !important;
+        box-sizing: border-box !important;
+        flex-wrap: nowrap !important;
+    }
+    
+    /* 按钮样式优化 */
+    #subjectModal .btn {
+        flex: 0 1 auto !important;
+        min-width: 60px !important;
+        max-width: 85px !important;
+        padding: 10px 12px !important;
+        font-size: 14px !important;
+        box-sizing: border-box !important;
+        margin: 0 !important;
+        white-space: nowrap !important;
+    }
+    
+    /* 删除按钮特殊处理 */
+    #subjectModal #deleteSubjectBtn {
+        min-width: 60px !important;
+        max-width: 80px !important;
+    }
+    
+    /* 自定义颜色选择器弹窗优化 */
+    #customColorPickerDialog {
+        width: 280px !important;
+        padding: 15px !important;
+    }
+    
+    #customColorPickerDialog h4 {
+        margin-bottom: 12px !important;
+        font-size: 15px !important;
+    }
+    
+    #customColorPickerDialog input[type="color"] {
+        height: 50px !important;
+        margin-bottom: 12px !important;
+    }
+    
+    #customColorPickerDialog input[type="text"] {
+        padding: 8px 14px !important;
+        margin-bottom: 12px !important;
+    }
+    
+    #customColorPickerDialog button {
+        padding: 8px 14px !important;
+        font-size: 13px !important;
+    }
+}
+
+.custom-color input[type="text"] {
+    width: 120px;
+    max-width: 150px;
+    padding: 8px 12px;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 600;
+    background-color: white;
+    color: #333333 !important;
+    text-align: center;
+    transition: all 0.3s ease;
+}
+
+.custom-color input[type="text"]:hover {
+    border-color: var(--primary-color);
+}
+
+.custom-color input[type="text"]:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px var(--shadow-color);
+    background-color: white;
+}
+
+/* 深色主题下的自定义颜色区域优化 */
+body.theme-dark .custom-color {
+    background: var(--background-color);
+    border-color: var(--border-color);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+body.theme-dark .custom-color:hover {
+    border-color: var(--primary-color);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+}
+
+body.theme-dark .custom-color label {
+    color: var(--text-color) !important;
+}
+
+body.theme-dark .custom-color input[type="color"] {
+    background: var(--background-color);
+    border-color: var(--border-color);
+}
+
+body.theme-dark .custom-color input[type="text"] {
+    background: var(--background-color);
+    border-color: var(--border-color);
+    color: var(--text-color) !important;
+}
+
+body.theme-dark .custom-color input[type="text"]:focus {
+    background: white;
+    color: #333333 !important;
+}
+
+/* 调整预设颜色区域的间距 */
+.preset-colors {
+    gap: 6px;
+    padding: 10px;
+    margin-bottom: 8px;
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    background: white;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    box-shadow: none;
+}
+
+/* 调整颜色选项区域的内边距 */
+.color-options {
+    padding: 12px;
+    gap: 10px;
+    margin-top: 8px;
+    background: var(--light-color);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    box-shadow: 0 1px 4px var(--shadow-color);
+}
+
+/* 调整颜色类型选择器 */
+.color-type-selector {
+    display: flex;
+    justify-content: center;
+    padding: 8px 12px;
+    margin-bottom: 10px;
+    gap: 20px;
+    background: white;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    box-shadow: none;
+}
+
+.color-type-selector label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    padding: 4px 8px;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+}
+
+.color-type-selector label:hover {
+    background: var(--light-color);
+}
+
+/* 调整颜色选项 */
+.color-option {
+    width: 32px !important;
+    height: 32px !important;
+    margin: 0 !important;
+    border: 2px solid transparent !important;
+    border-radius: 50% !important;
+    cursor: pointer !important;
+    transition: all 0.2s ease !important;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15) !important;
+    position: relative !important;
+    overflow: hidden !important;
+}
+
+.color-option:hover {
+    transform: scale(1.1) !important;
+    border-color: rgba(0, 0, 0, 0.2) !important;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2) !important;
+}
+
+.color-option.selected {
+    transform: scale(1.05) !important;
+    border-color: var(--primary-color) !important;
+    box-shadow: 0 0 0 2px var(--primary-color), 0 2px 8px rgba(0, 0, 0, 0.2) !important;
+}
+
+.color-option.selected::after {
+    content: '✓' !important;
+    position: absolute !important;
+    top: 50% !important;
+    left: 50% !important;
+    transform: translate(-50%, -50%) !important;
+    color: white !important;
+    font-size: 14px !important;
+    font-weight: bold !important;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5) !important;
+    z-index: 1 !important;
+}
+
+/* 调整自定义颜色输入区域 */
+.custom-color .color-input-group {
+    gap: 8px;
+}
+
+/* 调整模态框标题 */
+.modal-content h3 {
+    margin-bottom: 20px !important;
+    padding-bottom: 10px;
+}
+
+/* 调整表单按钮间距 */
+.form-actions {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin-top: 20px;
+    padding-top: 16px;
+    flex-wrap: nowrap;
+    border-top: 1px solid var(--border-color);
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.form-actions .btn {
+    flex: 0 1 auto;
+    min-width: 70px;
+    max-width: 100px;
+    padding: 10px 16px;
+    font-size: 14px;
+    white-space: nowrap;
+}
+
+/* 确保科目设置弹窗的按钮不会溢出 */
+#subjectModal .form-actions {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 20px;
+    padding-top: 16px;
+    flex-wrap: nowrap;
+    border-top: 1px solid var(--border-color);
+    width: 100%;
+    box-sizing: border-box;
+}
+
+#subjectModal .btn {
+    flex: 0 1 auto;
+    min-width: 65px;
+    max-width: 90px;
+    padding: 10px 14px;
+    font-size: 14px;
+    white-space: nowrap;
+}
+
+/* 确保科目信息中的字体颜色与主题色匹配 */
+.subject-info .subject-name,
+.subject-info .teacher-name {
+    color: var(--text-color) !important;
+    opacity: 1;
+}
+
+/* 强化深色主题下的科目名称颜色 */
+body.theme-dark .subject-info .subject-name,
+body.theme-dark .subject-info .teacher-name {
+    color: var(--text-color) !important;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+/* 确保模态框内所有文字颜色与主题匹配 */
+.modal-content h3,
+.modal-content h4,
+.modal-content label,
+.modal-content span:not(#colorPreview span),
+.modal-content input,
+.modal-content textarea,
+.modal-content select {
+    color: var(--text-color) !important;
+}
+
+/* 颜色预览区域的文字颜色由JavaScript控制 - 不使用!important */
+#colorPreview {
+    /* 颜色由JS动态设置 */
+}
+
+/* 确保颜色类型选择器的文字颜色正确 */
+.color-type-selector label {
+    color: var(--text-color) !important;
+}
+
+/* 确保自定义颜色区域的文字颜色正确 */
+.custom-color label {
+    color: var(--text-color) !important;
+}
+
+/* 优化颜色类型选择器的样式 */
+.color-type-selector {
+    background: var(--light-color) !important;
+    border: 1px solid var(--border-color) !important;
+}
+
+.color-type-selector label {
+    color: var(--text-color) !important;
+}
+
+.color-type-selector label:hover {
+    background: rgba(0, 0, 0, 0.05) !important;
+}
+
+/* 优化预设颜色区域样式 */
+.preset-colors {
+    background: var(--light-color) !important;
+    border: 1px solid var(--border-color) !important;
+}
+
+/* 确保所有弹窗内容都能正确居中 */
+.modal-content > * {
+    display: block;
+}
+
+/* 确保设置弹窗也能正确居中 */
+#settingsModal .modal-content {
+    display: block;
+}
+
+/* 为教程弹窗设置更大的最小宽度 */
+#tutorialModal .modal-content {
+    min-width: 500px;
+    max-width: 800px;
+}
+
+/* 为小弹窗设置更小的内边距和宽度 */
+#timeModal .modal-content,
+#confirmModal .modal-content,
+#importSubjectModal .modal-content {
+    min-width: 300px;
+    max-width: 450px;
+    padding: 25px;
+}
+
+/* 为添加科目弹窗设置更大的宽度 - PC端宽屏 */
+#subjectModal .modal-content {
+    min-width: 520px;
+    max-width: 620px;
+    padding: 24px 28px;
+    max-height: none;
+    overflow: visible;
+}
+
+/* 确认对话框样式 */
+.confirm-message {
+    font-size: 16px;
+    line-height: 1.6;
+    margin: 20px 0;
+    text-align: center;
+    color: var(--text-color);
+}
+
+/* 左侧栏主标题样式 */
+.section-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text-color);
+    margin: 0 0 16px 0;
+    padding: 12px 20px;
+    background-color: var(--background-color);
+    border-radius: 8px;
+    text-align: center;
+    border: 1px solid var(--border-color);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s ease;
+}
+
+.section-title:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+}
+
+/* 统一左侧栏模块样式 */
+.left-sidebar > div {
+    margin-bottom: 16px;
+}
+
+/* 将课时设置标题和内容合并成一个模块 */
+.left-sidebar > .section-title:nth-child(1) {
+    margin-bottom: 0 !important;
+    padding-bottom: 12px !important;
+    border-bottom: none !important;
+    border-radius: 8px 8px 0 0 !important;
+    box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.08), -2px 0 8px rgba(0, 0, 0, 0.08), 2px 0 8px rgba(0, 0, 0, 0.08) !important;
+    position: relative;
+    z-index: 1;
+}
+
+/* 课时控制区域样式 - 与标题合并，间距为0 */
+.period-controls-desktop {
+    margin-top: 0 !important;
+    border-radius: 0 0 8px 8px !important;
+    border-top: 1px solid var(--border-color) !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08) !important;
+    position: relative;
+    z-index: 0;
+}
+
+/* 科目池模块样式 */
+.subject-pool {
+    margin-top: 16px !important;
+}
+
+/* 确保其他section-title正常显示 */
+.left-sidebar > .section-title:not(:nth-child(1)) {
+    margin-bottom: 8px !important;
+}
+
+/* 科目池头部美化 */
+.subject-pool-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    background-color: var(--background-color);
+    border-bottom: 2px solid var(--border-color);
+    margin-bottom: 16px;
+    border-radius: 8px;
+}
+
+/* 导入科目按钮美化 */
+#importSubjectBtn {
+    padding: 10px 20px;
+    font-size: 14px;
+    font-weight: 600;
+    border: 2px solid var(--secondary-color);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background-color: var(--secondary-color);
+    color: white !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-width: 100px;
+    text-align: center;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+#importSubjectBtn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    background-color: var(--secondary-hover-color);
+    border-color: var(--secondary-hover-color);
+    color: white !important;
+}
+
+#importSubjectBtn:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+}
+
+/* 添加科目按钮美化 */
+#addSubjectBtn {
+    padding: 10px 24px;
+    font-size: 14px;
+    font-weight: 700;
+    border: 2px solid var(--primary-color);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background-color: var(--primary-color);
+    color: white !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-width: 100px;
+    text-align: center;
+    box-shadow: 0 2px 8px rgba(74, 124, 89, 0.2);
+}
+
+#addSubjectBtn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(74, 124, 89, 0.3);
+    background-color: var(--primary-hover-color);
+    border-color: var(--primary-hover-color);
+    color: white !important;
+}
+
+#addSubjectBtn:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 4px rgba(74, 124, 89, 0.2);
+}
+
+/* 导入科目弹窗美化 */
+#importSubjectModal h3 {
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--primary-color);
+    margin: 0 0 24px 0;
+    text-align: center;
+    padding-bottom: 12px;
+    border-bottom: 2px solid var(--primary-color);
+}
+
+#importSubjectModal .form-group {
+    margin-bottom: 24px;
+}
+
+#importSubjectModal label {
+    display: block;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-color);
+    margin-bottom: 8px;
+}
+
+#importSubjectModal .form-control {
+    width: 100%;
+    padding: 12px 16px;
+    border: 2px solid var(--border-color);
+    border-radius: 8px;
+    font-size: 14px;
+    color: var(--text-color);
+    background-color: var(--background-color);
+    transition: all 0.3s ease;
+    box-sizing: border-box;
+}
+
+#importSubjectModal .form-control:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(74, 124, 89, 0.1);
+}
+
+#importSubjectModal .form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 32px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border-color);
+}
+
+#importSubjectModal .btn {
+    padding: 10px 24px;
+    font-size: 14px;
+    font-weight: 500;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    min-width: 80px;
+    text-align: center;
+}
+
+#importSubjectModal .btn.primary {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+#importSubjectModal .btn.primary:hover {
+    background-color: var(--primary-hover-color);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(74, 124, 89, 0.3);
+}
+
+#importSubjectModal .btn.secondary {
+    background-color: var(--light-color);
+    color: var(--text-color);
+    border: 1px solid var(--border-color);
+}
+
+#importSubjectModal .btn.secondary:hover {
+    background-color: var(--border-color);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* 深色主题适配 */
+body.theme-dark #importSubjectModal .modal-content {
+    background-color: var(--light-color);
+    color: var(--text-color);
+}
+
+body.theme-dark #importSubjectModal h3 {
+    color: var(--primary-color);
+    border-bottom-color: var(--border-color);
+}
+
+body.theme-dark #importSubjectModal .form-control {
+    background-color: var(--background-color);
+    color: var(--text-color);
+    border-color: var(--border-color);
+}
+
+body.theme-dark #importSubjectModal .form-control:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(74, 124, 89, 0.2);
+}
+
+body.theme-dark #importSubjectModal .form-actions {
+    border-top-color: var(--border-color);
+}
+
+body.theme-dark #importSubjectModal .btn.secondary {
+    background-color: var(--background-color);
+    color: var(--text-color);
+    border-color: var(--border-color);
+}
+
+body.theme-dark #importSubjectModal .btn.secondary:hover {
+    background-color: var(--border-color);
+    color: var(--text-color);
+}
+
+/* 深色主题下的按钮样式 */
+body.theme-dark #importSubjectBtn {
+    background-color: var(--secondary-color);
+    border-color: var(--secondary-color);
+    color: white !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+body.theme-dark #importSubjectBtn:hover {
+    background-color: var(--secondary-hover-color);
+    border-color: var(--secondary-hover-color);
+    color: white !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+body.theme-dark #addSubjectBtn {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+    color: white !important;
+    box-shadow: 0 2px 8px rgba(74, 124, 89, 0.3);
+}
+
+body.theme-dark #addSubjectBtn:hover {
+    background-color: var(--primary-hover-color);
+    border-color: var(--primary-hover-color);
+    color: white !important;
+    box-shadow: 0 4px 12px rgba(74, 124, 89, 0.4);
+}
+
+body.theme-dark .subject-pool-header {
+    background-color: var(--light-color);
+    border-bottom-color: var(--border-color);
+}
+
+body.theme-dark .section-title {
+    background-color: var(--light-color);
+    color: var(--text-color);
+    border-color: var(--border-color);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+body.theme-dark .section-title:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+}
+
+/* 确保表单操作区域居中对齐 */
+.form-actions {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 25px;
+    padding-top: 20px;
+    border-top: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.modal-content h3 {
+    margin-bottom: 24px;
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--primary-color);
+    text-align: center;
+    position: relative;
+    padding-bottom: 12px;
+}
+
+.modal-content h3::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 50px;
+    height: 3px;
+    background: linear-gradient(90deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+    border-radius: 2px;
+}
+
+.form-group {
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.form-group label {
+    display: flex;
+    align-items: center;
+    min-width: 70px;
+    max-width: 80px;
+    font-weight: 600;
+    font-size: 14px;
+    color: var(--text-color);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    flex-shrink: 0;
+}
+
+.form-group input {
+    flex: 1;
+    width: 100%;
+    min-width: 0;
+    padding: 10px 14px;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    font-size: 14px;
+    background-color: var(--light-color);
+    color: var(--text-color);
+    transition: all 0.3s ease;
+}
+
+.form-group input:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 2px var(--shadow-color);
+    background-color: white;
+}
+
+.color-options {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    background: var(--light-color);
+    padding: 20px;
+    border-radius: 10px;
+    border: 1px solid var(--border-color);
+    box-shadow: 0 4px 12px var(--shadow-color);
+}
+
+.color-type-selector {
+    display: flex;
+    flex-direction: row;
+    gap: 30px;
+    margin-bottom: 15px;
+    justify-content: center;
+    padding: 12px;
+    background: var(--light-color);
+    border-radius: 8px;
+    width: 100%;
+    border: 1px solid var(--border-color);
+    box-shadow: 0 2px 8px var(--shadow-color);
+}
+
+.color-type-selector label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    color: var(--text-color);
+    font-size: 15px;
+    transition: all 0.3s ease;
+    padding: 6px 12px;
+    border-radius: 6px;
+    white-space: nowrap;
+    background: transparent;
+    border: 1px solid transparent;
+}
+
+.color-type-selector label:hover {
+    background: var(--background-color);
+    color: var(--text-color);
+    border-color: var(--border-color);
+    box-shadow: 0 2px 6px var(--shadow-color);
+}
+
+.color-type-selector input[type="radio"] {
+    display: none;
+}
+
+.color-type-selector input[type="radio"] + span {
+    position: relative;
+    padding-left: 28px;
+}
+
+.color-type-selector input[type="radio"] + span::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 20px;
+    height: 20px;
+    border: 2px solid var(--border-color);
+    border-radius: 4px;
+    background: white;
+    transition: all 0.2s ease;
+}
+
+.color-type-selector input[type="radio"] + span::after {
+    content: '✓';
+    position: absolute;
+    left: 4px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 14px;
+    font-weight: bold;
+    color: white;
+    opacity: 0;
+    transition: all 0.2s ease;
+}
+
+.color-type-selector input[type="radio"]:checked + span::before {
+    background: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+.color-type-selector input[type="radio"]:checked + span::after {
+    opacity: 1;
+}
+
+.color-type-selector label:hover input[type="radio"] + span::before {
+    border-color: var(--primary-color);
+}
+
+.color-type-selector input[type="radio"]:checked + span {
+    color: var(--primary-color);
+    font-weight: bold;
+}
+
+/* 修复预设颜色选中状态的文字颜色 */
+.color-option.selected::after {
+    color: white;
+    text-shadow: 0 0 2px rgba(0, 0, 0, 0.8);
+}
+
+/* 美化自定义颜色输入区域 */
+.custom-color {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    padding: 20px;
+    background: rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 10px;
+    box-shadow: 0 4px 12px var(--shadow-color);
+    backdrop-filter: blur(10px);
+    margin-top: 15px;
+}
+
+.custom-color label {
+    display: block;
+    font-weight: 600;
+    color: white;
+    margin-bottom: 5px;
+    font-size: 16px;
+}
+
+.custom-color .color-input-group {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.custom-color input[type="color"] {
+    width: 60px;
+    height: 60px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 8px;
+    cursor: pointer;
+    background: transparent;
+    transition: all 0.3s ease;
+    flex-shrink: 0;
+}
+
+.custom-color input[type="color"]:hover {
+    transform: scale(1.1);
+    border-color: white;
+    box-shadow: 0 0 15px rgba(255, 255, 255, 0.3);
+}
+
+.custom-color input[type="color"]::-webkit-color-swatch-wrapper {
+    padding: 0;
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+.custom-color input[type="color"]::-webkit-color-swatch {
+    border: none;
+    border-radius: 6px;
+    padding: 0;
+}
+
+.custom-color input[type="color"]::-moz-color-swatch {
+    border: none;
+    border-radius: 6px;
+    padding: 0;
+}
+
+.custom-color input[type="text"] {
+    flex: 1;
+    min-width: 200px;
+    padding: 12px 16px;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 8px;
+    font-size: 14px;
+    background-color: rgba(255, 255, 255, 0.2);
+    color: white;
+    transition: all 0.3s ease;
+    font-family: 'Courier New', monospace;
+    letter-spacing: 1px;
+}
+
+.custom-color .color-preview {
+    width: 40px;
+    height: 40px;
+    border-radius: 6px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    background-color: var(--primary-color);
+    transition: all 0.3s ease;
+    flex-shrink: 0;
+}
+
+.custom-color .color-preview:hover {
+    transform: scale(1.1);
+    border-color: white;
+}
+
+/* 添加颜色信息说明 */
+.custom-color .color-info {
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.8);
+    text-align: center;
+    margin-top: 5px;
+    line-height: 1.4;
+}
+
+
+
+/* 美化弹窗底部按钮 */
+.modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 25px;
+    padding-top: 20px;
+    border-top: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.modal-footer .btn {
+    padding: 10px 24px;
+    font-size: 14px;
+    font-weight: 600;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    border: none;
+    cursor: pointer;
+}
+
+.modal-footer .btn-primary {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+.modal-footer .btn-primary:hover {
+    background-color: var(--primary-hover-color);
+    box-shadow: 0 4px 12px var(--shadow-color);
+    transform: translateY(-1px);
+}
+
+.modal-footer .btn-secondary {
+    background-color: var(--secondary-color);
+    color: white;
+}
+
+.modal-footer .btn-secondary:hover {
+    background-color: var(--secondary-hover-color);
+    box-shadow: 0 4px 12px var(--shadow-color);
+    transform: translateY(-1px);
+}
+
+.preset-colors {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 12px;
+    margin-bottom: 15px;
+    background: rgba(255, 255, 255, 0.1);
+    padding: 15px;
+    border-radius: 8px;
+    backdrop-filter: blur(10px);
+}
+
+.color-option {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    cursor: pointer;
+    border: 2px solid transparent;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+    position: relative;
+    overflow: hidden;
+}
+
+.color-option:hover,
+.color-option.selected {
+    border-color: var(--text-color);
+    transform: scale(1.15);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+
+.color-option.selected::after {
+    content: '✓';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: white;
+    font-size: 14px;
+    font-weight: bold;
+    text-shadow: 0 0 2px rgba(0, 0, 0, 0.8);
+}
+
+.color-option[data-color*="linear-gradient"] {
+    border-radius: 6px;
+}
+
+.color-option[data-color*="linear-gradient"]::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: inherit;
+    border-radius: 6px;
+    z-index: 1;
+}
+
+.color-option[data-color*="linear-gradient"].selected::after {
+    z-index: 2;
+}
+
+/* 主题切换按钮样式 */
+.theme-dropdown {
+    position: relative;
+    display: inline-block;
+    margin-right: 10px;
+}
+
+#themeMenu {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    background-color: white;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    box-shadow: 0 2px 10px var(--shadow-color);
+    z-index: 1000;
+    min-width: 150px;
+}
+
+#themeMenu.show {
+    display: block;
+}
+
+.theme-item {
+    display: block;
+    width: 100%;
+    padding: 10px 15px;
+    text-align: left;
+    border: none;
+    background: none;
+    cursor: pointer;
+    color: var(--text-color);
+    transition: background-color 0.3s ease;
+}
+
+.theme-item:hover {
+    background-color: var(--light-color);
+}
+
+.theme-item.active {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+/* 字体切换按钮样式 */
+.font-dropdown {
+    position: relative;
+    display: inline-block;
+    margin-right: 10px;
+}
+
+#fontMenu {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    background-color: white;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    box-shadow: 0 2px 10px var(--shadow-color);
+    z-index: 1000;
+    min-width: 150px;
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+#fontMenu.show {
+    display: block;
+}
+
+.font-item {
+    display: block;
+    width: 100%;
+    padding: 10px 15px;
+    text-align: left;
+    border: none;
+    background: none;
+    cursor: pointer;
+    color: var(--text-color);
+    transition: background-color 0.3s ease;
+    font-family: inherit;
+}
+
+.font-item:hover {
+    background-color: var(--light-color);
+}
+
+.font-item.active {
+    background-color: var(--primary-color);
+    color: white;
+.custom-color {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.2);
+    padding: 10px;
+    border-radius: 8px;
+    backdrop-filter: blur(10px);
+}   align-items: center;
+}
+
+.custom-color input[type="color"] {
+    width: 50px;
+    height: 30px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.custom-color input[type="text"] {
+    flex: 1;
+    max-width: 100px;
+}
+
+.form-actions {
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 1px solid #e9ecef;
+}
+
+.btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    min-width: 80px;
+    transition: background-color 0.2s;
+}
+
+.btn.primary {
+    background: #007bff;
+    color: white;
+}
+
+.btn.primary:hover {
+    background: #0056b3;
+}
+
+.btn.secondary {
+    background: #6c757d;
+    color: white;
+}
+
+.btn.secondary:hover {
+    background: #545b62;
+}
+
+@media print {
+    @page {
+        size: A4 portrait;
+        margin: 15mm 10mm;
+    }
+    
+    /* 高级打印优化 - 强制彩色打印 */
+    * {
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+        color-adjust: exact !important;
+        box-sizing: border-box !important;
+        -webkit-filter: none !important;
+        filter: none !important;
+    }
+    
+    body {
+        background: var(--background-color) !important;
+        background-image: var(--pattern-background) !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        font-family: "Microsoft YaHei", "微软雅黑", "SimSun", "宋体", serif !important;
+        line-height: 1.4 !important;
+    }
+    
+    /* 隐藏控制元素 */
+    .header, .subject-pool, .section-controls {
+        display: none !important;
+    }
+    
+    /* 隐藏标题区域 */
+    .timetable-title-section {
+        display: none !important;
+    }
+    
+    .table-title-input {
+        display: block !important;
+        background: var(--light-color) !important;
+        color: var(--text-color) !important;
+        margin: 20px auto !important;
+        text-align: center !important;
+        width: 100% !important;
+        max-width: 400px !important;
+        font-size: 24px !important;
+        font-weight: bold !important;
+        border: none !important;
+        padding: 10px !important;
+        border-radius: 4px !important;
+    }
+    
+    /* 强化表格边框 */
+    .timetable {
+        width: 100% !important;
+        border-collapse: collapse !important;
+        margin: 0 auto !important;
+        border: 2px solid var(--text-color) !important;
+        font-size: 13px !important;
+        table-layout: fixed !important;
+        background: transparent !important;
+    }
+    
+    .timetable thead {
+        display: table-header-group !important;
+    }
+    
+    /* 优化表头打印效果 */
+    .timetable th {
+        background: var(--light-color) !important;
+        color: var(--text-color) !important;
+        font-weight: 700 !important;
+        font-size: 16px !important;
+        padding: 12px 8px !important;
+        text-align: center !important;
+        vertical-align: middle !important;
+        border: 1px solid var(--text-color) !important;
+        border-bottom: 2px solid var(--text-color) !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+    }
+    
+    .timetable th:first-child,
+    .timetable th:nth-child(2) {
+        background: var(--light-color) !important;
+        color: var(--text-color) !important;
+    }
+    
+    /* 强化单元格边框 */
+    .timetable td {
+        border: 1px solid var(--text-color) !important;
+        border-bottom: 1px solid var(--text-color) !important;
+        border-right: 1px solid var(--text-color) !important;
+        padding: 8px 4px !important;
+        text-align: center !important;
+        vertical-align: middle !important;
+        background: white !important;
+        color: var(--text-color) !important;
+    }
+    
+    /* 确保所有边框可见 */
+    .timetable tr {
+        border-bottom: 1px solid var(--text-color) !important;
+    }
+    
+    .timetable tbody tr:last-child td {
+        border-bottom: 2px solid var(--text-color) !important;
+    }
+    
+    /* 时间列样式 */
+    .time-header {
+        width: 50px !important;
+        background: var(--light-color) !important;
+        color: var(--text-color) !important;
+        font-weight: 600 !important;
+    }
+    
+    /* 课时列样式 */
+    .period-cell {
+        background: var(--light-color) !important;
+        color: var(--text-color) !important;
+        font-weight: 600 !important;
+    }
+    
+    .period-header {
+        width: 75px !important;
+        background: linear-gradient(135deg, #34495e, #2c3e50) !important;
+        color: white !important;
+        font-weight: 600 !important;
+    }
+    
+    /* 优化时间单元格打印 */
+    .time-cell {
+        width: 40px !important;
+        font-size: 14px !important;
+        font-weight: 600 !important;
+        color: var(--text-color) !important;
+        background: var(--light-color) !important;
+        border: 1px solid var(--text-color) !important;
+        padding: 8px 4px !important;
+        white-space: nowrap !important;
+        line-height: 1.3 !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+    }
+    
+    /* 优化节数单元格打印 */
+    .period-cell {
+        white-space: nowrap !important;
+        line-height: 1.4 !important;
+        background: var(--light-color) !important;
+        border: 1px solid var(--text-color) !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+    }
+    
+    .period-name {
+        font-size: 13px !important;
+        font-weight: 700 !important;
+        color: var(--text-color) !important;
+        margin-bottom: 3px !important;
+        white-space: nowrap !important;
+    }
+    
+    .time-display {
+        font-size: 10px !important;
+        color: var(--text-color) !important;
+        font-weight: 500 !important;
+    }
+    
+    /* 强化课程单元格边框 - 支持彩色 */
+    .cell {
+        height: 65px !important;
+        width: 105px !important;
+        border: 1px solid var(--text-color) !important;
+        background: white !important;
+        box-sizing: border-box !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+        -webkit-filter: none !important;
+        filter: none !important;
+    }
+    
+    .cell-content {
+        width: 100% !important;
+        height: 100% !important;
+        display: flex !important;
+        flex-direction: column !important;
+        justify-content: center !important;
+        align-items: center !important;
+        padding: 4px !important;
+        border: 1px solid #000 !important;
+        box-sizing: border-box !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+        -webkit-filter: none !important;
+        filter: none !important;
+    }
+    
+    .cell-content .subject-name {
+        font-size: 14px !important;
+        font-weight: 700 !important;
+        line-height: 1.4 !important;
+        margin-bottom: 3px !important;
+        text-align: center !important;
+        /* 颜色继承自父元素 */
+    }
+    
+    .cell-content .teacher-name {
+        font-size: 12px !important;
+        line-height: 1.3 !important;
+        text-align: center !important;
+        font-weight: 500 !important;
+        /* 颜色继承自父元素 */
+    }
+    
+    .delete-cell-btn {
+        display: none !important;
+    }
+    
+    /* 强制显示所有边框 */
+    .timetable * {
+        border-color: #000 !important;
+    }
+    
+    /* 优化彩色打印模式 */
+    .timetable th {
+        background: #e6f3ff !important;
+        color: #000 !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+        -webkit-filter: none !important;
+        filter: none !important;
+    }
+    
+    .timetable th:first-child,
+    .timetable th:nth-child(2) {
+        background: #f0f0f0 !important;
+        color: #000 !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+        -webkit-filter: none !important;
+        filter: none !important;
+    }
+    
+    /* 周一到周五表头彩色背景 */
+    .timetable th:nth-child(n+3) {
+        background: #fff2e6 !important;
+        color: #000 !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+        -webkit-filter: none !important;
+        filter: none !important;
+    }
+    
+    /* 优化黑白打印模式 */
+    .bw-mode .timetable th {
+        background: #e8e8e8 !important;
+        color: #000 !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+    }
+    
+    .bw-mode .timetable td {
+        border: 1px solid #000 !important;
+        background: white !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+    }
+    
+    .bw-mode .cell {
+        background: white !important;
+        border: 1px solid #000 !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+    }
+
+
+
+/* 移动端额外样式优化 */
+@media (max-width: 768px) {
+    body {
+        padding-top: 0;
+    }
+    
+    
+    
+    
+    /* 确保固定顶部区域在移动端正常显示 */
+    .fixed-top-area {
+        width: 100%;
+        max-width: 100%;
+    }
+    
+    /* 优化移动端滚动体验 */
+    .main-content {
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+    
+    /* 超强科目池 - 精确滚动控制 */
+    .subject-pool {
+        flex: 0 0 auto !important;
+        display: flex !important;
+        flex-direction: column !important;
+        max-height: 180px !important;
+        min-height: 100px !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        border-bottom: 1px solid #e9ecef !important;
+        background: #fff !important;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1) !important;
+        overflow: hidden !important;
+    }
+    
+    .subject-pool-header {
+        flex-shrink: 0 !important;
+        padding: 8px 12px !important;
+        margin: 0 !important;
+        border-bottom: 1px solid #f1f3f4 !important;
+        background: #fafbfc !important;
+        font-size: 14px !important;
+        font-weight: 600 !important;
+        color: #495057 !important;
+    }
+    
+    .subject-cards {
+        flex: 1 !important;
+        overflow-y: auto !important;
+        overflow-x: hidden !important;
+        padding: 8px 12px !important;
+        margin: 0 !important;
+        background: #fff !important;
+        -webkit-overflow-scrolling: touch !important;
+    }
+    
+    .subject-card {
+        padding: 4px 8px !important;
+        font-size: 12px !important;
+        margin: 2px 0 !important;
+        border-radius: 4px !important;
+        border: 1px solid #e9ecef !important;
+        background: #fff !important;
+        cursor: pointer !important;
+        transition: all 0.2s ease !important;
+    }
+    
+    .subject-card:hover {
+        transform: translateY(-1px) !important;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1) !important;
+    }
+    
+    /* 超强课程表容器 - 独立滚动系统 */
+    .timetable-container {
+        flex: 1 !important;
+        overflow-y: auto !important;
+        overflow-x: auto !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        background: #fff !important;
+        -webkit-overflow-scrolling: touch !important;
+        position: relative !important;
+    }
+    
+    /* 确保表格最小宽度 */
+    .timetable-wrapper {
+        min-width: 100% !important;
+        min-height: 100% !important;
+        padding: 10px !important;
+    }
+    
+    .timetable {
+        font-size: 12px !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        border: none !important;
+        width: 100% !important;
+        table-layout: fixed !important;
+        min-width: 100% !important;
+    }
+    
+    .cell {
+        width: 80px !important;
+        height: 60px !important;
+        min-width: 80px !important;
+        min-height: 60px !important;
+    }
+    
+    /* 隐藏手机端+号按钮 */
+    .mobile-add-btn {
+        display: none !important;
+    }
+    
+    /* 优化标题样式 */
+    .header .title-section {
+        margin: 0 !important;
+        flex: 1 !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: flex-start !important; /* 标题左对齐 */
+        order: 1 !important; /* 确保在左侧 */
+    }
+    
+    .header .timetable-title {
+        font-size: 16px !important;
+        font-weight: 600 !important;
+        color: #333 !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        text-align: left !important; /* 标题左对齐 */
+    }
+    
+    /* 手机端controls已隐藏，不需要额外样式 */
+    
+    /* 超强滚动优化系统 */
+    .period-controls {
+        justify-content: space-around !important;
+        align-items: center !important;
+        position: fixed !important;
+        top: 48px !important;
+        left: 0 !important;
+        right: 0 !important;
+        z-index: 9998 !important;
+        background: #f8f9fa !important;
+        padding: 6px 12px !important;
+        margin: 0 !important;
+        box-shadow: 0 1px 4px rgba(0,0,0,0.1) !important;
+        display: flex !important;
+        height: 42px !important;
+        border-bottom: 1px solid #dee2e6 !important;
+        transform: translate3d(0, 0, 0) !important;
+        backface-visibility: hidden !important;
+        perspective: 1000px !important;
+    }
+    
+    .period-controls .period-control-line {
+        display: flex !important;
+        align-items: center !important;
+        gap: 6px !important;
+        margin: 0 !important;
+    }
+    
+    .period-controls .period-control-line span {
+        font-size: 13px !important;
+        font-weight: 500 !important;
+        margin: 0 !important;
+        white-space: nowrap !important;
+        color: #495057 !important;
+    }
+    
+    .period-controls .period-control-line .btn {
+        padding: 3px 8px !important;
+        font-size: 13px !important;
+        margin: 0 !important;
+        min-width: 28px !important;
+        height: 26px !important;
+        line-height: 1 !important;
+    }
+    
+    /* 超强触摸优化 */
+    .subject-cards {
+        -webkit-overflow-scrolling: touch !important;
+        scrollbar-width: thin !important;
+        scrollbar-color: #cbd5e0 #f7fafc !important;
+    }
+    
+    .subject-cards::-webkit-scrollbar {
+        width: 4px !important;
+    }
+    
+    .subject-cards::-webkit-scrollbar-track {
+        background: #f7fafc !important;
+    }
+    
+    .subject-cards::-webkit-scrollbar-thumb {
+        background: #cbd5e0 !important;
+        border-radius: 2px !important;
+    }
+    
+    .timetable-container {
+        -webkit-overflow-scrolling: touch !important;
+        scrollbar-width: thin !important;
+        scrollbar-color: #cbd5e0 #f7fafc !important;
+    }
+    
+    .timetable-container::-webkit-scrollbar {
+        width: 4px !important;
+        height: 4px !important;
+    }
+    
+    .timetable-container::-webkit-scrollbar-track {
+        background: #f7fafc !important;
+    }
+    
+    .timetable-container::-webkit-scrollbar-thumb {
+        background: #cbd5e0 !important;
+        border-radius: 2px !important;
+    }
+    
+    /* 防止iOS橡皮筋效果 */
+    .container {
+        -webkit-overflow-scrolling: touch !important;
+        overscroll-behavior: contain !important;
+    }
+    
+    /* 增强触摸目标 */
+    .subject-card, .btn {
+        -webkit-tap-highlight-color: transparent !important;
+        -webkit-touch-callout: none !important;
+        -webkit-user-select: none !important;
+        user-select: none !important;
+    }
+        
+        /* 课程表区域 - 强制100vw宽度，移除所有边距和滚动 */
+        .timetable-container {
+            order: 2;
+            width: 100vw !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            overflow: hidden !important;
+            background: white;
+            border-radius: 0 !important;
+            box-shadow: none !important;
+        }
+        
+        .timetable-wrapper {
+            width: 100vw !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            overflow: hidden !important;
+        }
+        
+        /* 7列表格精确布局 - 极致压缩 */
+        .timetable {
+            width: 100vw !important;
+            table-layout: fixed !important;
+            border-collapse: collapse !important;
+            margin: 0 !important;
+            border-spacing: 0 !important;
+            border: none !important;
+            font-size: 7px !important;
+        }
+        
+        .timetable th,
+        .timetable td {
+            padding: 0 !important;
+            margin: 0 !important;
+            border: 1px solid #ddd !important;
+            box-sizing: border-box !important;
+            line-height: 1 !important;
+            overflow: hidden !important;
+            white-space: nowrap !important;
+        }
+        
+        /* 移除表格标题区域边距 */
+        .timetable-title-section {
+            margin: 0 !important;
+            padding: 0 !important;
+        }
+        
+        .table-title-input {
+            margin: 0 !important;
+            padding: 1px !important;
+            font-size: 10px !important;
+            border: none !important;
+        }
+        
+        /* 7列精确宽度分配：时间列8% + 课时列8% + 周一到周五各16.8% */
+        .timetable th:nth-child(1),
+        .timetable td:nth-child(1) {
+            width: 8% !important;
+            min-width: 20px !important;
+            max-width: 25px !important;
+            font-size: 7px !important;
+            padding: 0 !important;
+        }
+        
+        .timetable th:nth-child(2),
+        .timetable td:nth-child(2) {
+            width: 8% !important;
+            min-width: 25px !important;
+            max-width: 30px !important;
+            font-size: 7px !important;
+            padding: 0 !important;
+        }
+        
+        .timetable th:nth-child(n+3),
+        .timetable td:nth-child(n+3) {
+            width: 16.8% !important;
+            min-width: 0 !important;
+            padding: 0 !important;
+        }
+        
+        /* 单元格高度压缩 */
+        .cell {
+            height: 35px !important;
+            min-height: 35px !important;
+            max-height: 35px !important;
+            padding: 0 !important;
+            margin: 0 !important;
+            border: 1px solid #ccc !important;
+            overflow: hidden !important;
+        }
+        
+        /* 垂直文本极致压缩 */
+        .vertical-text {
+            font-size: 7px !important;
+            padding: 0 !important;
+            letter-spacing: 0 !important;
+            line-height: 1 !important;
+            writing-mode: vertical-rl !important;
+            transform: rotate(180deg) !important;
+            white-space: nowrap !important;
+            overflow: hidden !important;
+            text-overflow: ellipsis !important;
+        }
+        
+        /* 内容显示极致压缩 */
+        .cell-content {
+            font-size: 6px !important;
+            padding: 0 !important;
+            width: 100% !important;
+            height: 100% !important;
+            display: flex !important;
+            flex-direction: column !important;
+            justify-content: center !important;
+            align-items: center !important;
+            text-align: center !important;
+            line-height: 1 !important;
+            overflow: hidden !important;
+        }
+        
+        .subject-name {
+            font-size: 6px !important;
+            font-weight: 600 !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            line-height: 1 !important;
+            word-break: break-word !important;
+            overflow: hidden !important;
+            text-overflow: ellipsis !important;
+            display: -webkit-box !important;
+            -webkit-line-clamp: 2 !important;
+            -webkit-box-orient: vertical !important;
+            max-height: 12px !important;
+        }
+        
+        .teacher-name {
+            font-size: 5px !important;
+            opacity: 0.8 !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            line-height: 1 !important;
+            word-break: break-word !important;
+            overflow: hidden !important;
+            text-overflow: ellipsis !important;
+            white-space: nowrap !important;
+            max-height: 5px !important;
+        }
+        
+        /* 空单元格+号 */
+        .cell.empty-cell,
+        .cell:not(.has-subject) {
+            background-color: #f5f5f5 !important;
+            border: 1px dashed #bbb !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            padding: 0 !important;
+            margin: 0 !important;
+        }
+        
+        .plus-indicator,
+        .cell:not(.has-subject):after {
+            content: '+' !important;
+            font-size: 10px !important;
+            color: #aaa !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            line-height: 1 !important;
+            margin: 0 !important;
+            padding: 0 !important;
+        }
+        
+        /* 控制区域压缩 - 已被固定定位样式覆盖 */
+        .controls {
+            justify-content: center;
+            gap: 2px !important;
+            flex-wrap: wrap !important;
+            padding: 1px !important;
+        }
+        
+        .btn {
+            padding: 2px 4px !important;
+            font-size: 9px !important;
+            margin: 0 !important;
+        }
+        
+        /* 移除所有可能的溢出 */
+        * {
+            max-width: 100vw !important;
+        }
+    }
+    
+    /* PC端空单元格默认显示+号 */
+    @media (min-width: 769px) {
+        .main-content {
+            display: flex;
+            flex-direction: row !important;
+            gap: 20px;
+        }
+        
+        .subject-pool {
+            width: 250px;
+            flex-shrink: 0;
+        }
+        
+        .timetable-container {
+            flex: 1;
+            margin-left: 20px;
+        }
+        
+        .cell.empty-cell,
+        .cell:not(.has-subject) {
+            background-color: #f9f9f9 !important;
+            border: 1px dashed #ddd !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            cursor: pointer !important;
+            transition: all 0.3s ease !important;
+        }
+        
+        .plus-indicator,
+        .cell:not(.has-subject):after {
+            content: '+' !important;
+            font-size: 24px !important;
+            color: #ccc !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            line-height: 1 !important;
+        }
+        
+        .cell.empty-cell:hover,
+        .cell:not(.has-subject):hover {
+            background-color: #e9ecef !important;
+        }
+        
+        .cell.empty-cell:hover .plus-indicator,
+        .cell:not(.has-subject):hover:after {
+            color: #007bff !important;
+        }
+    }
+}
+
+.bw-mode .cell-content {
+    filter: grayscale(100%);
+}
+
+/* 时间设置弹窗 */
+.time-modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.4);
+}
+
+.time-modal-content {
+    background-color: #fefefe;
+    margin: 15% auto;
+    padding: 20px;
+    border: 1px solid var(--border-color);
+    width: 80%;
+    max-width: 500px;
+    border-radius: 10px;
+}
+
+.close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.close:hover {
+    color: var(--primary-color);
+}
+
+/* 设置弹窗样式 */
+.settings-modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.4);
+    align-items: center;
+    justify-content: center;
+}
+
+.settings-modal-content {
+    background-color: white;
+    margin: auto;
+    padding: 30px;
+    border: 1px solid var(--border-color);
+    width: 90%;
+    max-width: 400px;
+    border-radius: 10px;
+    box-shadow: 0 4px 20px var(--shadow-color);
+}
+
+.settings-modal-content h2 {
+    color: var(--primary-color);
+    margin-top: 0;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.settings-form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.settings-form label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 500;
+    color: var(--text-color);
+    cursor: pointer;
+}
+
+.settings-form input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+    appearance: none;
+    border: 2px solid #dee2e6;
+    border-radius: 4px;
+    position: relative;
+    transition: all 0.3s ease;
+    background: white;
+}
+
+.settings-form input[type="checkbox"]:checked {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-color: #667eea;
+}
+
+.settings-form input[type="checkbox"]:checked::after {
+    content: '✓';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: white;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.settings-form input[type="checkbox"]:hover {
+    border-color: #667eea;
+    transform: scale(1.05);
+}
+
+.settings-form label:hover {
+    color: #667eea;
+    transform: translateX(2px);
+}
+
+/* 简化设置界面样式 */
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.modal-header h3 {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 600;
+    color: #333;
+}
+
+.modal-close {
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    color: #666;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    line-height: 1;
+}
+
+.modal-close:hover {
+    background: #f5f5f5;
+    color: #333;
+}
+
+.settings-content {
+    margin-bottom: 15px;
+    padding: 0 5px;
+}
+
+.setting-item {
+    margin-bottom: 0;
+    padding: 10px 12px;
+    border-bottom: 1px solid #f0f0f0;
+    border-radius: 8px;
+    margin-bottom: 6px;
+    background: #fafafa;
+    transition: background 0.2s ease;
+}
+
+.setting-item:hover {
+    background: #f0f0f0;
+}
+
+.setting-item:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+}
+
+.setting-label {
+    display: flex;
+    align-items: center;
+    margin: 0;
+    cursor: pointer;
+    width: 100%;
+    gap: 10px;
+}
+
+.setting-checkbox {
+    display: none;
+}
+
+.setting-label .checkmark {
+    width: 20px;
+    height: 20px;
+    border: 2px solid var(--border-color);
+    border-radius: 4px;
+    background: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: all 0.2s ease;
+}
+
+.setting-label .checkmark::after {
+    content: '✓';
+    color: white;
+    font-size: 12px;
+    font-weight: bold;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+
+.setting-checkbox:checked + .checkmark {
+    background: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+.setting-checkbox:checked + .checkmark::after {
+    opacity: 1;
+}
+
+.setting-text {
+    flex: 1;
+}
+
+.setting-text strong {
+    display: block;
+    font-size: 14px;
+    color: #333;
+    margin-bottom: 1px;
+}
+
+.setting-text small {
+    display: block;
+    font-size: 11px;
+    color: #888;
+    font-weight: normal;
+}
+
+.settings-form .button-group {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+    margin-top: 20px;
+}
+
+/* 移动端弹窗动画 */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes slideUp {
+    from { 
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to { 
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeOut {
+    from { opacity: 1; }
+    to { opacity: 0; }
+}
+
+@keyframes slideDown {
+    from { 
+        opacity: 1;
+        transform: translateY(0);
+    }
+    to { 
+        opacity: 0;
+        transform: translateY(20px);
+    }
+}
+
+/* 教程弹窗样式 - 全新设计 */
+/* 教程弹窗特定样式 - 仅应用于教程弹窗 */
+#tutorialModal .modal-content,
+#tutorialModal .tutorial-modal-content {
+    background: linear-gradient(135deg, #ffffff 0%, #f8f9ff 100%);
+    border: 2px solid rgba(var(--primary-color-rgb), 0.2);
+    border-radius: 20px;
+    box-shadow: 
+        0 0 0 1px rgba(var(--primary-color-rgb), 0.1),
+        0 10px 30px rgba(0, 0, 0, 0.15),
+        0 0 40px rgba(var(--primary-color-rgb), 0.1);
+    overflow: hidden;
+    animation: modalSlideIn 0.2s ease-out;
+    will-change: transform, opacity;
+    transform: translateZ(0);
+    backface-visibility: hidden;
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* 确保其他弹窗不使用flex布局 */
+#subjectModal .modal-content,
+#timeModal .modal-content,
+#settingsModal .modal-content {
+    display: block;
+    background: white;
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+}
+
+/* 教程弹窗底部样式 */
+.tutorial-footer {
+    padding: 20px 30px;
+    background: rgba(var(--primary-color-rgb), 0.05);
+    border-top: 1px solid rgba(var(--primary-color-rgb), 0.1);
+    border-radius: 0 0 20px 20px;
+    margin-top: auto;
+}
+
+.tutorial-hint {
+    text-align: center;
+    margin-bottom: 15px;
+    color: var(--text-color);
+    font-size: 14px;
+}
+
+.tutorial-actions {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+}
+
+/* 确保内容区域能自适应高度 */
+#tutorialModal .tutorial-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px 30px;
+}
+
+/* 保留一个统一的modalSlideIn动画 */
+@keyframes modalSlideIn {
+    from {
+        opacity: 0;
+        transform: scale(0.8);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+#tutorialModal .tutorial-header {
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--dark-color) 100%);
+    color: white;
+    padding: 20px 25px;
+    border-radius: 20px 20px 0 0;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+#tutorialModal .tutorial-header h3 {
+    margin: 0;
+    font-size: 20px;
+    flex: 1;
+    text-align: center;
+    color: white !important;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+    position: relative;
+    z-index: 2;
+}
+
+/* 教程弹窗关闭按钮样式 */
+#tutorialModal .tutorial-close-btn {
+    background: transparent;
+    border: none;
+    color: white;
+    font-size: 24px;
+    cursor: pointer;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: all 0.3s ease;
+    z-index: 10;
+}
+
+#tutorialModal .tutorial-close-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: rotate(90deg);
+}
+
+#tutorialModal .tutorial-header-icon {
+    font-size: 24px;
+    margin-right: 15px;
+    position: relative;
+    z-index: 2;
+}
+
+#tutorialModal .tutorial-header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(45deg, transparent 30%, rgba(255,255,255,0.1) 50%, transparent 70%);
+    animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+}
+
+.tutorial-step {
+    margin-bottom: 20px;
+    background: linear-gradient(135deg, #ffffff 0%, #f9fbfd 100%);
+    padding: 18px;
+    border-radius: 12px;
+    border: 1px solid rgba(var(--primary-color-rgb), 0.1);
+    border-left: 4px solid var(--primary-color);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    will-change: transform, box-shadow;
+}
+
+.tutorial-step:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+    border-color: rgba(var(--primary-color-rgb), 0.2);
+}
+
+.tutorial-section {
+    margin-bottom: 25px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid rgba(var(--primary-color-rgb), 0.1);
+}
+
+.tutorial-section:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
+
+/* 教程内容视觉层次优化 - 重新设计 */
+.tutorial-section-title {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--primary-color);
+    margin-bottom: 18px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding-bottom: 12px;
+    border-bottom: 2px solid rgba(var(--primary-color-rgb), 0.2);
+}
+
+.tutorial-section-title svg {
+    flex-shrink: 0;
+}
+
+/* 教程卡片网格布局 */
+.tutorial-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px;
+    margin-bottom: 10px;
+}
+
+.tutorial-card {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 16px;
+    background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
+    border-radius: 12px;
+    border: 1px solid #e8e8e8;
+    transition: all 0.2s ease;
+}
+
+.tutorial-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    border-color: var(--primary-color);
+}
+
+.tutorial-card-icon {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.tutorial-card-content {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.tutorial-card-content strong {
+    font-size: 16px;
+    color: #333;
+}
+
+.tutorial-card-content span {
+    font-size: 14px;
+    color: #666;
+    line-height: 1.4;
+}
+
+/* 教程功能列表 */
+.tutorial-features {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.tutorial-feature {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px 18px;
+    background: #f9f9f9;
+    border-radius: 10px;
+    border-left: 4px solid var(--primary-color);
+}
+
+.tutorial-feature .feature-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.tutorial-feature .feature-text {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.tutorial-feature .feature-text strong {
+    font-size: 16px;
+    color: #333;
+}
+
+.tutorial-feature .feature-text span {
+    font-size: 14px;
+    color: #666;
+}
+
+/* 教程小技巧 */
+.tutorial-tips {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+}
+
+.tip-item {
+    padding: 12px 14px;
+    background: linear-gradient(135deg, var(--light-color) 0%, #ffffff 100%);
+    border-radius: 8px;
+    font-size: 14px;
+    color: #555;
+    border: 1px solid rgba(var(--primary-color-rgb), 0.15);
+}
+
+.tip-item kbd {
+    background: var(--primary-color);
+    color: white;
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    margin-right: 6px;
+    font-weight: 600;
+}
+
+.tutorial-section-content {
+    background: linear-gradient(135deg, #ffffff 0%, #f9fbfd 100%);
+    padding: 25px;
+    border-radius: 16px;
+    border: 1px solid rgba(var(--primary-color-rgb), 0.15);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    margin-bottom: 20px;
+}
+
+.tutorial-step-title {
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--dark-color);
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.tutorial-step-title::before {
+    content: "▶";
+    color: var(--primary-color);
+    font-size: 14px;
+}
+
+.tutorial-step-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.tutorial-step-list li {
+    padding: 10px 0;
+    padding-left: 32px;
+    position: relative;
+    line-height: 1.7;
+    font-size: 15px;
+    color: #444;
+    border-bottom: 1px dashed rgba(var(--primary-color-rgb), 0.1);
+}
+
+.tutorial-step-list li:last-child {
+    border-bottom: none;
+}
+
+.tutorial-step-list li::before {
+    content: "✨";
+    position: absolute;
+    left: 0;
+    top: 10px;
+    font-size: 16px;
+    color: var(--primary-color);
+    background: rgba(var(--primary-color-rgb), 0.1);
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* 快捷键网格布局 - 优化 */
+.shortcut-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 12px;
+    margin-top: 20px;
+}
+
+.shortcut-item {
+    background: linear-gradient(135deg, #ffffff 0%, #f9fbfd 100%);
+    padding: 16px 12px;
+    border-radius: 12px;
+    border: 1px solid rgba(var(--primary-color-rgb), 0.1);
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+    text-align: center;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    will-change: transform, box-shadow;
+}
+
+.shortcut-item:hover {
+    transform: translateY(-2px) scale(1.02);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+    border-color: rgba(var(--primary-color-rgb), 0.3);
+}
+
+.shortcut-key {
+    display: block;
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--primary-color);
+    margin-bottom: 6px;
+    background: linear-gradient(135deg, rgba(var(--primary-color-rgb), 0.1) 0%, rgba(var(--primary-color-rgb), 0.05) 100%);
+    padding: 8px 10px;
+    border-radius: 8px;
+    font-family: 'Courier New', monospace;
+    border: 1px solid rgba(var(--primary-color-rgb), 0.2);
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.shortcut-desc {
+    display: block;
+    font-size: 13px;
+    color: #555;
+    font-weight: 500;
+}
+
+/* FAQ样式 - 重新设计 */
+.faq-item {
+    margin-bottom: 20px;
+    background: linear-gradient(135deg, #ffffff 0%, #f9fbfd 100%);
+    padding: 20px;
+    border-radius: 16px;
+    border: 1px solid rgba(var(--primary-color-rgb), 0.15);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    transition: all 0.2s ease;
+}
+
+.faq-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.12);
+}
+
+.faq-question {
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--dark-color);
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.faq-question::before {
+    content: "❓";
+    color: var(--primary-color);
+    font-size: 18px;
+}
+
+.faq-answer {
+    font-size: 15px;
+    color: #555;
+    line-height: 1.7;
+    padding-left: 26px;
+    border-left: 3px solid rgba(var(--primary-color-rgb), 0.3);
+    margin-left: 8px;
+}
+
+/* 教程弹窗样式优化 - 重新设计 */
+@media (max-width: 768px) {
+    #tutorialModal .modal-content {
+        margin: 8px;
+        max-width: calc(100vw - 16px);
+        max-height: calc(100vh - 16px);
+        border-radius: 16px;
+        box-shadow: 
+            0 0 0 1px rgba(var(--primary-color-rgb), 0.1),
+            0 8px 25px rgba(0, 0, 0, 0.15),
+            0 0 30px rgba(var(--primary-color-rgb), 0.08);
+    }
+    
+    #tutorialModal .modal-header {
+        padding: 18px 20px;
+        border-radius: 16px 16px 0 0;
+    }
+    
+    #tutorialModal .tutorial-content {
+        padding: 0 20px 20px;
+        max-height: calc(100vh - 140px);
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+    
+    #tutorialModal .form-actions {
+        flex-direction: column;
+        gap: 12px;
+        padding: 15px 20px;
+    }
+    
+    #tutorialModal .form-actions button {
+        width: 100%;
+        min-width: auto;
+        font-size: 16px;
+        padding: 12px 20px;
+        border-radius: 10px;
+    }
+    
+    /* 手机端教程弹窗标题优化 */
+    #tutorialModal h3 {
+        font-size: 22px !important;
+        text-align: center;
+        margin: 0;
+    }
+    
+    /* 手机端教程内容优化 */
+    #tutorialModal .tutorial-content {
+        font-size: 15px;
+        line-height: 1.6;
+    }
+    
+    .tutorial-section-title {
+        font-size: 18px !important;
+        margin-bottom: 12px;
+    }
+    
+    .tutorial-step-title {
+        font-size: 15px !important;
+    }
+    
+    .tutorial-section-content {
+        padding: 18px;
+        margin-bottom: 15px;
+    }
+    
+    .tutorial-step-list li {
+        font-size: 14px;
+        padding: 8px 0;
+        padding-left: 28px;
+    }
+    
+    .tutorial-step-list li::before {
+        width: 20px;
+        height: 20px;
+        font-size: 14px;
+    }
+    
+    .shortcut-grid {
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 10px;
+    }
+    
+    .shortcut-item {
+        padding: 12px 8px;
+    }
+    
+    .shortcut-key {
+        font-size: 14px;
+        padding: 6px 8px;
+    }
+    
+    .shortcut-desc {
+        font-size: 12px;
+    }
+    
+    .faq-item {
+        padding: 15px;
+    }
+    
+    .faq-question {
+        font-size: 15px;
+    }
+    
+    .faq-answer {
+        font-size: 13px;
+        padding-left: 20px;
+    }
+    
+    /* 移动端性能优化 */
+    .tutorial-step,
+    .shortcut-item,
+    .faq-item {
+        will-change: auto;
+    }
+    
+    /* 移动端科目池完整显示优化 */
+    .subject-pool {
+        margin-top: 35px !important; /* 增加顶部间距 */
+        margin-bottom: 30px !important;
+        min-height: 400px !important; /* 增加最小高度 */
+        max-height: calc(100vh - 350px) !important; /* 调整最大高度计算 */
+        overflow: hidden !important;
+        background: white !important;
+        border-radius: 12px !important;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.1) !important;
+        border: 1px solid rgba(0,0,0,0.05) !important;
+    }
+    
+    .subjects {
+        min-height: 300px !important; /* 增加最小高度 */
+        max-height: calc(100vh - 350px - 60px) !important; /* 调整最大高度计算 */
+        overflow-y: auto !important;
+        padding: 15px 20px !important; /* 减少垂直内边距，保持水平内边距 */
+        background: white !important;
+        border-radius: 0 0 12px 12px !important;
+    }
+}
+
+/* 教程内容样式 */
+.tutorial-content {
+    padding: 20px 30px 20px;
+    background: transparent;
+    max-height: 500px;
+    overflow-y: auto;
+}
+
+/* 教程内容滚动条样式 */
+.tutorial-content::-webkit-scrollbar {
+    width: 8px;
+}
+
+.tutorial-content::-webkit-scrollbar-track {
+    background: rgba(var(--primary-color-rgb), 0.1);
+    border-radius: 4px;
+}
+
+.tutorial-content::-webkit-scrollbar-thumb {
+    background: rgba(var(--primary-color-rgb), 0.4);
+    border-radius: 4px;
+}
+
+.tutorial-content::-webkit-scrollbar-thumb:hover {
+    background: rgba(var(--primary-color-rgb), 0.6);
+}
+
+.tutorial-section {
+    margin-bottom: 35px;
+    padding-bottom: 25px;
+    border-bottom: 1px solid rgba(74, 124, 89, 0.1);
+    position: relative;
+}
+
+.tutorial-section::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 4px;
+    height: 100%;
+    background: linear-gradient(180deg, var(--primary-color) 0%, var(--info-color) 100%);
+    border-radius: 2px;
+    opacity: 0.3;
+}
+
+.tutorial-section:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+}
+
+.tutorial-section h4 {
+    color: var(--primary-color);
+    font-size: 20px;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 3px solid var(--primary-color);
+    display: inline-block;
+    font-weight: 700;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.tutorial-step {
+    margin-bottom: 25px;
+    background: white;
+    padding: 20px;
+    border-radius: 12px;
+    border-left: 5px solid var(--primary-color);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s ease;
+}
+
+.tutorial-step:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+}
+
+.tutorial-step h5 {
+    color: var(--text-color);
+    font-size: 17px;
+    margin-bottom: 12px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.tutorial-step h5::before {
+    content: '✓';
+    color: var(--primary-color);
+    font-weight: 700;
+}
+
+.tutorial-step ul {
+    margin: 0;
+    padding-left: 25px;
+}
+
+.tutorial-step li {
+    margin-bottom: 10px;
+    line-height: 1.6;
+    color: #555;
+    font-size: 15px;
+    position: relative;
+}
+
+.tutorial-step li::before {
+    content: '•';
+    color: var(--primary-color);
+    font-weight: bold;
+    position: absolute;
+    left: -18px;
+    top: 0;
+}
+
+.faq-item {
+    margin-bottom: 25px;
+    background: white;
+    padding: 20px;
+    border-radius: 12px;
+    border-left: 5px solid var(--info-color);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s ease;
+}
+
+.faq-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+}
+
+.faq-item h5 {
+    color: var(--info-color);
+    font-size: 16px;
+    margin-bottom: 10px;
+    font-weight: 600;
+}
+
+.faq-item p {
+    color: #555;
+    line-height: 1.6;
+    margin: 0;
+    font-size: 15px;
+}
+
+.tutorial-content kbd {
+    background: linear-gradient(135deg, #f0f0f0 0%, #e0e0e0 100%);
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-family: 'Consolas', 'Monaco', monospace;
+    font-size: 13px;
+    border: 1px solid #ddd;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    color: #333;
+    font-weight: 600;
+}
+
+/* 教程底部操作区优化 */
+#tutorialModal .form-actions {
+    background: rgba(74, 124, 89, 0.05);
+    padding: 25px 30px;
+    margin: 30px -30px 0;
+    border-radius: 0 0 16px 16px;
+    border-top: 1px solid rgba(74, 124, 89, 0.1);
+}
+
+#tutorialModal .form-actions button {
+    border-radius: 8px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+#tutorialModal .btn.primary {
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--dark-color) 100%);
+    border: none;
+    color: white;
+    padding: 12px 24px;
+    font-size: 15px;
+}
+
+#tutorialModal .btn.primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(74, 124, 89, 0.4);
+}
+
+#tutorialModal .btn.secondary {
+    background: white;
+    color: var(--text-color);
+    border: 1px solid var(--border-color);
+    padding: 12px 24px;
+    font-size: 15px;
+}
+
+#tutorialModal .btn.secondary:hover {
+    background: var(--light-color);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+}
+
+/* 移动端教程内容优化 */
+@media (max-width: 768px) {
+    #tutorialModal .modal-content {
+        margin: 10px;
+        max-width: calc(100vw - 20px);
+        max-height: calc(100vh - 20px);
+        border-radius: 12px;
+    }
+    
+    #tutorialModal .modal-header {
+        padding: 20px 25px;
+        margin: 0 -15px 20px;
+    }
+    
+    #tutorialModal h3 {
+        font-size: 22px !important;
+        text-align: center;
+    }
+    
+    .tutorial-content {
+        padding: 0 20px 15px;
+    }
+    
+    .tutorial-section h4 {
+        font-size: 18px;
+    }
+    
+    .tutorial-step {
+        padding: 15px;
+        margin-bottom: 20px;
+    }
+    
+    .tutorial-step h5 {
+        font-size: 16px;
+    }
+    
+    .tutorial-step li {
+        font-size: 14px;
+    }
+    
+    .faq-item {
+        padding: 15px;
+        margin-bottom: 20px;
+    }
+    
+    .faq-item h5 {
+        font-size: 15px;
+    }
+    
+    .faq-item p {
+        font-size: 14px;
+    }
+    
+    #tutorialModal .form-actions {
+        flex-direction: column;
+        gap: 10px;
+        padding: 20px;
+    }
+    
+    #tutorialModal .form-actions button {
+        width: 100%;
+        min-width: auto;
+    }
+}
+    
+    /* 确保科目卡片完整显示 */
+    .subject-card {
+        margin: 6px 0 !important; /* 减少科目卡片间距 */
+        padding: 12px 15px !important; /* 减少内边距 */
+        min-height: 55px !important; /* 减少最小高度 */
+        border: 1px solid var(--border-color) !important;
+        background: var(--light-color) !important;
+        box-shadow: 0 2px 6px var(--shadow-color) !important; /* 减少阴影 */
+        border-radius: 8px !important; /* 减少圆角 */
+        transition: all 0.3s ease !important;
+    }
+    
+    .subject-card:hover {
+        transform: translateY(-2px) !important;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.12) !important;
+    }
+    
+    /* 科目信息样式 */
+    .subject-info .subject-name {
+        font-size: 15px !important; /* 减少字体大小 */
+        font-weight: 600 !important;
+        color: var(--text-color) !important;
+        margin-bottom: 3px !important; /* 减少底部间距 */
+        line-height: 1.3 !important; /* 减少行高 */
+    }
+    
+    .subject-info .teacher-name {
+        font-size: 13px !important; /* 减少字体大小 */
+        color: var(--text-color) !important;
+        opacity: 0.9 !important;
+        line-height: 1.1 !important; /* 减少行高 */
+    }
+    
+    /* 科目操作按钮优化 */
+    .subject-actions {
+        gap: 6px !important; /* 减少按钮间距 */
+    }
+    
+    /* 移动端现代化文字按钮优化 */
+    .btn-text {
+        padding: 8px 14px !important;
+        font-size: 11px !important;
+        min-width: 45px !important;
+        height: 32px !important;
+        border-radius: 8px !important;
+        margin: 0 3px !important;
+        letter-spacing: 0.3px !important;
+        font-weight: 600 !important;
+    }
+    
+    .btn-text:hover {
+        transform: translateY(-1px) !important;
+    }
+    
+    .btn-text:active {
+        transform: translateY(0) !important;
+    }
+    
+    /* 移动端编辑按钮优化 - 使用主题色变量 */
+    .edit-btn {
+        background: rgba(143, 188, 143, 0.08) !important;
+        border-color: rgba(143, 188, 143, 0.3) !important;
+    }
+    
+    .edit-btn:hover {
+        background: rgba(143, 188, 143, 0.15) !important;
+        border-color: rgba(143, 188, 143, 0.5) !important;
+    }
+    
+    /* 移动端删除按钮优化 - 使用主题色变量 */
+    .delete-btn {
+        background: rgba(239, 68, 68, 0.08) !important;
+        border-color: rgba(239, 68, 68, 0.3) !important;
+    }
+    
+    .delete-btn:hover {
+        background: rgba(239, 68, 68, 0.15) !important;
+        border-color: rgba(239, 68, 68, 0.5) !important;
+    }
+    
+    /* 为不同主题添加移动端按钮样式 */
+    .theme-blue .edit-btn {
+        background: rgba(0, 123, 255, 0.08) !important;
+        border-color: rgba(0, 123, 255, 0.3) !important;
+    }
+    
+    .theme-blue .edit-btn:hover {
+        background: rgba(0, 123, 255, 0.15) !important;
+        border-color: rgba(0, 123, 255, 0.5) !important;
+    }
+    
+    .theme-purple .edit-btn {
+        background: rgba(111, 66, 193, 0.08) !important;
+        border-color: rgba(111, 66, 193, 0.3) !important;
+    }
+    
+    .theme-purple .edit-btn:hover {
+        background: rgba(111, 66, 193, 0.15) !important;
+        border-color: rgba(111, 66, 193, 0.5) !important;
+    }
+    
+    .theme-pink .edit-btn {
+        background: rgba(233, 30, 99, 0.08) !important;
+        border-color: rgba(233, 30, 99, 0.3) !important;
+    }
+    
+    .theme-pink .edit-btn:hover {
+        background: rgba(233, 30, 99, 0.15) !important;
+        border-color: rgba(233, 30, 99, 0.5) !important;
+    }
+    
+    .theme-orange .edit-btn {
+        background: rgba(253, 126, 20, 0.08) !important;
+        border-color: rgba(253, 126, 20, 0.3) !important;
+    }
+    
+    .theme-orange .edit-btn:hover {
+        background: rgba(253, 126, 20, 0.15) !important;
+        border-color: rgba(253, 126, 20, 0.5) !important;
+    }
+    
+    .theme-dark .edit-btn {
+        background: rgba(32, 201, 151, 0.08) !important;
+        border-color: rgba(32, 201, 151, 0.3) !important;
+    }
+    
+    .theme-dark .edit-btn:hover {
+        background: rgba(32, 201, 151, 0.15) !important;
+        border-color: rgba(32, 201, 151, 0.5) !important;
+    }
+}`,
+      "tools/kechengbiao2/js/script.js": `class TimetableApp {
+    constructor() {
+        this.subjects = [];
+        this.timetable = {};
+        this.periods = {
+            morning: [
+                { name: '第1节', time: '08:00-08:40' },
+                { name: '第2节', time: '08:50-09:30' },
+                { name: '第3节', time: '10:00-10:40' },
+                { name: '第4节', time: '10:50-11:30' }
+            ],
+            afternoon: [
+                { name: '第1节', time: '14:00-14:40' },
+                { name: '第2节', time: '14:50-15:30' },
+                { name: '第3节', time: '15:40-16:20' }
+            ],
+            evening: [
+                { name: '第1节', time: '19:00-19:40' },
+                { name: '第2节', time: '19:50-20:30' }
+            ]
+        };
+        this.sectionNames = {
+            morning: '上午',
+            afternoon: '下午',
+            evening: '晚上'
+        };
+        this.settings = {
+            showEvening: true,
+            showSaturday: true,
+            showSunday: true,
+            showPeriodTime: true
+        };
+        this.editingSubject = null;
+        this.editingCell = null;
+        this.editingPeriod = null;
+        this.draggedSubject = null;
+        
+        this.init();
+    }
+
+    init() {
+        this.loadData();
+        this.loadSettings();
+        this.bindEvents();
+        this.renderSubjects();
+        this.renderTimetable();
+        this.loadTimetableTitle();
+        this.loadTableTitle();
+        this.applySettings();
+    }
+
+    bindEvents() {
+        // 科目相关
+        document.getElementById('addSubjectBtn').addEventListener('click', () => this.openSubjectModal());
+        document.getElementById('importSubjectBtn').addEventListener('click', () => this.openImportSubjectModal());
+        document.getElementById('subjectForm').addEventListener('submit', (e) => this.saveSubject(e));
+        document.getElementById('cancelBtn').addEventListener('click', () => this.closeSubjectModal());
+        document.getElementById('deleteSubjectBtn').addEventListener('click', () => this.deleteSubject());
+        document.getElementById('importSubjectForm').addEventListener('submit', (e) => this.importSubjects(e));
+        document.getElementById('cancelImportBtn').addEventListener('click', () => this.closeImportSubjectModal());
+        
+        // 课程表标题
+        document.getElementById('timetableTitle').addEventListener('input', (e) => this.saveTimetableTitle(e.target.value));
+        document.getElementById('tableTitle').addEventListener('input', (e) => this.saveTableTitle(e.target.value));
+        
+        // 课时管理
+        document.getElementById('addMorningBtn').addEventListener('click', () => this.addPeriod('morning'));
+        document.getElementById('addAfternoonBtn').addEventListener('click', () => this.addPeriod('afternoon'));
+        document.getElementById('addEveningBtn').addEventListener('click', () => this.addPeriod('evening'));
+        document.getElementById('removeMorningBtn').addEventListener('click', () => this.removePeriod('morning'));
+        document.getElementById('removeAfternoonBtn').addEventListener('click', () => this.removePeriod('afternoon'));
+        document.getElementById('removeEveningBtn').addEventListener('click', () => this.removePeriod('evening'));
+        
+        // PC端课时管理按钮
+        document.getElementById('addMorningBtn2').addEventListener('click', () => this.addPeriod('morning'));
+        document.getElementById('addAfternoonBtn2').addEventListener('click', () => this.addPeriod('afternoon'));
+        document.getElementById('addEveningBtn2').addEventListener('click', () => this.addPeriod('evening'));
+        document.getElementById('removeMorningBtn2').addEventListener('click', () => this.removePeriod('morning'));
+        document.getElementById('removeAfternoonBtn2').addEventListener('click', () => this.removePeriod('afternoon'));
+        document.getElementById('removeEveningBtn2').addEventListener('click', () => this.removePeriod('evening'));
+        
+        // 时间相关
+        document.getElementById('timeForm').addEventListener('submit', (e) => this.savePeriodTime(e));
+        document.getElementById('cancelTimeBtn').addEventListener('click', () => this.closeTimeModal());
+        
+        // 初始化时间选择器
+        this.initTimeSelectors();
+        
+        // 教程事件
+        document.getElementById('tutorialBtn').addEventListener('click', () => this.openTutorialModal());
+        document.getElementById('closeTutorialBtn').addEventListener('click', () => this.closeTutorialModal());
+        
+        // 重置和导出
+        document.getElementById('resetBtn').addEventListener('click', () => this.resetTimetable());
+        
+        // 导出下拉菜单
+        document.getElementById('exportBtn').addEventListener('click', (e) => this.toggleExportDropdown(e));
+        document.getElementById('saveImageBtn').addEventListener('click', () => this.saveAsImage());
+        document.getElementById('exportWordBtn').addEventListener('click', () => this.exportToWord());
+        document.getElementById('exportExcelBtn').addEventListener('click', () => this.exportToExcel());
+        
+        // 设置相关
+        document.getElementById('settingsBtn').addEventListener('click', () => this.openSettingsModal());
+        document.getElementById('settingsForm').addEventListener('submit', (e) => this.saveSettings(e));
+        document.getElementById('cancelSettingsBtn').addEventListener('click', () => this.closeSettingsModal());
+        
+        // 备份数据相关
+        document.getElementById('backupBtn').addEventListener('click', (e) => this.toggleBackupMenu(e));
+        document.getElementById('exportDataBtn').addEventListener('click', () => this.exportData());
+        document.getElementById('importDataBtn').addEventListener('click', () => this.importData());
+        document.getElementById('importFileInput').addEventListener('change', (e) => this.handleFileImport(e));
+        
+        // 手机端汉堡菜单相关
+        document.getElementById('hamburgerBtn').addEventListener('click', () => this.toggleMobileSidebar());
+        document.getElementById('closeSidebarBtn').addEventListener('click', () => this.closeMobileSidebar());
+        document.getElementById('sidebarOverlay').addEventListener('click', () => this.closeMobileSidebar());
+        
+        // 侧边栏菜单按钮事件
+        document.addEventListener('click', (e) => {
+            if (e.target.classList.contains('sidebar-btn')) {
+                const action = e.target.dataset.action;
+                this.handleSidebarAction(action);
+            }
+            // 侧边栏主题按钮
+            if (e.target.classList.contains('sidebar-theme-btn')) {
+                const theme = e.target.dataset.theme;
+                setTheme(theme);
+                this.updateSidebarThemeButtons(theme);
+            }
+            // 侧边栏字体按钮
+            if (e.target.classList.contains('sidebar-font-btn')) {
+                const font = e.target.dataset.font;
+                setFont(font);
+                this.updateSidebarFontButtons(font);
+            }
+        });
+        
+        // 手机端自定义颜色选择器
+        const mobileColorPicker = document.getElementById('mobileCustomColorPicker');
+        if (mobileColorPicker) {
+            mobileColorPicker.addEventListener('input', (e) => {
+                applyCustomColor(e.target.value);
+            });
+            mobileColorPicker.addEventListener('change', (e) => {
+                localStorage.setItem('timetable-custom-color', e.target.value);
+            });
+        }
+        
+        // 全局点击事件监听器 - 点击外部区域隐藏下拉菜单
+        document.addEventListener('click', (e) => this.handleGlobalClick(e));
+        
+        // 窗口大小改变时重新调整下拉菜单
+        window.addEventListener('resize', () => this.handleWindowResize());
+        
+        // 颜色选择 - 背景色
+        document.querySelectorAll('.color-option.bg-color').forEach(option => {
+            option.addEventListener('click', (e) => this.selectBgColor(e));
+        });
+        
+        // 颜色选择 - 字体色
+        document.querySelectorAll('.color-option.text-color').forEach(option => {
+            option.addEventListener('click', (e) => this.selectTextColor(e));
+        });
+        
+        // 背景色自定义颜色选择器
+        const bgColorPicker = document.getElementById('bgColorPicker');
+        const bgColorText = document.getElementById('bgColorText');
+        
+        if (bgColorPicker) {
+            bgColorPicker.addEventListener('input', (e) => {
+                if (bgColorText) bgColorText.value = e.target.value;
+                this.updateColorPreview();
+                // 取消预设颜色的选中状态
+                document.querySelectorAll('.color-option.bg-color').forEach(opt => opt.classList.remove('selected'));
+            });
+        }
+        
+        if (bgColorText) {
+            bgColorText.addEventListener('input', (e) => {
+                if (/^#[0-9A-Fa-f]{6}$/.test(e.target.value)) {
+                    if (bgColorPicker) bgColorPicker.value = e.target.value;
+                    this.updateColorPreview();
+                }
+            });
+        }
+        
+        // 字体色自定义颜色选择器
+        const textColorPicker = document.getElementById('textColorPicker');
+        const textColorText = document.getElementById('textColorText');
+        
+        if (textColorPicker) {
+            textColorPicker.addEventListener('input', (e) => {
+                if (textColorText) textColorText.value = e.target.value;
+                this.updateColorPreview();
+                // 取消预设颜色的选中状态
+                document.querySelectorAll('.color-option.text-color').forEach(opt => opt.classList.remove('selected'));
+            });
+        }
+        
+        if (textColorText) {
+            textColorText.addEventListener('input', (e) => {
+                if (/^#[0-9A-Fa-f]{6}$/.test(e.target.value)) {
+                    if (textColorPicker) textColorPicker.value = e.target.value;
+                    this.updateColorPreview();
+                }
+            });
+        }
+        
+        // 颜色模式选择事件
+        document.querySelectorAll('input[name="colorMode"]').forEach(radio => {
+            radio.addEventListener('change', (e) => {
+                this.handleColorModeChange(e.target.value);
+            });
+        });
+        
+        // 拖拽相关
+        this.setupDragAndDrop();
+        
+        // 键盘事件
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Delete' && this.editingCell) {
+                this.removeSubjectFromCell(this.editingCell);
+            }
+            if (e.key === 'Escape') {
+                // 关闭所有弹窗（优先级：手机端侧边栏 > 手机端科目选择 > 科目编辑 > 时间设置 > 教程）
+                const sidebar = document.getElementById('mobileSidebar');
+                if (sidebar && sidebar.classList.contains('show')) {
+                    this.closeMobileSidebar();
+                } else if (this.currentMobileModal) {
+                    this.closeMobileSubjectModal(this.currentMobileModal);
+                } else {
+                    this.closeSubjectModal();
+                    this.closeTimeModal();
+                    this.closeTutorialModal();
+                }
+            }
+        });
+    }
+
+    setupDragAndDrop() {
+        // 科目池拖拽
+        document.getElementById('subjectPool').addEventListener('dragstart', (e) => {
+            if (e.target.classList.contains('subject-card')) {
+                this.draggedSubject = e.target.dataset.subjectId;
+                e.target.classList.add('dragging');
+            }
+        });
+        
+        document.getElementById('subjectPool').addEventListener('dragend', (e) => {
+            if (e.target.classList.contains('subject-card')) {
+                e.target.classList.remove('dragging');
+            }
+        });
+        
+        // 使用事件委托处理表格拖拽
+        const timetable = document.getElementById('timetable');
+        
+        timetable.addEventListener('dragover', (e) => {
+            const cell = e.target.closest('.cell');
+            if (cell && !cell.classList.contains('occupied')) {
+                e.preventDefault();
+                cell.classList.add('drag-over');
+            }
+        });
+        
+        timetable.addEventListener('dragleave', (e) => {
+            const cell = e.target.closest('.cell');
+            if (cell) {
+                cell.classList.remove('drag-over');
+            }
+        });
+        
+        timetable.addEventListener('drop', (e) => {
+            const cell = e.target.closest('.cell');
+            if (cell && !cell.classList.contains('occupied')) {
+                e.preventDefault();
+                cell.classList.remove('drag-over');
+                
+                if (this.draggedSubject) {
+                    const day = cell.dataset.day;
+                    const section = cell.dataset.section;
+                    const period = cell.dataset.period;
+                    this.addSubjectToCell(this.draggedSubject, day, section, period);
+                }
+            }
+        });
+        
+        // 双击删除课程
+        timetable.addEventListener('dblclick', (e) => {
+            const cell = e.target.closest('.cell');
+            if (cell && cell.classList.contains('occupied')) {
+                this.removeSubjectFromCell(cell);
+            }
+        });
+    }
+
+    openSubjectModal(subject = null) {
+        this.editingSubject = subject;
+        const modal = document.getElementById('subjectModal');
+        const nameInput = document.getElementById('subjectName');
+        const teacherInput = document.getElementById('teacherName');
+        const deleteBtn = document.getElementById('deleteSubjectBtn');
+        
+        if (subject) {
+            nameInput.value = subject.name;
+            teacherInput.value = subject.teacher || '';
+            
+            // 设置颜色模式和颜色值
+            const colorMode = subject.colorMode || 'both';
+            document.querySelector(\`input[name="colorMode"][value="\${colorMode}"]\`).checked = true;
+            this.handleColorModeChange(colorMode);
+            
+            // 设置背景色
+            const bgColor = subject.bgColor || subject.color || '#3498DB';
+            document.getElementById('bgColorPicker').value = bgColor;
+            document.getElementById('bgColorText').value = bgColor;
+            this.selectBgColorByValue(bgColor);
+            
+            // 设置字体色
+            const textColor = subject.textColor || '#FFFFFF';
+            document.getElementById('textColorPicker').value = textColor;
+            document.getElementById('textColorText').value = textColor;
+            this.selectTextColorByValue(textColor);
+            
+            this.updateColorPreview();
+            deleteBtn.style.display = 'block';
+        } else {
+            nameInput.value = '';
+            teacherInput.value = '';
+            
+            // 默认选择背景+字体模式
+            document.querySelector('input[name="colorMode"][value="both"]').checked = true;
+            this.handleColorModeChange('both');
+            
+            // 默认颜色
+            document.getElementById('bgColorPicker').value = '#3498DB';
+            document.getElementById('bgColorText').value = '#3498DB';
+            document.getElementById('textColorPicker').value = '#FFFFFF';
+            document.getElementById('textColorText').value = '#FFFFFF';
+            
+            this.selectBgColorByValue('#3498DB');
+            this.selectTextColorByValue('#FFFFFF');
+            
+            deleteBtn.style.display = 'none';
+        }
+        
+        modal.style.display = 'flex';
+        
+        // 确保预览在弹窗显示后更新
+        setTimeout(() => {
+            this.updateColorPreview();
+        }, 50);
+    }
+
+    closeSubjectModal() {
+        document.getElementById('subjectModal').style.display = 'none';
+        this.editingSubject = null;
+    }
+
+    openImportSubjectModal() {
+        document.getElementById('importSubjectModal').style.display = 'flex';
+    }
+
+    closeImportSubjectModal() {
+        document.getElementById('importSubjectModal').style.display = 'none';
+    }
+
+    importSubjects(e) {
+        e.preventDefault();
+        
+        const stageSelect = document.getElementById('stageSelect');
+        const stage = stageSelect.value;
+        
+        if (!stage) return;
+        
+        // 定义各阶段的科目数据
+        const stageSubjects = {
+            primary: [
+                { id: Date.now() + '_1', name: '语文', teacher: '', color: '#000000', colorType: 'text' },
+                { id: Date.now() + '_2', name: '数学', teacher: '', color: '#000000', colorType: 'text' },
+                { id: Date.now() + '_3', name: '英语', teacher: '', color: '#000000', colorType: 'text' },
+                { id: Date.now() + '_4', name: '道德与法治', teacher: '', color: '#000000', colorType: 'text' },
+                { id: Date.now() + '_5', name: '科学', teacher: '', color: '#000000', colorType: 'text' },
+                { id: Date.now() + '_6', name: '体育与健康', teacher: '', color: '#000000', colorType: 'text' },
+                { id: Date.now() + '_7', name: '音乐', teacher: '', color: '#000000', colorType: 'text' },
+                { id: Date.now() + '_8', name: '美术', teacher: '', color: '#000000', colorType: 'text' },
+                { id: Date.now() + '_9', name: '信息技术', teacher: '', color: '#000000', colorType: 'text' },
+                { id: Date.now() + '_10', name: '劳动', teacher: '', color: '#000000', colorType: 'text' },
+                { id: Date.now() + '_11', name: '综合实践活动', teacher: '', color: '#000000', colorType: 'text' },
+                { id: Date.now() + '_12', name: '地方与学校课程', teacher: '', color: '#000000', colorType: 'text' }
+            ],
+            junior: [
+                { id: Date.now() + '_1', name: '语文', teacher: '', color: '#000000', colorType: 'text' },
+                { id: Date.now() + '_2', name: '数学', teacher: '', color: '#000000', colorType: 'text' },
+                { id: Date.now() + '_3', name: '英语', teacher: '', color: '#000000', colorType: 'text' },
+                { id: Date.now() + '_4', name: '道德与法治', teacher: '', color: '#000000', colorType: 'text' },
+                { id: Date.now() + '_5', name: '历史', teacher: '', color: '#000000', colorType: 'text' },
+                { id: Date.now() + '_6', name: '地理', teacher: '', color: '#000000', colorType: 'text' },
+                { id: Date.now() + '_7', name: '物理', teacher: '', color: '#000000', colorType: 'text' },
+                { id: Date.now() + '_8', name: '化学', teacher: '', color: '#000000', colorType: 'text' },
+                { id: Date.now() + '_9', name: '生物', teacher: '', color: '#000000', colorType: 'text' },
+                { id: Date.now() + '_10', name: '体育与健康', teacher: '', color: '#000000', colorType: 'text' },
+                { id: Date.now() + '_11', name: '音乐', teacher: '', color: '#000000', colorType: 'text' },
+                { id: Date.now() + '_12', name: '美术', teacher: '', color: '#000000', colorType: 'text' },
+                { id: Date.now() + '_13', name: '信息技术', teacher: '', color: '#000000', colorType: 'text' },
+                { id: Date.now() + '_14', name: '劳动技术', teacher: '', color: '#000000', colorType: 'text' },
+                { id: Date.now() + '_15', name: '综合实践活动', teacher: '', color: '#000000', colorType: 'text' }
+            ],
+            senior: [
+                { id: Date.now() + '_1', name: '语文', teacher: '', color: '#000000', colorType: 'text' },
+                { id: Date.now() + '_2', name: '数学', teacher: '', color: '#000000', colorType: 'text' },
+                { id: Date.now() + '_3', name: '英语', teacher: '', color: '#000000', colorType: 'text' },
+                { id: Date.now() + '_4', name: '思想政治', teacher: '', color: '#000000', colorType: 'text' },
+                { id: Date.now() + '_5', name: '历史', teacher: '', color: '#000000', colorType: 'text' },
+                { id: Date.now() + '_6', name: '地理', teacher: '', color: '#000000', colorType: 'text' },
+                { id: Date.now() + '_7', name: '物理', teacher: '', color: '#000000', colorType: 'text' },
+                { id: Date.now() + '_8', name: '化学', teacher: '', color: '#000000', colorType: 'text' },
+                { id: Date.now() + '_9', name: '生物', teacher: '', color: '#000000', colorType: 'text' },
+                { id: Date.now() + '_10', name: '体育与健康', teacher: '', color: '#000000', colorType: 'text' },
+                { id: Date.now() + '_11', name: '音乐', teacher: '', color: '#000000', colorType: 'text' },
+                { id: Date.now() + '_12', name: '美术', teacher: '', color: '#000000', colorType: 'text' },
+                { id: Date.now() + '_13', name: '信息技术', teacher: '', color: '#000000', colorType: 'text' },
+                { id: Date.now() + '_14', name: '通用技术', teacher: '', color: '#000000', colorType: 'text' },
+                { id: Date.now() + '_15', name: '综合实践活动', teacher: '', color: '#000000', colorType: 'text' },
+                { id: Date.now() + '_16', name: '校本课程', teacher: '', color: '#000000', colorType: 'text' }
+            ],
+            university: [
+                // 公共基础课
+                { id: Date.now() + '_1', name: '大学语文', teacher: '', color: '#000000', colorType: 'text' },
+                { id: Date.now() + '_2', name: '高等数学', teacher: '', color: '#000000', colorType: 'text' },
+                { id: Date.now() + '_3', name: '大学英语', teacher: '', color: '#000000', colorType: 'text' },
+                { id: Date.now() + '_4', name: '大学物理', teacher: '', color: '#000000', colorType: 'text' },
+                { id: Date.now() + '_5', name: '大学化学', teacher: '', color: '#000000', colorType: 'text' },
+                { id: Date.now() + '_6', name: '思想政治理论', teacher: '', color: '#000000', colorType: 'text' },
+                { id: Date.now() + '_7', name: '体育', teacher: '', color: '#000000', colorType: 'text' },
+                { id: Date.now() + '_8', name: '军事理论', teacher: '', color: '#000000', colorType: 'text' },
+                { id: Date.now() + '_9', name: '心理健康教育', teacher: '', color: '#000000', colorType: 'text' },
+                // 专业基础课
+                { id: Date.now() + '_10', name: '线性代数', teacher: '', color: '#000000', colorType: 'text' },
+                { id: Date.now() + '_11', name: '概率论与数理统计', teacher: '', color: '#000000', colorType: 'text' },
+                { id: Date.now() + '_12', name: '程序设计基础', teacher: '', color: '#000000', colorType: 'text' },
+                { id: Date.now() + '_13', name: '数据结构', teacher: '', color: '#000000', colorType: 'text' },
+                { id: Date.now() + '_14', name: '电路分析', teacher: '', color: '#000000', colorType: 'text' },
+                { id: Date.now() + '_15', name: '机械制图', teacher: '', color: '#000000', colorType: 'text' },
+                { id: Date.now() + '_16', name: '经济学原理', teacher: '', color: '#000000', colorType: 'text' },
+                { id: Date.now() + '_17', name: '管理学原理', teacher: '', color: '#000000', colorType: 'text' },
+                { id: Date.now() + '_18', name: '心理学导论', teacher: '', color: '#000000', colorType: 'text' },
+                // 计算机类专业课程
+                { id: Date.now() + '_19', name: '操作系统', teacher: '', color: '#000000', colorType: 'text' },
+                { id: Date.now() + '_20', name: '计算机网络', teacher: '', color: '#000000', colorType: 'text' },
+                { id: Date.now() + '_21', name: '数据库原理', teacher: '', color: '#000000', colorType: 'text' },
+                { id: Date.now() + '_22', name: '软件工程', teacher: '', color: '#000000', colorType: 'text' },
+                // 经济类专业课程
+                { id: Date.now() + '_23', name: '微观经济学', teacher: '', color: '#000000', colorType: 'text' },
+                { id: Date.now() + '_24', name: '宏观经济学', teacher: '', color: '#000000', colorType: 'text' },
+                { id: Date.now() + '_25', name: '金融学', teacher: '', color: '#000000', colorType: 'text' },
+                { id: Date.now() + '_26', name: '会计学', teacher: '', color: '#000000', colorType: 'text' },
+                // 管理类专业课程
+                { id: Date.now() + '_27', name: '市场营销', teacher: '', color: '#000000', colorType: 'text' },
+                { id: Date.now() + '_28', name: '人力资源管理', teacher: '', color: '#000000', colorType: 'text' },
+                { id: Date.now() + '_29', name: '财务管理', teacher: '', color: '#000000', colorType: 'text' },
+                // 工程类专业课程
+                { id: Date.now() + '_30', name: '材料力学', teacher: '', color: '#000000', colorType: 'text' },
+                { id: Date.now() + '_31', name: '工程热力学', teacher: '', color: '#000000', colorType: 'text' },
+                { id: Date.now() + '_32', name: '自动控制原理', teacher: '', color: '#000000', colorType: 'text' },
+                // 文学类专业课程
+                { id: Date.now() + '_33', name: '古代文学', teacher: '', color: '#000000', colorType: 'text' },
+                { id: Date.now() + '_34', name: '现代文学', teacher: '', color: '#000000', colorType: 'text' },
+                { id: Date.now() + '_35', name: '外国文学', teacher: '', color: '#000000', colorType: 'text' },
+                // 法学类专业课程
+                { id: Date.now() + '_36', name: '宪法学', teacher: '', color: '#000000', colorType: 'text' },
+                { id: Date.now() + '_37', name: '民法学', teacher: '', color: '#000000', colorType: 'text' },
+                { id: Date.now() + '_38', name: '刑法学', teacher: '', color: '#000000', colorType: 'text' }
+            ]
+        };
+
+        // 清除现有科目和课程表
+        this.subjects = [];
+        this.timetable = {};
+        
+        // 添加新科目
+        this.subjects = stageSubjects[stage];
+        
+        // 保存数据并重新渲染
+        this.saveData();
+        this.renderSubjects();
+        this.renderTimetable();
+        
+        // 关闭模态框
+        this.closeImportSubjectModal();
+        
+        // 显示成功提示
+        this.showNotification('科目导入成功！', 'success');
+    }
+
+    saveSubject(e) {
+        e.preventDefault();
+        
+        const name = document.getElementById('subjectName').value.trim();
+        const teacher = document.getElementById('teacherName').value.trim();
+        const colorMode = document.querySelector('input[name="colorMode"]:checked').value;
+        const bgColor = document.getElementById('bgColorPicker').value;
+        const textColor = document.getElementById('textColorPicker').value;
+        
+        if (!name) return;
+        
+        if (this.editingSubject) {
+            this.editingSubject.name = name;
+            this.editingSubject.teacher = teacher;
+            this.editingSubject.colorMode = colorMode;
+            this.editingSubject.bgColor = bgColor;
+            this.editingSubject.textColor = textColor;
+            // 保持向后兼容
+            this.editingSubject.color = bgColor;
+            this.editingSubject.colorType = colorMode === 'textOnly' ? 'text' : 'background';
+        } else {
+            const subject = {
+                id: Date.now().toString(),
+                name,
+                teacher,
+                colorMode,
+                bgColor,
+                textColor,
+                // 保持向后兼容
+                color: bgColor,
+                colorType: colorMode === 'textOnly' ? 'text' : 'background'
+            };
+            this.subjects.push(subject);
+        }
+        
+        this.saveData();
+        this.renderSubjects();
+        this.renderTimetable();
+        this.closeSubjectModal();
+    }
+
+    deleteSubject() {
+        if (this.editingSubject) {
+            this.deleteSubjectFromPool(this.editingSubject.id);
+            this.closeSubjectModal();
+        }
+    }
+
+    deleteSubjectFromPool(subjectId) {
+        const subject = this.subjects.find(s => s.id === subjectId);
+        if (subject) {
+            // 从科目列表中删除
+            this.subjects = this.subjects.filter(s => s.id !== subjectId);
+            
+            // 从课程表中移除该科目的所有实例
+            Object.keys(this.timetable).forEach(key => {
+                if (this.timetable[key] === subjectId) {
+                    delete this.timetable[key];
+                }
+            });
+            
+            this.saveData();
+            this.renderSubjects();
+            this.renderTimetable();
+        }
+    }
+
+    // 选择背景色
+    selectBgColor(e) {
+        const color = e.target.dataset.color;
+        if (!color) return;
+        
+        const bgColorPicker = document.getElementById('bgColorPicker');
+        const bgColorText = document.getElementById('bgColorText');
+        
+        if (bgColorPicker) bgColorPicker.value = color;
+        if (bgColorText) bgColorText.value = color;
+        
+        document.querySelectorAll('.color-option.bg-color').forEach(opt => {
+            opt.classList.remove('selected');
+        });
+        e.target.classList.add('selected');
+        this.updateColorPreview();
+    }
+    
+    // 选择字体色
+    selectTextColor(e) {
+        const color = e.target.dataset.color;
+        if (!color) return;
+        
+        const textColorPicker = document.getElementById('textColorPicker');
+        const textColorText = document.getElementById('textColorText');
+        
+        if (textColorPicker) textColorPicker.value = color;
+        if (textColorText) textColorText.value = color;
+        
+        document.querySelectorAll('.color-option.text-color').forEach(opt => {
+            opt.classList.remove('selected');
+        });
+        e.target.classList.add('selected');
+        this.updateColorPreview();
+    }
+    
+    // 根据值选择背景色
+    selectBgColorByValue(color) {
+        document.querySelectorAll('.color-option.bg-color').forEach(opt => {
+            opt.classList.toggle('selected', opt.dataset.color === color);
+        });
+    }
+    
+    // 根据值选择字体色
+    selectTextColorByValue(color) {
+        document.querySelectorAll('.color-option.text-color').forEach(opt => {
+            opt.classList.toggle('selected', opt.dataset.color === color);
+        });
+    }
+    
+    // 处理颜色模式切换
+    handleColorModeChange(mode) {
+        const bgColorGroup = document.getElementById('bgColorGroup');
+        const textColorGroup = document.getElementById('textColorGroup');
+        
+        if (!bgColorGroup || !textColorGroup) return;
+        
+        // 更新选中状态的样式类
+        document.querySelectorAll('.color-mode-option').forEach(option => {
+            const radio = option.querySelector('input[type="radio"]');
+            if (radio && radio.checked) {
+                option.classList.add('selected');
+            } else {
+                option.classList.remove('selected');
+            }
+        });
+        
+        if (mode === 'both') {
+            // 背景+字体模式：显示背景色选择，显示字体色选择
+            bgColorGroup.style.display = 'block';
+            textColorGroup.style.display = 'block';
+        } else {
+            // 仅字体色模式：隐藏背景色选择，显示字体色选择
+            bgColorGroup.style.display = 'none';
+            textColorGroup.style.display = 'block';
+        }
+        this.updateColorPreview();
+    }
+    
+    // 更新颜色预览
+    updateColorPreview() {
+        const preview = document.getElementById('colorPreview');
+        if (!preview) return;
+        
+        const colorModeRadio = document.querySelector('input[name="colorMode"]:checked');
+        const colorMode = colorModeRadio ? colorModeRadio.value : 'both';
+        const bgColorPicker = document.getElementById('bgColorPicker');
+        const textColorPicker = document.getElementById('textColorPicker');
+        
+        const bgColor = bgColorPicker ? bgColorPicker.value : '#3498DB';
+        const textColor = textColorPicker ? textColorPicker.value : '#FFFFFF';
+        
+        // 直接设置样式，使用 cssText 确保覆盖
+        if (colorMode === 'both') {
+            preview.style.cssText = \`
+                padding: 16px 20px;
+                border-radius: 8px;
+                text-align: center;
+                font-size: 16px;
+                font-weight: 600;
+                min-height: 20px;
+                background-color: \${bgColor};
+                color: \${textColor};
+                border: 1px solid \${bgColor};
+            \`;
+        } else {
+            preview.style.cssText = \`
+                padding: 16px 20px;
+                border-radius: 8px;
+                text-align: center;
+                font-size: 16px;
+                font-weight: 600;
+                min-height: 20px;
+                background-color: transparent;
+                color: \${textColor};
+                border: 1px solid #ddd;
+            \`;
+        }
+    }
+
+    // 保留旧函数以兼容
+    selectColor(e) {
+        const color = e.target.dataset.color;
+        if (e.target.classList.contains('bg-color')) {
+            this.selectBgColor(e);
+        } else if (e.target.classList.contains('text-color')) {
+            this.selectTextColor(e);
+        }
+    }
+
+    selectColorByValue(color) {
+        // 兼容旧数据
+        document.getElementById('bgColorPicker').value = color;
+        document.getElementById('bgColorText').value = color;
+        this.selectBgColorByValue(color);
+    }
+
+    getCurrentColorType() {
+        const radio = document.querySelector('input[name="colorMode"]:checked');
+        return radio && radio.value === 'textOnly' ? 'text' : 'background';
+    }
+
+    showColorOptions(type) {
+        // 保留兼容性，但不再使用
+    }
+
+    openTimeModal(e) {
+        const timeText = e.target;
+        const period = timeText.dataset.period;
+        const modal = document.getElementById('timeModal');
+        const timeInput = document.getElementById('timeRange');
+        
+        timeInput.value = timeText.textContent;
+        timeInput.dataset.period = period;
+        modal.style.display = 'flex';
+    }
+
+    closeTimeModal() {
+        document.getElementById('timeModal').style.display = 'none';
+    }
+
+    // 打开时段名称编辑弹窗
+    openSectionNameModal(section) {
+        this.editingSection = section;
+        
+        const sectionName = this.sectionNames[section];
+        const sectionLabel = { morning: '上午', afternoon: '下午', evening: '晚上' }[section];
+        
+        const modal = document.createElement('div');
+        modal.className = 'modal';
+        modal.style.display = 'flex';
+        modal.style.position = 'fixed';
+        modal.style.top = '0';
+        modal.style.left = '0';
+        modal.style.width = '100%';
+        modal.style.height = '100%';
+        modal.style.background = 'rgba(0, 0, 0, 0.5)';
+        modal.style.zIndex = '2000';
+        modal.style.alignItems = 'center';
+        modal.style.justifyContent = 'center';
+        
+        const content = document.createElement('div');
+        content.className = 'modal-content';
+        content.style.cssText = \`
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            max-width: 400px;
+            width: 90%;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        \`;
+        
+        content.innerHTML = \`
+            <h3 style="margin: 0 0 20px 0; font-size: 18px; color: #333;">修改时段名称<\/h3>
+            <form id="sectionNameForm">
+                <div class="form-group">
+                    <label style="display: block; margin-bottom: 8px; color: #666;">时段名称（当前：\${sectionLabel}）<\/label>
+                    <input type="text" id="sectionNameInput" value="\${sectionName}" required 
+                           style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; box-sizing: border-box;" 
+                           placeholder="请输入旰的名称">
+                <\/div>
+                <div class="form-actions" style="margin-top: 20px; display: flex; gap: 10px; justify-content: flex-end;">
+                    <button type="button" id="cancelSectionBtn" class="btn secondary" 
+                            style="padding: 8px 16px; background: #6c757d; color: white; border: none; border-radius: 6px; cursor: pointer;">取消<\/button>
+                    <button type="submit" class="btn primary" 
+                            style="padding: 8px 16px; background: #4a7c59; color: white; border: none; border-radius: 6px; cursor: pointer;">保存<\/button>
+                <\/div>
+            <\/form>
+        \`;
+        
+        modal.appendChild(content);
+        document.body.appendChild(modal);
+        
+        // 焦点输入框
+        setTimeout(() => {
+            const input = document.getElementById('sectionNameInput');
+            input.focus();
+            input.select();
+        }, 100);
+        
+        // 保存事件
+        const form = document.getElementById('sectionNameForm');
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const newName = document.getElementById('sectionNameInput').value.trim();
+            if (newName) {
+                this.sectionNames[section] = newName;
+                this.saveData();
+                this.renderTimetable();
+                document.body.removeChild(modal);
+            }
+        });
+        
+        // 取消事件
+        document.getElementById('cancelSectionBtn').addEventListener('click', () => {
+            document.body.removeChild(modal);
+        });
+        
+        // 点击背景关闭
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                document.body.removeChild(modal);
+            }
+        });
+        
+        // ESC关闭
+        const handleEsc = (e) => {
+            if (e.key === 'Escape') {
+                if (modal.parentNode) {
+                    document.body.removeChild(modal);
+                }
+                document.removeEventListener('keydown', handleEsc);
+            }
+        };
+        document.addEventListener('keydown', handleEsc);
+    }
+
+    openTutorialModal() {
+        this.generateTutorialContent();
+        document.getElementById('tutorialModal').style.display = 'flex';
+    }
+
+    closeTutorialModal() {
+        document.getElementById('tutorialModal').style.display = 'none';
+    }
+
+    generateTutorialContent() {
+        const tutorialContent = document.getElementById('tutorialContent');
+        if (!tutorialContent) return;
+    
+        const content = \`
+            <div class="tutorial-section">
+                <h4 class="tutorial-section-title">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/><\/svg>
+                    快速开始
+                <\/h4>
+                <div class="tutorial-grid">
+                    <div class="tutorial-card">
+                        <div class="tutorial-card-icon">
+                            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--primary-color)" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/><\/svg>
+                        <\/div>
+                        <div class="tutorial-card-content">
+                            <strong>添加科目<\/strong>
+                            <span>点击“+ 科目”按钮创建课程<\/span>
+                        <\/div>
+                    <\/div>
+                    <div class="tutorial-card">
+                        <div class="tutorial-card-icon">
+                            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--primary-color)" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14,2 14,8 20,8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/><\/svg>
+                        <\/div>
+                        <div class="tutorial-card-content">
+                            <strong>导入预设<\/strong>
+                            <span>按学习阶段快速导入课程<\/span>
+                        <\/div>
+                    <\/div>
+                    <div class="tutorial-card">
+                        <div class="tutorial-card-icon">
+                            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--primary-color)" stroke-width="2"><polyline points="5,9 2,12 5,15"/><polyline points="9,5 12,2 15,5"/><polyline points="19,9 22,12 19,15"/><polyline points="9,19 12,22 15,19"/><line x1="2" y1="12" x2="22" y2="12"/><line x1="12" y1="2" x2="12" y2="22"/><\/svg>
+                        <\/div>
+                        <div class="tutorial-card-content">
+                            <strong>拖拽排课<\/strong>
+                            <span>将科目拖到课程表对应位置<\/span>
+                        <\/div>
+                    <\/div>
+                    <div class="tutorial-card">
+                        <div class="tutorial-card-icon">
+                            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--primary-color)" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12,6 12,12 16,14"/><\/svg>
+                        <\/div>
+                        <div class="tutorial-card-content">
+                            <strong>设置时间<\/strong>
+                            <span>点击课时标签修改上课时间<\/span>
+                        <\/div>
+                    <\/div>
+                    <div class="tutorial-card">
+                        <div class="tutorial-card-icon">
+                            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--primary-color)" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7,10 12,15 17,10"/><line x1="12" y1="15" x2="12" y2="3"/><\/svg>
+                        <\/div>
+                        <div class="tutorial-card-content">
+                            <strong>导出保存<\/strong>
+                            <span>支持图片/Word/Excel格式<\/span>
+                        <\/div>
+                    <\/div>
+                    <div class="tutorial-card">
+                        <div class="tutorial-card-icon">
+                            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--primary-color)" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17,21 17,13 7,13 7,21"/><polyline points="7,3 7,8 15,8"/><\/svg>
+                        <\/div>
+                        <div class="tutorial-card-content">
+                            <strong>备份数据<\/strong>
+                            <span>导出/导入JSON数据文件<\/span>
+                        <\/div>
+                    <\/div>
+                <\/div>
+            <\/div>
+    
+            <div class="tutorial-section">
+                <h4 class="tutorial-section-title">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/><\/svg>
+                    个性化设置
+                <\/h4>
+                <div class="tutorial-features">
+                    <div class="tutorial-feature">
+                        <span class="feature-icon">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--primary-color)" stroke-width="2"><circle cx="13.5" cy="6.5" r="2.5"/><circle cx="17.5" cy="10.5" r="2.5"/><circle cx="8.5" cy="7.5" r="2.5"/><circle cx="6.5" cy="12.5" r="2.5"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.93 0 1.5-.68 1.5-1.5 0-.38-.1-.74-.33-1.05-.21-.27-.33-.67-.33-1.05 0-.83.67-1.5 1.5-1.5H16c3.31 0 6-2.69 6-6 0-5.52-4.48-10-10-10z"/><\/svg>
+                        <\/span>
+                        <div class="feature-text">
+                            <strong>主题切换<\/strong>
+                            <span>6种预设主题 + 自定义颜色<\/span>
+                        <\/div>
+                    <\/div>
+                    <div class="tutorial-feature">
+                        <span class="feature-icon">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--primary-color)" stroke-width="2"><polyline points="4,7 4,4 20,4 20,7"/><line x1="9" y1="20" x2="15" y2="20"/><line x1="12" y1="4" x2="12" y2="20"/><\/svg>
+                        <\/span>
+                        <div class="feature-text">
+                            <strong>字体选择<\/strong>
+                            <span>多种中英文字体可选<\/span>
+                        <\/div>
+                    <\/div>
+                    <div class="tutorial-feature">
+                        <span class="feature-icon">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--primary-color)" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><\/svg>
+                        <\/span>
+                        <div class="feature-text">
+                            <strong>显示设置<\/strong>
+                            <span>控制晚间/周末/时间显示<\/span>
+                        <\/div>
+                    <\/div>
+                <\/div>
+            <\/div>
+    
+            <div class="tutorial-section">
+                <h4 class="tutorial-section-title">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/><\/svg>
+                    小技巧
+                <\/h4>
+                <div class="tutorial-tips">
+                    <div class="tip-item"><kbd>ESC<\/kbd> 快速关闭弹窗<\/div>
+                    <div class="tip-item">右键点击课程可删除<\/div>
+                    <div class="tip-item">数据自动保存到浏览器<\/div>
+                    <div class="tip-item">建议定期备份数据<\/div>
+                <\/div>
+            <\/div>
+        \`;
+    
+        tutorialContent.innerHTML = content;
+        
+        // 绑定"我知道了"按钮事件
+        const closeTutorialBtn = document.getElementById('closeTutorialBtn');
+        if (closeTutorialBtn) {
+            closeTutorialBtn.onclick = () => this.closeTutorialModal();
+        }
+    }
+
+    // 设置相关方法
+    loadSettings() {
+        const savedSettings = localStorage.getItem('timetableSettings');
+        if (savedSettings) {
+            this.settings = { ...this.settings, ...JSON.parse(savedSettings) };
+        }
+    }
+
+    saveSettings() {
+        localStorage.setItem('timetableSettings', JSON.stringify(this.settings));
+    }
+
+    applySettings() {
+        // 应用晚上课时显示设置 - 直接通过ID查找并隐藏整个控制行
+        const eveningControlLines = document.querySelectorAll('.period-control-line');
+        
+        eveningControlLines.forEach(controlLine => {
+            const span = controlLine.querySelector('span');
+            if (span && span.textContent.trim() === '晚上课时') {
+                // 隐藏整个控制行（包括文本和按钮）
+                controlLine.style.display = this.settings.showEvening ? 'flex' : 'none';
+                controlLine.style.visibility = this.settings.showEvening ? 'visible' : 'hidden';
+            }
+        });
+
+        // 应用周六、周日显示设置
+        const saturdayCol = document.getElementById('saturdayCol');
+        const sundayCol = document.getElementById('sundayCol');
+        
+        if (saturdayCol) {
+            saturdayCol.style.display = this.settings.showSaturday ? 'table-cell' : 'none';
+        }
+        if (sundayCol) {
+            sundayCol.style.display = this.settings.showSunday ? 'table-cell' : 'none';
+        }
+
+        // 更新课程表中的周末列 - 重新渲染后应用设置
+        setTimeout(() => {
+            const weekendCols = document.querySelectorAll('.weekend-col');
+            weekendCols.forEach(col => {
+                if (col.dataset.day === '6') {
+                    col.style.display = this.settings.showSaturday ? 'table-cell' : 'none';
+                } else if (col.dataset.day === '7') {
+                    col.style.display = this.settings.showSunday ? 'table-cell' : 'none';
+                }
+            });
+        }, 0);
+
+        // 应用时间显示设置
+        setTimeout(() => {
+            const timeDisplays = document.querySelectorAll('.time-display');
+            timeDisplays.forEach(display => {
+                display.style.display = this.settings.showPeriodTime ? 'block' : 'none';
+            });
+        }, 0);
+
+        this.renderTimetable();
+    }
+
+    openSettingsModal() {
+        const modal = document.getElementById('settingsModal');
+        const showEveningCheckbox = document.getElementById('showEvening');
+        const showSaturdayCheckbox = document.getElementById('showSaturday');
+        const showSundayCheckbox = document.getElementById('showSunday');
+        const showPeriodTimeCheckbox = document.getElementById('showPeriodTime');
+
+        showEveningCheckbox.checked = this.settings.showEvening;
+        showSaturdayCheckbox.checked = this.settings.showSaturday;
+        showSundayCheckbox.checked = this.settings.showSunday;
+        showPeriodTimeCheckbox.checked = this.settings.showPeriodTime;
+
+        modal.style.display = 'flex';
+    }
+
+    closeSettingsModal() {
+        document.getElementById('settingsModal').style.display = 'none';
+    }
+
+    // 备份数据相关方法
+    toggleBackupMenu(e) {
+        e.stopPropagation();
+        const menu = document.getElementById('backupMenu');
+        const isVisible = menu.classList.contains('show');
+        
+        // 关闭所有其他下拉菜单
+        this.closeAllDropdowns();
+        
+        if (!isVisible) {
+            menu.classList.add('show');
+            this.positionDropdown(menu, e.target);
+        }
+    }
+
+    closeBackupMenu(e) {
+        const menu = document.getElementById('backupMenu');
+        const button = document.getElementById('backupBtn');
+        
+        if (!menu.contains(e.target) && !button.contains(e.target)) {
+            menu.classList.remove('show');
+            document.removeEventListener('click', this.closeBackupMenu.bind(this));
+        }
+    }
+
+    // 导出数据
+    exportData() {
+        try {
+            const data = {
+                timetable: this.timetable,
+                subjects: this.subjects,
+                periods: this.periods,
+                sectionNames: this.sectionNames,
+                settings: this.settings,
+                exportTime: new Date().toISOString(),
+                version: '1.0'
+            };
+            
+            const dataStr = JSON.stringify(data, null, 2);
+            const dataBlob = new Blob([dataStr], { type: 'application/json' });
+            
+            const url = URL.createObjectURL(dataBlob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = \`课程表备份_\${new Date().toLocaleDateString().replace(/\\//g, '-')}.json\`;
+            
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+            
+            this.showNotification('数据导出成功！', 'success');
+            this.closeBackupMenu({ target: null });
+        } catch (error) {
+            console.error('导出数据失败:', error);
+            this.showNotification('导出数据失败，请重试', 'error');
+        }
+    }
+
+    // 导入数据
+    importData() {
+        document.getElementById('importFileInput').click();
+        this.closeBackupMenu({ target: null });
+    }
+
+    // 处理文件导入
+    handleFileImport(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        console.log('开始导入文件:', file.name, '大小:', file.size, 'bytes');
+
+        if (!file.name.endsWith('.json')) {
+            this.showNotification('请选择JSON格式的备份文件', 'error');
+            return;
+        }
+
+        if (file.size === 0) {
+            this.showNotification('文件为空，请选择有效的备份文件', 'error');
+            return;
+        }
+
+        if (file.size > 10 * 1024 * 1024) { // 10MB限制
+            this.showNotification('文件过大，请选择小于10MB的备份文件', 'error');
+            return;
+        }
+
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            try {
+                console.log('文件读取成功，文件内容长度:', e.target.result.length);
+                console.log('文件内容前100字符:', e.target.result.substring(0, 100));
+                
+                // 检查文件内容是否为空
+                if (!e.target.result || e.target.result.trim() === '') {
+                    this.showNotification('文件内容为空，请选择有效的备份文件', 'error');
+                    return;
+                }
+                
+                console.log('开始解析JSON...');
+                const data = JSON.parse(e.target.result);
+                console.log('JSON解析成功，数据类型:', typeof data);
+                console.log('数据内容:', data);
+                
+                // 验证数据格式
+                if (!this.validateImportData(data)) {
+                    this.showNotification('备份文件格式不正确，请检查文件内容', 'error');
+                    return;
+                }
+                
+                // 确认导入
+                if (confirm('导入数据将覆盖当前课表，是否继续？')) {
+                    console.log('用户确认导入，开始加载数据...');
+                    this.loadImportedData(data);
+                    this.showNotification('数据导入成功！', 'success');
+                } else {
+                    console.log('用户取消导入');
+                }
+            } catch (error) {
+                console.error('导入数据失败:', error);
+                console.error('错误详情:', {
+                    name: error.name,
+                    message: error.message,
+                    stack: error.stack
+                });
+                
+                let errorMessage = '文件解析失败';
+                if (error instanceof SyntaxError) {
+                    errorMessage = \`JSON格式错误: \${error.message}\`;
+                    console.error('JSON解析错误位置:', error.message);
+                } else if (error.message) {
+                    errorMessage = \`导入失败: \${error.message}\`;
+                }
+                this.showNotification(errorMessage, 'error');
+            }
+        };
+        
+        reader.onerror = (error) => {
+            console.error('文件读取失败:', error);
+            this.showNotification('文件读取失败，请重试', 'error');
+        };
+        
+        reader.readAsText(file, 'UTF-8');
+        // 清空文件输入，允许重复选择同一文件
+        event.target.value = '';
+    }
+
+    // 验证导入数据格式
+    validateImportData(data) {
+        try {
+            console.log('开始验证导入数据:', data);
+            
+            // 基本结构检查
+            if (!data || typeof data !== 'object') {
+                console.error('数据格式错误: 不是有效的对象');
+                return false;
+            }
+            
+            // 检查必要字段
+            if (!Array.isArray(data.subjects)) {
+                console.error('数据格式错误: subjects 不是数组，实际类型:', typeof data.subjects);
+                return false;
+            }
+            
+            if (typeof data.timetable !== 'object') {
+                console.error('数据格式错误: timetable 不是对象，实际类型:', typeof data.timetable);
+                return false;
+            }
+            
+            if (typeof data.periods !== 'object') {
+                console.error('数据格式错误: periods 不是对象，实际类型:', typeof data.periods);
+                return false;
+            }
+            
+            // 检查periods结构 - 更宽松的验证
+            if (data.periods.morning && !Array.isArray(data.periods.morning)) {
+                console.error('数据格式错误: periods.morning 不是数组');
+                return false;
+            }
+            
+            if (data.periods.afternoon && !Array.isArray(data.periods.afternoon)) {
+                console.error('数据格式错误: periods.afternoon 不是数组');
+                return false;
+            }
+            
+            if (data.periods.evening && !Array.isArray(data.periods.evening)) {
+                console.error('数据格式错误: periods.evening 不是数组');
+                return false;
+            }
+            
+            // 检查科目数据格式 - 更宽松的验证
+            for (let i = 0; i < data.subjects.length; i++) {
+                const subject = data.subjects[i];
+                if (!subject || typeof subject !== 'object') {
+                    console.error(\`数据格式错误: 科目[\${i}]不是对象:\`, subject);
+                    return false;
+                }
+                if (!subject.id && !subject.name) {
+                    console.error(\`数据格式错误: 科目[\${i}]缺少必要字段:\`, subject);
+                    return false;
+                }
+            }
+            
+            console.log('数据验证通过，包含字段:', Object.keys(data));
+            return true;
+        } catch (error) {
+            console.error('验证数据时出错:', error);
+            return false;
+        }
+    }
+
+    // 加载导入的数据
+    loadImportedData(data) {
+        try {
+            console.log('开始加载导入数据...');
+            
+            // 恢复课表数据 - 确保是对象
+            this.timetable = (data.timetable && typeof data.timetable === 'object') ? data.timetable : {};
+            console.log('课表数据加载:', Object.keys(this.timetable).length, '个时间段');
+            
+            // 恢复科目数据 - 确保是数组并验证完整性
+            this.subjects = Array.isArray(data.subjects) ? data.subjects : [];
+            this.subjects = this.subjects.filter(subject => {
+                if (!subject || typeof subject !== 'object') {
+                    console.warn('过滤掉无效的科目数据:', subject);
+                    return false;
+                }
+                if (!subject.id) {
+                    subject.id = 'subject_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+                    console.log('为科目生成新ID:', subject.name, subject.id);
+                }
+                return true;
+            });
+            console.log('科目数据加载:', this.subjects.length, '个科目');
+            
+            // 恢复时间段数据 - 提供默认值
+            this.periods = {
+                morning: Array.isArray(data.periods?.morning) ? data.periods.morning : [
+                    { name: '第1节', time: '08:00-08:40' },
+                    { name: '第2节', time: '08:50-09:30' },
+                    { name: '第3节', time: '10:00-10:40' },
+                    { name: '第4节', time: '10:50-11:30' }
+                ],
+                afternoon: Array.isArray(data.periods?.afternoon) ? data.periods.afternoon : [
+                    { name: '第1节', time: '14:00-14:40' },
+                    { name: '第2节', time: '14:50-15:30' },
+                    { name: '第3节', time: '15:40-16:20' }
+                ],
+                evening: Array.isArray(data.periods?.evening) ? data.periods.evening : [
+                    { name: '第1节', time: '19:00-19:40' },
+                    { name: '第2节', time: '19:50-20:30' }
+                ]
+            };
+            console.log('时间段数据加载完成');
+            
+            // 恢复时段名称
+            this.sectionNames = data.sectionNames || {
+                morning: '上午',
+                afternoon: '下午',
+                evening: '晚上'
+            };
+            console.log('时段名称加载:', this.sectionNames);
+            
+            // 恢复设置数据 - 提供默认值
+            if (data.settings && typeof data.settings === 'object') {
+                this.settings = { ...this.settings, ...data.settings };
+                console.log('设置数据加载:', this.settings);
+                // 应用设置
+                this.applySettings();
+            }
+            
+            // 重新渲染界面
+            this.renderTimetable();
+            this.renderSubjects();
+            
+            // 保存到本地存储
+            this.saveData();
+            localStorage.setItem('timetableSettings', JSON.stringify(this.settings));
+            
+            console.log('数据导入成功，界面已更新');
+        } catch (error) {
+            console.error('加载导入数据时出错:', error);
+            this.showNotification('导入数据时发生错误', 'error');
+        }
+    }
+
+    // 显示通知
+    showNotification(message, type = 'info') {
+        const notification = document.createElement('div');
+        notification.style.cssText = \`
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 12px 20px;
+            border-radius: 6px;
+            color: white;
+            font-weight: 500;
+            z-index: 10000;
+            animation: slideInRight 0.3s ease-out;
+            max-width: 300px;
+            word-wrap: break-word;
+        \`;
+        
+        // 根据类型设置颜色
+        switch (type) {
+            case 'success':
+                notification.style.backgroundColor = '#28a745';
+                break;
+            case 'error':
+                notification.style.backgroundColor = '#dc3545';
+                break;
+            case 'warning':
+                notification.style.backgroundColor = '#ffc107';
+                notification.style.color = '#333';
+                break;
+            default:
+                notification.style.backgroundColor = '#007bff';
+        }
+        
+        notification.textContent = message;
+        document.body.appendChild(notification);
+        
+        // 3秒后自动移除
+        setTimeout(() => {
+            if (notification.parentNode) {
+                notification.style.animation = 'slideOutRight 0.3s ease-in';
+                setTimeout(() => {
+                    if (notification.parentNode) {
+                        notification.parentNode.removeChild(notification);
+                    }
+                }, 300);
+            }
+        }, 3000);
+    }
+
+    saveSettings(e) {
+        e.preventDefault();
+        
+        const showEveningCheckbox = document.getElementById('showEvening');
+        const showSaturdayCheckbox = document.getElementById('showSaturday');
+        const showSundayCheckbox = document.getElementById('showSunday');
+        const showPeriodTimeCheckbox = document.getElementById('showPeriodTime');
+
+        this.settings.showEvening = showEveningCheckbox.checked;
+        this.settings.showSaturday = showSaturdayCheckbox.checked;
+        this.settings.showSunday = showSundayCheckbox.checked;
+        this.settings.showPeriodTime = showPeriodTimeCheckbox.checked;
+
+        // 保存设置到本地存储
+        localStorage.setItem('timetableSettings', JSON.stringify(this.settings));
+        
+        // 应用设置并重新渲染
+        this.applySettings();
+        this.closeSettingsModal();
+    }
+
+    // 立即开始创建课程表功能
+    startCreatingTimetable() {
+        // 关闭教程弹窗
+        this.closeTutorialModal();
+        
+        // 如果在手机端，确保显示科目池
+        if (window.innerWidth <= 768) {
+            const subjectPool = document.querySelector('.subject-pool');
+            if (subjectPool) {
+                subjectPool.style.display = 'block';
+            }
+        }
+        
+        // 滚动到课程表顶部，确保用户看到操作区域
+        const timetableContainer = document.querySelector('.timetable-container');
+        if (timetableContainer) {
+            timetableContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+        
+        // 如果没有科目，提示用户添加
+        if (this.subjects.length === 0) {
+            // 显示一个简短提示
+            const hint = document.createElement('div');
+            hint.innerHTML = \`
+                <div style="position: fixed; top: 20px; left: 50%; transform: translateX(-50%); 
+                background: #4CAF50; color: white; padding: 15px 25px; border-radius: 8px; 
+                box-shadow: 0 4px 12px rgba(0,0,0,0.15); z-index: 10000; 
+                animation: fadeInOut 3s ease-in-out;">
+                    请点击左侧「+ 科目」按钮开始添加科目
+                <\/div>
+                <style>
+                @keyframes fadeInOut {
+                    0% { opacity: 0; top: 0; }
+                    10% { opacity: 1; top: 20px; }
+                    90% { opacity: 1; top: 20px; }
+                    100% { opacity: 0; top: 0; }
+                }
+                <\/style>
+            \`;
+            document.body.appendChild(hint);
+            
+            // 3秒后自动移除提示
+            setTimeout(() => {
+                if (hint.parentNode) {
+                    hint.parentNode.removeChild(hint);
+                }
+            }, 3000);
+        }
+        
+        // 如果有科目，但科目池在手机端被隐藏，提示用户如何操作
+        if (this.subjects.length > 0 && window.innerWidth <= 768) {
+            // 检查科目池是否可见
+            const subjectPool = document.querySelector('.subject-pool');
+            // 使用getComputedStyle来准确判断元素是否可见
+            const computedStyle = window.getComputedStyle(subjectPool);
+            if (subjectPool && (subjectPool.style.display === 'none' || computedStyle.display === 'none')) {
+                // 显示一个简短提示
+                const hint = document.createElement('div');
+                hint.innerHTML = \`
+                    <div style="position: fixed; top: 20px; left: 50%; transform: translateX(-50%); 
+                    background: #2196F3; color: white; padding: 15px 25px; border-radius: 8px; 
+                    box-shadow: 0 4px 12px rgba(0,0,0,0.15); z-index: 10000; 
+                    animation: fadeInOut 3s ease-in-out;">
+                        请从上方科目池中拖拽科目到课程表中
+                    <\/div>
+                    <style>
+                    @keyframes fadeInOut {
+                        0% { opacity: 0; top: 0; }
+                        10% { opacity: 1; top: 20px; }
+                        90% { opacity: 1; top: 20px; }
+                        100% { opacity: 0; top: 0; }
+                    }
+                    <\/style>
+                \`;
+                document.body.appendChild(hint);
+                
+                // 3秒后自动移除提示
+                setTimeout(() => {
+                    if (hint.parentNode) {
+                        hint.parentNode.removeChild(hint);
+                    }
+                }, 3000);
+            }
+        }
+    }
+
+    saveTime(e) {
+        e.preventDefault();
+        
+        const timeInput = document.getElementById('timeRange');
+        const period = timeInput.dataset.period;
+        const newTime = timeInput.value.trim();
+        
+        if (!newTime) return;
+        
+        document.querySelector(\`[data-period="\${period}"]\`).textContent = newTime;
+        this.saveData();
+        this.closeTimeModal();
+    }
+
+    addSubjectToCell(subjectId, day, section, period) {
+        const key = \`\${day}-\${section}-\${period}\`;
+        this.timetable[key] = subjectId;
+        this.saveData();
+        this.renderTimetable();
+    }
+
+    removeSubjectFromCell(cell) {
+        if (cell.classList.contains('occupied')) {
+            const day = cell.dataset.day;
+            const section = cell.dataset.section;
+            const period = cell.dataset.period;
+            const key = \`\${day}-\${section}-\${period}\`;
+            delete this.timetable[key];
+            this.saveData();
+            this.renderTimetable();
+        }
+    }
+
+    renderSubjects() {
+        const pool = document.getElementById('subjectPool');
+        pool.innerHTML = '';
+        
+        this.subjects.forEach(subject => {
+            const card = document.createElement('div');
+            card.className = 'subject-card';
+            card.draggable = true;
+            card.dataset.subjectId = subject.id;
+            
+            // 使用新的颜色模式
+            const colorMode = subject.colorMode || (subject.colorType === 'text' ? 'textOnly' : 'both');
+            const bgColor = subject.bgColor || subject.color || '#3498DB';
+            const textColor = subject.textColor || (colorMode === 'both' ? '#FFFFFF' : subject.color || '#000000');
+            
+            if (colorMode === 'both') {
+                card.style.borderLeft = \`4px solid \${bgColor}\`;
+            } else {
+                card.style.borderLeft = \`4px solid \${textColor}\`;
+            }
+            
+            const teacherHtml = subject.teacher ? \`<div class="teacher-name">\${subject.teacher}<\/div>\` : '';
+            const subjectStyle = !subject.teacher ? 'style="line-height: 40px;"' : '';
+            
+            card.innerHTML = \`
+                <div class="subject-info">
+                    <div class="subject-name" \${subjectStyle}>\${subject.name}<\/div>
+                    \${teacherHtml}
+                <\/div>
+                <div class="subject-actions">
+                    <button class="btn-text edit-btn" title="编辑" data-action="edit">编辑<\/button>
+                    <button class="btn-text delete-btn" title="删除" data-action="delete">删除<\/button>
+                <\/div>
+            \`;
+            
+            // 编辑按钮事件
+            card.querySelector('.edit-btn').addEventListener('click', (e) => {
+                e.stopPropagation();
+                this.openSubjectModal(subject);
+            });
+            
+            // 删除按钮事件
+            card.querySelector('.delete-btn').addEventListener('click', (e) => {
+                e.stopPropagation();
+                this.deleteSubjectFromPool(subject.id);
+            });
+            
+            pool.appendChild(card);
+        });
+    }
+
+    addPeriod(section) {
+        const periods = this.periods[section];
+        let defaultTime = '15:00-15:40';
+        switch(section) {
+            case 'morning':
+                defaultTime = '09:00-09:40';
+                break;
+            case 'afternoon':
+                defaultTime = '15:00-15:40';
+                break;
+            case 'evening':
+                defaultTime = '19:00-19:40';
+                break;
+        }
+        const newPeriod = {
+            name: \`第\${periods.length + 1}节\`,
+            time: defaultTime
+        };
+        periods.push(newPeriod);
+        this.saveData();
+        this.renderTimetable();
+    }
+
+    // 自定义确认对话框
+    confirm(message, callback) {
+        const modal = document.getElementById('confirmModal');
+        const messageEl = modal.querySelector('.confirm-message');
+        const okBtn = document.getElementById('confirmOkBtn');
+        const cancelBtn = document.getElementById('confirmCancelBtn');
+        
+        messageEl.textContent = message;
+        modal.style.display = 'flex';
+        
+        // 移除之前的事件监听器
+        okBtn.removeEventListener('click', this.confirmOkHandler);
+        cancelBtn.removeEventListener('click', this.confirmCancelHandler);
+        
+        // 创建新的事件监听器
+        this.confirmOkHandler = () => {
+            modal.style.display = 'none';
+            if (callback) callback(true);
+        };
+        
+        this.confirmCancelHandler = () => {
+            modal.style.display = 'none';
+            if (callback) callback(false);
+        };
+        
+        // 添加事件监听器
+        okBtn.addEventListener('click', this.confirmOkHandler);
+        cancelBtn.addEventListener('click', this.confirmCancelHandler);
+        
+        // 点击模态框背景关闭
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                this.confirmCancelHandler();
+            }
+        });
+    }
+    
+    removePeriod(section) {
+        if (this.periods[section].length <= 1) {
+            this.confirm('至少需要保留一节课！');
+            return;
+        }
+        
+        let sectionName = '下午';
+        switch(section) {
+            case 'morning':
+                sectionName = '上午';
+                break;
+            case 'afternoon':
+                sectionName = '下午';
+                break;
+            case 'evening':
+                sectionName = '晚上';
+                break;
+        }
+        
+        this.confirm(\`确定要删除\${sectionName}的最后一节课吗？\`, (confirmed) => {
+            if (confirmed) {
+                this.periods[section].pop();
+                
+                // 清理对应的课程表数据
+                const keysToDelete = [];
+                for (let key in this.timetable) {
+                    if (key.includes(\`-\${section}-\`)) {
+                        const parts = key.split('-');
+                        const periodIndex = parseInt(parts[2]);
+                        if (periodIndex >= this.periods[section].length) {
+                            keysToDelete.push(key);
+                        }
+                    }
+                }
+                
+                keysToDelete.forEach(key => {
+                    delete this.timetable[key];
+                });
+                
+                this.saveData();
+                this.renderTimetable();
+            }
+        });
+    }
+
+    renderTimetable() {
+        const tbody = document.getElementById('timetableBody');
+        tbody.innerHTML = '';
+        
+        // 渲染上午
+        if (this.periods.morning.length > 0) {
+            this.periods.morning.forEach((period, index) => {
+                const row = this.createPeriodRow('morning', index, period);
+                tbody.appendChild(row);
+            });
+        }
+        
+        // 渲染下午
+        if (this.periods.afternoon.length > 0) {
+            this.periods.afternoon.forEach((period, index) => {
+                const row = this.createPeriodRow('afternoon', index, period);
+                tbody.appendChild(row);
+            });
+        }
+
+        // 渲染晚上
+        if (this.settings.showEvening && this.periods.evening.length > 0) {
+            this.periods.evening.forEach((period, index) => {
+                const row = this.createPeriodRow('evening', index, period);
+                tbody.appendChild(row);
+            });
+        }
+    }
+
+    // 手机端选择科目功能
+    showMobileSubjectSelector(day, section, period) {
+        const cellKey = \`\${day}-\${section}-\${period}\`;
+        
+        // 创建弹窗
+        const modal = document.createElement('div');
+        modal.className = 'mobile-subject-modal';
+        modal.style.cssText = \`
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 2000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        \`;
+        
+        const content = document.createElement('div');
+        // PC端和移动端响应式宽度
+        const isMobile = window.innerWidth <= 768;
+        content.style.cssText = \`
+            background: white;
+            border-radius: 12px;
+            padding: 0;
+            max-width: \${isMobile ? '90%' : '600px'};
+            width: \${isMobile ? '90%' : '600px'};
+            max-height: 80vh;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        \`;
+        
+        // 头部区域
+        const header = document.createElement('div');
+        header.style.cssText = \`
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 20px 15px;
+            border-bottom: 1px solid #eee;
+        \`;
+        
+        const title = document.createElement('h3');
+        title.textContent = '选择科目';
+        title.style.cssText = 'margin: 0; font-size: 18px; color: #333; font-weight: 600;';
+        
+        const closeBtn = document.createElement('button');
+        closeBtn.innerHTML = '×';
+        closeBtn.style.cssText = \`
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #999;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: all 0.2s;
+        \`;
+        closeBtn.onmouseover = () => closeBtn.style.background = '#f5f5f5';
+        closeBtn.onmouseout = () => closeBtn.style.background = 'none';
+        
+        header.appendChild(title);
+        header.appendChild(closeBtn);
+        
+        // 搜索框区域
+        const searchContainer = document.createElement('div');
+        searchContainer.style.cssText = 'padding: 15px 20px; border-bottom: 1px solid #eee;';
+        
+        const searchInput = document.createElement('input');
+        searchInput.type = 'text';
+        searchInput.placeholder = '搜索科目或老师...';
+        searchInput.style.cssText = \`
+            width: 100%;
+            padding: 10px 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.2s;
+            box-sizing: border-box;
+        \`;
+        searchInput.onfocus = () => searchInput.style.borderColor = '#007bff';
+        searchInput.onblur = () => searchInput.style.borderColor = '#ddd';
+        
+        searchContainer.appendChild(searchInput);
+        
+        // 科目列表区域
+        const listContainer = document.createElement('div');
+        listContainer.style.cssText = 'max-height: 50vh; overflow-y: auto; padding: 15px 20px;';
+        
+        const list = document.createElement('div');
+        // 2个课程一行，响应式网格布局
+        list.style.cssText = \`
+            display: grid;
+            grid-template-columns: \${isMobile ? '1fr' : 'repeat(2, 1fr)'};
+            gap: 10px;
+        \`;
+        
+        // 渲染科目列表
+        const renderSubjects = (filterText = '') => {
+            list.innerHTML = '';
+            
+            const filteredSubjects = this.subjects.filter(subject => {
+                if (!filterText) return true;
+                const searchLower = filterText.toLowerCase();
+                return subject.name.toLowerCase().includes(searchLower) || 
+                       (subject.teacher && subject.teacher.toLowerCase().includes(searchLower));
+            });
+            
+            if (filteredSubjects.length === 0) {
+                const emptyMessage = document.createElement('div');
+                emptyMessage.style.cssText = \`
+                    text-align: center;
+                    padding: 40px 20px;
+                    color: #999;
+                    font-size: 14px;
+                    grid-column: 1 / -1;
+                \`;
+                emptyMessage.innerHTML = filterText 
+                    ? \`<div style="font-size: 48px; margin-bottom: 10px;">🔍<\/div><div>未找到匹配的科目<\/div>\`
+                    : \`<div style="font-size: 48px; margin-bottom: 10px;">📚<\/div>
+                       <div>暂无科目，请先添加科目<\/div>
+                       <button onclick="document.getElementById('addSubjectBtn').click(); this.closest('.mobile-subject-modal').remove();" 
+                               style="margin-top: 10px; padding: 8px 16px; background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer;">
+                           添加科目
+                       <\/button>\`;
+                list.appendChild(emptyMessage);
+            } else {
+                filteredSubjects.forEach(subject => {
+                    const item = document.createElement('div');
+                    item.style.cssText = \`
+                        padding: 12px;
+                        border: 1px solid #eee;
+                        border-radius: 8px;
+                        cursor: pointer;
+                        display: flex;
+                        align-items: center;
+                        gap: 10px;
+                        transition: all 0.2s;
+                        background: white;
+                    \`;
+                    item.onmouseover = () => {
+                        item.style.background = '#f8f9fa';
+                        item.style.borderColor = '#007bff';
+                    };
+                    item.onmouseout = () => {
+                        item.style.background = 'white';
+                        item.style.borderColor = '#eee';
+                    };
+                    
+                    const colorBox = document.createElement('div');
+                    // 使用新的颜色模式
+                    const colorMode = subject.colorMode || (subject.colorType === 'text' ? 'textOnly' : 'both');
+                    const bgColor = subject.bgColor || subject.color || '#3498DB';
+                    const textColor = subject.textColor || (colorMode === 'both' ? '#FFFFFF' : subject.color || '#000000');
+                    const displayColor = colorMode === 'both' ? bgColor : textColor;
+                    
+                    colorBox.style.cssText = \`
+                        width: 20px;
+                        height: 20px;
+                        border-radius: 50%;
+                        background: \${displayColor};
+                        flex-shrink: 0;
+                        \${displayColor === '#FFFFFF' || displayColor === '#ffffff' ? 'border: 1px solid #ddd;' : ''}
+                    \`;
+                    
+                    const textContainer = document.createElement('div');
+                    textContainer.style.cssText = 'flex: 1; min-width: 0;';
+                    
+                    const subjectName = document.createElement('div');
+                    subjectName.textContent = subject.name;
+                    subjectName.style.cssText = 'font-weight: 600; color: #333; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;';
+                    
+                    const teacherName = document.createElement('div');
+                    teacherName.textContent = subject.teacher || '暂无老师';
+                    teacherName.style.cssText = 'font-size: 11px; color: #666; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;';
+                    
+                    textContainer.appendChild(subjectName);
+                    textContainer.appendChild(teacherName);
+                    
+                    item.appendChild(colorBox);
+                    item.appendChild(textContainer);
+                    
+                    item.addEventListener('click', () => {
+                        this.addSubjectToCell(subject.id, day, section, period);
+                        this.closeMobileSubjectModal(modal);
+                    });
+                    
+                    list.appendChild(item);
+                });
+            }
+        };
+        
+        // 初始渲染
+        renderSubjects();
+        
+        // 搜索功能
+        searchInput.addEventListener('input', (e) => {
+            renderSubjects(e.target.value);
+        });
+        
+        listContainer.appendChild(list);
+        
+        if (this.subjects.length === 0) {
+            const emptyMessage = document.createElement('div');
+            emptyMessage.style.cssText = \`
+                text-align: center;
+                padding: 40px 20px;
+                color: #999;
+                font-size: 14px;
+            \`;
+            emptyMessage.innerHTML = \`
+                <div style="font-size: 48px; margin-bottom: 10px;">📚<\/div>
+                <div>暂无科目，请先添加科目<\/div>
+                <button onclick="document.getElementById('addSubjectBtn').click(); this.closest('.mobile-subject-modal').remove();" 
+                        style="margin-top: 10px; padding: 8px 16px; background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer;">
+                    添加科目
+                <\/button>
+            \`;
+            listContainer.appendChild(emptyMessage);
+        }
+        
+        // 底部按钮区域
+        const footer = document.createElement('div');
+        footer.style.cssText = \`
+            padding: 15px 20px 20px;
+            border-top: 1px solid #eee;
+            display: flex;
+            gap: 10px;
+        \`;
+        
+        const addSubjectBtn = document.createElement('button');
+        addSubjectBtn.textContent = '添加新科目';
+        addSubjectBtn.style.cssText = \`
+            flex: 1;
+            padding: 10px;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s;
+        \`;
+        addSubjectBtn.onmouseover = () => addSubjectBtn.style.background = '#0056b3';
+        addSubjectBtn.onmouseout = () => addSubjectBtn.style.background = '#007bff';
+        addSubjectBtn.addEventListener('click', () => {
+            this.closeMobileSubjectModal(modal);
+            setTimeout(() => this.openSubjectModal(), 300);
+        });
+        
+        const cancelBtn = document.createElement('button');
+        cancelBtn.textContent = '取消';
+        cancelBtn.style.cssText = \`
+            flex: 1;
+            padding: 10px;
+            background: #6c757d;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s;
+        \`;
+        cancelBtn.onmouseover = () => cancelBtn.style.background = '#545b62';
+        cancelBtn.onmouseout = () => cancelBtn.style.background = '#6c757d';
+        cancelBtn.addEventListener('click', () => {
+            this.closeMobileSubjectModal(modal);
+        });
+        
+        footer.appendChild(addSubjectBtn);
+        footer.appendChild(cancelBtn);
+        
+        // 组装弹窗
+        content.appendChild(header);
+        content.appendChild(searchContainer);
+        content.appendChild(listContainer);
+        content.appendChild(footer);
+        modal.appendChild(content);
+        
+        // CSS动画已在styles.css中定义，无需动态添加
+        
+        // 多种关闭方式
+        const closeModal = () => this.closeMobileSubjectModal(modal);
+        
+        // 1. 点击关闭按钮
+        closeBtn.addEventListener('click', closeModal);
+        
+        // 2. 点击背景区域
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                closeModal();
+            }
+        });
+        
+        // 3. 按ESC键关闭
+        const handleEscape = (e) => {
+            if (e.key === 'Escape') {
+                closeModal();
+                document.removeEventListener('keydown', handleEscape);
+            }
+        };
+        document.addEventListener('keydown', handleEscape);
+        
+        // 4. 点击取消按钮
+        cancelBtn.addEventListener('click', closeModal);
+        
+        // 防止滚动穿透，同时避免页面晃动
+        const scrollBarWidth = window.innerWidth - document.documentElement.clientWidth;
+        document.body.style.overflow = 'hidden';
+        if (scrollBarWidth > 0) {
+            document.body.style.paddingRight = scrollBarWidth + 'px';
+        }
+        
+        // 显示弹窗
+        document.body.appendChild(modal);
+        
+        // 保存引用以便关闭
+        this.currentMobileModal = modal;
+    }
+    
+    // 关闭手机端选择科目弹窗
+    closeMobileSubjectModal(modal) {
+        if (!modal) return;
+        
+        // 直接关闭弹窗，无动画效果
+        if (modal.parentNode) {
+            document.body.removeChild(modal);
+        }
+        document.body.style.overflow = '';
+        document.body.style.paddingRight = '';
+        
+        this.currentMobileModal = null;
+    }
+
+    createPeriodRow(section, periodIndex, period) {
+        const row = document.createElement('tr');
+        
+        // 时间列 - 只在第一节创建，使用rowSpan合并单元格
+        if (periodIndex === 0) {
+            const timeCell = document.createElement('td');
+            timeCell.className = 'time-cell';
+            timeCell.style.cursor = 'pointer';
+            timeCell.dataset.section = section;
+            
+            // 获取自定义名称，如果没有则使用默认名称
+            const sectionName = this.sectionNames[section] || '上午';
+            const chars = sectionName.split('');
+            let timeText = '<div class="vertical-text">';
+            chars.forEach(char => {
+                timeText += \`<span>\${char}<\/span>\`;
+            });
+            timeText += '<\/div>';
+            
+            timeCell.innerHTML = timeText;
+            timeCell.rowSpan = this.periods[section].length;
+            
+            // 添加点击事件编辑时段名称
+            timeCell.addEventListener('click', () => {
+                this.openSectionNameModal(section);
+            });
+            
+            row.appendChild(timeCell);
+        }
+        
+        // 课时列
+        const periodCell = document.createElement('td');
+        periodCell.className = 'period-cell';
+        const timeDisplayStyle = this.settings.showPeriodTime ? 'display: block;' : 'display: none;';
+        periodCell.innerHTML = \`
+                        <div class="period-name" data-section="\${section}" data-period="\${periodIndex}" style="cursor: pointer; font-weight: bold; color: var(--text-color);">
+                            \${period.name}
+                        <\/div>
+                        <div class="time-display" data-section="\${section}" data-period="\${periodIndex}" style="cursor: pointer; font-size: 12px; color: var(--text-color); \${timeDisplayStyle}">
+                            \${period.time}
+                        <\/div>
+                    \`;
+        
+        // 添加课时名称和时间段点击事件
+        periodCell.querySelector('.period-name').addEventListener('click', (e) => {
+            this.openTimeModal(e, section, periodIndex);
+        });
+        periodCell.querySelector('.time-display').addEventListener('click', (e) => {
+            this.openTimeModal(e, section, periodIndex);
+        });
+        
+        row.appendChild(periodCell);
+        
+        // 周一到周日的格子
+        const days = [1, 2, 3, 4, 5];
+        if (this.settings.showSaturday) days.push(6);
+        if (this.settings.showSunday) days.push(7);
+
+        for (let day of days) {
+            const cell = document.createElement('td');
+            cell.className = 'cell';
+            if (day >= 6) {
+                cell.classList.add('weekend-col');
+            }
+            cell.dataset.day = day;
+            cell.dataset.section = section;
+            cell.dataset.period = periodIndex;
+            
+            const key = \`\${day}-\${section}-\${periodIndex}\`;
+            const subjectId = this.timetable[key];
+            
+            if (subjectId) {
+                const subject = this.subjects.find(s => s.id === subjectId);
+                if (subject) {
+                    cell.classList.add('occupied');
+                    const content = document.createElement('div');
+                    content.className = 'cell-content';
+                    
+                    // 根据颜色模式应用颜色
+                    const colorMode = subject.colorMode || (subject.colorType === 'text' ? 'textOnly' : 'both');
+                    const bgColor = subject.bgColor || subject.color || '#3498DB';
+                    const textColor = subject.textColor || (colorMode === 'both' ? '#FFFFFF' : subject.color || '#000000');
+                    
+                    if (colorMode === 'both') {
+                        // 背景+字体模式
+                        content.style.backgroundColor = bgColor;
+                        content.style.color = textColor;
+                    } else {
+                        // 仅字体色模式 - 透明背景
+                        content.style.backgroundColor = 'transparent';
+                        content.style.color = textColor;
+                    }
+                    
+                    const teacherHtml = subject.teacher ? \`<div class="teacher-name">\${subject.teacher}<\/div>\` : '';
+                    const subjectStyle = !subject.teacher ? 'style="margin-bottom: 0;"' : '';
+                    content.innerHTML = \`
+                        <div class="subject-name" \${subjectStyle}>\${subject.name}<\/div>
+                        \${teacherHtml}
+                        <button class="delete-cell-btn" title="删除课程">×<\/button>
+                    \`;
+                    cell.appendChild(content);
+                    
+                    // 添加删除按钮事件
+                    content.querySelector('.delete-cell-btn').addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        this.removeSubjectFromCell(cell);
+                    });
+                }
+            } else {
+                // 所有设备默认显示+号
+                cell.classList.add('empty-cell');
+                cell.style.cssText = 'position: relative; cursor: pointer;';
+                
+                // 使用CSS伪元素显示+号，确保默认显示
+                const plusIndicator = document.createElement('div');
+                plusIndicator.className = 'plus-indicator';
+                plusIndicator.textContent = '+';
+                plusIndicator.style.cssText = 'font-size: 24px; color: #ccc; display: flex; align-items: center; justify-content: center; width: 100%; height: 100%;';
+                cell.appendChild(plusIndicator);
+            }
+            
+            // 添加双击删除课程事件
+            cell.addEventListener('dblclick', () => {
+                if (cell.classList.contains('occupied')) {
+                    this.removeSubjectFromCell(cell);
+                }
+            });
+            
+            // 添加点击选择
+            cell.addEventListener('click', () => {
+                this.editingCell = cell;
+                document.querySelectorAll('.cell').forEach(c => c.classList.remove('selected'));
+                cell.classList.add('selected');
+                
+                // 所有设备点击选择科目
+                if (!cell.classList.contains('occupied')) {
+                    this.showMobileSubjectSelector(day, section, periodIndex);
+                }
+            });
+            
+            row.appendChild(cell);
+        }
+        
+        return row;
+    }
+
+    openTimeModal(e, section, periodIndex) {
+        this.editingPeriod = { section, periodIndex };
+        const modal = document.getElementById('timeModal');
+        const nameInput = document.getElementById('periodName');
+        const startHourSelect = document.getElementById('startHour');
+        const startMinuteSelect = document.getElementById('startMinute');
+        const endHourSelect = document.getElementById('endHour');
+        const endMinuteSelect = document.getElementById('endMinute');
+        
+        const period = this.periods[section][periodIndex];
+        nameInput.value = period.name;
+        
+        // 解析现有时间
+        const [startTime, endTime] = period.time.split('-');
+        const [startH, startM] = startTime.split(':');
+        const [endH, endM] = endTime.split(':');
+        
+        startHourSelect.value = startH;
+        startMinuteSelect.value = startM;
+        endHourSelect.value = endH;
+        endMinuteSelect.value = endM;
+        
+        modal.style.display = 'flex';
+    }
+
+    savePeriodTime(e) {
+        e.preventDefault();
+        
+        if (!this.editingPeriod) return;
+        
+        const { section, periodIndex } = this.editingPeriod;
+        const nameInput = document.getElementById('periodName');
+        const startHourSelect = document.getElementById('startHour');
+        const startMinuteSelect = document.getElementById('startMinute');
+        const endHourSelect = document.getElementById('endHour');
+        const endMinuteSelect = document.getElementById('endMinute');
+        
+        const newName = nameInput.value.trim();
+        const startHour = startHourSelect.value;
+        const startMinute = startMinuteSelect.value;
+        const endHour = endHourSelect.value;
+        const endMinute = endMinuteSelect.value;
+        
+        if (!newName || !startHour || !startMinute || !endHour || !endMinute) return;
+        
+        const newTime = \`\${startHour}:\${startMinute}-\${endHour}:\${endMinute}\`;
+        this.periods[section][periodIndex].time = newTime;
+        this.periods[section][periodIndex].name = newName;
+        this.saveData();
+        this.renderTimetable();
+        this.closeTimeModal();
+    }
+
+    resetTimetable() {
+        if (confirm('确定要重置整个课程表吗？这将清空课程表内容但保留科目')) {
+            // 只重置课程表内容，保留科目池
+            this.timetable = {};
+            this.periods = {
+                morning: [
+                { name: '第1节', time: '08:00-08:40' },
+                { name: '第2节', time: '08:50-09:30' },
+                { name: '第3节', time: '10:00-10:40' },
+                { name: '第4节', time: '10:50-11:30' }
+            ],
+            afternoon: [
+                { name: '第1节', time: '14:00-14:40' },
+                { name: '第2节', time: '14:50-15:30' },
+                { name: '第3节', time: '15:40-16:20' }
+            ],
+            evening: [
+                { name: '第1节', time: '19:00-19:40' },
+                { name: '第2节', time: '19:50-20:30' }
+            ]
+            };
+            
+            // 重置时段名称
+            this.sectionNames = {
+                morning: '上午',
+                afternoon: '下午',
+                evening: '晚上'
+            };
+            
+            // 重置课程表标题
+            const defaultTitle = '我的课程表';
+            document.getElementById('timetableTitle').value = defaultTitle;
+            localStorage.setItem('timetableTitle', defaultTitle);
+            
+            this.saveData();
+            this.renderTimetable();
+        }
+    }
+
+    toggleExportDropdown(e) {
+        e.stopPropagation();
+        const dropdown = document.getElementById('exportMenu');
+        const isVisible = dropdown.classList.contains('show');
+        
+        // 关闭所有其他下拉菜单
+        this.closeAllDropdowns();
+        
+        // 切换当前下拉菜单
+        if (!isVisible) {
+            dropdown.classList.add('show');
+            this.positionDropdown(dropdown, e.target);
+        }
+    }
+
+    closeAllDropdowns() {
+        // 调用全局关闭函数
+        closeAllMenus();
+        
+        // 关闭其他下拉菜单
+        const dropdowns = document.querySelectorAll('.dropdown-content');
+        dropdowns.forEach(dropdown => {
+            dropdown.style.display = 'none';
+        });
+        
+        // 隐藏移动端遮罩层
+        this.hideMobileOverlay();
+    }
+    
+    // 处理全局点击事件
+    handleGlobalClick(e) {
+        const exportMenu = document.getElementById('exportMenu');
+        const backupMenu = document.getElementById('backupMenu');
+        const exportBtn = document.getElementById('exportBtn');
+        const backupBtn = document.getElementById('backupBtn');
+        
+        // 检查是否点击在下拉菜单或按钮上
+        const isClickOnExportMenu = exportMenu && (exportMenu.contains(e.target) || exportBtn.contains(e.target));
+        const isClickOnBackupMenu = backupMenu && (backupMenu.contains(e.target) || backupBtn.contains(e.target));
+        
+        // 如果点击在外部区域，隐藏所有下拉菜单
+        if (!isClickOnExportMenu && !isClickOnBackupMenu) {
+            this.closeAllDropdowns();
+        }
+    }
+    
+    // 智能定位下拉菜单
+    positionDropdown(dropdown, button) {
+        if (!dropdown || !button) return;
+        
+        const isMobile = window.innerWidth <= 768;
+        
+        if (isMobile) {
+            // 手机端：固定定位，避免被遮挡
+            this.positionMobileDropdown(dropdown, button);
+        } else {
+            // PC端：相对定位
+            this.positionDesktopDropdown(dropdown, button);
+        }
+    }
+    
+    // PC端下拉菜单定位
+    positionDesktopDropdown(dropdown, button) {
+        const rect = button.getBoundingClientRect();
+        const dropdownRect = dropdown.getBoundingClientRect();
+        
+        // 重置样式
+        dropdown.style.position = 'absolute';
+        dropdown.style.top = '100%';
+        dropdown.style.left = '0';
+        dropdown.style.right = 'auto';
+        dropdown.style.bottom = 'auto';
+        dropdown.style.transform = 'none';
+        dropdown.style.zIndex = '9999';
+        
+        // 检查是否需要调整位置避免超出屏幕
+        const viewportWidth = window.innerWidth;
+        const viewportHeight = window.innerHeight;
+        
+        if (rect.left + dropdownRect.width > viewportWidth) {
+            dropdown.style.left = 'auto';
+            dropdown.style.right = '0';
+        }
+        
+        if (rect.bottom + dropdownRect.height > viewportHeight) {
+            dropdown.style.top = 'auto';
+            dropdown.style.bottom = '100%';
+        }
+    }
+    
+    // 手机端下拉菜单定位
+    positionMobileDropdown(dropdown, button) {
+        // 手机端使用固定定位，从底部弹出
+        dropdown.style.position = 'fixed';
+        dropdown.style.top = 'auto';
+        dropdown.style.bottom = '20px';
+        dropdown.style.left = '20px';
+        dropdown.style.right = '20px';
+        dropdown.style.width = 'auto';
+        dropdown.style.transform = 'translateY(120%)';
+        dropdown.style.zIndex = '999999';
+        dropdown.style.transition = 'transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)';
+        dropdown.style.maxHeight = '50vh';
+        dropdown.style.overflowY = 'auto';
+        
+        // 创建或显示遮罩层
+        this.createMobileOverlay();
+    }
+    
+    // 创建移动端遮罩层
+    createMobileOverlay() {
+        let overlay = document.querySelector('.dropdown-overlay');
+        if (!overlay) {
+            overlay = document.createElement('div');
+            overlay.className = 'dropdown-overlay';
+            document.body.appendChild(overlay);
+            
+            // 点击遮罩层关闭菜单
+            overlay.addEventListener('click', () => {
+                this.closeAllDropdowns();
+            });
+        }
+        overlay.classList.add('show');
+    }
+    
+    // 隐藏移动端遮罩层
+    hideMobileOverlay() {
+        const overlay = document.querySelector('.dropdown-overlay');
+        if (overlay) {
+            overlay.classList.remove('show');
+        }
+    }
+
+
+    // 处理窗口大小改变
+    handleWindowResize() {
+        // 检查是否有打开的下拉菜单，重新定位
+        const exportMenu = document.getElementById('exportMenu');
+        const backupMenu = document.getElementById('backupMenu');
+        const exportBtn = document.getElementById('exportBtn');
+        const backupBtn = document.getElementById('backupBtn');
+        
+        if (exportMenu && exportMenu.classList.contains('show') && exportBtn) {
+            this.positionDropdown(exportMenu, exportBtn);
+        }
+        
+        if (backupMenu && backupMenu.classList.contains('show') && backupBtn) {
+            this.positionDropdown(backupMenu, backupBtn);
+        }
+        
+        // 如果窗口变大，关闭手机端侧边栏
+        if (window.innerWidth > 768) {
+            this.closeMobileSidebar();
+        }
+    }
+    
+    // 手机端侧边栏相关方法
+    toggleMobileSidebar() {
+        const sidebar = document.getElementById('mobileSidebar');
+        const overlay = document.getElementById('sidebarOverlay');
+        const hamburgerBtn = document.getElementById('hamburgerBtn');
+        
+        if (sidebar.classList.contains('show')) {
+            this.closeMobileSidebar();
+        } else {
+            this.openMobileSidebar();
+        }
+    }
+    
+    openMobileSidebar() {
+        const sidebar = document.getElementById('mobileSidebar');
+        const overlay = document.getElementById('sidebarOverlay');
+        const hamburgerBtn = document.getElementById('hamburgerBtn');
+        
+        sidebar.classList.add('show');
+        overlay.classList.add('show');
+        hamburgerBtn.classList.add('active');
+        
+        // 防止背景滚动
+        document.body.style.overflow = 'hidden';
+    }
+    
+    closeMobileSidebar() {
+        const sidebar = document.getElementById('mobileSidebar');
+        const overlay = document.getElementById('sidebarOverlay');
+        const hamburgerBtn = document.getElementById('hamburgerBtn');
+        
+        sidebar.classList.remove('show');
+        overlay.classList.remove('show');
+        hamburgerBtn.classList.remove('active');
+        
+        // 恢复背景滚动
+        document.body.style.overflow = '';
+    }
+    
+    // 处理侧边栏菜单按钮点击
+    handleSidebarAction(action) {
+        // 关闭侧边栏
+        this.closeMobileSidebar();
+        
+        // 根据action执行相应功能
+        switch (action) {
+            case 'tutorial':
+                this.openTutorialModal();
+                break;
+            case 'reset':
+                this.resetTimetable();
+                break;
+            case 'saveImage':
+                this.saveAsImage();
+                break;
+            case 'exportWord':
+                this.exportToWord();
+                break;
+            case 'exportExcel':
+                this.exportToExcel();
+                break;
+            case 'exportData':
+                this.exportData();
+                break;
+            case 'importData':
+                this.importData();
+                break;
+            case 'settings':
+                this.openSettingsModal();
+                break;
+            default:
+                console.warn('未知的侧边栏操作:', action);
+        }
+    }
+    
+    // 更新侧边栏主题按钮状态
+    updateSidebarThemeButtons(theme) {
+        document.querySelectorAll('.sidebar-theme-btn').forEach(btn => {
+            btn.classList.toggle('active', btn.dataset.theme === theme);
+        });
+    }
+    
+    // 更新侧边栏字体按钮状态
+    updateSidebarFontButtons(font) {
+        document.querySelectorAll('.sidebar-font-btn').forEach(btn => {
+            btn.classList.toggle('active', btn.dataset.font === font);
+        });
+    }
+
+    saveAsImage() {
+        let cleanContainer = null;
+        try {
+            const isMobile = window.innerWidth <= 768;
+            
+            // 获取主题色
+            const getThemeColor = (variableName, defaultValue) => {
+                const computedValue = getComputedStyle(document.body).getPropertyValue(variableName).trim();
+                return computedValue || defaultValue;
+            };
+            
+            const primaryColor = getThemeColor('--primary-color', '#4a7c59');
+            const primaryRgb = this.hexToRgb(primaryColor);
+            const lightPrimary = primaryRgb ? \`rgba(\${primaryRgb.r}, \${primaryRgb.g}, \${primaryRgb.b}, 0.1)\` : '#f0f8f0';
+            const mediumPrimary = primaryRgb ? \`rgba(\${primaryRgb.r}, \${primaryRgb.g}, \${primaryRgb.b}, 0.15)\` : '#e8f5e9';
+            
+            // 获取当前字体设置
+            const currentFont = getComputedStyle(document.body).fontFamily || '"Microsoft YaHei", "PingFang SC", Arial, sans-serif';
+            
+            // 获取标题
+            const titleInput = document.getElementById('tableTitle');
+            const titleText = titleInput.value || '课程表';
+            
+            // 创建干净导出容器
+            cleanContainer = document.createElement('div');
+            cleanContainer.style.cssText = \`
+                position: absolute; 
+                top: -9999px; 
+                left: -9999px; 
+                width: 900px; 
+                padding: 40px 50px; 
+                background: #ffffff;
+                font-family: \${currentFont};
+            \`;
+
+            // 创建标题区域
+            const headerDiv = document.createElement('div');
+            headerDiv.style.cssText = \`
+                text-align: center; 
+                margin-bottom: 30px; 
+                padding-bottom: 20px;
+                border-bottom: 3px solid \${primaryColor};
+            \`;
+            
+            const mainTitle = document.createElement('h1');
+            mainTitle.textContent = titleText;
+            mainTitle.style.cssText = \`
+                margin: 0 0 8px 0; 
+                font-size: 32px; 
+                font-weight: bold; 
+                color: \${primaryColor}; 
+                letter-spacing: 4px;
+                font-family: \${currentFont};
+            \`;
+            headerDiv.appendChild(mainTitle);
+            
+            // 添加日期
+            const dateDiv = document.createElement('div');
+            const now = new Date();
+            const dateStr = \`\${now.getFullYear()}年\${now.getMonth() + 1}月\${now.getDate()}日\`;
+            dateDiv.textContent = dateStr;
+            dateDiv.style.cssText = \`font-size: 14px; color: #888; margin-top: 5px; font-family: \${currentFont};\`;
+            headerDiv.appendChild(dateDiv);
+            
+            cleanContainer.appendChild(headerDiv);
+
+            // 创建表格容器
+            const tableWrapper = document.createElement('div');
+            tableWrapper.style.cssText = \`
+                border-radius: 12px;
+                overflow: hidden;
+                box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+                border: 1px solid #e0e0e0;
+            \`;
+            
+            // 克隆课程表
+            const originalContainer = document.querySelector('.timetable-container');
+            const containerClone = originalContainer.cloneNode(true);
+
+            // 移除不需要的元素
+            const removeSelectors = '.section-controls, .edit-btn, .delete-btn, .timetable-title-section, .table-title-input, .delete-cell-btn, .plus-indicator';
+            containerClone.querySelectorAll(removeSelectors).forEach(el => el.remove());
+
+            // 设置表格样式
+            const table = containerClone.querySelector('.timetable');
+            if (table) {
+                table.style.cssText = \`
+                    border-collapse: collapse;
+                    width: 100%;
+                    table-layout: fixed;
+                    font-size: 14px;
+                    background: #ffffff;
+                    font-family: \${currentFont};
+                \`;
+            }
+            
+            // 处理表头（星期行）
+            const headerCells = containerClone.querySelectorAll('th');
+            headerCells.forEach(cell => {
+                cell.style.cssText = \`
+                    background: \${primaryColor};
+                    color: #ffffff;
+                    padding: 14px 8px;
+                    font-weight: 600;
+                    font-size: 15px;
+                    border: none;
+                    text-align: center;
+                    font-family: \${currentFont};
+                \`;
+            });
+            
+            // 处理所有单元格
+            const allCells = containerClone.querySelectorAll('td');
+            allCells.forEach((cell, index) => {
+                const isTimeCell = cell.classList.contains('time-cell') || cell.classList.contains('period-cell');
+                const isSection = cell.textContent.includes('上午') || cell.textContent.includes('下午') || cell.textContent.includes('晚上');
+                const isOccupied = cell.classList.contains('occupied');
+                
+                let bgColor = '#ffffff';
+                let fontWeight = 'normal';
+                let textColor = '#333333';
+                
+                if (isSection) {
+                    bgColor = mediumPrimary;
+                    fontWeight = '600';
+                    textColor = primaryColor;
+                } else if (isTimeCell) {
+                    bgColor = lightPrimary;
+                    fontWeight = '500';
+                }
+                
+                cell.style.cssText = \`
+                    padding: 12px 8px;
+                    text-align: center;
+                    vertical-align: middle;
+                    border: 1px solid #e8e8e8;
+                    font-size: 13px;
+                    color: \${textColor};
+                    background: \${bgColor};
+                    font-weight: \${fontWeight};
+                    font-family: \${currentFont};
+                \`;
+                
+                // 处理已占用单元格 - 保留科目颜色
+                if (isOccupied) {
+                    const cellContent = cell.querySelector('.cell-content');
+                    if (cellContent) {
+                        const subjectBg = cellContent.style.backgroundColor;
+                        const subjectColor = cellContent.style.color || '#333333';
+                        
+                        // 获取科目名称和老师名称元素
+                        const subjectName = cell.querySelector('.subject-name');
+                        const teacherName = cell.querySelector('.teacher-name');
+                        
+                        // 设置 cell-content 的基础样式
+                        cellContent.style.cssText = \`
+                            width: 100%;
+                            height: 100%;
+                            display: flex;
+                            flex-direction: column;
+                            justify-content: center;
+                            align-items: center;
+                            padding: 8px;
+                            box-sizing: border-box;
+                            background-color: \${subjectBg || 'transparent'};
+                            color: \${subjectColor};
+                            border-radius: 6px;
+                            font-family: \${currentFont};
+                        \`;
+                        
+                        if (subjectBg && subjectBg !== 'transparent' && subjectBg !== 'rgba(0, 0, 0, 0)') {
+                            // 背景+字体模式
+                            cell.style.backgroundColor = 'transparent';
+                            cell.style.padding = '4px';
+                            cellContent.style.boxShadow = '0 2px 8px rgba(0,0,0,0.1)';
+                            
+                            // 设置文字颜色和字体
+                            if (subjectName) {
+                                subjectName.style.cssText = \`color: \${subjectColor}; font-weight: 600; font-size: 14px; display: block; margin-bottom: 3px; text-align: center; font-family: \${currentFont};\`;
+                            }
+                            if (teacherName) {
+                                teacherName.style.cssText = \`color: \${subjectColor}; opacity: 0.9; font-size: 12px; display: block; text-align: center; font-family: \${currentFont};\`;
+                            }
+                        } else {
+                            // 仅字体色模式 - 透明背景
+                            cellContent.style.backgroundColor = 'transparent';
+                            cell.style.backgroundColor = '#ffffff';
+                            cell.style.border = '1px solid #e8e8e8';
+                            
+                            // 设置文字颜色和字体
+                            if (subjectName) {
+                                subjectName.style.cssText = \`color: \${subjectColor}; font-weight: 600; font-size: 14px; display: block; margin-bottom: 3px; text-align: center; font-family: \${currentFont};\`;
+                            }
+                            if (teacherName) {
+                                teacherName.style.cssText = \`color: \${subjectColor}; opacity: 0.9; font-size: 12px; display: block; text-align: center; font-family: \${currentFont};\`;
+                            }
+                        }
+                    }
+                }
+            });
+            
+            // 根据设置隐藏周六和周日列
+            const rows = containerClone.querySelectorAll('tr');
+            rows.forEach(row => {
+                const cells = row.querySelectorAll('td, th');
+                let cellIndex = 0;
+                cells.forEach(cell => {
+                    if (cellIndex >= 2) {
+                        const dayIndex = cellIndex - 2;
+                        if ((dayIndex === 5 && !this.settings.showSaturday) || 
+                            (dayIndex === 6 && !this.settings.showSunday)) {
+                            cell.style.display = 'none';
+                        }
+                    }
+                    cellIndex++;
+                });
+            });
+            
+            tableWrapper.appendChild(containerClone);
+            cleanContainer.appendChild(tableWrapper);
+            
+            document.body.appendChild(cleanContainer);
+            
+            // 生成图片
+            html2canvas(cleanContainer, {
+                backgroundColor: '#ffffff',
+                scale: isMobile ? 3 : 2,
+                useCORS: true,
+                allowTaint: true,
+                width: 900,
+                height: cleanContainer.scrollHeight,
+                windowWidth: 900,
+                logging: false
+            }).then(canvas => {
+                const link = document.createElement('a');
+                link.download = \`\${titleText}.png\`;
+                link.href = canvas.toDataURL('image/png', 1.0);
+                link.click();
+                document.body.removeChild(cleanContainer);
+            }).catch(error => {
+                console.error('生成图片失败:', error);
+                alert('生成图片失败，请重试');
+                if (cleanContainer && document.body.contains(cleanContainer)) {
+                    document.body.removeChild(cleanContainer);
+                }
+            });
+        } catch (error) {
+            console.error('保存图片出错:', error);
+            alert('保存图片出错，请重试');
+            if (cleanContainer && document.body.contains(cleanContainer)) {
+                document.body.removeChild(cleanContainer);
+            }
+        }
+    }
+    
+    // 辅助函数：十六进制转RGB
+    hexToRgb(hex) {
+        if (!hex) return null;
+        const result = /^#?([a-f\\d]{2})([a-f\\d]{2})([a-f\\d]{2})$/i.exec(hex);
+        return result ? {
+            r: parseInt(result[1], 16),
+            g: parseInt(result[2], 16),
+            b: parseInt(result[3], 16)
+        } : null;
+    }
+
+
+
+    saveData() {
+        const data = {
+            subjects: this.subjects,
+            timetable: this.timetable,
+            periods: this.periods,
+            sectionNames: this.sectionNames
+        };
+        localStorage.setItem('timetableData', JSON.stringify(data));
+    }
+
+    loadData() {
+        const data = localStorage.getItem('timetableData');
+            
+        if (data) {
+            const parsed = JSON.parse(data);
+                
+            // 恢复科目数据
+            if (parsed.subjects && Array.isArray(parsed.subjects) && parsed.subjects.length > 0) {
+                this.subjects = parsed.subjects;
+            } else {
+                this.subjects = [];
+            }
+                
+            // 恢复课程表数据
+            this.timetable = parsed.timetable || {};
+                
+            // 恢复课时数据
+            this.periods = parsed.periods || {
+                morning: [
+                    { name: '第1节', time: '08:00-08:40' },
+                    { name: '第2节', time: '08:50-09:30' },
+                    { name: '第3节', time: '10:00-10:40' },
+                    { name: '第4节', time: '10:50-11:30' }
+                ],
+                afternoon: [
+                    { name: '第1节', time: '14:00-14:40' },
+                    { name: '第2节', time: '14:50-15:30' },
+                    { name: '第3节', time: '15:40-16:20' }
+                ],
+                evening: [
+                    { name: '第1节', time: '19:00-19:40' },
+                    { name: '第2节', time: '19:50-20:30' }
+                ]
+            };
+                
+            // 加载时段名称
+            this.sectionNames = parsed.sectionNames || {
+                morning: '上午',
+                afternoon: '下午',
+                evening: '晚上'
+            };
+                
+            // 确保 evening 存在
+            if (!this.periods.evening) {
+                this.periods.evening = [
+                    { name: '第1节', time: '19:00-19:40' },
+                    { name: '第2节', time: '19:50-20:30' }
+                ];
+            }
+        } else {
+            // 如果没有数据，初始化所有时段
+            this.subjects = [];
+            this.timetable = {};
+            this.periods = {
+                morning: [
+                    { name: '第1节', time: '08:00-08:40' },
+                    { name: '第2节', time: '08:50-09:30' },
+                    { name: '第3节', time: '10:00-10:40' },
+                    { name: '第4节', time: '10:50-11:30' }
+                ],
+                afternoon: [
+                    { name: '第1节', time: '14:00-14:40' },
+                    { name: '第2节', time: '14:50-15:30' },
+                    { name: '第3节', time: '15:40-16:20' }
+                ],
+                evening: [
+                    { name: '第1节', time: '19:00-19:40' },
+                    { name: '第2节', time: '19:50-20:30' }
+                ]
+            };
+            this.sectionNames = {
+                morning: '上午',
+                afternoon: '下午',
+                evening: '晚上'
+            };
+        }
+    }
+
+    loadTimetableTitle() {
+        const savedTitle = localStorage.getItem('timetableTitle');
+        const titleInput = document.getElementById('timetableTitle');
+        if (savedTitle) {
+            titleInput.value = savedTitle;
+        }
+    }
+
+    saveTimetableTitle(title) {
+        localStorage.setItem('timetableTitle', title);
+    }
+
+    saveTableTitle(title) {
+        localStorage.setItem('tableTitle', title);
+    }
+
+    loadTableTitle() {
+        const savedTitle = localStorage.getItem('tableTitle');
+        const titleInput = document.getElementById('tableTitle');
+        if (savedTitle) {
+            titleInput.value = savedTitle;
+        }
+    }
+
+    initTimeSelectors() {
+        // 生成小时选项 (0-23) - 24小时制
+        const startHourSelect = document.getElementById('startHour');
+        const endHourSelect = document.getElementById('endHour');
+        
+        for (let i = 0; i <= 23; i++) {
+            const hour = i.toString().padStart(2, '0');
+            startHourSelect.appendChild(new Option(hour, hour));
+            endHourSelect.appendChild(new Option(hour, hour));
+        }
+        
+        // 生成分钟选项 (00-55，间隔5分钟)
+        const startMinuteSelect = document.getElementById('startMinute');
+        const endMinuteSelect = document.getElementById('endMinute');
+        
+        for (let i = 0; i < 60; i += 5) {
+            const minute = i.toString().padStart(2, '0');
+            startMinuteSelect.appendChild(new Option(minute, minute));
+            endMinuteSelect.appendChild(new Option(minute, minute));
+        }
+    }
+
+    // Word导出功能 - 移动端PC端统一效果
+    exportToWord() {
+        const title = document.getElementById('tableTitle').value || '课程表';
+        
+        // 检测是否为移动端
+        const isMobile = window.innerWidth <= 768;
+        
+        // 创建兼容Word的HTML格式（移动端PC端统一）
+        let wordContent = \`<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40">
+        <head>
+            <meta charset="utf-8">
+            <title>\${title}<\/title>
+            <!--[if gte mso 9]>
+            <xml>
+                <w:WordDocument>
+                    <w:View>Print<\/w:View>
+                    <w:Zoom>100<\/w:Zoom>
+                    <w:DoNotOptimizeForBrowser/>
+                <\/w:WordDocument>
+            <\/xml>
+            <![endif]-->
+            <style>
+                @page { 
+                    margin: 1.2cm 1cm;
+                    size: A4 portrait;
+                }
+                body { 
+                    font-family: 'Microsoft YaHei', 'SimSun', Arial, sans-serif; 
+                    margin: 0;
+                    padding: 10px;
+                    background: white;
+                }
+                .main-title { 
+                    text-align: center; 
+                    color: #000; 
+                    margin-bottom: 15px; 
+                    font-size: 22px; 
+                    font-weight: bold;
+                    letter-spacing: 1px;
+                }
+                table { 
+                    border-collapse: collapse; 
+                    width: 100%; 
+                    margin: 0 auto; 
+                    table-layout: fixed;
+                    border: 2px solid #000;
+                }
+                th, td { 
+                    border: 1px solid #000;
+                    padding: 8px 6px;
+                    text-align: center;
+                    font-size: 13px;
+                    vertical-align: middle;
+                    height: auto;
+                    line-height: 1.4;
+                    word-wrap: break-word;
+                    word-break: break-all;
+                    overflow-wrap: break-word;
+                    color: #000;
+                }
+                td {
+                    width: 110px;
+                    min-width: 110px;
+                    max-width: 110px;
+                }
+                th {
+                    width: 110px;
+                }
+                th { 
+                    background-color: #fff;
+                    color: #000;
+                    font-weight: bold;
+                    font-size: 14px;
+                }
+                .time-header { 
+                    background-color: #fff;
+                    color: #000;
+                    font-weight: bold;
+                    width: 50px;
+                    min-width: 50px;
+                    max-width: 50px;
+                    font-size: 13px;
+                    writing-mode: vertical-rl;
+                    text-orientation: mixed;
+                    padding: 10px 0;
+                }
+                .period-header { 
+                    background-color: #fff;
+                    color: #000;
+                    font-weight: bold;
+                    width: 90px;
+                    min-width: 90px;
+                    max-width: 90px;
+                    font-size: 13px;
+                }
+                .subject { 
+                    font-weight: bold;
+                    color: #000;
+                    font-size: 14px;
+                    margin-bottom: 2px;
+                }
+                .teacher { 
+                    font-size: 12px;
+                    color: #000;
+                    margin-top: 2px;
+                    display: block;
+                }
+                .period-time { 
+                    font-size: 11px;
+                    color: #666;
+                    display: block;
+                    margin-top: 2px;
+                }
+                td {
+                    background-color: #fff;
+                }
+            <\/style>
+        <\/head>
+        <body>
+            <div class="main-title">\${title}<\/div>
+            <table>
+                <thead>
+                    <tr>
+                        <th class="time-header">时段<\/th>
+                        <th class="period-header">课时<\/th>
+                        \${(() => {
+                            let headers = ['周一', '周二', '周三', '周四', '周五'];
+                            if (this.settings.showSaturday) headers.push('周六');
+                            if (this.settings.showSunday) headers.push('周日');
+                            return headers.map(day => \`<th>\${day}<\/th>\`).join('');
+                        })()}
+                    <\/tr>
+                <\/thead>
+                <tbody>\`;
+
+        // 构建表格内容
+        
+        // 添加上午部分
+        if (this.periods.morning && this.periods.morning.length > 0) {
+            this.periods.morning.forEach((period, periodIndex) => {
+                wordContent += \`<tr>\`;
+                
+                // 时间列（只在第一节显示，竭排显示）
+                if (periodIndex === 0) {
+                    const sectionText = this.sectionNames.morning.split('').join('<br>');
+                    wordContent += \`<td class="time-header" rowspan="\${this.periods.morning.length}">\${sectionText}<\/td>\`;
+                }
+                
+                // 节数和时间（时间段换行显示）
+                let periodTimeHtml = period.name;
+                if (this.settings.showPeriodTime && period.time) {
+                    // 将时间段从中间的-分割，换行显示
+                    const timeFormatted = period.time.replace('-', '-<br>');
+                    periodTimeHtml += \`<br><span class="period-time">\${timeFormatted}<\/span>\`;
+                }
+                wordContent += \`<td class="period-header">\${periodTimeHtml}<\/td>\`;
+                
+                // 每天的课程（根据设置动态显示）
+                const dayCount = 5 + (this.settings.showSaturday ? 1 : 0) + (this.settings.showSunday ? 1 : 0);
+                for (let day = 1; day <= dayCount; day++) {
+                    const key = \`\${day}-morning-\${periodIndex}\`;
+                    const subjectId = this.timetable[key];
+                    
+                    if (subjectId) {
+                        const subject = this.subjects.find(s => s.id === subjectId);
+                        if (subject) {
+                            wordContent += \`<td>
+                                <div class="subject">\${subject.name}<\/div>
+                                \${subject.teacher ? \`<div class="teacher">\${subject.teacher}<\/div>\` : ''}
+                            <\/td>\`;
+                        } else {
+                            wordContent += \`<td><\/td>\`;
+                        }
+                    } else {
+                        wordContent += \`<td><\/td>\`;
+                    }
+                }
+                
+                wordContent += \`<\/tr>\`;
+            });
+        }
+        
+        // 添加下午部分
+        if (this.periods.afternoon && this.periods.afternoon.length > 0) {
+            this.periods.afternoon.forEach((period, periodIndex) => {
+                wordContent += \`<tr>\`;
+                
+                // 时间列（只在第一节显示，竭排显示）
+                if (periodIndex === 0) {
+                    const sectionText = this.sectionNames.afternoon.split('').join('<br>');
+                    wordContent += \`<td class="time-header" rowspan="\${this.periods.afternoon.length}">\${sectionText}<\/td>\`;
+                }
+                
+                // 节数和时间（时间段换行显示）
+                let periodTimeHtml = period.name;
+                if (this.settings.showPeriodTime && period.time) {
+                    const timeFormatted = period.time.replace('-', '-<br>');
+                    periodTimeHtml += \`<br><span class="period-time">\${timeFormatted}<\/span>\`;
+                }
+                wordContent += \`<td class="period-header">\${periodTimeHtml}<\/td>\`;
+                
+                // 每天的课程（根据设置动态显示）
+                const dayCount = 5 + (this.settings.showSaturday ? 1 : 0) + (this.settings.showSunday ? 1 : 0);
+                for (let day = 1; day <= dayCount; day++) {
+                    const key = \`\${day}-afternoon-\${periodIndex}\`;
+                    const subjectId = this.timetable[key];
+                    
+                    if (subjectId) {
+                        const subject = this.subjects.find(s => s.id === subjectId);
+                        if (subject) {
+                            wordContent += \`<td>
+                                <div class="subject">\${subject.name}<\/div>
+                                \${subject.teacher ? \`<div class="teacher">\${subject.teacher}<\/div>\` : ''}
+                            <\/td>\`;
+                        } else {
+                            wordContent += \`<td><\/td>\`;
+                        }
+                    } else {
+                        wordContent += \`<td><\/td>\`;
+                    }
+                }
+                
+                wordContent += \`<\/tr>\`;
+            });
+        }
+
+        
+        // 添加晚上部分（如果显示）
+        if (this.settings.showEvening && this.periods.evening && this.periods.evening.length > 0) {
+            this.periods.evening.forEach((period, periodIndex) => {
+                wordContent += \`<tr>\`;
+                
+                // 时间列（只在第一节显示，竭排显示）
+                if (periodIndex === 0) {
+                    const sectionText = this.sectionNames.evening.split('').join('<br>');
+                    wordContent += \`<td class="time-header" rowspan="\${this.periods.evening.length}">\${sectionText}<\/td>\`;
+                }
+                
+                // 节数和时间（时间段换行显示）
+                let periodTimeHtml = period.name;
+                if (this.settings.showPeriodTime && period.time) {
+                    const timeFormatted = period.time.replace('-', '-<br>');
+                    periodTimeHtml += \`<br><span class="period-time">\${timeFormatted}<\/span>\`;
+                }
+                wordContent += \`<td class="period-header">\${periodTimeHtml}<\/td>\`;
+                
+                // 每天的课程（根据设置动态显示）
+                const dayCount = 5 + (this.settings.showSaturday ? 1 : 0) + (this.settings.showSunday ? 1 : 0);
+                for (let day = 1; day <= dayCount; day++) {
+                    const key = \`\${day}-evening-\${periodIndex}\`;
+                    const subjectId = this.timetable[key];
+                    
+                    if (subjectId) {
+                        const subject = this.subjects.find(s => s.id === subjectId);
+                        if (subject) {
+                            wordContent += \`<td>
+                                <div class="subject">\${subject.name}<\/div>
+                                \${subject.teacher ? \`<div class="teacher">\${subject.teacher}<\/div>\` : ''}
+                            <\/td>\`;
+                        } else {
+                            wordContent += \`<td><\/td>\`;
+                        }
+                    } else {
+                        wordContent += \`<td><\/td>\`;
+                    }
+                }
+                
+                wordContent += \`<\/tr>\`;
+            });
+        }
+
+        wordContent += \`<\/tbody><\/table><\/body><\/html>\`;
+
+        // 创建Blob并下载（使用正确的HTML格式）
+        const blob = new Blob([wordContent], { type: 'application/msword;charset=utf-8' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = \`\${title}.doc\`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+    }
+    
+    // Excel导出功能 - 重写版本，确保数据完整
+    exportToExcel() {
+        try {
+            const title = document.getElementById('tableTitle').value || '课程表';
+            
+            // 生成完整的Excel HTML内容
+            let excelHTML = this.generateExcelHTML(title);
+            
+            // 创建Excel文件
+            const blob = new Blob([excelHTML], { 
+                type: 'application/vnd.ms-excel;charset=utf-8' 
+            });
+            
+            const link = document.createElement('a');
+            link.download = \`\${title}.xls\`;
+            link.href = URL.createObjectURL(blob);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(link.href);
+            
+        } catch (error) {
+            console.error('导出Excel出错:', error);
+            alert('导出Excel出错：' + error.message);
+        }
+    }
+    
+    // 生成Excel HTML内容
+    generateExcelHTML(title) {
+        // Excel文件头部（移除XML声明，避免冲突）
+        let html = \`<html xmlns:o="urn:schemas-microsoft-com:office:office" 
+      xmlns:x="urn:schemas-microsoft-com:office:excel" 
+      xmlns="http://www.w3.org/TR/REC-html40">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <!--[if gte mso 9]>
+    <xml>
+        <x:ExcelWorkbook>
+            <x:ExcelWorksheets>
+                <x:ExcelWorksheet>
+                    <x:Name>课程表<\/x:Name>
+                    <x:WorksheetOptions>
+                        <x:Print>
+                            <x:ValidPrinterInfo/>
+                            <x:PaperSizeIndex>9<\/x:PaperSizeIndex>
+                        <\/x:Print>
+                        <x:Selected/>
+                        <x:ProtectContents>False<\/x:ProtectContents>
+                    <\/x:WorksheetOptions>
+                <\/x:ExcelWorksheet>
+            <\/x:ExcelWorksheets>
+        <\/x:ExcelWorkbook>
+    <\/xml>
+    <![endif]-->
+    <style>
+        body { 
+            font-family: 'Microsoft YaHei', 'SimSun', Arial, sans-serif; 
+            margin: 0;
+            padding: 0;
+        }
+        .main-title { 
+            text-align: center; 
+            color: #333; 
+            margin: 15px 0;
+            font-size: 18px; 
+            font-weight: bold;
+        }
+        table { 
+            border-collapse: collapse; 
+            width: auto;
+            margin: 0 auto; 
+            table-layout: fixed; 
+            border: 1px solid #666;
+            border-spacing: 0;
+        }
+        th, td { 
+            border: 1px solid #999;
+            padding: 8px;
+            text-align: center;
+            vertical-align: middle;
+            mso-number-format:'\\@';
+            white-space: normal;
+            word-wrap: break-word;
+            color: #333;
+            mso-protection: unlocked visible;
+        }
+        th {
+            background: #f5f5f5;
+            color: #333;
+            font-weight: bold;
+            font-size: 13px;
+            height: 40px;
+            width: 100px;
+            border: 1px solid #999;
+        }
+        tr {
+            height: 60px;
+        }
+        .time-header {
+            width: 50px;
+            background: #f5f5f5;
+            color: #333;
+            font-weight: bold;
+            border: 1px solid #999;
+        }
+        .period-header {
+            width: 85px;
+            background: #f5f5f5;
+            color: #333;
+            font-weight: bold;
+            border: 1px solid #999;
+        }
+        .time-section { 
+            background: #f5f5f5;
+            color: #333;
+            font-weight: bold;
+            font-size: 13px;
+            width: 50px;
+            border: 1px solid #999;
+        }
+        td {
+            width: 100px;
+            font-size: 12px;
+            background: #fff;
+            border: 1px solid #999;
+        }
+        .subject { 
+            font-weight: bold;
+            color: #000;
+            font-size: 14px;
+            display: block;
+        }
+        .teacher { 
+            font-size: 11px;
+            color: #000;
+            display: block;
+            margin-top: 3px;
+        }
+        .period-time { 
+            font-size: 10px;
+            color: #666;
+            display: block;
+        }
+    <\/style>
+<\/head>
+<body>
+    <div class="main-title">\${title}<\/div>
+    <table>
+        <thead>
+            <tr style="height: 40px;">
+                <th class="time-header">时段<\/th>
+                <th class="period-header">课时<\/th>\`;
+        
+        // 添加星期表头
+        const weekDays = ['周一', '周二', '周三', '周四', '周五'];
+        if (this.settings.showSaturday) weekDays.push('周六');
+        if (this.settings.showSunday) weekDays.push('周日');
+        weekDays.forEach(day => {
+            html += \`<th>\${day}<\/th>\`;
+        });
+        
+        html += \`<\/tr>
+        <\/thead>
+        <tbody>\`;
+        
+        // 添加上午课程
+        if (this.periods.morning && this.periods.morning.length > 0) {
+            this.periods.morning.forEach((period, index) => {
+                html += '<tr>';
+                
+                // 时段列（仅第一行，合并整个时段）
+                if (index === 0) {
+                    html += \`<td rowspan="\${this.periods.morning.length}" class="time-section">\${this.sectionNames.morning}<\/td>\`;
+                }
+                
+                // 课时列
+                html += \`<td class="period-header">\${period.name}\`;
+                if (this.settings.showPeriodTime && period.time) {
+                    html += \`<br><span class="period-time">\${period.time}<\/span>\`;
+                }
+                html += \`<\/td>\`;
+                
+                // 课程内容
+                const dayCount = weekDays.length;
+                for (let day = 1; day <= dayCount; day++) {
+                    const key = \`\${day}-morning-\${index}\`;
+                    const subjectId = this.timetable[key];
+                    
+                    if (subjectId) {
+                        const subject = this.subjects.find(s => s.id === subjectId);
+                        if (subject) {
+                            const colorType = subject.colorType || 'background';
+                            let cellStyle = '';
+                            let subjectStyle = '';
+                            let teacherStyle = '';
+                            
+                            if (colorType === 'background') {
+                                // 背景色模式
+                                cellStyle = \`style="background-color: \${subject.color}; color: white; border: 1px solid #000 !important;"\`;
+                            } else {
+                                // 字体色模式
+                                subjectStyle = \`style="color: \${subject.color};"\`;
+                                teacherStyle = \`style="color: \${subject.color};"\`;
+                            }
+                            
+                            html += \`<td \${cellStyle}><span class="subject" \${subjectStyle}>\${subject.name}<\/span>\`;
+                            if (subject.teacher) {
+                                html += \`<br><span class="teacher" \${teacherStyle}>\${subject.teacher}<\/span>\`;
+                            }
+                            html += \`<\/td>\`;
+                        } else {
+                            html += '<td><\/td>';
+                        }
+                    } else {
+                        html += '<td><\/td>';
+                    }
+                }
+                
+                html += '<\/tr>';
+            });
+        }
+        
+        // 添加下午课程
+        if (this.periods.afternoon && this.periods.afternoon.length > 0) {
+            this.periods.afternoon.forEach((period, index) => {
+                html += '<tr>';
+                
+                // 时段列（仅第一行，合并整个时段）
+                if (index === 0) {
+                    html += \`<td rowspan="\${this.periods.afternoon.length}" class="time-section">\${this.sectionNames.afternoon}<\/td>\`;
+                }
+                
+                // 课时列
+                html += \`<td class="period-header">\${period.name}\`;
+                if (this.settings.showPeriodTime && period.time) {
+                    html += \`<br><span class="period-time">\${period.time}<\/span>\`;
+                }
+                html += \`<\/td>\`;
+                
+                // 课程内容
+                const dayCount = weekDays.length;
+                for (let day = 1; day <= dayCount; day++) {
+                    const key = \`\${day}-afternoon-\${index}\`;
+                    const subjectId = this.timetable[key];
+                    
+                    if (subjectId) {
+                        const subject = this.subjects.find(s => s.id === subjectId);
+                        if (subject) {
+                            const colorType = subject.colorType || 'background';
+                            let cellStyle = '';
+                            let subjectStyle = '';
+                            let teacherStyle = '';
+                            
+                            if (colorType === 'background') {
+                                // 背景色模式
+                                cellStyle = \`style="background-color: \${subject.color}; color: white; border: 1px solid #000 !important;"\`;
+                            } else {
+                                // 字体色模式
+                                subjectStyle = \`style="color: \${subject.color};"\`;
+                                teacherStyle = \`style="color: \${subject.color};"\`;
+                            }
+                            
+                            html += \`<td \${cellStyle}><span class="subject" \${subjectStyle}>\${subject.name}<\/span>\`;
+                            if (subject.teacher) {
+                                html += \`<br><span class="teacher" \${teacherStyle}>\${subject.teacher}<\/span>\`;
+                            }
+                            html += \`<\/td>\`;
+                        } else {
+                            html += '<td><\/td>';
+                        }
+                    } else {
+                        html += '<td><\/td>';
+                    }
+                }
+                
+                html += '<\/tr>';
+            });
+        }
+        
+        // 添加晚上课程
+        if (this.settings.showEvening && this.periods.evening && this.periods.evening.length > 0) {
+            this.periods.evening.forEach((period, index) => {
+                html += '<tr>';
+                
+                // 时段列（仅第一行，合并整个时段）
+                if (index === 0) {
+                    html += \`<td rowspan="\${this.periods.evening.length}" class="time-section">\${this.sectionNames.evening}<\/td>\`;
+                }
+                
+                // 课时列
+                html += \`<td class="period-header">\${period.name}\`;
+                if (this.settings.showPeriodTime && period.time) {
+                    html += \`<br><span class="period-time">\${period.time}<\/span>\`;
+                }
+                html += \`<\/td>\`;
+                
+                // 课程内容
+                const dayCount = weekDays.length;
+                for (let day = 1; day <= dayCount; day++) {
+                    const key = \`\${day}-evening-\${index}\`;
+                    const subjectId = this.timetable[key];
+                    
+                    if (subjectId) {
+                        const subject = this.subjects.find(s => s.id === subjectId);
+                        if (subject) {
+                            const colorType = subject.colorType || 'background';
+                            let cellStyle = '';
+                            let subjectStyle = '';
+                            let teacherStyle = '';
+                            
+                            if (colorType === 'background') {
+                                // 背景色模式
+                                cellStyle = \`style="background-color: \${subject.color}; color: white; border: 1px solid #000 !important;"\`;
+                            } else {
+                                // 字体色模式
+                                subjectStyle = \`style="color: \${subject.color};"\`;
+                                teacherStyle = \`style="color: \${subject.color};"\`;
+                            }
+                            
+                            html += \`<td \${cellStyle}><span class="subject" \${subjectStyle}>\${subject.name}<\/span>\`;
+                            if (subject.teacher) {
+                                html += \`<br><span class="teacher" \${teacherStyle}>\${subject.teacher}<\/span>\`;
+                            }
+                            html += \`<\/td>\`;
+                        } else {
+                            html += '<td><\/td>';
+                        }
+                    } else {
+                        html += '<td><\/td>';
+                    }
+                }
+                
+                html += '<\/tr>';
+            });
+        }
+        
+        html += \`<\/tbody>
+    <\/table>
+<\/body>
+<\/html>\`;
+        
+        return html;
+    }
+}
+
+// 初始化应用
+let app;
+document.addEventListener('DOMContentLoaded', () => {
+    app = new TimetableApp();
+    
+    // 初始化主题切换
+    initThemeSwitcher();
+    initCustomColor();
+    initFontSwitcher();
+});
+
+// 全局关闭所有下拉菜单函数
+function closeAllMenus() {
+    const exportMenu = document.getElementById('exportMenu');
+    const backupMenu = document.getElementById('backupMenu');
+    const themeMenu = document.getElementById('themeMenu');
+    const fontMenu = document.getElementById('fontMenu');
+    
+    if (exportMenu) exportMenu.classList.remove('show');
+    if (backupMenu) backupMenu.classList.remove('show');
+    if (themeMenu) themeMenu.classList.remove('show');
+    if (fontMenu) fontMenu.classList.remove('show');
+}
+
+// 重写初始化顺序，确保主题正确应用
+function initThemeSwitcher() {
+    const themeBtn = document.getElementById('themeBtn');
+    const themeMenu = document.getElementById('themeMenu');
+    const themeItems = document.querySelectorAll('.theme-item');
+    
+    // 从本地存储加载主题
+    const savedTheme = localStorage.getItem('timetable-theme') || 'default';
+    
+    // 初始化主题
+    if (savedTheme === 'custom') {
+        const savedCustomColor = localStorage.getItem('timetable-custom-color');
+        if (savedCustomColor) {
+            applyCustomColor(savedCustomColor);
+        }
+    } else {
+        setTheme(savedTheme);
+    }
+    
+    // 切换主题菜单显示/隐藏
+    themeBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const isVisible = themeMenu.classList.contains('show');
+        closeAllMenus();
+        if (!isVisible) {
+            themeMenu.classList.add('show');
+        }
+    });
+    
+    // 点击菜单项切换主题
+    themeItems.forEach(item => {
+        item.addEventListener('click', () => {
+            const theme = item.dataset.theme;
+            setTheme(theme);
+            themeMenu.classList.remove('show');
+        });
+    });
+    
+    // 点击页面其他地方关闭主题菜单
+    document.addEventListener('click', () => {
+        themeMenu.classList.remove('show');
+    });
+    
+    // 阻止菜单内部点击事件冒泡
+    themeMenu.addEventListener('click', (e) => {
+        e.stopPropagation();
+    });
+}
+
+function setTheme(theme) {
+    // 移除所有主题类
+    document.body.classList.remove('theme-blue', 'theme-purple', 'theme-pink', 'theme-orange', 'theme-dark');
+    
+    // 清除自定义颜色样式
+    document.documentElement.removeAttribute('style');
+    
+    // 应用预设主题
+    if (theme !== 'default') {
+        document.body.classList.add(\`theme-\${theme}\`);
+    }
+    
+    // 保存到本地存储
+    localStorage.setItem('timetable-theme', theme);
+    
+    // 更新菜单项状态
+    document.querySelectorAll('.theme-item').forEach(item => {
+        item.classList.toggle('active', item.dataset.theme === theme);
+    });
+}
+
+// 自定义颜色功能
+function initCustomColor() {
+    const colorPicker = document.getElementById('customColorPicker');
+    const applyBtn = document.getElementById('applyCustomColor');
+    
+    // 从本地存储加载自定义颜色
+    const savedCustomColor = localStorage.getItem('timetable-custom-color');
+    if (savedCustomColor) {
+        colorPicker.value = savedCustomColor;
+    }
+    
+    // 应用自定义颜色的核心函数
+    function applyColor(color) {
+        // 移除所有主题类
+        document.body.classList.remove('theme-blue', 'theme-purple', 'theme-pink', 'theme-orange', 'theme-dark');
+        
+        // 清除之前的自定义样式
+        document.documentElement.removeAttribute('style');
+        
+        // 应用自定义颜色
+        applyCustomColor(color);
+        
+        // 保存到本地存储
+        localStorage.setItem('timetable-theme', 'custom');
+        localStorage.setItem('timetable-custom-color', color);
+        
+        // 更新主题菜单项状态
+        document.querySelectorAll('.theme-item').forEach(item => {
+            item.classList.remove('active');
+        });
+    }
+    
+    // 直接选择颜色时应用（实时生效）
+    colorPicker.addEventListener('input', () => {
+        const color = colorPicker.value;
+        applyColor(color);
+    });
+    
+    // 颜色选择完成后保存
+    colorPicker.addEventListener('change', () => {
+        const color = colorPicker.value;
+        applyColor(color);
+    });
+    
+    // 隐藏应用按钮，因为不再需要
+    if (applyBtn) {
+        applyBtn.style.display = 'none';
+    }
+}
+
+function setTheme(theme) {
+    // 移除所有主题类
+    document.body.classList.remove('theme-blue', 'theme-purple', 'theme-pink', 'theme-orange', 'theme-dark');
+    
+    // 特殊处理自定义主题
+    if (theme === 'custom') {
+        // 加载保存的自定义颜色并应用
+        const savedCustomColor = localStorage.getItem('timetable-custom-color');
+        if (savedCustomColor) {
+            applyCustomColor(savedCustomColor);
+        }
+    } else {
+        // 应用预设主题
+        if (theme !== 'default') {
+            document.body.classList.add(\`theme-\${theme}\`);
+        } else {
+            // 恢复默认主题（豆沙绿）
+            document.documentElement.removeAttribute('style');
+        }
+    }
+    
+    // 保存到本地存储
+    localStorage.setItem('timetable-theme', theme);
+    
+    // 更新菜单项状态
+    document.querySelectorAll('.theme-item').forEach(item => {
+        item.classList.toggle('active', item.dataset.theme === theme);
+    });
+}
+
+// 自定义颜色功能
+function initCustomColor() {
+    const colorPicker = document.getElementById('customColorPicker');
+    
+    // 从本地存储加载自定义颜色
+    const savedCustomColor = localStorage.getItem('timetable-custom-color');
+    if (savedCustomColor) {
+        colorPicker.value = savedCustomColor;
+    }
+    
+    // 直接选择颜色时应用（实时生效）
+    colorPicker.addEventListener('input', () => {
+        const color = colorPicker.value;
+        applyCustomColor(color);
+    });
+    
+    // 颜色选择完成后保存
+    colorPicker.addEventListener('change', () => {
+        const color = colorPicker.value;
+        localStorage.setItem('timetable-custom-color', color);
+    });
+}
+
+// 字体切换功能
+function initFontSwitcher() {
+    const fontBtn = document.getElementById('fontBtn');
+    const fontMenu = document.getElementById('fontMenu');
+    const fontItems = document.querySelectorAll('.font-item');
+    
+    // 从本地存储加载字体
+    const savedFont = localStorage.getItem('timetable-font') || 'system';
+    setFont(savedFont);
+    
+    // 切换字体菜单显示/隐藏
+    fontBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const isVisible = fontMenu.classList.contains('show');
+        closeAllMenus();
+        if (!isVisible) {
+            fontMenu.classList.add('show');
+        }
+    });
+    
+    // 点击菜单项切换字体
+    fontItems.forEach(item => {
+        item.addEventListener('click', () => {
+            const font = item.dataset.font;
+            setFont(font);
+            fontMenu.classList.remove('show');
+        });
+    });
+    
+    // 点击页面其他地方关闭字体菜单
+    document.addEventListener('click', () => {
+        fontMenu.classList.remove('show');
+    });
+    
+    // 阻止菜单内部点击事件冒泡
+    fontMenu.addEventListener('click', (e) => {
+        e.stopPropagation();
+    });
+}
+
+function setFont(font) {
+    // 定义字体映射
+    const fontMap = {
+        'system': 'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+        'microsoft-yahei': '"Microsoft YaHei", "微软雅黑", sans-serif',
+        'simsun': 'SimSun, "宋体", serif',
+        'heiti': '"SimHei", "黑体", sans-serif',
+        'kaiti': 'KaiTi, "楷体", serif',
+        'fangsong': 'FangSong, "仿宋", serif',
+        'xingkai': '"STXingkai", "华文行楷", "STXingkai SC", "华文行楷 SC", "KaiTi", "楷体", "SimSun", "宋体", serif',
+        'lishu': '"LiSu", "隶书", "STXingkai", "华文行楷", "KaiTi", "楷体", "SimSun", "宋体", serif',
+        'kaiti': '"KaiTi", "楷体", "STXingkai", "华文行楷", "SimSun", "宋体", serif',
+        'fangsong': '"FangSong", "仿宋", "KaiTi", "楷体", "SimSun", "宋体", serif',
+        'youyuan': '"YouYuan", "幼圆", "Microsoft YaHei", "微软雅黑", sans-serif',
+        'source-han-sans': '"Source Han Sans", "思源黑体", "Microsoft YaHei", sans-serif',
+        'source-han-serif': '"Source Han Serif", "思源宋体", "SimSun", serif',
+        'youyuan': '"YouYuan", "幼圆", sans-serif',
+        'arial': 'Arial, sans-serif',
+        'helvetica': 'Helvetica, Arial, sans-serif',
+        'georgia': 'Georgia, serif',
+        'times-new-roman': '"Times New Roman", Times, serif'
+    };
+    
+    // 应用字体到整个页面
+    document.body.style.fontFamily = fontMap[font] || fontMap['system'];
+    
+    // 保存到本地存储
+    localStorage.setItem('timetable-font', font);
+    
+    // 更新菜单项状态
+    document.querySelectorAll('.font-item').forEach(item => {
+        item.classList.toggle('active', item.dataset.font === font);
+    });
+}
+
+function applyCustomColor(color) {
+    // 移除所有主题类
+    document.body.classList.remove('theme-blue', 'theme-purple', 'theme-pink', 'theme-orange', 'theme-dark');
+    
+    // 计算颜色变体
+    const rgb = hexToRgb(color);
+    const lightColor = \`rgba(\${rgb.r}, \${rgb.g}, \${rgb.b}, 0.1)\`;
+    const darkColor = darkenColor(color, 0.3);
+    const borderColor = \`rgba(\${rgb.r}, \${rgb.g}, \${rgb.b}, 0.3)\`;
+    const shadowColor = \`rgba(\${rgb.r}, \${rgb.g}, \${rgb.b}, 0.15)\`;
+    const patternBackground = \`radial-gradient(circle at 10% 20%, rgba(\${rgb.r}, \${rgb.g}, \${rgb.b}, 0.1) 0%, rgba(\${rgb.r}, \${rgb.g}, \${rgb.b}, 0.05) 90%)\`;
+    
+    // 设置CSS变量
+    document.documentElement.style.setProperty('--primary-color', color);
+    document.documentElement.style.setProperty('--light-color', lightColor);
+    document.documentElement.style.setProperty('--dark-color', darkColor);
+    document.documentElement.style.setProperty('--border-color', borderColor);
+    document.documentElement.style.setProperty('--background-color', lightColor);
+    document.documentElement.style.setProperty('--text-color', darkColor);
+    document.documentElement.style.setProperty('--shadow-color', shadowColor);
+    document.documentElement.style.setProperty('--pattern-background', patternBackground);
+    
+    // 保存到本地存储
+    localStorage.setItem('timetable-theme', 'custom');
+}
+
+// 辅助函数：十六进制转RGB
+function hexToRgb(hex) {
+    const result = /^#?([a-f\\d]{2})([a-f\\d]{2})([a-f\\d]{2})$/i.exec(hex);
+    return result ? {
+        r: parseInt(result[1], 16),
+        g: parseInt(result[2], 16),
+        b: parseInt(result[3], 16)
+    } : { r: 74, g: 124, b: 89 }; // 默认豆沙绿
+}
+
+// 辅助函数：加深颜色
+function darkenColor(color, amount) {
+    const rgb = hexToRgb(color);
+    const r = Math.max(0, Math.min(255, rgb.r - rgb.r * amount));
+    const g = Math.max(0, Math.min(255, rgb.g - rgb.g * amount));
+    const b = Math.max(0, Math.min(255, rgb.b - rgb.b * amount));
+    return \`rgb(\${r}, \${g}, \${b})\`;
+}`
     },
-    meta: {builtAt: "2026-09-28 09:10:16", sources: {"tools/kechengbiao2/css/styles.css": "154acb2cba12", "assets/js/frame-bridge.js": "1131903c1e46", "tools/kechengbiao2/js/script.js": "e909ce0adecf"}}
+    meta: {builtAt: "2026-09-28 11:07:05", sources: {"tools/kechengbiao2/css/styles.css": "154acb2cba12", "assets/js/frame-bridge.js": "1131903c1e46", "tools/kechengbiao2/js/script.js": "e909ce0adecf"}}
   };
 })();

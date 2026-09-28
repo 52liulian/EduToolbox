@@ -1,18 +1,2765 @@
-/* 自动生成，请勿手改 —— 源：tools/award-generator/  ·  构建：2026-09-28 09:10:16 */
+/* 自动生成，请勿手改 —— 源：tools/award-generator/  ·  构建：2026-09-28 11:07:05 */
 /* 用途：file:// 离线场景下 fetch 被 CORS 拦截，站点改用 <script src> 加载本文件，
    拿到工具页面与本地 CSS/JS 文本后走与 http 相同的 Shadow DOM 组件化挂载。
    工具源码改动后请重跑：python .workbuddy/scripts/build_tool_bundles.py */
 (function(){
   var g = window.EduToolboxToolBundles || (window.EduToolboxToolBundles = {});
   g["award-generator"] = {
-    html: "<!DOCTYPE html>\n<html lang=\"zh-CN\">\n<head>\n<meta charset=\"UTF-8\">\n<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n<title>电子奖状生成器 | EduToolbox · 奖状/表扬信/喜报实时预览<\/title>\n<meta name=\"description\" content=\"选模板、填姓名与奖项，实时预览奖状，一键打印或导出 PNG 图片。学期评优、课堂即时表扬必备。全本地处理，不上传任何数据。\">\n<link rel=\"icon\" href=\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%8F%86%3C/text%3E%3C/svg%3E\">\n<link rel=\"stylesheet\" href=\"../../assets/css/tool-common.css\">\n<link rel=\"stylesheet\" href=\"award-generator.css\">\n<\/head>\n<body>\n\n<div class=\"container\">\n  <div class=\"workbench\">\n    <!-- ======================= 左侧设置面板 ======================= -->\n    <aside class=\"panel setup-panel\">\n      <div class=\"block\">\n        <h2 class=\"block-title\">① 奖状模板<\/h2>\n        <div class=\"chips\" id=\"tplChips\">\n          <button type=\"button\" class=\"chip active\" data-tpl=\"award\">🏅 奖状<\/button>\n          <button type=\"button\" class=\"chip\" data-tpl=\"cert\">📜 荣誉证书<\/button>\n          <button type=\"button\" class=\"chip\" data-tpl=\"praise\">💌 表扬信<\/button>\n          <button type=\"button\" class=\"chip\" data-tpl=\"happy\">🎉 喜报<\/button>\n        <\/div>\n      <\/div>\n\n      <div class=\"block\">\n        <h2 class=\"block-title\">② 奖项称号<\/h2>\n        <input type=\"text\" id=\"awardName\" class=\"text-input\" placeholder=\"如：三好学生、学习之星\" maxlength=\"12\">\n        <div class=\"chips chips-mini\" id=\"awardChips\"><\/div>\n      <\/div>\n\n      <div class=\"block\">\n        <h2 class=\"block-title\">③ 学生姓名<\/h2>\n        <input type=\"text\" id=\"studentName\" class=\"text-input\" placeholder=\"请输入学生姓名\" maxlength=\"10\">\n      <\/div>\n\n      <div class=\"block\">\n        <h2 class=\"block-title\">④ 颁发信息<\/h2>\n        <div class=\"field\">\n          <label for=\"schoolName\">颁发单位（落款）<\/label>\n          <input type=\"text\" id=\"schoolName\" class=\"text-input\" value=\"杏坛实验学校\" maxlength=\"20\">\n        <\/div>\n        <div class=\"field\">\n          <label for=\"awardDate\">颁发日期<\/label>\n          <input type=\"date\" id=\"awardDate\" class=\"text-input\">\n        <\/div>\n        <div class=\"field\">\n          <label for=\"certBody\">正文（可编辑）<\/label>\n          <textarea id=\"certBody\" class=\"text-input\" rows=\"2\">在 2025—2026 学年度中，表现优异，特授予「{award}」荣誉称号，以资鼓励。<\/textarea>\n          <p class=\"block-hint\">可用 <code>{name}<\/code> 与 <code>{award}<\/code> 两个占位符<\/p>\n        <\/div>\n      <\/div>\n\n      <div class=\"actions\">\n        <button type=\"button\" class=\"btn btn-primary\" id=\"btnExport\">📥 导出 PNG<\/button>\n        <button type=\"button\" class=\"btn btn-small\" id=\"btnPrint\">🖨 打印奖状<\/button>\n        <button type=\"button\" class=\"btn btn-small btn-ghost\" id=\"btnDemo\">🎲 示例<\/button>\n      <\/div>\n    <\/aside>\n\n    <!-- ======================= 右侧预览舞台 ======================= -->\n    <main class=\"stage-panel\">\n      <!-- 舞台右上角工具栏：⛶ 舞台全屏（自动隐藏设置栏） / ⚙ 切换设置栏显隐 -->\n      <div class=\"stage-toolbar\">\n        <button type=\"button\" class=\"icon-btn\" id=\"fullscreenBtn\" title=\"全屏\">⛶<\/button>\n        <button type=\"button\" class=\"icon-btn\" id=\"hideSetupBtn\" title=\"隐藏设置\">⚙<\/button>\n      <\/div>\n      <div class=\"stage-head\">\n        <h2 class=\"panel-title\">👀 实时预览<\/h2>\n        <span class=\"stage-ok\" id=\"stageOk\">自动更新中<\/span>\n      <\/div>\n\n      <div class=\"cert-sheet\">\n        <!-- 奖状主体（导出/打印即以该元素为准） -->\n        <div class=\"certificate\" id=\"certificate\">\n          <div class=\"corner tl\"><\/div>\n          <div class=\"corner tr\"><\/div>\n          <div class=\"corner bl\"><\/div>\n          <div class=\"corner br\"><\/div>\n          <div class=\"cert-inner\">\n            <h2 class=\"cert-title\" id=\"certTitle\">奖 状<\/h2>\n            <div class=\"cert-ribbon\" id=\"certRibbon\"><\/div>\n            <div class=\"cert-award\" id=\"certAward\">三好学生<\/div>\n            <div class=\"cert-line\" id=\"certLine\">兹有 <span class=\"hl\" id=\"certName\">张三<\/span> 同学：<\/div>\n            <p class=\"cert-body\" id=\"certBodyView\">在 2025—2026 学年度中，表现优异，特授予「三好学生」荣誉称号，以资鼓励。<\/p>\n            <div class=\"cert-foot\">\n              <div class=\"cert-school\" id=\"certSchool\">杏坛实验学校<\/div>\n              <div class=\"cert-date\" id=\"certDate\">2026-09-21<\/div>\n            <\/div>\n          <\/div>\n        <\/div>\n      <\/div>\n\n      <div class=\"stage-tip\">💡 点击「导出 PNG」可保存为高清图片；「打印」可输出纸质奖状（A4 横向）。<\/div>\n    <\/main>\n  <\/div>\n<\/div>\n\n<!-- 提示条 -->\n<div class=\"toast\" id=\"toast\"><\/div>\n\n<script src=\"../../assets/js/frame-bridge.js\"><\/script>\n<script src=\"../../assets/vendor/html2canvas.min.js\"><\/script>\n<script src=\"../../assets/js/tool-stage-toolbar.js\"><\/script>\n<script src=\"award-generator.js\"><\/script>\n<\/body>\n<\/html>\n",
+    html: `<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>电子奖状生成器 | EduToolbox · 奖状/表扬信/喜报实时预览<\/title>
+<meta name="description" content="选模板、填姓名与奖项，实时预览奖状，一键打印或导出 PNG 图片。学期评优、课堂即时表扬必备。全本地处理，不上传任何数据。">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%8F%86%3C/text%3E%3C/svg%3E">
+<link rel="stylesheet" href="../../assets/css/tool-common.css">
+<link rel="stylesheet" href="award-generator.css">
+<\/head>
+<body>
+
+<div class="container">
+  <div class="workbench">
+    <!-- ======================= 左侧设置面板 ======================= -->
+    <aside class="panel setup-panel">
+      <div class="block">
+        <h2 class="block-title">① 奖状模板<\/h2>
+        <div class="chips" id="tplChips">
+          <button type="button" class="chip active" data-tpl="award">🏅 奖状<\/button>
+          <button type="button" class="chip" data-tpl="cert">📜 荣誉证书<\/button>
+          <button type="button" class="chip" data-tpl="praise">💌 表扬信<\/button>
+          <button type="button" class="chip" data-tpl="happy">🎉 喜报<\/button>
+        <\/div>
+      <\/div>
+
+      <div class="block">
+        <h2 class="block-title">② 奖项称号<\/h2>
+        <input type="text" id="awardName" class="text-input" placeholder="如：三好学生、学习之星" maxlength="12">
+        <div class="chips chips-mini" id="awardChips"><\/div>
+      <\/div>
+
+      <div class="block">
+        <h2 class="block-title">③ 学生姓名<\/h2>
+        <input type="text" id="studentName" class="text-input" placeholder="请输入学生姓名" maxlength="10">
+      <\/div>
+
+      <div class="block">
+        <h2 class="block-title">④ 颁发信息<\/h2>
+        <div class="field">
+          <label for="schoolName">颁发单位（落款）<\/label>
+          <input type="text" id="schoolName" class="text-input" value="杏坛实验学校" maxlength="20">
+        <\/div>
+        <div class="field">
+          <label for="awardDate">颁发日期<\/label>
+          <input type="date" id="awardDate" class="text-input">
+        <\/div>
+        <div class="field">
+          <label for="certBody">正文（可编辑）<\/label>
+          <textarea id="certBody" class="text-input" rows="2">在 2025—2026 学年度中，表现优异，特授予「{award}」荣誉称号，以资鼓励。<\/textarea>
+          <p class="block-hint">可用 <code>{name}<\/code> 与 <code>{award}<\/code> 两个占位符<\/p>
+        <\/div>
+      <\/div>
+
+      <div class="actions">
+        <button type="button" class="btn btn-primary" id="btnExport">📥 导出 PNG<\/button>
+        <button type="button" class="btn btn-small" id="btnPrint">🖨 打印奖状<\/button>
+        <button type="button" class="btn btn-small btn-ghost" id="btnDemo">🎲 示例<\/button>
+      <\/div>
+    <\/aside>
+
+    <!-- ======================= 右侧预览舞台 ======================= -->
+    <main class="stage-panel">
+      <!-- 舞台右上角工具栏：⛶ 舞台全屏（自动隐藏设置栏） / ⚙ 切换设置栏显隐 -->
+      <div class="stage-toolbar">
+        <button type="button" class="icon-btn" id="fullscreenBtn" title="全屏">⛶<\/button>
+        <button type="button" class="icon-btn" id="hideSetupBtn" title="隐藏设置">⚙<\/button>
+      <\/div>
+      <div class="stage-head">
+        <h2 class="panel-title">👀 实时预览<\/h2>
+        <span class="stage-ok" id="stageOk">自动更新中<\/span>
+      <\/div>
+
+      <div class="cert-sheet">
+        <!-- 奖状主体（导出/打印即以该元素为准） -->
+        <div class="certificate" id="certificate">
+          <div class="corner tl"><\/div>
+          <div class="corner tr"><\/div>
+          <div class="corner bl"><\/div>
+          <div class="corner br"><\/div>
+          <div class="cert-inner">
+            <h2 class="cert-title" id="certTitle">奖 状<\/h2>
+            <div class="cert-ribbon" id="certRibbon"><\/div>
+            <div class="cert-award" id="certAward">三好学生<\/div>
+            <div class="cert-line" id="certLine">兹有 <span class="hl" id="certName">张三<\/span> 同学：<\/div>
+            <p class="cert-body" id="certBodyView">在 2025—2026 学年度中，表现优异，特授予「三好学生」荣誉称号，以资鼓励。<\/p>
+            <div class="cert-foot">
+              <div class="cert-school" id="certSchool">杏坛实验学校<\/div>
+              <div class="cert-date" id="certDate">2026-09-21<\/div>
+            <\/div>
+          <\/div>
+        <\/div>
+      <\/div>
+
+      <div class="stage-tip">💡 点击「导出 PNG」可保存为高清图片；「打印」可输出纸质奖状（A4 横向）。<\/div>
+    <\/main>
+  <\/div>
+<\/div>
+
+<!-- 提示条 -->
+<div class="toast" id="toast"><\/div>
+
+<script src="../../assets/js/frame-bridge.js"><\/script>
+<script src="../../assets/vendor/html2canvas.min.js"><\/script>
+<script src="../../assets/js/tool-stage-toolbar.js"><\/script>
+<script src="award-generator.js"><\/script>
+<\/body>
+<\/html>
+`,
     files: {
-      "assets/css/tool-common.css": "/* ============================================================================\n * EduToolbox · tool-common.css\n * 自研工具共享设计系统（iframe 嵌入 / 独立打开均适用）\n * ----------------------------------------------------------------------------\n * 加载约定：各工具页先加载「自己的 css」，再加载本文件。\n *   → 本文件只提供公共底座；工具特有布局写在各自 css 中，\n *     若需覆盖本文件的同优先级声明，请使用更高特异性选择器\n *     （如 body.xxx、#app .main、具体 id）。\n * 高度策略：所有容器高度自动撑开，除 body 浏览器主滚动条外不制造内部滚动条；\n *   唯一例外：textarea 等表单控件在内容超出时允许自身滚动 + 可拖拽放大；\n *   工具自身的全屏投影模式（.is-fullscreen / :fullscreen）由各工具 css 定义。\n * ========================================================================== */\n\n/* ---------------------------------------------------------------------------\n * 1. 设计令牌\n * ------------------------------------------------------------------------- */\n:root {\n  --primary:        #3b6ef6;\n  --primary-hover:  #2f5ee0;\n  --primary-active: #274fc2;\n  --primary-soft:   #e8edff;\n  --primary-soft-2: #dbe4ff;\n  --primary-grad:   linear-gradient(135deg, #5a8dff 0%, #3b6ef6 55%, #2f5bd9 100%);\n\n  --success: #22b36a;\n  --warning: #f5a623;\n  --danger:  #ef5b5b;\n  --info:    #38a3e8;\n\n  --text-1: #1f2733;\n  --text-2: #515b6b;\n  --text-3: #8a93a3;\n\n  --bg:        #eef2fa;\n  --bg-soft:   #f4f7fd;\n  --card-bg:   #ffffff;\n  --card-bg-2: #f8faff;\n  --border:    #e4e9f2;\n  --border-2:  #d6deec;\n\n  --shadow-sm: 0 2px 8px rgba(31, 45, 80, 0.05);\n  --shadow:    0 6px 22px rgba(31, 45, 80, 0.07);\n  --shadow-lg: 0 16px 40px rgba(36, 66, 140, 0.14);\n  --shadow-primary: 0 10px 24px rgba(59, 110, 246, 0.28);\n\n  --r-sm: 8px;\n  --r:    14px;\n  --r-lg: 20px;\n  --r-pill: 999px;\n\n  --ease: cubic-bezier(0.4, 0, 0.2, 1);\n  --t-fast: 0.16s;\n  --t:      0.26s;\n\n  --font: -apple-system, BlinkMacSystemFont, \"Segoe UI\", \"PingFang SC\",\n          \"Hiragino Sans GB\", \"Microsoft YaHei\", \"Helvetica Neue\", Arial,\n          sans-serif;\n}\n\n/* ---------------------------------------------------------------------------\n * 2. Reset（工具页可能被独立打开，需要完整底座）\n * ------------------------------------------------------------------------- */\n*, *::before, *::after { box-sizing: border-box; }\n* { margin: 0; padding: 0; }\n\nhtml {\n  -webkit-text-size-adjust: 100%;\n  -webkit-tap-highlight-color: transparent;\n  height: auto;\n}\n\nbody {\n  height: auto;\n  min-height: 100%;\n  overflow-x: hidden;      /* 仅防止横向溢出，纵向由浏览器主滚动条承担 */\n  overflow-y: visible;\n  font-family: var(--font);\n  font-size: 15px;\n  line-height: 1.65;\n  color: var(--text-1);\n  background:\n    radial-gradient(1200px 500px at 85% -10%, rgba(91, 139, 255, 0.10), transparent 60%),\n    radial-gradient(900px 420px at 0% 0%, rgba(56, 163, 232, 0.08), transparent 55%),\n    var(--bg);\n  background-attachment: fixed;\n  -webkit-font-smoothing: antialiased;\n}\n\nimg, svg, canvas, video { display: block; max-width: 100%; }\ninput, button, textarea, select { font: inherit; color: inherit; }\nbutton { background: none; border: none; cursor: pointer; }\na { color: inherit; text-decoration: none; }\na:hover { color: var(--primary); }\nul, ol { list-style: none; }\nh1, h2, h3, h4, h5, h6 { font-weight: 700; line-height: 1.3; color: var(--text-1); }\n\n::selection { background: var(--primary); color: #fff; }\n\n[hidden] { display: none !important; }\n.hidden { display: none !important; }\n\n::-webkit-scrollbar { width: 10px; height: 10px; }\n::-webkit-scrollbar-thumb {\n  background: var(--border-2);\n  border-radius: 999px;\n  border: 2px solid transparent;\n  background-clip: content-box;\n}\n::-webkit-scrollbar-track { background: transparent; }\n\nkbd {\n  display: inline-block;\n  padding: 2px 8px;\n  font-family: Consolas, Menlo, monospace;\n  font-size: 12px;\n  color: var(--text-2);\n  background: var(--card-bg);\n  border: 1px solid var(--border-2);\n  border-bottom-width: 2px;\n  border-radius: 6px;\n}\n\n/* ---------------------------------------------------------------------------\n * 3. 页面骨架（高度全部 auto，内容自然向下撑开）\n * ------------------------------------------------------------------------- */\n#app { width: 100%; }\n\n.container {\n  width: 100%;\n  max-width: 1180px;\n  margin: 0 auto;\n  padding: 28px 24px 56px;\n}\n\n.wrap {\n  width: 100%;\n  max-width: 1240px;\n  margin: 0 auto;\n  padding: 28px 24px 56px;\n}\n\n/* 双栏工具：左设置面板 + 右舞台（各工具可用更高优先级改列宽/断点） */\n.main {\n  display: grid;\n  grid-template-columns: 360px minmax(0, 1fr);\n  gap: 22px;\n  align-items: start;\n  width: 100%;\n  max-width: 1440px;\n  margin: 0 auto;\n  padding: 24px;\n}\n\n.layout {\n  display: grid;\n  grid-template-columns: minmax(0, 1fr);\n  gap: 22px;\n  width: 100%;\n  max-width: 1240px;\n  margin: 0 auto;\n  padding: 24px;\n}\n\n.setup-panel,\n.settings-panel {\n  display: flex;\n  flex-direction: column;\n  gap: 16px;\n  /* 不设 sticky、不设固定高度、不内部滚动，随页面一起滚动 */\n  min-width: 0;\n}\n\n.stage {\n  position: relative;\n  min-width: 0;\n  min-height: 420px;\n  padding: 24px;\n  background: var(--card-bg);\n  border: 1px solid var(--border);\n  border-radius: var(--r-lg);\n  box-shadow: var(--shadow);\n  overflow: visible; /* 内容自动撑开，不裁切不滚动 */\n}\n\n/* ---------------------------------------------------------------------------\n * 4. 工具页头部（.hero / .hdr / .head / 标题组）\n * ------------------------------------------------------------------------- */\n.hero {\n  margin-bottom: 22px;\n  padding: 26px 28px;\n  text-align: center;\n  background: var(--card-bg);\n  border: 1px solid var(--border);\n  border-radius: var(--r-lg);\n  box-shadow: var(--shadow-sm);\n}\n\n.hero .title,\n.hero h1 {\n  font-size: clamp(22px, 3vw, 30px);\n  font-weight: 800;\n  margin-bottom: 8px;\n}\n\n.hero .subtitle,\n.hero p {\n  font-size: 14.5px;\n  line-height: 1.8;\n  color: var(--text-2);\n  max-width: 860px;\n  margin: 0 auto;\n}\n\n/* 评语类工具使用的大蓝色介绍卡 */\n.hdr {\n  display: flex;\n  align-items: center;\n  gap: 20px;\n  padding: 28px 30px;\n  margin-bottom: 22px;\n  color: #fff;\n  background: var(--primary-grad);\n  border-radius: var(--r-lg);\n  box-shadow: var(--shadow-primary);\n}\n\n.hdr-emoji {\n  display: grid;\n  place-items: center;\n  width: 72px;\n  height: 72px;\n  flex-shrink: 0;\n  font-size: 38px;\n  background: rgba(255, 255, 255, 0.18);\n  border: 1px solid rgba(255, 255, 255, 0.3);\n  border-radius: 20px;\n}\n\n.hdr-text h1 { color: #fff; font-size: clamp(22px, 2.6vw, 28px); margin-bottom: 6px; }\n.hdr-text p { color: rgba(255, 255, 255, 0.92); font-size: 14px; line-height: 1.75; }\n\n.head {\n  margin-bottom: 20px;\n  padding: 22px 24px;\n  background: var(--card-bg);\n  border: 1px solid var(--border);\n  border-radius: var(--r-lg);\n  box-shadow: var(--shadow-sm);\n}\n\n.head h1,\n.head .title { font-size: clamp(20px, 2.4vw, 26px); margin-bottom: 6px; }\n.head p { color: var(--text-2); font-size: 14px; line-height: 1.7; }\n\n.title { font-size: 24px; font-weight: 800; }\n.subtitle { font-size: 14.5px; color: var(--text-2); line-height: 1.75; }\n.slogan { font-size: 13px; color: var(--text-3); }\n.tool-title { font-size: 20px; font-weight: 800; }\n.tool-sub { font-size: 13.5px; color: var(--text-2); }\n\n/* ---------------------------------------------------------------------------\n * 5. 面板 / 卡片 / 区块\n * ------------------------------------------------------------------------- */\n.panel,\n.card,\n.side-card,\n.sheet {\n  background: var(--card-bg);\n  border: 1px solid var(--border);\n  border-radius: var(--r);\n  box-shadow: var(--shadow-sm);\n  padding: 22px;\n}\n\n.panels {\n  display: grid;\n  grid-template-columns: minmax(280px, 360px) minmax(0, 1fr);\n  gap: 18px;\n  margin-bottom: 18px;\n}\n\n.panel { min-width: 0; }\n.panel-names { grid-column: 1; }\n.panel-dims  {\n  grid-column: 2;\n  background: linear-gradient(135deg, #f0f6ff 0%, #f7f9ff 100%);\n  border-color: #dce7ff;\n}\n.panel-settings { grid-column: 1 / -1; }\n\n.panel-head {\n  display: flex;\n  align-items: center;\n  justify-content: space-between;\n  gap: 12px;\n  margin-bottom: 12px;\n}\n\n.panel-title,\n.card-title {\n  display: flex;\n  align-items: center;\n  gap: 8px;\n  font-size: 16px;\n  font-weight: 700;\n  margin-bottom: 12px;\n}\n\n.panel-head .panel-title { margin-bottom: 0; }\n\n.panel-tip,\n.panel-toggle {\n  margin-top: 10px;\n  font-size: 12.5px;\n  line-height: 1.6;\n  color: var(--text-3);\n}\n\n.panel-block { margin-top: 16px; }\n\n.block {\n  padding: 20px;\n  background: var(--card-bg);\n  border: 1px solid var(--border);\n  border-radius: var(--r);\n  box-shadow: var(--shadow-sm);\n}\n\n.block + .block { margin-top: 0; }\n.setup-panel .block { /* 已由父级 gap 控制间距 */ }\n\n.block-title {\n  display: flex;\n  align-items: center;\n  gap: 7px;\n  font-size: 15.5px;\n  font-weight: 700;\n  margin-bottom: 10px;\n}\n\n.block-hint {\n  font-size: 12.5px;\n  line-height: 1.6;\n  color: var(--text-3);\n  margin-bottom: 10px;\n}\n\n.count-bar {\n  display: flex;\n  align-items: center;\n  gap: 10px;\n  flex-wrap: wrap;\n  margin-top: 10px;\n  font-size: 13px;\n  color: var(--text-2);\n}\n\n.count-bar span { font-weight: 700; color: var(--primary); }\n\n/* ---------------------------------------------------------------------------\n * 6. 表单元素\n * ------------------------------------------------------------------------- */\ninput[type=\"text\"],\ninput[type=\"number\"],\ninput[type=\"email\"],\ninput[type=\"password\"],\ninput[type=\"search\"],\ninput[type=\"url\"],\ninput[type=\"date\"],\ninput[type=\"time\"],\ninput[type=\"datetime-local\"],\nselect,\ntextarea {\n  width: 100%;\n  padding: 10px 14px;\n  font-size: 14px;\n  color: var(--text-1);\n  background: var(--card-bg-2);\n  border: 1.5px solid var(--border);\n  border-radius: var(--r-sm);\n  outline: none;\n  transition: all var(--t-fast) var(--ease);\n}\n\ntextarea {\n  display: block;\n  min-height: 150px;\n  line-height: 1.7;\n  resize: vertical;          /* 用户可拖拽放大，默认完整展示不出现内部滚动条 */\n  overflow: auto;\n}\n\ninput:focus, select:focus, textarea:focus {\n  border-color: var(--primary);\n  background: #fff;\n  box-shadow: 0 0 0 3px rgba(59, 110, 246, 0.12);\n}\n\ninput::placeholder, textarea::placeholder { color: var(--text-3); }\n\nselect {\n  appearance: none;\n  -webkit-appearance: none;\n  background-image: url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M2 4l4 4 4-4' stroke='%238a93a3' stroke-width='1.6' fill='none' stroke-linecap='round'/%3E%3C/svg%3E\");\n  background-repeat: no-repeat;\n  background-position: right 12px center;\n  padding-right: 34px;\n  cursor: pointer;\n}\n\ninput[type=\"number\"] { -moz-appearance: textfield; }\ninput[type=\"number\"]::-webkit-outer-spin-button,\ninput[type=\"number\"]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }\n\ninput[type=\"color\"] {\n  width: 40px;\n  height: 32px;\n  padding: 2px;\n  border: 1.5px solid var(--border);\n  border-radius: var(--r-sm);\n  background: var(--card-bg);\n  cursor: pointer;\n}\n\n/* 滑杆 */\ninput[type=\"range\"] {\n  -webkit-appearance: none;\n  appearance: none;\n  width: 100%;\n  height: 6px;\n  border-radius: 999px;\n  background: var(--primary-soft-2);\n  outline: none;\n}\n\ninput[type=\"range\"]::-webkit-slider-thumb {\n  -webkit-appearance: none;\n  appearance: none;\n  width: 20px;\n  height: 20px;\n  border-radius: 50%;\n  background: var(--primary-grad);\n  border: 3px solid #fff;\n  box-shadow: 0 2px 6px rgba(59, 110, 246, 0.4);\n  cursor: pointer;\n}\n\ninput[type=\"range\"]::-moz-range-thumb {\n  width: 14px;\n  height: 14px;\n  border-radius: 50%;\n  background: var(--primary);\n  border: 3px solid #fff;\n  box-shadow: 0 2px 6px rgba(59, 110, 246, 0.4);\n  cursor: pointer;\n}\n\n/* 表单字段组 */\n.field { margin-bottom: 14px; }\n.field:last-child { margin-bottom: 0; }\n\n.field-label {\n  display: block;\n  font-size: 13.5px;\n  font-weight: 600;\n  color: var(--text-1);\n  margin-bottom: 7px;\n}\n\n.field-row {\n  display: flex;\n  align-items: center;\n  gap: 12px;\n  flex-wrap: wrap;\n}\n\n.field-hint {\n  margin-top: 6px;\n  font-size: 12.5px;\n  color: var(--text-3);\n}\n\n/* 设置行（label 左 / 控件右） */\n.setting-row {\n  display: flex;\n  align-items: center;\n  justify-content: space-between;\n  gap: 14px;\n  padding: 9px 0;\n  border-bottom: 1px dashed var(--border);\n}\n\n.setting-row:last-child { border-bottom: none; }\n\n.setting-row > label {\n  font-size: 13.5px;\n  font-weight: 500;\n  color: var(--text-2);\n  flex-shrink: 0;\n}\n\n.setting-row input[type=\"number\"],\n.setting-row input[type=\"text\"],\n.setting-row select { max-width: 180px; }\n\n.setting-grid {\n  display: grid;\n  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));\n  gap: 14px;\n}\n\n.setting-item {\n  display: flex;\n  align-items: center;\n  justify-content: space-between;\n  gap: 12px;\n  flex-wrap: wrap;\n  padding: 16px;\n  background: var(--card-bg-2);\n  border: 1px solid var(--border);\n  border-radius: var(--r-sm);\n}\n\n.setting-item--full { grid-column: 1 / -1; }\n\n.setting-label { font-size: 13.5px; font-weight: 600; }\n.setting-val { font-size: 13px; color: var(--text-3); }\n\n.opt-group { display: flex; flex-direction: column; gap: 8px; }\n.opt-label { font-size: 13px; font-weight: 600; color: var(--text-2); }\n\n/* 数字步进器 */\n.num-ctrl,\n.num-input {\n  display: inline-flex;\n  align-items: center;\n  gap: 4px;\n}\n\n.num-btn,\n.adj-btn {\n  display: grid;\n  place-items: center;\n  width: 32px;\n  height: 32px;\n  font-size: 16px;\n  font-weight: 700;\n  color: var(--primary);\n  background: var(--primary-soft);\n  border-radius: var(--r-sm);\n  transition: all var(--t-fast) var(--ease);\n  flex-shrink: 0;\n}\n\n.num-btn:hover,\n.adj-btn:hover { background: var(--primary-soft-2); }\n\n.num-val,\n.num-mini,\n.num-wide {\n  min-width: 52px;\n  text-align: center;\n  font-weight: 700;\n  font-size: 16px;\n  color: var(--text-1);\n}\n\n.num-wide { min-width: 84px; }\n.num-mini { min-width: 40px; font-size: 14px; }\n.num-unit,\n.unit { font-size: 12.5px; color: var(--text-3); margin-left: 4px; }\n\n.textarea-wrap { position: relative; }\n.textarea-toolbar {\n  display: flex;\n  justify-content: flex-end;\n  gap: 8px;\n  margin-top: 8px;\n}\n\n/* 复选行 / 单选 */\n.check-line,\n.check-inline,\n.check,\n.chk {\n  display: flex;\n  align-items: center;\n  gap: 9px;\n  padding: 7px 0;\n  font-size: 14px;\n  color: var(--text-2);\n  cursor: pointer;\n  user-select: none;\n}\n\n.check-inline { display: inline-flex; padding: 4px 12px 4px 0; }\n\n.check-stack { display: flex; flex-direction: column; gap: 2px; margin-top: 8px; }\n\n.check-line input,\n.check-inline input,\n.check input,\n.chk input {\n  width: 17px;\n  height: 17px;\n  flex-shrink: 0;\n  accent-color: var(--primary);\n  cursor: pointer;\n}\n\n.radio {\n  display: inline-flex;\n  align-items: center;\n  gap: 8px;\n  cursor: pointer;\n  font-size: 14px;\n  color: var(--text-2);\n}\n.radio input { accent-color: var(--primary); width: 16px; height: 16px; }\n\n/* 开关 switch（.switch 内含 checkbox + .slider） */\n.switch-wrap {\n  display: flex;\n  align-items: center;\n  justify-content: flex-end;\n  gap: 12px;\n}\n\n.switch-desc { font-size: 13px; color: var(--text-2); }\n\n.switch {\n  position: relative;\n  display: inline-block;\n  width: 46px;\n  height: 26px;\n  flex-shrink: 0;\n}\n\n.switch input {\n  position: absolute;\n  opacity: 0;\n  width: 100%;\n  height: 100%;\n  cursor: pointer;\n  z-index: 2;\n  margin: 0;\n}\n\n.switch .slider {\n  position: absolute;\n  inset: 0;\n  background: #c7cfdd;\n  border-radius: 999px;\n  transition: background var(--t-fast) var(--ease);\n  pointer-events: none;\n}\n\n.switch .slider::before {\n  content: \"\";\n  position: absolute;\n  top: 3px;\n  left: 3px;\n  width: 20px;\n  height: 20px;\n  background: #fff;\n  border-radius: 50%;\n  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);\n  transition: transform var(--t-fast) var(--ease);\n}\n\n.switch input:checked + .slider { background: var(--primary); }\n.switch input:checked + .slider::before { transform: translateX(20px); }\n\n/* 分段选择器：seg-group > label.seg > input + span；以及按钮式 seg-btn */\n.seg-group {\n  display: inline-flex;\n  flex-wrap: wrap;\n  gap: 4px;\n  padding: 4px;\n  background: var(--bg-soft);\n  border: 1px solid var(--border);\n  border-radius: var(--r-pill);\n}\n\n.seg { position: relative; cursor: pointer; }\n\n.seg input { position: absolute; opacity: 0; inset: 0; cursor: pointer; }\n\n.seg span {\n  display: inline-flex;\n  align-items: center;\n  gap: 5px;\n  padding: 7px 16px;\n  font-size: 13.5px;\n  font-weight: 600;\n  color: var(--text-2);\n  border-radius: var(--r-pill);\n  transition: all var(--t-fast) var(--ease);\n  white-space: nowrap;\n}\n\n.seg input:checked + span {\n  color: #fff;\n  background: var(--primary-grad);\n  box-shadow: var(--shadow-primary);\n}\n\n.seg:hover input:not(:checked) + span { color: var(--primary); background: var(--primary-soft); }\n\n.seg-bar {\n  display: inline-flex;\n  gap: 4px;\n  padding: 4px;\n  background: var(--bg-soft);\n  border-radius: var(--r-pill);\n}\n\n.seg-btn,\n.mode-btn,\n.mode-tab,\n.tab,\n.year-btn,\n.size-btn,\n.preset,\n.preset-btn {\n  display: inline-flex;\n  align-items: center;\n  justify-content: center;\n  gap: 5px;\n  padding: 8px 16px;\n  font-size: 13.5px;\n  font-weight: 600;\n  color: var(--text-2);\n  background: var(--card-bg);\n  border: 1.5px solid var(--border);\n  border-radius: var(--r-pill);\n  cursor: pointer;\n  transition: all var(--t-fast) var(--ease);\n  white-space: nowrap;\n  user-select: none;\n}\n\n.seg-btn:hover,\n.mode-btn:hover,\n.mode-tab:hover,\n.tab:hover,\n.year-btn:hover,\n.size-btn:hover,\n.preset:hover,\n.preset-btn:hover {\n  color: var(--primary);\n  border-color: var(--primary-soft-2);\n  background: var(--primary-soft);\n}\n\n.seg-btn.active,\n.mode-btn.active,\n.mode-tab.active,\n.tab.active,\n.year-btn.active,\n.size-btn.active {\n  color: #fff;\n  background: var(--primary-grad);\n  border-color: transparent;\n  box-shadow: var(--shadow-primary);\n}\n\n.tabs {\n  display: flex;\n  flex-wrap: wrap;\n  gap: 6px;\n  margin-bottom: 14px;\n}\n\n.tab-pane { display: none; }\n.tab-pane.active { display: block; }\n\n.seg-tip { font-size: 12.5px; color: var(--text-3); margin-top: 6px; }\n\n/* 标签芯片（可点选） */\n.chips {\n  display: flex;\n  flex-wrap: wrap;\n  gap: 9px;\n}\n\n.chip {\n  display: inline-flex;\n  align-items: center;\n  gap: 5px;\n  padding: 8px 16px;\n  font-size: 13.5px;\n  font-weight: 600;\n  color: var(--text-2);\n  background: var(--card-bg);\n  border: 1.5px solid var(--border);\n  border-radius: var(--r-pill);\n  cursor: pointer;\n  transition: all var(--t-fast) var(--ease);\n  user-select: none;\n}\n\n.chip:hover {\n  color: var(--primary);\n  border-color: var(--primary-soft-2);\n  transform: translateY(-1px);\n}\n\n.chip.active,\n.chip[aria-pressed=\"true\"] {\n  color: #fff;\n  background: var(--primary-grad);\n  border-color: transparent;\n  box-shadow: var(--shadow-primary);\n}\n\n.theme-chip {\n  display: inline-flex;\n  align-items: center;\n  gap: 6px;\n  padding: 7px 14px;\n  font-size: 13px;\n  border: 1.5px solid var(--border);\n  border-radius: var(--r-pill);\n  cursor: pointer;\n  background: var(--card-bg);\n  color: var(--text-2);\n  transition: all var(--t-fast) var(--ease);\n}\n\n.theme-chip.active { border-color: var(--primary); color: var(--primary); background: var(--primary-soft); }\n\n.theme-dot,\n.dot {\n  width: 16px;\n  height: 16px;\n  border-radius: 50%;\n  border: 2px solid var(--border-2);\n  flex-shrink: 0;\n}\n.theme-chip.active .theme-dot { box-shadow: 0 0 0 2px var(--primary-soft); }\n\n.val-tag {\n  display: inline-block;\n  padding: 1px 9px;\n  font-size: 12px;\n  font-weight: 600;\n  color: var(--primary);\n  background: var(--primary-soft);\n  border-radius: var(--r-pill);\n}\n\n/* 颜色行 */\n.color-row { display: flex; flex-wrap: wrap; gap: 12px; }\n.color-item {\n  display: inline-flex;\n  align-items: center;\n  gap: 7px;\n  font-size: 12.5px;\n  color: var(--text-2);\n}\n.color-item input[type=\"color\"] { width: 34px; height: 28px; }\n.color-swatch { width: 22px; height: 22px; border-radius: 7px; border: 1px solid var(--border); }\n.color-line { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }\n\n/* 拖拽上传区 */\n.dropzone {\n  display: flex;\n  flex-direction: column;\n  align-items: center;\n  justify-content: center;\n  gap: 8px;\n  padding: 34px 20px;\n  text-align: center;\n  background: var(--card-bg-2);\n  border: 2px dashed var(--border-2);\n  border-radius: var(--r);\n  cursor: pointer;\n  transition: all var(--t-fast) var(--ease);\n}\n.dropzone:hover,\n.dropzone.dragover {\n  border-color: var(--primary);\n  background: var(--primary-soft);\n}\n.dz-icon { font-size: 36px; line-height: 1; }\n.dz-hint { font-size: 13px; color: var(--text-3); }\n\n/* ---------------------------------------------------------------------------\n * 7. 按钮体系\n * ------------------------------------------------------------------------- */\n.btn,\n.btn-primary,\n.btn-ghost,\n.btn-soft,\n.btn-danger,\n.btn-stop,\n.btn-reveal,\n.btn-small,\n.bulk-btn,\n.tool-btn,\n.neon-btn,\n.link-btn,\n.ctrl-btn,\n.ctrl-secondary,\n.action-btn,\n.theme-btn {\n  display: inline-flex;\n  align-items: center;\n  justify-content: center;\n  gap: 6px;\n  padding: 10px 20px;\n  font-size: 14px;\n  font-weight: 600;\n  line-height: 1.2;\n  white-space: nowrap;\n  color: var(--text-2);\n  background: var(--card-bg);\n  border: 1.5px solid var(--border);\n  border-radius: var(--r-pill);\n  cursor: pointer;\n  user-select: none;\n  transition: all var(--t-fast) var(--ease);\n}\n\n.btn:hover,\n.btn-ghost:hover,\n.btn-soft:hover,\n.bulk-btn:hover,\n.tool-btn:hover,\n.ctrl-btn:hover,\n.ctrl-secondary:hover,\n.action-btn:hover,\n.link-btn:hover {\n  color: var(--primary);\n  border-color: var(--primary-soft-2);\n  background: var(--primary-soft);\n  transform: translateY(-1px);\n}\n\n.btn-primary {\n  color: #fff;\n  background: var(--primary-grad);\n  border-color: transparent;\n  box-shadow: var(--shadow-primary);\n}\n.btn-primary:hover {\n  color: #fff;\n  background: var(--primary-grad);\n  filter: brightness(1.05);\n  box-shadow: 0 12px 28px rgba(59, 110, 246, 0.36);\n  transform: translateY(-1px);\n}\n\n.btn-danger,\n.btn-stop {\n  color: var(--danger);\n  border-color: #ffd4d4;\n  background: #fff5f5;\n}\n.btn-danger:hover,\n.btn-stop:hover {\n  color: #fff;\n  background: var(--danger);\n  border-color: var(--danger);\n}\n\n.btn-soft { background: var(--primary-soft); border-color: var(--primary-soft-2); color: var(--primary); }\n.btn-soft:hover { background: var(--primary-soft-2); color: var(--primary); }\n\n.btn-lg { padding: 13px 30px; font-size: 16px; }\n.btn-small { padding: 7px 15px; font-size: 13px; }\n.btn--ghost { /* 变体命名兼容 */ }\n\n/* setup-panel 中无 .btn 前缀的按钮（chouti/seat 等工具使用） */\n.setup-panel .btn-primary,\n.setup-panel .btn-ghost {\n  width: 100%;\n  padding: 11px 18px;\n  font-size: 14px;\n}\n\n.btn-mini {\n  display: inline-flex;\n  align-items: center;\n  justify-content: center;\n  gap: 4px;\n  padding: 6px 13px;\n  font-size: 12.5px;\n  font-weight: 600;\n  color: var(--text-2);\n  background: var(--card-bg);\n  border: 1.5px solid var(--border);\n  border-radius: var(--r-pill);\n  cursor: pointer;\n  white-space: nowrap;\n  transition: all var(--t-fast) var(--ease);\n}\n.btn-mini:hover {\n  color: var(--primary);\n  border-color: var(--primary-soft-2);\n  background: var(--primary-soft);\n}\n\n.icon-btn {\n  display: grid;\n  place-items: center;\n  width: 40px;\n  height: 40px;\n  font-size: 18px;\n  color: var(--text-2);\n  background: var(--card-bg);\n  border: 1.5px solid var(--border);\n  border-radius: 50%;\n  cursor: pointer;\n  transition: all var(--t-fast) var(--ease);\n  flex-shrink: 0;\n}\n.icon-btn:hover {\n  color: var(--primary);\n  border-color: var(--primary-soft-2);\n  background: var(--primary-soft);\n  transform: translateY(-1px);\n}\n\n.link-btn {\n  border: none;\n  background: none;\n  padding: 4px 8px;\n  box-shadow: none;\n}\n.link-btn:hover { background: none; transform: none; }\n\n.btn-start {\n  display: inline-flex;\n  align-items: center;\n  justify-content: center;\n  padding: 16px 52px;\n  font-size: 20px;\n  font-weight: 800;\n  color: #fff;\n  background: var(--primary-grad);\n  border-radius: var(--r-pill);\n  box-shadow: var(--shadow-primary);\n  cursor: pointer;\n  transition: all var(--t-fast) var(--ease);\n}\n.btn-start:hover { transform: translateY(-2px); filter: brightness(1.06); }\n.btn-start:active { transform: translateY(0); }\n\n.neon-btn {\n  color: #fff;\n  background: linear-gradient(135deg, #6d4df2, #3b6ef6);\n  border-color: transparent;\n  box-shadow: 0 8px 20px rgba(90, 80, 246, 0.35);\n}\n.neon-btn:hover { color: #fff; filter: brightness(1.08); transform: translateY(-1px); }\n\n/* 按钮行 / 操作区 */\n.btn-row,\n.actions,\n.action-bar,\n.button-group,\n.btns,\n.controls,\n.ctrl-row,\n.ctrl-group,\n.toolbar,\n.tool-group,\n.text-tools {\n  display: flex;\n  align-items: center;\n  gap: 10px;\n  flex-wrap: wrap;\n}\n\n.action-bar { justify-content: space-between; margin: 18px 0; }\n.actions { justify-content: center; margin-top: 18px; }\n.setup-panel .actions { flex-direction: column; align-items: stretch; }\n.setup-panel .button-group { gap: 8px; }\n\n/* 名单管理区按钮行：统一间距 */\n.panel-names .btn-row {\n  display: flex;\n  gap: 8px;\n  margin-top: 10px;\n}\n.panel-names .btn-row .btn { flex: 1; }\n\n.toolbar {\n  justify-content: space-between;\n  padding: 16px 20px;\n  margin-bottom: 18px;\n  background: var(--card-bg);\n  border: 1px solid var(--border);\n  border-radius: var(--r);\n  box-shadow: var(--shadow-sm);\n}\n\n.controls {\n  justify-content: center;\n  margin-top: 22px;\n}\n.ctrl-row { justify-content: center; }\n.ctrl-label { font-size: 13px; font-weight: 600; color: var(--text-3); }\n.ctrl-secondary { color: var(--text-3); }\n\n/* ---------------------------------------------------------------------------\n * 8. 舞台 / 大屏展示\n * ------------------------------------------------------------------------- */\n.stage-inner {\n  position: relative;\n  display: flex;\n  flex-direction: column;\n  align-items: center;\n  justify-content: center;\n  gap: 20px;\n  min-height: 380px;\n  height: auto;\n  padding: 30px 20px;\n}\n\n.stage-toolbar {\n  position: absolute;\n  top: 14px;\n  right: 14px;\n  z-index: 5;\n  display: flex;\n  gap: 8px;\n}\n\n.stage-title {\n  font-size: 20px;\n  font-weight: 800;\n  text-align: center;\n}\n\n.stage-hint,\n.display-hint,\n.key-hint {\n  font-size: 13px;\n  color: var(--text-3);\n  text-align: center;\n}\n\n.display {\n  display: flex;\n  flex-direction: column;\n  align-items: center;\n  justify-content: center;\n  gap: 10px;\n  width: 100%;\n}\n\n.display-card {\n  width: 100%;\n  padding: 28px;\n  text-align: center;\n  background: var(--card-bg-2);\n  border: 1px solid var(--border);\n  border-radius: var(--r);\n}\n\n.display-value,\n.display-label,\n.display-sub { text-align: center; }\n\n.display-label { font-size: 14px; color: var(--text-3); }\n.display-sub { font-size: 13px; color: var(--text-3); }\n\n.time-display,\n.time-value,\n.num-display,\n.q-display {\n  font-variant-numeric: tabular-nums;\n  font-weight: 800;\n  letter-spacing: -0.02em;\n  text-align: center;\n  color: var(--text-1);\n}\n\n.time-block { display: inline-flex; align-items: baseline; gap: 2px; }\n.time-label { font-size: 13px; color: var(--text-3); }\n.time-colon,\n.colon { font-size: 34px; font-weight: 800; color: var(--text-2); padding: 0 2px; }\n\n.status-bar {\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  gap: 22px;\n  flex-wrap: wrap;\n  font-size: 13.5px;\n  color: var(--text-2);\n}\n\n.status-item { display: inline-flex; align-items: center; gap: 6px; }\n.status {\n  display: inline-flex;\n  align-items: center;\n  gap: 6px;\n  font-size: 14px;\n  font-weight: 600;\n  color: var(--text-2);\n}\n\n/* 进度环（timer） */\n.ring { display: block; margin: 0 auto; }\n.ring-bg { fill: none; stroke: var(--primary-soft-2); stroke-width: 12; }\n.ring-fg {\n  fill: none;\n  stroke: var(--primary);\n  stroke-width: 12;\n  stroke-linecap: round;\n  transform: rotate(-90deg);\n  transform-origin: center;\n  transition: stroke-dashoffset 0.3s linear;\n}\n.ring-center { position: relative; }\n\n/* 抽题专用 */\n.q-index { font-size: 14px; font-weight: 700; color: var(--primary); }\n.q-display { font-size: clamp(24px, 3.4vw, 40px); line-height: 1.4; padding: 0 10px; }\n.answer-area {\n  width: 100%;\n  max-width: 760px;\n  text-align: center;\n}\n.name-display {\n  font-size: clamp(30px, 5vw, 56px);\n  font-weight: 900;\n  text-align: center;\n  background: var(--primary-grad);\n  -webkit-background-clip: text;\n  background-clip: text;\n  -webkit-text-fill-color: transparent;\n}\n\n/* 预设按钮组（timer） */\n.presets {\n  display: flex;\n  flex-wrap: wrap;\n  justify-content: center;\n  gap: 9px;\n  margin-bottom: 20px;\n}\n.presets__label {\n  align-self: center;\n  font-size: 13.5px;\n  color: var(--text-3);\n  width: 100%;\n  text-align: center;\n}\n\n.mode-switch {\n  display: inline-flex;\n  gap: 4px;\n  padding: 5px;\n  margin: 0 auto 20px;\n  background: var(--card-bg);\n  border: 1px solid var(--border);\n  border-radius: var(--r-pill);\n  box-shadow: var(--shadow-sm);\n}\n\n.custom {\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  gap: 14px;\n  flex-wrap: wrap;\n  margin-bottom: 14px;\n}\n.custom__label { font-size: 13.5px; color: var(--text-3); }\n.time-input { display: inline-flex; align-items: center; gap: 8px; }\n.time-unit { display: inline-flex; flex-direction: column; align-items: center; gap: 2px; }\n.time-unit input { width: 88px; text-align: center; font-size: 18px; font-weight: 700; }\n.time-unit label { font-size: 12px; color: var(--text-3); }\n\n/* ---------------------------------------------------------------------------\n * 9. 统计\n * ------------------------------------------------------------------------- */\n.stats {\n  display: inline-flex;\n  align-items: center;\n  gap: 18px;\n  flex-wrap: wrap;\n}\n.stat {\n  display: inline-flex;\n  align-items: baseline;\n  gap: 5px;\n  font-size: 13.5px;\n  color: var(--text-2);\n}\n.stat b { font-size: 18px; color: var(--primary); }\n\n.stat-card,\n.stat-item {\n  display: flex;\n  flex-direction: column;\n  align-items: center;\n  gap: 2px;\n  padding: 14px 20px;\n  background: var(--card-bg-2);\n  border: 1px solid var(--border);\n  border-radius: var(--r);\n  min-width: 110px;\n}\n.stat-num { font-size: 22px; font-weight: 800; color: var(--primary); }\n.stat-label { font-size: 12.5px; color: var(--text-3); }\n\n/* ---------------------------------------------------------------------------\n * 10. 记录 / 结果 / 空状态 / 提示\n * ------------------------------------------------------------------------- */\n.record-list {\n  /* 自动撑开，不限制高度，不出现内部滚动条 */\n  display: flex;\n  flex-direction: column;\n  gap: 6px;\n  max-height: none;\n  overflow: visible;\n}\n\n.record-list li {\n  display: flex;\n  align-items: center;\n  gap: 8px;\n  padding: 8px 12px;\n  font-size: 13.5px;\n  background: var(--card-bg-2);\n  border: 1px solid var(--border);\n  border-radius: var(--r-sm);\n}\n\n.record-list li.empty {\n  justify-content: center;\n  color: var(--text-3);\n  background: none;\n  border: 1.5px dashed var(--border-2);\n}\n\n.rec { font-size: 13px; color: var(--text-2); }\n\n.results { margin-top: 22px; }\n.results-title { font-size: 17px; font-weight: 700; margin-bottom: 14px; }\n\n.r-grid,\n.grid {\n  display: grid;\n  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));\n  gap: 14px;\n}\n\n.result {\n  padding: 16px;\n  background: var(--card-bg);\n  border: 1px solid var(--border);\n  border-radius: var(--r);\n  box-shadow: var(--shadow-sm);\n}\n\n.empty,\n.empty-tip {\n  display: flex;\n  flex-direction: column;\n  align-items: center;\n  gap: 10px;\n  padding: 36px 20px;\n  text-align: center;\n  color: var(--text-3);\n  font-size: 14px;\n}\n\n.empty-icon { font-size: 48px; line-height: 1; }\n.empty-text { font-size: 14px; color: var(--text-2); }\n\n/* ---------------------------------------------------------------------------\n * 10.5 统一状态组件基线（空状态 / 信息 / 错误 / 加载中）\n *   现有 .empty / .empty-tip 保留兼容；新工具优先使用 .state 系列\n *   设计目标：跨工具统一的\"无数据/异常/加载\"展示，提升体验一致性\n *   用法：\n *     <div class=\"state state--empty\">\n *       <div class=\"state-icon\">📭<\/div>\n *       <div class=\"state-title\">暂无名单<\/div>\n *       <div class=\"state-desc\">请先导入学生名单后再使用<\/div>\n *       <button class=\"state-action\" onclick=\"...\">去添加<\/button>\n *     <\/div>\n *   语义变体（必选其一）：\n *     state--empty | state--info | state--success | state--warning\n *     | state--error | state--loading\n *   尺寸/布局修饰（可叠加）：\n *     state--compact    紧凑变体（小区域/卡片内嵌）\n *     state--list-item  列表项内嵌（消除 li 默认样式，水平占满）\n *     state--inline     行内变体（pill 形，水平排列，按钮旁/表头用）\n *     state--plain      无框变体（去掉虚线边框与背景，融入父容器）\n *     state--hero       超大变体（整页空状态，初始未导入数据用）\n *     state--closable   可关闭变体（右上角 ✕，可消除临时提示，配合 data-close）\n *   按钮修饰：\n *     state-action--ghost（次要按钮：重试/取消）\n *   loading 动效：state--loading 的 .state-title 自动叠加省略号动画\n * ------------------------------------------------------------------------- */\n.state {\n  display: flex;\n  flex-direction: column;\n  align-items: center;\n  gap: 12px;\n  padding: 48px 24px;\n  text-align: center;\n  border: 1.5px dashed var(--border-2);\n  border-radius: var(--r);\n  background: var(--bg-soft);\n  color: var(--text-2);\n}\n\n.state-icon {\n  display: grid;\n  place-items: center;\n  width: 64px;\n  height: 64px;\n  font-size: 36px;\n  line-height: 1;\n  background: var(--card-bg);\n  border-radius: 50%;\n  box-shadow: var(--shadow-sm);\n}\n\n.state-title {\n  font-size: 16px;\n  font-weight: 700;\n  color: var(--text-1);\n}\n\n.state-desc {\n  font-size: 13.5px;\n  color: var(--text-3);\n  max-width: 420px;\n  line-height: 1.7;\n}\n\n.state-action {\n  margin-top: 4px;\n  padding: 8px 20px;\n  font-size: 14px;\n  font-weight: 600;\n  color: #fff;\n  background: var(--primary-grad);\n  border: none;\n  border-radius: var(--r-pill);\n  box-shadow: var(--shadow-primary);\n  cursor: pointer;\n  transition: transform var(--t-fast) var(--ease),\n              box-shadow var(--t-fast) var(--ease);\n}\n.state-action:hover {\n  transform: translateY(-1px);\n  box-shadow: 0 12px 28px rgba(59, 110, 246, 0.36);\n}\n.state-action:active { transform: translateY(0); }\n.state-action:focus-visible {\n  outline: 2px solid var(--primary);\n  outline-offset: 2px;\n}\n\n/* 次要按钮（重试 / 取消），用于错误状态下的次要操作 */\n.state-action--ghost {\n  background: transparent;\n  color: var(--primary);\n  border: 1px solid var(--primary);\n  box-shadow: none;\n}\n.state-action--ghost:hover {\n  background: var(--primary-soft);\n  box-shadow: none;\n}\n\n/* 变体：通过边框色 + 图标色区分语义 */\n.state--empty  { border-color: var(--border-2); }\n.state--info   { border-color: rgba(56, 163, 232, 0.35); background: #f0f9ff; }\n.state--info   .state-icon { color: var(--info); }\n.state--success { border-color: rgba(34, 179, 106, 0.35); background: #f0fdf4; }\n.state--success .state-icon { color: var(--success); }\n.state--warning { border-color: rgba(245, 166, 35, 0.38); background: #fffbf0; }\n.state--warning .state-icon { color: var(--warning); }\n.state--error  { border-color: rgba(239, 91, 91, 0.42); background: #fef2f2; }\n.state--error  .state-icon { color: var(--danger); }\n\n/* 加载中变体：内置旋转 spinner，不依赖外部图标库 */\n.state--loading {\n  border-style: solid;\n  border-color: var(--border);\n  background: var(--card-bg);\n}\n.state--loading .state-icon {\n  width: 40px;\n  height: 40px;\n  font-size: 0;\n  border: 3px solid var(--border-2);\n  border-top-color: var(--primary);\n  border-radius: 50%;\n  animation: state-spin 0.8s linear infinite;\n}\n@keyframes state-spin { to { transform: rotate(360deg); } }\n\n/* 紧凑变体：用于列表/卡片内嵌的局部空状态或错误提示 */\n.state--compact { padding: 24px 16px; }\n.state--compact .state-icon { width: 48px; height: 48px; font-size: 28px; }\n.state--compact .state-title { font-size: 14px; }\n.state--compact .state-desc  { font-size: 12.5px; }\n\n/* 列表项内嵌变体：消除 li 默认样式干扰，让 .state 占满列表项宽度\n   用法：<li class=\"state state--list-item state--empty\">...<\/li> 或\n        <li><div class=\"state state--list-item state--empty\">...<\/div><\/li> */\n.state--list-item,\nli.state--list-item {\n  width: 100%;\n  list-style: none;\n  margin: 0;\n  padding: 20px 12px;\n  border-left: none;\n  border-right: none;\n  border-top: none;\n  border-radius: 0;\n  background: transparent;\n}\n.state--list-item + .state--list-item { border-top: 1px solid var(--border); }\n.state--list-item .state-icon { width: 40px; height: 40px; font-size: 22px; }\n.state--list-item .state-title { font-size: 13.5px; }\n.state--list-item .state-desc  { font-size: 12px; }\n\n/* list-item 的语义色锚点：因 border 已被去除，改用左侧 4px 色条 + 图标色区分\n   原 .state--info/-success/-warning/-error 的 background 在 list-item 下被覆盖为透明 */\n.state--list-item.state--info,\n.state--list-item.state--success,\n.state--list-item.state--warning,\n.state--list-item.state--error {\n  border-left: 4px solid currentColor;\n  padding-left: 16px;\n  background: transparent;\n}\n.state--list-item.state--info    { color: var(--info); }\n.state--list-item.state--info    .state-title { color: var(--info); }\n.state--list-item.state--success { color: var(--success); }\n.state--list-item.state--success .state-title { color: var(--success); }\n.state--list-item.state--warning { color: var(--warning); }\n.state--list-item.state--warning .state-title { color: var(--warning); }\n.state--list-item.state--error   { color: var(--danger); }\n.state--list-item.state--error   .state-title { color: var(--danger); }\n/* empty 变体无色条（默认中性），保持简洁 */\n\n/* list-item hover 态：轻微背景高亮，提示该项可点击/可操作 */\n.state--list-item.state--closable,\n.state--list-item[data-close] {\n  cursor: default;\n  transition: background var(--t-fast) var(--ease);\n}\n.state--list-item.state--closable:hover,\n.state--list-item[data-close]:hover {\n  background: var(--bg-soft);\n}\n\n/* list-item + closable 组合：关闭按钮位置调整（避开 4px 色条） */\n.state--list-item.state--closable { padding-right: 40px; }\n.state--list-item.state--closable::before { top: 14px; right: 12px; }\n\n/* list-item 在父容器 ul/ol 内的兼容：去默认 list-style 与 padding\n   兼容性：:has() 需 Firefox 121+ / Safari 15.4+ / Chrome 105+，\n   旧浏览器兜底：给 ul/ol 显式加 class=\"clean-list\" 即可 */\nul:has(> .state--list-item),\nol:has(> .state--list-item),\nul.clean-list,\nol.clean-list {\n  list-style: none;\n  padding: 0;\n  margin: 0;\n}\n\n/* 嵌套容器适配：带背景的容器内不加分割线，改用卡片背景；多列网格中等高撑满 */\n.record-list .state--list-item,\n.results .state--list-item,\n.grid .state--list-item,\n.r-grid .state--list-item {\n  border-top: none;\n  border-radius: var(--r-sm);\n  background: var(--card-bg);\n}\n.record-list .state--list-item,\n.results .state--list-item { margin-bottom: 6px; }\n.grid .state--list-item,\n.r-grid .state--list-item { width: 100%; height: 100%; }\n\n/* list-item + loading 组合：spinner 与标题水平排列，避免竖向占用过多行高 */\n.state--list-item.state--loading {\n  flex-direction: row;\n  justify-content: center;\n  gap: 12px;\n  padding: 14px 12px;\n}\n.state--list-item.state--loading .state-icon {\n  width: 18px;\n  height: 18px;\n  border-width: 2px;\n}\n\n/* list-item + inline 组合：行内 pill 在列表项内自动占满 */\n.state--list-item.state--inline {\n  width: 100%;\n  justify-content: flex-start;\n  border-radius: var(--r-sm);\n  padding: 8px 12px;\n}\n\n/* 行内变体：水平排列，用于按钮组旁、表格单元格内、卡片头部的轻量提示\n   用法：<span class=\"state state--inline state--info\"><span class=\"state-icon\">ℹ️<\/span><span class=\"state-title\">已保存<\/span><\/span> */\n.state--inline {\n  display: inline-flex;\n  flex-direction: row;\n  align-items: center;\n  gap: 8px;\n  width: auto;\n  max-width: 100%;\n  padding: 6px 12px;\n  border-width: 1px;\n  border-style: solid;\n  border-radius: var(--r-pill);\n  background: var(--card-bg);\n}\n.state--inline .state-icon {\n  width: 20px;\n  height: 20px;\n  font-size: 14px;\n  background: none;\n  box-shadow: none;\n  border-radius: 0;\n}\n.state--inline .state-title { font-size: 13px; font-weight: 600; }\n.state--inline .state-desc  { font-size: 12px; max-width: none; }\n.state--inline .state-action { margin-top: 0; padding: 4px 10px; font-size: 12px; }\n\n/* 无框变体：去掉虚线边框与背景，融入父容器\n   用法：卡片头部小提示、分割区段内的轻提示 */\n.state--plain {\n  border: none;\n  background: none;\n  padding: 16px 8px;\n}\n\n/* 超大变体：用于整页空状态（如初始未导入任何数据）\n   用法：<div class=\"state state--hero state--empty\">...<\/div> */\n.state--hero {\n  padding: 80px 24px;\n  gap: 18px;\n}\n.state--hero .state-icon { width: 96px; height: 96px; font-size: 52px; }\n.state--hero .state-title { font-size: 20px; }\n.state--hero .state-desc  { font-size: 14.5px; max-width: 540px; }\n\n/* loading 文字动效：在 state--loading 内 .state-title 上叠加省略号动画\n   实现：::after content=\"...\" + width 0→3ch 阶梯动画（step-end）\n   原因：content 不是 animatable property，旧方案在 Firefox 等浏览器失效；\n        改用 width 动画是 CSS Animations Level 1 标准做法，跨浏览器一致 */\n.state--loading .state-title::after {\n  content: \"...\";\n  display: inline-block;\n  width: 0;\n  overflow: hidden;\n  vertical-align: baseline;\n  font-family: ui-monospace, Menlo, Consolas, monospace;\n  animation: state-dots 1.4s step-end infinite;\n}\n@keyframes state-dots {\n  0%   { width: 0ch; }\n  25%  { width: 1ch; }\n  50%  { width: 2ch; }\n  75%  { width: 3ch; }\n  100% { width: 0ch; }\n}\n\n/* 可关闭变体：右上角关闭按钮，用于可消除的临时提示\n   用法：<div class=\"state state--info state--closable\" data-close>...<\/div>\n        JS 中监听 [data-close] 点击事件隐藏整块 */\n.state--closable { position: relative; padding-right: 40px; }\n.state--closable::before {\n  content: \"✕\";\n  position: absolute;\n  top: 10px;\n  right: 12px;\n  width: 22px;\n  height: 22px;\n  display: grid;\n  place-items: center;\n  font-size: 13px;\n  color: var(--text-3);\n  cursor: pointer;\n  border-radius: 50%;\n  transition: background var(--t-fast) var(--ease), color var(--t-fast) var(--ease);\n}\n.state--closable::before:hover {\n  background: var(--bg-soft);\n  color: var(--text-1);\n}\n\n/* 行内轻量错误提示：用于表单字段下方的小字提示 */\n.field-error {\n  margin-top: 6px;\n  font-size: 12.5px;\n  color: var(--danger);\n  display: flex;\n  align-items: center;\n  gap: 4px;\n}\n.field-error::before { content: \"⚠\"; font-size: 13px; }\n\n.tip,\n.hint,\n.notice {\n  padding: 10px 14px;\n  font-size: 12.5px;\n  line-height: 1.65;\n  color: var(--text-2);\n  background: var(--bg-soft);\n  border-left: 3px solid var(--primary);\n  border-radius: var(--r-sm);\n}\n.notice { margin: 10px 0; }\n.hint { background: none; border-left: none; padding: 4px; color: var(--text-3); }\n\n/* ---------------------------------------------------------------------------\n * 11. 弹窗 / Toast\n * ------------------------------------------------------------------------- */\n.modal-mask {\n  position: fixed;\n  inset: 0;\n  z-index: 1000;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  padding: 20px;\n  background: rgba(20, 28, 48, 0.5);\n  backdrop-filter: blur(3px);\n}\n\n.modal {\n  width: 100%;\n  max-width: 520px;\n  max-height: 86vh;          /* 视口约束的弹层允许内部滚动 */\n  overflow-y: auto;\n  padding: 26px;\n  background: var(--card-bg);\n  border-radius: var(--r-lg);\n  box-shadow: var(--shadow-lg);\n  animation: modal-in 0.22s var(--ease);\n}\n\n@keyframes modal-in {\n  from { opacity: 0; transform: translateY(14px) scale(0.98); }\n  to   { opacity: 1; transform: translateY(0) scale(1); }\n}\n\n.modal-close {\n  position: absolute;\n  top: 14px;\n  right: 14px;\n  width: 34px;\n  height: 34px;\n  font-size: 16px;\n  color: var(--text-3);\n  border-radius: 50%;\n  transition: all var(--t-fast) var(--ease);\n}\n.modal-close:hover { background: var(--bg-soft); color: var(--danger); }\n.modal { position: relative; }\n\n.toast {\n  position: fixed;\n  left: 50%;\n  bottom: 36px;\n  z-index: 1200;\n  max-width: min(90vw, 480px);\n  padding: 12px 24px;\n  font-size: 14px;\n  font-weight: 600;\n  color: #fff;\n  background: rgba(31, 39, 51, 0.92);\n  border-radius: var(--r-pill);\n  box-shadow: var(--shadow-lg);\n  opacity: 0;\n  visibility: hidden;\n  transform: translate(-50%, 16px);\n  transition: all var(--t) var(--ease);\n  pointer-events: none;\n  text-align: center;\n}\n\n.toast.show {\n  opacity: 1;\n  visibility: visible;\n  transform: translate(-50%, 0);\n}\n\n/* ---------------------------------------------------------------------------\n * 12. 介绍/引导（intro__* 系列）\n * ------------------------------------------------------------------------- */\n.intro__section {\n  padding: 22px;\n  margin-bottom: 16px;\n  background: var(--card-bg);\n  border: 1px solid var(--border);\n  border-radius: var(--r);\n}\n.intro__h3 { font-size: 17px; margin-bottom: 10px; }\n.intro__h4 { font-size: 14.5px; margin: 12px 0 6px; color: var(--text-1); }\n.intro__body { font-size: 14px; color: var(--text-2); line-height: 1.8; }\n.intro__qa { padding: 8px 0; font-size: 14px; line-height: 1.8; color: var(--text-2); }\n.intro__step {\n  display: flex;\n  gap: 12px;\n  padding: 10px 0;\n  border-bottom: 1px dashed var(--border);\n  font-size: 14px;\n  color: var(--text-2);\n}\n\n.feature {\n  display: inline-flex;\n  align-items: center;\n  gap: 7px;\n  padding: 7px 15px;\n  font-size: 13px;\n  font-weight: 600;\n  color: var(--text-2);\n  background: var(--card-bg);\n  border: 1px solid var(--border);\n  border-radius: var(--r-pill);\n}\n.feature-icon { font-size: 16px; }\n\n/* meta 键值 */\n.meta-key { font-size: 12.5px; color: var(--text-3); }\n.meta-val { font-size: 13.5px; font-weight: 600; }\n\n/* 表单行 */\n.form-row,\n.row {\n  display: flex;\n  align-items: center;\n  gap: 12px;\n  flex-wrap: wrap;\n  margin-bottom: 12px;\n}\n\n/* 滑杆行 */\n.slider-line {\n  display: flex;\n  align-items: center;\n  gap: 12px;\n  padding: 8px 0;\n}\n.slider-line input[type=\"range\"] { flex: 1; }\n\n/* range 区间 */\n.range { display: inline-flex; align-items: center; gap: 8px; }\n.range-block { margin-bottom: 12px; }\n.range-sep { color: var(--text-3); }\n\n/* 预览/纸张区 */\n.preview-panel,\n.paper-area {\n  padding: 22px;\n  background: var(--card-bg);\n  border: 1px solid var(--border);\n  border-radius: var(--r);\n  box-shadow: var(--shadow-sm);\n}\n\n/* settings 通用 */\n.settings { display: flex; flex-direction: column; gap: 14px; }\n.params { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; }\n.sep { color: var(--text-3); }\n.tpl { /* 模板容器占位 */ }\n.c-text { font-size: 14px; color: var(--text-2); line-height: 1.7; }\n.screen { width: 100%; }\n\n/* ---------------------------------------------------------------------------\n * 13. 大屏全屏模式基础（各工具可覆盖细节）\n *     进入全屏后固定视口；正常文档流不使用这些类\n * ------------------------------------------------------------------------- */\n.is-fullscreen,\nbody:fullscreen,\nbody:-webkit-full-screen {\n  background: var(--bg);\n}\n\n.is-fullscreen {\n  position: fixed;\n  inset: 0;\n  z-index: 900;\n  overflow: auto; /* 仅全屏投影时允许滚动，常规流不受影响 */\n  border-radius: 0;\n}\n\n/* ---------------------------------------------------------------------------\n * 14. 打印\n * ------------------------------------------------------------------------- */\n@media print {\n  body { background: #fff !important; }\n  .toolbar, .setup-panel, .stage-toolbar, .action-bar, .toast, .modal-mask,\n  .btn-row, .actions, .controls, .button-group, .tool-topbar { display: none !important; }\n  .main { display: block; padding: 0; }\n  .stage, .panel, .card, .block {\n    border: none;\n    box-shadow: none;\n    padding: 0;\n    overflow: visible;\n  }\n}\n",
-      "assets/js/frame-bridge.js": "/* ============================================================================\n * iframe 内工具桥 · frame-bridge.js\n * ============================================================================\n * 【背景】站点在 file://（离线双击 index.html）下无法用 fetch 读取工具页面\n * （Chromium 把 file:// 互相视为不透明源，fetch/XHR 一律被 CORS 拦截），于是\n * 所有自研工具回退为 <iframe> 兜底。跨源带来两个问题：\n *   ① 父页拿不到 iframe 的 contentDocument → 高度自适应失效，工具页被压成\n *      固定视口高度（\"页面不能自动撑开\"）；\n *   ② file:// 下 iframe 内的 requestFullscreen 被权限策略拒绝 → 工具右上角\n *      ⛶ 点了没反应（\"全屏按钮不能用\"）。\n *\n * 【方案】本脚本随工具页面一起被 iframe 加载（真实文档环境），通过\n * postMessage 向父页（站点外壳）上报：\n *   - height     ：工具内容实际高度（rAF 节流 + ResizeObserver 持续监听）；\n *   - fullscreen ：工具内部全屏请求被拒时，请父页对 <iframe> 本身发起全屏\n *                  （postMessage 会把 user activation 一并委托给父页；\n *                  父页若仍失败，再降级为父页侧 CSS 伪全屏）。\n *\n * 【安全阀】用 self !== top 判定「真实运行在 iframe 里」：\n *   - 独立双击打开工具页 → self === top → 本脚本整体空转；\n *   - 站点内嵌 Shadow DOM（http 适配器）路径下，脚本在 docShim/winShim 代理里\n *     执行，self/top 都落到真实顶层 window → self === top → 空转，\n *     不会向父页发任何消息；\n *   - 真实 iframe 内（含 file:// 跨源）→ self !== top → 激活。\n *   ⚠️ 不要用 window.frameElement 判定：跨源 iframe 里访问它会抛 SecurityError\n *     （实测），一旦 catch 成 null 桥就整体失效。\n *   ⚠️ self / top 属于跨源 WindowProxy 的「允许访问」属性（不会抛错），\n *     引用比较即可判定。\n * 消息一律带 __edutoolboxFrame 命名空间标记，父页校验 e.source 后才处理。\n * ========================================================================== */\n(function () {\n  \"use strict\";\n\n  /* 只在真实 iframe 内激活 */\n  var inFrame = false;\n  try {\n    var self = window.self, top = window.top;\n    inFrame = !!(self && top && self !== top && window.parent && window.parent !== window);\n  } catch (e) { inFrame = false; }\n  if (!inFrame) return;\n\n  var raf = 0;\n\n  /** rAF 节流地把当前文档高度报给父页 */\n  function reportHeight() {\n    if (raf) return;\n    raf = (window.requestAnimationFrame || function (f) { return setTimeout(f, 60); })(\n      function () {\n        raf = 0;\n        try {\n          var h = Math.max(\n            document.documentElement ? document.documentElement.scrollHeight : 0,\n            document.body ? document.body.scrollHeight : 0\n          );\n          window.parent.postMessage({\n            __edutoolboxFrame: true,\n            type: \"height\",\n            h: h\n          }, \"*\");\n        } catch (e) { /* 父页不可达：静默 */ }\n      }\n    );\n  }\n\n  /** 工具内部全屏请求失败时，委托父页对 iframe 元素本身发起全屏 */\n  function requestParentFullscreen() {\n    try {\n      window.parent.postMessage({\n        __edutoolboxFrame: true,\n        type: \"fullscreen\"\n      }, \"*\");\n    } catch (e) { /* 静默 */ }\n  }\n\n  /* 暴露给共享舞台模块（tool-stage-toolbar.js）在全屏失败分支调用 */\n  window.EduToolFrameBridge = {\n    reportHeight: reportHeight,\n    requestParentFullscreen: requestParentFullscreen\n  };\n\n  /* 首帧 + load 后补报，防首报时内容未排完 */\n  reportHeight();\n  window.addEventListener(\"load\", function () {\n    reportHeight();\n    setTimeout(reportHeight, 300);\n  });\n\n  /* 内容持续变化（点名记录增长、生成结果插入等）→ 宿主跟着长高 */\n  if (typeof ResizeObserver === \"function\") {\n    try {\n      new ResizeObserver(reportHeight).observe(document.documentElement);\n    } catch (e) { /* 老浏览器无此能力：靠 load 兜底 */ }\n  }\n\n  /* 父页通知重新测量（伪全屏退出后恢复常规高度） */\n  window.addEventListener(\"message\", function (e) {\n    var d = e.data;\n    if (d && d.__edutoolboxFrame === true && d.type === \"report\") reportHeight();\n  });\n})();\n",
-      "assets/js/tool-stage-toolbar.js": "/* ============================================================================\n * 舞台右上角工具栏（共享模块）· tool-stage-toolbar.js\n *\n * 【约定】\n *   1. 本模块只做两件事：舞台全屏（对 stage 元素自身，不是整页）与设置栏显隐。\n *      它不认识任何具体工具的业务，也不读写 localStorage。\n *   2. 结构与「随机叫号 random-call」保持一致：舞台内第一个子元素为\n *      <div class=\"stage-toolbar\">，内含且仅含两个 .icon-btn，顺序固定为\n *      #fullscreenBtn(⛶ 全屏) → #hideSetupBtn(⚙ 隐藏设置)。\n *      .stage-toolbar / .icon-btn 的基础样式由 assets/css/tool-common.css 提供。\n *   3. 隐藏机制：给「双栏容器」（panelHost）加/去 hiddenClass，由各工具 css 把\n *      带该 class 的容器改成单栏并 display:none 掉 .setup-panel。\n *   4. 【全屏专属模式】#hideSetupBtn 是可选的。很多工具（计时器、秒表、板书、\n *      噪音检测等）根本没有可隐藏的设置栏，只有 ⛶ 一个按钮。此时只接全屏，\n *      不做任何显隐操作 —— 否则「进入全屏自动隐藏、却没有按钮能调回来」会\n *      把界面改坏。判定：只有 host 与 hideBtn 同时存在才启用自动隐藏。\n *\n * 【用法】\n *   在工具的 <script src=\"<slug>.js\"> 之前引入本文件，然后在工具自身的\n *   初始化函数里调用：\n *\n *     if (window.EduToolStageToolbar) {\n *       EduToolStageToolbar.init({ stage: \".stage-panel\", panelHost: \".workbench\" });\n *     }\n *\n *   三个可选参数（缺省即下面 DEFAULTS 的值）：\n *     stage       —— 舞台元素选择器，进入全屏的 target，也是工具栏的挂载父级\n *     panelHost   —— 承载 hiddenClass 的双栏容器选择器\n *     hiddenClass —— 隐藏态 class 名（与 random-call 一致用 \"setup-hidden\"）\n *\n * 【健壮性】\n *   - 找不到 stage / panelHost / 任一按钮时静默返回，绝不抛异常（工具页可能\n *     被站点适配器裁剪或降级渲染）。\n *   - 全屏请求同时处理「同步抛错」与「Promise 拒绝」两种失败形态；失败时把设置\n *     栏显隐回滚到发起请求前的状态，避免界面被改坏或产生未处理的 rejection。\n *   - 所有 DOM 查询走 document.querySelector，以适配站点 Shadow DOM 适配器；\n *     禁止 window.top / parent / documentElement.requestFullscreen。\n * ========================================================================== */\n(function (global) {\n  \"use strict\";\n\n  /** 默认配置：与 random-call 的命名保持一致 */\n  var DEFAULTS = {\n    stage: \".stage-panel\",\n    panelHost: \".workbench\",\n    hiddenClass: \"setup-hidden\"\n  };\n\n  /**\n   * 合并配置（浅拷贝，缺省值兜底）\n   * @param {Object|undefined} opts 调用方传入的选项\n   * @returns {{stage:string, panelHost:string, hiddenClass:string}} 合并后的配置\n   */\n  function mergeOptions(opts) {\n    var o = opts || {};\n    return {\n      stage: typeof o.stage === \"string\" && o.stage ? o.stage : DEFAULTS.stage,\n      /* panelHost 传 null 或 \"\" 表示「本工具没有可隐藏的设置栏」——\n         设置区是浮层/弹窗的工具（如倒计时）用这个显式声明，避免误命中默认值。 */\n      panelHost: (o.panelHost === null || o.panelHost === \"\")\n        ? \"\"\n        : (typeof o.panelHost === \"string\" && o.panelHost ? o.panelHost : DEFAULTS.panelHost),\n      hiddenClass: typeof o.hiddenClass === \"string\" && o.hiddenClass ? o.hiddenClass : DEFAULTS.hiddenClass\n    };\n  }\n\n  /**\n   * 调用一个可能「同步抛错」或「返回 rejected Promise」的方法，两种失败都吞掉。\n   * @param {Function|undefined} fn 待调用的方法\n   * @param {Object} ctx this 指向\n   * @returns {boolean} 是否成功发起（未同步抛错）\n   */\n  function callQuietly(fn, ctx) {\n    if (typeof fn !== \"function\") return false;\n    try {\n      var p = fn.call(ctx);\n      if (p && typeof p.catch === \"function\") p.catch(function () { /* 静默：权限/手势被拒 */ });\n      return true;\n    } catch (err) {\n      return false;\n    }\n  }\n\n  /**\n   * 取得「本工具自己的」document。\n   *\n   * ⚠️ 历史缺陷（2026-09-22）：早期实现写成 `global.document`。站点适配器是\n   * 通过 `new Function(\"document\",\"window\", code)` 执行脚本的 —— 词法上的\n   * `document` 形参才是限定在影子树内的 docShim，而 `window.document` 会退回\n   * 真实文档，导致 querySelector 找不到 .stage-panel，init() 静默返回 false，\n   * 两个按钮完全无反应（仅在「站点内嵌」路径复现，单独打开工具页正常）。\n   * 因此这里优先取词法 document，取不到再回退 global。\n   * @returns {Document|null} 文档对象\n   */\n  function resolveDoc(global) {\n    try {\n      if (typeof document !== \"undefined\" && document) return document;\n    } catch (e) { /* 自由变量不存在：继续回退 */ }\n    try {\n      return global && global.document ? global.document : null;\n    } catch (e) {\n      return null;\n    }\n  }\n\n  /**\n   * 当前是否处于全屏状态（兼容 webkit 前缀）\n   * @param {Document} doc 文档对象\n   * @returns {boolean} 是否已全屏\n   */\n  function isFullscreen(doc) {\n    return !!(doc && (doc.fullscreenElement || doc.webkitFullscreenElement));\n  }\n\n  /**\n   * 按 v 的布尔值增删 class\n   * @param {Element} el 目标元素\n   * @param {string} cls class 名\n   * @param {boolean} v true 加 / false 去\n   * @returns {void}\n   */\n  function setHidden(el, cls, v) {\n    if (v) el.classList.add(cls);\n    else el.classList.remove(cls);\n  }\n\n  /**\n   * 注册 fullscreenchange：同一目标只保留一个 handler，避免重复 init 叠加监听。\n   * @param {Array<object>} targets 监听目标（可能同时含 shim 与真实 document）\n   * @param {Function} handler 事件处理函数\n   * @returns {void}\n   */\n  function listenChange(targets, handler) {\n    for (var i = 0; i < targets.length; i++) {\n      var t = targets[i];\n      if (!t) continue;\n      var prev = registered ? registered.get(t) : null;\n      if (prev && prev !== handler) {\n        try { t.removeEventListener(\"fullscreenchange\", prev); } catch (e) { /* 忽略 */ }\n        try { t.removeEventListener(\"webkitfullscreenchange\", prev); } catch (e) { /* 忽略 */ }\n      }\n      t.addEventListener(\"fullscreenchange\", handler);\n      t.addEventListener(\"webkitfullscreenchange\", handler);\n      if (registered) registered.set(t, handler);\n    }\n  }\n\n  /** 已注册的 fullscreenchange handler：目标对象 → handler */\n  var registered = typeof WeakMap === \"function\" ? new WeakMap() : null;\n\n  /* ------------------------------------------------------------------\n   * 【iframe 独占模式（solo）】\n   * file:// 下 iframe 内全屏被拒，由父页对 <iframe> 本身全屏。此时如果不加\n   * 处理，全屏画面是「整个工具页」（含左侧设置栏），不是舞台。父页在发起\n   * 全屏前会 postMessage {__edutoolboxFrame,type:'fs-enter'}，本模块收到后\n   * 给舞台加 .edutf-solo（fixed 铺满 iframe 视口），退出时移除。\n   * 直接监听 window message：iframe 内共享模块能收到父页发给 iframe 的消息；\n   * 同文档挂载（站点适配器）下父页不会发这种消息，监听器永远空转，无害。\n   * ------------------------------------------------------------------ */\n  var soloCssDone = false;\n  /** 最近一次 init() 成功注册的舞台元素（模块级：iframe 独占消息处理需要）。\n   *  ⚠️ 不能在 onFrameFsMessage 里直接引用 init 作用域的 stage —— strict 模式下\n   *  未声明变量抛 ReferenceError，solo 永远加不上（zhongkao 实测踩坑：\n   *  random-call 侥幸生效只是因为它恰好在 window 上有同名全局变量）。 */\n  var currentStage = null;\n  function ensureSoloCss() {\n    if (soloCssDone) return;\n    soloCssDone = true;\n    try {\n      var st = document.createElement(\"style\");\n      /* ⚠️ 尺寸用 100vw/100vh 而不是 100%：solo 模式下工具 body 里被盖住的\n         内容若超高会产生滚动条，100% 会被滚动条挤掉一截（实测右侧留 10px 缝）；\n         vw/vh 含滚动条槽，舞台整体铺满且把滚动条压在底下。 */\n      st.textContent =\n        \".edutf-solo{position:fixed!important;inset:0!important;z-index:2147483000!important;\" +\n        \"width:100vw!important;height:100vh!important;max-width:none!important;min-height:0!important;\" +\n        \"margin:0!important;border:none!important;border-radius:0!important;box-shadow:none!important;}\";\n      (document.head || document.documentElement).appendChild(st);\n    } catch (err) { /* 静默 */ }\n  }\n\n  function onFrameFsMessage(e) {\n    var d = e.data;\n    if (!d || d.__edutoolboxFrame !== true) return;\n    if (d.type === \"fs-enter\") {\n      ensureSoloCss();\n      if (currentStage) currentStage.classList.add(\"edutf-solo\");\n    } else if (d.type === \"fs-exit\") {\n      if (currentStage) currentStage.classList.remove(\"edutf-solo\");\n    }\n  }\n  try { global.addEventListener(\"message\", onFrameFsMessage, false); } catch (err) { /* 静默 */ }\n\n  /**\n   * 初始化舞台工具栏\n   * @param {Object} [opts] {stage, panelHost, hiddenClass}\n   * @returns {boolean} 是否成功初始化\n   */\n  function init(opts) {\n    var doc = resolveDoc(global);\n    if (!doc) return false;\n\n    var cfg = mergeOptions(opts);\n    var stage = doc.querySelector(cfg.stage);\n    var host = cfg.panelHost ? doc.querySelector(cfg.panelHost) : null;\n    /* 统一用 querySelector：站点 Shadow DOM 适配器会把 document 查询限定到 shadow 内部 */\n    var fsBtn = doc.querySelector(\"#fullscreenBtn\");\n    var hideBtn = doc.querySelector(\"#hideSetupBtn\");\n\n    /* 结构不齐（页面被裁剪 / 降级渲染）时静默退出，不影响工具其它功能。\n       #hideSetupBtn 允许缺失：见文件头约定 4「全屏专属模式」。 */\n    if (!stage || !fsBtn) return false;\n    currentStage = stage;  // 供 onFrameFsMessage（iframe 独占）使用\n\n    /* 只有「双栏容器」与「设置按钮」都在，才启用进入全屏自动隐藏设置栏 ——\n       否则用户进了全屏就再也调不回设置栏了。 */\n    var canHide = !!(host && hideBtn);\n\n    /**\n     * 进入全屏「之前」设置栏的显隐快照。\n     * 退出全屏时按它还原，而不是按全屏中最后看到的状态 —— 这样即便用户在全屏里\n     * 手动把设置栏调出来，退出后也会回到进入前的样子。\n     */\n    var wasHidden = false;\n\n    /** 隐藏/还原设置栏（无设置栏时是空操作） */\n    function applyHidden(v) {\n      if (!canHide) return;\n      setHidden(host, cfg.hiddenClass, v);\n    }\n\n  /**\n   * 全屏请求失败后的兜底：若本工具正以 iframe 形式内嵌在站点里（file:// 离线\n   * 场景下 iframe 内的 requestFullscreen 会被权限策略拒绝），通过 frame-bridge.js\n   * 请父页（站点外壳）对 iframe 元素本身发起全屏。非内嵌场景桥不存在，空操作。\n   * @param {Element} stage 舞台元素（仅用于签名，桥不需要）\n   * @returns {void}\n   */\n  function bridgeFallback() {\n    try {\n      var b = global.EduToolFrameBridge;\n      if (b && typeof b.requestParentFullscreen === \"function\") b.requestParentFullscreen();\n    } catch (err) { /* 静默 */ }\n  }\n\n  /**\n   * 切换舞台全屏：目标是 stage 元素自身\n   * @returns {void}\n   */\n  function toggleFullscreen() {\n    if (isFullscreen(doc)) {\n      var exit = doc.exitFullscreen || doc.webkitExitFullscreen;\n      callQuietly(exit, doc);\n      return;\n    }\n    /* 先快照再乐观隐藏：进入全屏后画面立刻铺满，不等 fullscreenchange */\n    wasHidden = canHide ? host.classList.contains(cfg.hiddenClass) : false;\n    applyHidden(true);\n\n    /* 只发起一次请求；同步抛错与异步 Promise 拒绝都要能回滚 */\n    var request = stage.requestFullscreen || stage.webkitRequestFullscreen;\n    var ok = false;\n    try {\n      if (request) {\n        var p = request.call(stage);\n        ok = true;\n        /* 异步失败（权限策略拒绝 / 缺少用户手势）→ 在 catch 里回滚 */\n        if (p && typeof p.catch === \"function\") {\n          p.catch(function () { applyHidden(wasHidden); bridgeFallback(); });\n        }\n      }\n    } catch (err) {\n      ok = false;\n    }\n    /* 同步失败（方法缺失 / 直接抛错）→ 立刻回滚 */\n    if (!ok) { applyHidden(wasHidden); bridgeFallback(); }\n  }\n\n    /**\n     * 全屏状态变化：进入时确保隐藏，退出时按快照还原\n     * @returns {void}\n     */\n    var onChange = function () {\n      if (!canHide) return;\n      if (isFullscreen(doc)) setHidden(host, cfg.hiddenClass, true);\n      else setHidden(host, cfg.hiddenClass, wasHidden);\n    };\n\n    /* 站点适配器把 document 代理成 ShadowRoot，其 addEventListener 也绑在影子树上；\n       而 fullscreenchange 派发在「真实 document」上、不会向下穿透进影子树。\n       因此除 shim 之外，再在 stage.ownerDocument（即真实文档）上注册一份，\n       保证「直开页面」与「站点内嵌」两种加载方式都能拿到退出全屏事件。\n       直开模式下二者是同一个对象，listenChange 只会注册一次，不会重复触发。 */\n    var realDoc = stage.ownerDocument || null;\n    var targets = (realDoc && realDoc !== doc) ? [doc, realDoc] : [doc];\n    listenChange(targets, onChange);\n\n    fsBtn.addEventListener(\"click\", toggleFullscreen);\n    if (canHide) {\n      hideBtn.addEventListener(\"click\", function () {\n        host.classList.toggle(cfg.hiddenClass);\n      });\n    }\n\n    return true;\n  }\n\n  /* 只暴露一个全局，不污染其它命名空间 */\n  global.EduToolStageToolbar = { init: init };\n})(typeof window !== \"undefined\" ? window : this);\n",
-      "tools/award-generator/award-generator.css": "/* ============================================================\n * EduToolbox · 电子奖状生成器 award-generator.css\n * 依赖公共底座 tool-common.css（本文件应在其后加载，以便覆盖）\n * ============================================================ */\n\n/* ---------- 主题变量（JS 通过 body[data-theme] 轮换主色） ---------- */\nbody{ --acc:#3b6ef6; --acc-soft:#e8edff; --acc-2:#5a8dff; }\nbody[data-theme=\"sky\"]   { --primary:#0ea5e9; --primary-soft:#e0f2fe; --primary-soft-2:#ccecfc; --primary-grad:linear-gradient(135deg,#38bdf8,#0ea5e9,#0284c7); }\nbody[data-theme=\"violet\"]{ --primary:#7c3aed; --primary-soft:#f0e9fe; --primary-soft-2:#e2d5fc; --primary-grad:linear-gradient(135deg,#8b5cf6,#7c3aed,#6d28d9); }\nbody[data-theme=\"green\"]{ --primary:#16a34a; --primary-soft:#e7f6ec; --primary-soft-2:#d3f0dc; --primary-grad:linear-gradient(135deg,#22c55e,#16a34a,#15803d); }\nbody[data-theme=\"gold\"] { --primary:#d97706; --primary-soft:#fdf1dc; --primary-soft-2:#fbe3bc; --primary-grad:linear-gradient(135deg,#f59e0b,#d97706,#b45309); }\nbody[data-theme=\"orange\"]{ --primary:#ea580c; --primary-soft:#ffefe4; --primary-soft-2:#ffdec9; --primary-grad:linear-gradient(135deg,#fb923c,#ea580c,#c2410c); }\nbody[data-theme=\"pink\"] { --primary:#db2777; --primary-soft:#fce7f0; --primary-soft-2:#f9cfe1; --primary-grad:linear-gradient(135deg,#f472b6,#db2777,#be185d); }\n\n/* ---------- 工作台两栏布局 ---------- */\n.workbench{\n  display:grid; grid-template-columns:minmax(280px,340px) minmax(0,1fr);\n  gap:18px; margin-top:18px; align-items:start;\n}\n/* position:relative —— 舞台右上角 .stage-toolbar 的绝对定位基准 */\n.stage-panel{\n  position:relative;\n  background:var(--card-bg); border:1px solid var(--border);\n  border-radius:var(--r-lg); box-shadow:var(--shadow); padding:20px;\n  min-width:0;\n}\n.stage-head{ display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:14px; padding-right:96px; }\n.stage-head .panel-title{ margin-bottom:0; }\n.stage-ok{ font-size:12px; color:var(--text-3); }\n\n/* ---------- 设置面板细节 ---------- */\n.text-input{\n  width:100%; font-family:inherit; font-size:14px; padding:9px 12px;\n  border:1.5px solid var(--border); border-radius:10px;\n  background:#fafbfe; color:var(--text-1); margin-bottom:8px; transition:.15s;\n}\n.text-input:focus{ outline:none; border-color:var(--primary); box-shadow:0 0 0 3px var(--primary-soft); }\ntextarea.text-input{ resize:vertical; line-height:1.6; }\n.field label{ display:block; font-size:12.5px; color:var(--text-3); margin:8px 0 4px; font-weight:600; }\n.code{ font-family:ui-monospace,Consolas,monospace; background:var(--primary-soft); padding:0 5px; border-radius:6px; }\n.chips-mini{ margin-top:8px; }\n.chips-mini .chip{ font-size:12px; padding:6px 12px; }\n.setup-panel .actions{ margin-top:16px; flex-direction:row; flex-wrap:wrap; }\n.setup-panel .actions .btn{ flex:1 1 auto; }\n\n/* ---------- 奖状样式（模板基座） ---------- */\n.cert-sheet{\n  padding:18px; background:#f3f5fa; border:1px solid var(--border);\n  border-radius:14px; display:flex; justify-content:center;\n}\n.certificate{\n  position:relative; width:min(100%,860px); aspect-ratio:21/14.02;\n  background:#fff8ec; border-radius:6px; overflow:hidden;\n  box-shadow:0 8px 30px rgba(30,30,60,.16);\n  padding:clamp(16px,3vw,36px);\n}\n.cert-inner{\n  position:relative; width:100%; height:100%;\n  border:3px solid var(--tpl-line,#c1902f); border-radius:4px;\n  display:flex; flex-direction:column; align-items:center; justify-content:space-between;\n  padding:clamp(14px,3vw,30px) clamp(18px,4vw,44px); text-align:center;\n  background:\n    radial-gradient(120% 120% at 50% 0%, var(--tpl-bg2,rgba(255,255,255,.6)), transparent 60%),\n    var(--tpl-bg,#fffdf6);\n}\n/* 四角装饰 */\n.corner{ position:absolute; width:52px; height:52px; border:4px solid var(--tpl-corner,#c1902f); z-index:2; }\n.corner.tl{ top:8px; left:8px; border-right:none; border-bottom:none; border-top-left-radius:6px; }\n.corner.tr{ top:8px; right:8px; border-left:none; border-bottom:none; border-top-right-radius:6px; }\n.corner.bl{ bottom:8px; left:8px; border-right:none; border-top:none; border-bottom-left-radius:6px; }\n.corner.br{ bottom:8px; right:8px; border-left:none; border-top:none; border-bottom-right-radius:6px; }\n@media (max-width:560px){ .corner{ width:34px; height:34px; border-width:3px; } }\n\n/* 标题（模板名称） */\n.cert-title{\n  margin:0; font-size:clamp(26px,5.6vw,54px); font-weight:900;\n  letter-spacing:.42em; text-indent:.42em; color:var(--tpl-title,#b4451c);\n  font-family:\"Kaiti SC\",\"STKaiti\",\"KaiTi\",\"SimSun\",serif;\n}\n.cert-ribbon{\n  width:clamp(90px,22vw,200px); height:6px; margin:10px auto 0;\n  background:var(--tpl-line,#c1902f); border-radius:99px; opacity:.9;\n}\n/* 称号大字 */\n.cert-award{\n  font-size:clamp(26px,5.2vw,48px); font-weight:900; color:var(--tpl-acc,#c0392b);\n  margin:14px 0 6px; line-height:1.15; letter-spacing:.08em;\n  font-family:\"Kaiti SC\",\"STKaiti\",\"KaiTi\",\"SimSun\",serif;\n  text-shadow:0 2px 0 rgba(0,0,0,.04);\n}\n/* 称呼行 */\n.cert-line{ font-size:clamp(14px,2.2vw,20px); color:var(--text-1,#3a3328); font-weight:600; }\n.cert-line .hl{ color:var(--tpl-acc,#c0392b); font-weight:800; border-bottom:2px solid var(--tpl-line,#c1902f); padding:0 6px; }\n/* 正文 */\n.cert-body{ font-size:clamp(12px,1.9vw,17px); color:#5b5343; line-height:1.9; margin:4px 0 0; max-width:92%; }\n/* 落款 */\n.cert-foot{ display:flex; flex-direction:column; align-items:flex-end; gap:3px; width:100%; padding-top:8px; }\n.cert-school{ font-size:clamp(13px,2vw,19px); font-weight:700; color:var(--tpl-acc,#c0392b); }\n.cert-date{ font-size:clamp(11px,1.6vw,15px); color:#8a8171; }\n\n.stage-tip{ margin-top:12px; font-size:12.5px; color:var(--text-3); text-align:center; }\n\n/* ---------- 四种模板配色 ---------- */\n/* 奖状：中国红 */\n.certificate.tpl-award{ --tpl-line:#c0392b; --tpl-title:#9b1c0e; --tpl-acc:#c0392b; --tpl-corner:#b23a2a; --tpl-bg:#fff6ec; }\n/* 荣誉证书：金黄蓝 */\n.certificate.tpl-cert{ --tpl-line:#c1902f; --tpl-title:#1e4a8a; --tpl-acc:#1e4a8a; --tpl-corner:#b58a2f; --tpl-bg:#fbfaf6; }\n/* 表扬信：清新绿 */\n.certificate.tpl-praise{ --tpl-line:#2e8b57; --tpl-title:#1f6b3f; --tpl-acc:#20784a; --tpl-corner:#2e8b57; --tpl-bg:#f6fbf6; }\n/* 喜报：喜庆渐变 */\n.certificate.tpl-happy{\n  --tpl-line:#e0a32b; --tpl-title:#c1121f; --tpl-acc:#c1121f; --tpl-corner:#d98e1f;\n  --tpl-bg:#fff1e0;\n}\n.certificate.tpl-happy .cert-inner{\n  background:\n    radial-gradient(130% 130% at 50% 0%, #ffe9c9, transparent 58%),\n    linear-gradient(180deg,#fff7ec,#fff0dc);\n}\n\n/* ---------- 响应式 ---------- */\n@media (max-width:880px){ .workbench{ grid-template-columns:1fr; } }\n@media (max-width:560px){\n  .cert-sheet{ padding:10px; }\n  .certificate{ padding:12px; }\n  .cert-inner{ padding:12px; }\n}\n\n/* ---------- 打印：仅输出奖状（A4 横向） ---------- */\n@media print{\n  html,body{ background:#fff !important; }\n  .setup-panel,.stage-head,.stage-tip,.toast{ display:none !important; }\n  .workbench{ display:block; margin:0; }\n  .stage-panel{ box-shadow:none; border:none; padding:0; }\n  .cert-sheet{ padding:0; background:#fff; border:none; }\n  .certificate{\n    width:282mm; height:188mm; aspect-ratio:auto;\n    box-shadow:none; border-radius:0; padding:8mm;\n  }\n  .cert-inner{ border-width:3px; }\n  @page{ size:A4 landscape; margin:0; }\n}\n\n/* ---------- 隐藏设置栏（⚙）：双栏 → 单栏，与 random-call 同构 ---------- */\n.workbench.setup-hidden{ grid-template-columns:minmax(0,1fr); }\n.workbench.setup-hidden .setup-panel{ display:none; }\n\n/* ---------- 舞台全屏（⛶）：全屏目标是 .stage-panel 自身，不是整页 ---------- */\n.stage-panel:fullscreen,\n.stage-panel:-webkit-full-screen,\n.stage-panel.edutf-solo{\n  display:flex; flex-direction:column; justify-content:center; align-items:stretch;\n  min-height:100vh; padding:36px 30px;\n  border-radius:0; border-color:transparent; box-shadow:none;\n  background:var(--card-bg); overflow:auto;\n}\n/* 全屏下工具栏仍可见：贴边 + 半透明，hover 恢复不透明 */\n.stage-panel:fullscreen .stage-toolbar,\n.stage-panel:-webkit-full-screen .stage-toolbar,\n.stage-panel.edutf-solo .stage-toolbar{\n  position:fixed; top:18px; right:22px; z-index:30;\n  opacity:.55; transition:opacity .18s var(--ease);\n}\n.stage-panel:fullscreen .stage-toolbar:hover,\n.stage-panel:-webkit-full-screen .stage-toolbar:hover,\n.stage-panel.edutf-solo .stage-toolbar:hover{ opacity:1; }\n@media print{ .stage-toolbar{ display:none; } }\n",
-      "tools/award-generator/award-generator.js": "/* ============================================================\n * EduToolbox · 电子奖状生成器 award-generator.js\n * 功能：模板/姓名/奖项/正文 → 实时预览 → 打印 / 导出 PNG\n * 纯前端 IIFE，全本地处理；依赖本地 vendor/html2canvas\n * ============================================================ */\n(function () {\n  \"use strict\";\n\n  /* ---------- 常用工具 ---------- */\n  const $ = (id) => document.getElementById(id);\n  const esc = (s) => String(s == null ? \"\" : s).replace(/[&<>\"']/g, (c) => ({ \"&\": \"&amp;\", \"<\": \"&lt;\", \">\": \"&gt;\", '\"': \"&quot;\", \"'\": \"&#39;\" }[c]));\n\n  /* ---------- 常量 ---------- */\n  // 常用奖项快捷选项\n  const AWARDS = [\n    \"三好学生\", \"优秀学生\", \"学习之星\", \"进步之星\", \"文明之星\",\n    \"劳动之星\", \"纪律之星\", \"体育之星\", \"艺术之星\", \"阅读之星\",\n    \"小小书法家\", \"数学之星\", \"英语小达人\", \"科学小博士\", \"优秀干部\",\n  ];\n  // 模板标题\n  const TPL_TITLES = { award: \"奖　状\", cert: \"荣 誉 证 书\", praise: \"表 扬 信\", happy: \"喜　报\" };\n  // 状态\n  const state = { tpl: \"award\" };\n\n  /* ---------- 提示条 ---------- */\n  let toastTimer;\n  function toast(msg) {\n    const t = $(\"toast\");\n    if (!t) return;\n    t.textContent = msg;\n    t.classList.add(\"show\");\n    clearTimeout(toastTimer);\n    toastTimer = setTimeout(() => t.classList.remove(\"show\"), 2200);\n  }\n\n  /* ---------- 渲染：把表单状态反映到奖状预览 ---------- */\n  function todayStr() {\n    const d = new Date();\n    const p = (n) => String(n).padStart(2, \"0\");\n    return d.getFullYear() + \"-\" + p(d.getMonth() + 1) + \"-\" + p(d.getDate());\n  }\n\n  function render() {\n    const name = ($(\"studentName\").value || \"张三\").trim();\n    const award = ($(\"awardName\").value || \"三好学生\").trim();\n    const school = ($(\"schoolName\").value || \"\").trim();\n    const date = $(\"awardDate\").value || todayStr();\n\n    // 模板\n    const cert = $(\"certificate\");\n    cert.className = \"certificate tpl-\" + state.tpl;\n    $(\"certTitle\").textContent = TPL_TITLES[state.tpl] || \"奖　状\";\n    $(\"certAward\").textContent = award;\n    $(\"certName\").textContent = name;\n    $(\"certSchool\").textContent = school;\n    // 日期格式化为 2026年9月21日\n    let dateText = date;\n    if (/^\\d{4}-\\d{2}-\\d{2}$/.test(date)) {\n      const [y, m, d] = date.split(\"-\");\n      dateText = y + \" 年 \" + parseInt(m, 10) + \" 月 \" + parseInt(d, 10) + \" 日\";\n    }\n    $(\"certDate\").textContent = dateText;\n    // 正文：替换占位符\n    const body = ($(\"certBody\").value || \"\")\n      .replace(/\\{name\\}/g, name)\n      .replace(/\\{award\\}/g, award);\n    $(\"certBodyView\").textContent = body || \"在 2025—2026 学年度中，表现优异，特授予「\" + award + \"」荣誉称号，以资鼓励。\";\n  }\n\n  /* ---------- 导出 PNG（html2canvas） ---------- */\n  function exportPng() {\n    const node = $(\"certificate\");\n    if (typeof html2canvas === \"undefined\") {\n      toast(\"当前环境不支持导出图片，可使用打印替代\");\n      return;\n    }\n    toast(\"正在生成图片…\");\n    html2canvas(node, {\n      scale: 2,\n      backgroundColor: null,\n      useCORS: true,\n      logging: false,\n    }).then((canvas) => {\n      const a = document.createElement(\"a\");\n      a.download = \"奖状-\" + ($(\"studentName\").value || \"学生\") + \".png\";\n      a.href = canvas.toDataURL(\"image/png\");\n      a.click();\n      toast(\"✅ 已导出 PNG 图片\");\n    }).catch(() => toast(\"❌ 导出失败，请使用打印\"));\n  }\n\n  /* ---------- 事件绑定 ---------- */\n  function bind() {\n    // 模板选择\n    $(\"tplChips\").querySelectorAll(\".chip\").forEach((chip) => {\n      chip.addEventListener(\"click\", () => {\n        state.tpl = chip.dataset.tpl;\n        $(\"tplChips\").querySelectorAll(\".chip\").forEach((c) => c.classList.remove(\"active\"));\n        chip.classList.add(\"active\");\n        render();\n      });\n    });\n\n    // 奖项快捷 chips\n    const wrap = $(\"awardChips\");\n    wrap.innerHTML = AWARDS.map((a) => '<button type=\"button\" class=\"chip\" data-v=\"' + esc(a) + '\">' + esc(a) + \"<\/button>\").join(\"\");\n    wrap.querySelectorAll(\".chip\").forEach((chip) => {\n      chip.addEventListener(\"click\", () => {\n        $(\"awardName\").value = chip.dataset.v;\n        $(\"awardChips\").querySelectorAll(\".chip\").forEach((c) => c.classList.remove(\"active\"));\n        chip.classList.add(\"active\");\n        render();\n      });\n    });\n\n    // 表单变化 → 实时刷新\n    [\"studentName\", \"awardName\", \"schoolName\", \"awardDate\", \"certBody\"].forEach((id) => {\n      $(id).addEventListener(\"input\", render);\n    });\n\n    // 按钮\n    $(\"btnExport\").addEventListener(\"click\", exportPng);\n    $(\"btnPrint\").addEventListener(\"click\", () => window.print());\n    $(\"btnDemo\").addEventListener(\"click\", () => {\n      $(\"studentName\").value = \"李欣怡\";\n      $(\"awardName\").value = \"学习之星\";\n      $(\"schoolName\").value = \"杏坛实验学校\";\n      $(\"certBody\").value = \"在 2025—2026 学年度第一学期中，刻苦努力、进步显著，特授予「{award}」荣誉称号，以资鼓励。\";\n      $(\"awardDate\").value = todayStr();\n      render();\n      toast(\"已载入示例\");\n    });\n\n  }\n\n  /* ---------- 初始化 ---------- */\n  function init() {\n    $(\"awardDate\").value = todayStr();\n    if (window.EduToolStageToolbar) window.EduToolStageToolbar.init({ stage: \".stage-panel\", panelHost: \".workbench\", hiddenClass: \"setup-hidden\" });\n    bind();\n    render();\n  }\n  if (document.readyState === \"loading\") document.addEventListener(\"DOMContentLoaded\", init);\n  else init();\n})();\n"
+      "assets/css/tool-common.css": `/* ============================================================================
+ * EduToolbox · tool-common.css
+ * 自研工具共享设计系统（iframe 嵌入 / 独立打开均适用）
+ * ----------------------------------------------------------------------------
+ * 加载约定：各工具页先加载「自己的 css」，再加载本文件。
+ *   → 本文件只提供公共底座；工具特有布局写在各自 css 中，
+ *     若需覆盖本文件的同优先级声明，请使用更高特异性选择器
+ *     （如 body.xxx、#app .main、具体 id）。
+ * 高度策略：所有容器高度自动撑开，除 body 浏览器主滚动条外不制造内部滚动条；
+ *   唯一例外：textarea 等表单控件在内容超出时允许自身滚动 + 可拖拽放大；
+ *   工具自身的全屏投影模式（.is-fullscreen / :fullscreen）由各工具 css 定义。
+ * ========================================================================== */
+
+/* ---------------------------------------------------------------------------
+ * 1. 设计令牌
+ * ------------------------------------------------------------------------- */
+:root {
+  --primary:        #3b6ef6;
+  --primary-hover:  #2f5ee0;
+  --primary-active: #274fc2;
+  --primary-soft:   #e8edff;
+  --primary-soft-2: #dbe4ff;
+  --primary-grad:   linear-gradient(135deg, #5a8dff 0%, #3b6ef6 55%, #2f5bd9 100%);
+
+  --success: #22b36a;
+  --warning: #f5a623;
+  --danger:  #ef5b5b;
+  --info:    #38a3e8;
+
+  --text-1: #1f2733;
+  --text-2: #515b6b;
+  --text-3: #8a93a3;
+
+  --bg:        #eef2fa;
+  --bg-soft:   #f4f7fd;
+  --card-bg:   #ffffff;
+  --card-bg-2: #f8faff;
+  --border:    #e4e9f2;
+  --border-2:  #d6deec;
+
+  --shadow-sm: 0 2px 8px rgba(31, 45, 80, 0.05);
+  --shadow:    0 6px 22px rgba(31, 45, 80, 0.07);
+  --shadow-lg: 0 16px 40px rgba(36, 66, 140, 0.14);
+  --shadow-primary: 0 10px 24px rgba(59, 110, 246, 0.28);
+
+  --r-sm: 8px;
+  --r:    14px;
+  --r-lg: 20px;
+  --r-pill: 999px;
+
+  --ease: cubic-bezier(0.4, 0, 0.2, 1);
+  --t-fast: 0.16s;
+  --t:      0.26s;
+
+  --font: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC",
+          "Hiragino Sans GB", "Microsoft YaHei", "Helvetica Neue", Arial,
+          sans-serif;
+}
+
+/* ---------------------------------------------------------------------------
+ * 2. Reset（工具页可能被独立打开，需要完整底座）
+ * ------------------------------------------------------------------------- */
+*, *::before, *::after { box-sizing: border-box; }
+* { margin: 0; padding: 0; }
+
+html {
+  -webkit-text-size-adjust: 100%;
+  -webkit-tap-highlight-color: transparent;
+  height: auto;
+}
+
+body {
+  height: auto;
+  min-height: 100%;
+  overflow-x: hidden;      /* 仅防止横向溢出，纵向由浏览器主滚动条承担 */
+  overflow-y: visible;
+  font-family: var(--font);
+  font-size: 15px;
+  line-height: 1.65;
+  color: var(--text-1);
+  background:
+    radial-gradient(1200px 500px at 85% -10%, rgba(91, 139, 255, 0.10), transparent 60%),
+    radial-gradient(900px 420px at 0% 0%, rgba(56, 163, 232, 0.08), transparent 55%),
+    var(--bg);
+  background-attachment: fixed;
+  -webkit-font-smoothing: antialiased;
+}
+
+img, svg, canvas, video { display: block; max-width: 100%; }
+input, button, textarea, select { font: inherit; color: inherit; }
+button { background: none; border: none; cursor: pointer; }
+a { color: inherit; text-decoration: none; }
+a:hover { color: var(--primary); }
+ul, ol { list-style: none; }
+h1, h2, h3, h4, h5, h6 { font-weight: 700; line-height: 1.3; color: var(--text-1); }
+
+::selection { background: var(--primary); color: #fff; }
+
+[hidden] { display: none !important; }
+.hidden { display: none !important; }
+
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-thumb {
+  background: var(--border-2);
+  border-radius: 999px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+::-webkit-scrollbar-track { background: transparent; }
+
+kbd {
+  display: inline-block;
+  padding: 2px 8px;
+  font-family: Consolas, Menlo, monospace;
+  font-size: 12px;
+  color: var(--text-2);
+  background: var(--card-bg);
+  border: 1px solid var(--border-2);
+  border-bottom-width: 2px;
+  border-radius: 6px;
+}
+
+/* ---------------------------------------------------------------------------
+ * 3. 页面骨架（高度全部 auto，内容自然向下撑开）
+ * ------------------------------------------------------------------------- */
+#app { width: 100%; }
+
+.container {
+  width: 100%;
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 28px 24px 56px;
+}
+
+.wrap {
+  width: 100%;
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 28px 24px 56px;
+}
+
+/* 双栏工具：左设置面板 + 右舞台（各工具可用更高优先级改列宽/断点） */
+.main {
+  display: grid;
+  grid-template-columns: 360px minmax(0, 1fr);
+  gap: 22px;
+  align-items: start;
+  width: 100%;
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 24px;
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 22px;
+  width: 100%;
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 24px;
+}
+
+.setup-panel,
+.settings-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  /* 不设 sticky、不设固定高度、不内部滚动，随页面一起滚动 */
+  min-width: 0;
+}
+
+.stage {
+  position: relative;
+  min-width: 0;
+  min-height: 420px;
+  padding: 24px;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow);
+  overflow: visible; /* 内容自动撑开，不裁切不滚动 */
+}
+
+/* ---------------------------------------------------------------------------
+ * 4. 工具页头部（.hero / .hdr / .head / 标题组）
+ * ------------------------------------------------------------------------- */
+.hero {
+  margin-bottom: 22px;
+  padding: 26px 28px;
+  text-align: center;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow-sm);
+}
+
+.hero .title,
+.hero h1 {
+  font-size: clamp(22px, 3vw, 30px);
+  font-weight: 800;
+  margin-bottom: 8px;
+}
+
+.hero .subtitle,
+.hero p {
+  font-size: 14.5px;
+  line-height: 1.8;
+  color: var(--text-2);
+  max-width: 860px;
+  margin: 0 auto;
+}
+
+/* 评语类工具使用的大蓝色介绍卡 */
+.hdr {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 28px 30px;
+  margin-bottom: 22px;
+  color: #fff;
+  background: var(--primary-grad);
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow-primary);
+}
+
+.hdr-emoji {
+  display: grid;
+  place-items: center;
+  width: 72px;
+  height: 72px;
+  flex-shrink: 0;
+  font-size: 38px;
+  background: rgba(255, 255, 255, 0.18);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 20px;
+}
+
+.hdr-text h1 { color: #fff; font-size: clamp(22px, 2.6vw, 28px); margin-bottom: 6px; }
+.hdr-text p { color: rgba(255, 255, 255, 0.92); font-size: 14px; line-height: 1.75; }
+
+.head {
+  margin-bottom: 20px;
+  padding: 22px 24px;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow-sm);
+}
+
+.head h1,
+.head .title { font-size: clamp(20px, 2.4vw, 26px); margin-bottom: 6px; }
+.head p { color: var(--text-2); font-size: 14px; line-height: 1.7; }
+
+.title { font-size: 24px; font-weight: 800; }
+.subtitle { font-size: 14.5px; color: var(--text-2); line-height: 1.75; }
+.slogan { font-size: 13px; color: var(--text-3); }
+.tool-title { font-size: 20px; font-weight: 800; }
+.tool-sub { font-size: 13.5px; color: var(--text-2); }
+
+/* ---------------------------------------------------------------------------
+ * 5. 面板 / 卡片 / 区块
+ * ------------------------------------------------------------------------- */
+.panel,
+.card,
+.side-card,
+.sheet {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  box-shadow: var(--shadow-sm);
+  padding: 22px;
+}
+
+.panels {
+  display: grid;
+  grid-template-columns: minmax(280px, 360px) minmax(0, 1fr);
+  gap: 18px;
+  margin-bottom: 18px;
+}
+
+.panel { min-width: 0; }
+.panel-names { grid-column: 1; }
+.panel-dims  {
+  grid-column: 2;
+  background: linear-gradient(135deg, #f0f6ff 0%, #f7f9ff 100%);
+  border-color: #dce7ff;
+}
+.panel-settings { grid-column: 1 / -1; }
+
+.panel-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.panel-title,
+.card-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 16px;
+  font-weight: 700;
+  margin-bottom: 12px;
+}
+
+.panel-head .panel-title { margin-bottom: 0; }
+
+.panel-tip,
+.panel-toggle {
+  margin-top: 10px;
+  font-size: 12.5px;
+  line-height: 1.6;
+  color: var(--text-3);
+}
+
+.panel-block { margin-top: 16px; }
+
+.block {
+  padding: 20px;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  box-shadow: var(--shadow-sm);
+}
+
+.block + .block { margin-top: 0; }
+.setup-panel .block { /* 已由父级 gap 控制间距 */ }
+
+.block-title {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 15.5px;
+  font-weight: 700;
+  margin-bottom: 10px;
+}
+
+.block-hint {
+  font-size: 12.5px;
+  line-height: 1.6;
+  color: var(--text-3);
+  margin-bottom: 10px;
+}
+
+.count-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 10px;
+  font-size: 13px;
+  color: var(--text-2);
+}
+
+.count-bar span { font-weight: 700; color: var(--primary); }
+
+/* ---------------------------------------------------------------------------
+ * 6. 表单元素
+ * ------------------------------------------------------------------------- */
+input[type="text"],
+input[type="number"],
+input[type="email"],
+input[type="password"],
+input[type="search"],
+input[type="url"],
+input[type="date"],
+input[type="time"],
+input[type="datetime-local"],
+select,
+textarea {
+  width: 100%;
+  padding: 10px 14px;
+  font-size: 14px;
+  color: var(--text-1);
+  background: var(--card-bg-2);
+  border: 1.5px solid var(--border);
+  border-radius: var(--r-sm);
+  outline: none;
+  transition: all var(--t-fast) var(--ease);
+}
+
+textarea {
+  display: block;
+  min-height: 150px;
+  line-height: 1.7;
+  resize: vertical;          /* 用户可拖拽放大，默认完整展示不出现内部滚动条 */
+  overflow: auto;
+}
+
+input:focus, select:focus, textarea:focus {
+  border-color: var(--primary);
+  background: #fff;
+  box-shadow: 0 0 0 3px rgba(59, 110, 246, 0.12);
+}
+
+input::placeholder, textarea::placeholder { color: var(--text-3); }
+
+select {
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M2 4l4 4 4-4' stroke='%238a93a3' stroke-width='1.6' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  padding-right: 34px;
+  cursor: pointer;
+}
+
+input[type="number"] { -moz-appearance: textfield; }
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+
+input[type="color"] {
+  width: 40px;
+  height: 32px;
+  padding: 2px;
+  border: 1.5px solid var(--border);
+  border-radius: var(--r-sm);
+  background: var(--card-bg);
+  cursor: pointer;
+}
+
+/* 滑杆 */
+input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 6px;
+  border-radius: 999px;
+  background: var(--primary-soft-2);
+  outline: none;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--primary-grad);
+  border: 3px solid #fff;
+  box-shadow: 0 2px 6px rgba(59, 110, 246, 0.4);
+  cursor: pointer;
+}
+
+input[type="range"]::-moz-range-thumb {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--primary);
+  border: 3px solid #fff;
+  box-shadow: 0 2px 6px rgba(59, 110, 246, 0.4);
+  cursor: pointer;
+}
+
+/* 表单字段组 */
+.field { margin-bottom: 14px; }
+.field:last-child { margin-bottom: 0; }
+
+.field-label {
+  display: block;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--text-1);
+  margin-bottom: 7px;
+}
+
+.field-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.field-hint {
+  margin-top: 6px;
+  font-size: 12.5px;
+  color: var(--text-3);
+}
+
+/* 设置行（label 左 / 控件右） */
+.setting-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 9px 0;
+  border-bottom: 1px dashed var(--border);
+}
+
+.setting-row:last-child { border-bottom: none; }
+
+.setting-row > label {
+  font-size: 13.5px;
+  font-weight: 500;
+  color: var(--text-2);
+  flex-shrink: 0;
+}
+
+.setting-row input[type="number"],
+.setting-row input[type="text"],
+.setting-row select { max-width: 180px; }
+
+.setting-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 14px;
+}
+
+.setting-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding: 16px;
+  background: var(--card-bg-2);
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+}
+
+.setting-item--full { grid-column: 1 / -1; }
+
+.setting-label { font-size: 13.5px; font-weight: 600; }
+.setting-val { font-size: 13px; color: var(--text-3); }
+
+.opt-group { display: flex; flex-direction: column; gap: 8px; }
+.opt-label { font-size: 13px; font-weight: 600; color: var(--text-2); }
+
+/* 数字步进器 */
+.num-ctrl,
+.num-input {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.num-btn,
+.adj-btn {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--primary);
+  background: var(--primary-soft);
+  border-radius: var(--r-sm);
+  transition: all var(--t-fast) var(--ease);
+  flex-shrink: 0;
+}
+
+.num-btn:hover,
+.adj-btn:hover { background: var(--primary-soft-2); }
+
+.num-val,
+.num-mini,
+.num-wide {
+  min-width: 52px;
+  text-align: center;
+  font-weight: 700;
+  font-size: 16px;
+  color: var(--text-1);
+}
+
+.num-wide { min-width: 84px; }
+.num-mini { min-width: 40px; font-size: 14px; }
+.num-unit,
+.unit { font-size: 12.5px; color: var(--text-3); margin-left: 4px; }
+
+.textarea-wrap { position: relative; }
+.textarea-toolbar {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+/* 复选行 / 单选 */
+.check-line,
+.check-inline,
+.check,
+.chk {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 7px 0;
+  font-size: 14px;
+  color: var(--text-2);
+  cursor: pointer;
+  user-select: none;
+}
+
+.check-inline { display: inline-flex; padding: 4px 12px 4px 0; }
+
+.check-stack { display: flex; flex-direction: column; gap: 2px; margin-top: 8px; }
+
+.check-line input,
+.check-inline input,
+.check input,
+.chk input {
+  width: 17px;
+  height: 17px;
+  flex-shrink: 0;
+  accent-color: var(--primary);
+  cursor: pointer;
+}
+
+.radio {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  color: var(--text-2);
+}
+.radio input { accent-color: var(--primary); width: 16px; height: 16px; }
+
+/* 开关 switch（.switch 内含 checkbox + .slider） */
+.switch-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+.switch-desc { font-size: 13px; color: var(--text-2); }
+
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 46px;
+  height: 26px;
+  flex-shrink: 0;
+}
+
+.switch input {
+  position: absolute;
+  opacity: 0;
+  width: 100%;
+  height: 100%;
+  cursor: pointer;
+  z-index: 2;
+  margin: 0;
+}
+
+.switch .slider {
+  position: absolute;
+  inset: 0;
+  background: #c7cfdd;
+  border-radius: 999px;
+  transition: background var(--t-fast) var(--ease);
+  pointer-events: none;
+}
+
+.switch .slider::before {
+  content: "";
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 20px;
+  height: 20px;
+  background: #fff;
+  border-radius: 50%;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  transition: transform var(--t-fast) var(--ease);
+}
+
+.switch input:checked + .slider { background: var(--primary); }
+.switch input:checked + .slider::before { transform: translateX(20px); }
+
+/* 分段选择器：seg-group > label.seg > input + span；以及按钮式 seg-btn */
+.seg-group {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  padding: 4px;
+  background: var(--bg-soft);
+  border: 1px solid var(--border);
+  border-radius: var(--r-pill);
+}
+
+.seg { position: relative; cursor: pointer; }
+
+.seg input { position: absolute; opacity: 0; inset: 0; cursor: pointer; }
+
+.seg span {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 7px 16px;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--text-2);
+  border-radius: var(--r-pill);
+  transition: all var(--t-fast) var(--ease);
+  white-space: nowrap;
+}
+
+.seg input:checked + span {
+  color: #fff;
+  background: var(--primary-grad);
+  box-shadow: var(--shadow-primary);
+}
+
+.seg:hover input:not(:checked) + span { color: var(--primary); background: var(--primary-soft); }
+
+.seg-bar {
+  display: inline-flex;
+  gap: 4px;
+  padding: 4px;
+  background: var(--bg-soft);
+  border-radius: var(--r-pill);
+}
+
+.seg-btn,
+.mode-btn,
+.mode-tab,
+.tab,
+.year-btn,
+.size-btn,
+.preset,
+.preset-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  padding: 8px 16px;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--text-2);
+  background: var(--card-bg);
+  border: 1.5px solid var(--border);
+  border-radius: var(--r-pill);
+  cursor: pointer;
+  transition: all var(--t-fast) var(--ease);
+  white-space: nowrap;
+  user-select: none;
+}
+
+.seg-btn:hover,
+.mode-btn:hover,
+.mode-tab:hover,
+.tab:hover,
+.year-btn:hover,
+.size-btn:hover,
+.preset:hover,
+.preset-btn:hover {
+  color: var(--primary);
+  border-color: var(--primary-soft-2);
+  background: var(--primary-soft);
+}
+
+.seg-btn.active,
+.mode-btn.active,
+.mode-tab.active,
+.tab.active,
+.year-btn.active,
+.size-btn.active {
+  color: #fff;
+  background: var(--primary-grad);
+  border-color: transparent;
+  box-shadow: var(--shadow-primary);
+}
+
+.tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 14px;
+}
+
+.tab-pane { display: none; }
+.tab-pane.active { display: block; }
+
+.seg-tip { font-size: 12.5px; color: var(--text-3); margin-top: 6px; }
+
+/* 标签芯片（可点选） */
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 9px;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 8px 16px;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--text-2);
+  background: var(--card-bg);
+  border: 1.5px solid var(--border);
+  border-radius: var(--r-pill);
+  cursor: pointer;
+  transition: all var(--t-fast) var(--ease);
+  user-select: none;
+}
+
+.chip:hover {
+  color: var(--primary);
+  border-color: var(--primary-soft-2);
+  transform: translateY(-1px);
+}
+
+.chip.active,
+.chip[aria-pressed="true"] {
+  color: #fff;
+  background: var(--primary-grad);
+  border-color: transparent;
+  box-shadow: var(--shadow-primary);
+}
+
+.theme-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 14px;
+  font-size: 13px;
+  border: 1.5px solid var(--border);
+  border-radius: var(--r-pill);
+  cursor: pointer;
+  background: var(--card-bg);
+  color: var(--text-2);
+  transition: all var(--t-fast) var(--ease);
+}
+
+.theme-chip.active { border-color: var(--primary); color: var(--primary); background: var(--primary-soft); }
+
+.theme-dot,
+.dot {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 2px solid var(--border-2);
+  flex-shrink: 0;
+}
+.theme-chip.active .theme-dot { box-shadow: 0 0 0 2px var(--primary-soft); }
+
+.val-tag {
+  display: inline-block;
+  padding: 1px 9px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--primary);
+  background: var(--primary-soft);
+  border-radius: var(--r-pill);
+}
+
+/* 颜色行 */
+.color-row { display: flex; flex-wrap: wrap; gap: 12px; }
+.color-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 12.5px;
+  color: var(--text-2);
+}
+.color-item input[type="color"] { width: 34px; height: 28px; }
+.color-swatch { width: 22px; height: 22px; border-radius: 7px; border: 1px solid var(--border); }
+.color-line { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+
+/* 拖拽上传区 */
+.dropzone {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 34px 20px;
+  text-align: center;
+  background: var(--card-bg-2);
+  border: 2px dashed var(--border-2);
+  border-radius: var(--r);
+  cursor: pointer;
+  transition: all var(--t-fast) var(--ease);
+}
+.dropzone:hover,
+.dropzone.dragover {
+  border-color: var(--primary);
+  background: var(--primary-soft);
+}
+.dz-icon { font-size: 36px; line-height: 1; }
+.dz-hint { font-size: 13px; color: var(--text-3); }
+
+/* ---------------------------------------------------------------------------
+ * 7. 按钮体系
+ * ------------------------------------------------------------------------- */
+.btn,
+.btn-primary,
+.btn-ghost,
+.btn-soft,
+.btn-danger,
+.btn-stop,
+.btn-reveal,
+.btn-small,
+.bulk-btn,
+.tool-btn,
+.neon-btn,
+.link-btn,
+.ctrl-btn,
+.ctrl-secondary,
+.action-btn,
+.theme-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 10px 20px;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.2;
+  white-space: nowrap;
+  color: var(--text-2);
+  background: var(--card-bg);
+  border: 1.5px solid var(--border);
+  border-radius: var(--r-pill);
+  cursor: pointer;
+  user-select: none;
+  transition: all var(--t-fast) var(--ease);
+}
+
+.btn:hover,
+.btn-ghost:hover,
+.btn-soft:hover,
+.bulk-btn:hover,
+.tool-btn:hover,
+.ctrl-btn:hover,
+.ctrl-secondary:hover,
+.action-btn:hover,
+.link-btn:hover {
+  color: var(--primary);
+  border-color: var(--primary-soft-2);
+  background: var(--primary-soft);
+  transform: translateY(-1px);
+}
+
+.btn-primary {
+  color: #fff;
+  background: var(--primary-grad);
+  border-color: transparent;
+  box-shadow: var(--shadow-primary);
+}
+.btn-primary:hover {
+  color: #fff;
+  background: var(--primary-grad);
+  filter: brightness(1.05);
+  box-shadow: 0 12px 28px rgba(59, 110, 246, 0.36);
+  transform: translateY(-1px);
+}
+
+.btn-danger,
+.btn-stop {
+  color: var(--danger);
+  border-color: #ffd4d4;
+  background: #fff5f5;
+}
+.btn-danger:hover,
+.btn-stop:hover {
+  color: #fff;
+  background: var(--danger);
+  border-color: var(--danger);
+}
+
+.btn-soft { background: var(--primary-soft); border-color: var(--primary-soft-2); color: var(--primary); }
+.btn-soft:hover { background: var(--primary-soft-2); color: var(--primary); }
+
+.btn-lg { padding: 13px 30px; font-size: 16px; }
+.btn-small { padding: 7px 15px; font-size: 13px; }
+.btn--ghost { /* 变体命名兼容 */ }
+
+/* setup-panel 中无 .btn 前缀的按钮（chouti/seat 等工具使用） */
+.setup-panel .btn-primary,
+.setup-panel .btn-ghost {
+  width: 100%;
+  padding: 11px 18px;
+  font-size: 14px;
+}
+
+.btn-mini {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 6px 13px;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--text-2);
+  background: var(--card-bg);
+  border: 1.5px solid var(--border);
+  border-radius: var(--r-pill);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all var(--t-fast) var(--ease);
+}
+.btn-mini:hover {
+  color: var(--primary);
+  border-color: var(--primary-soft-2);
+  background: var(--primary-soft);
+}
+
+.icon-btn {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  font-size: 18px;
+  color: var(--text-2);
+  background: var(--card-bg);
+  border: 1.5px solid var(--border);
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all var(--t-fast) var(--ease);
+  flex-shrink: 0;
+}
+.icon-btn:hover {
+  color: var(--primary);
+  border-color: var(--primary-soft-2);
+  background: var(--primary-soft);
+  transform: translateY(-1px);
+}
+
+.link-btn {
+  border: none;
+  background: none;
+  padding: 4px 8px;
+  box-shadow: none;
+}
+.link-btn:hover { background: none; transform: none; }
+
+.btn-start {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px 52px;
+  font-size: 20px;
+  font-weight: 800;
+  color: #fff;
+  background: var(--primary-grad);
+  border-radius: var(--r-pill);
+  box-shadow: var(--shadow-primary);
+  cursor: pointer;
+  transition: all var(--t-fast) var(--ease);
+}
+.btn-start:hover { transform: translateY(-2px); filter: brightness(1.06); }
+.btn-start:active { transform: translateY(0); }
+
+.neon-btn {
+  color: #fff;
+  background: linear-gradient(135deg, #6d4df2, #3b6ef6);
+  border-color: transparent;
+  box-shadow: 0 8px 20px rgba(90, 80, 246, 0.35);
+}
+.neon-btn:hover { color: #fff; filter: brightness(1.08); transform: translateY(-1px); }
+
+/* 按钮行 / 操作区 */
+.btn-row,
+.actions,
+.action-bar,
+.button-group,
+.btns,
+.controls,
+.ctrl-row,
+.ctrl-group,
+.toolbar,
+.tool-group,
+.text-tools {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.action-bar { justify-content: space-between; margin: 18px 0; }
+.actions { justify-content: center; margin-top: 18px; }
+.setup-panel .actions { flex-direction: column; align-items: stretch; }
+.setup-panel .button-group { gap: 8px; }
+
+/* 名单管理区按钮行：统一间距 */
+.panel-names .btn-row {
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
+}
+.panel-names .btn-row .btn { flex: 1; }
+
+.toolbar {
+  justify-content: space-between;
+  padding: 16px 20px;
+  margin-bottom: 18px;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  box-shadow: var(--shadow-sm);
+}
+
+.controls {
+  justify-content: center;
+  margin-top: 22px;
+}
+.ctrl-row { justify-content: center; }
+.ctrl-label { font-size: 13px; font-weight: 600; color: var(--text-3); }
+.ctrl-secondary { color: var(--text-3); }
+
+/* ---------------------------------------------------------------------------
+ * 8. 舞台 / 大屏展示
+ * ------------------------------------------------------------------------- */
+.stage-inner {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  min-height: 380px;
+  height: auto;
+  padding: 30px 20px;
+}
+
+.stage-toolbar {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  z-index: 5;
+  display: flex;
+  gap: 8px;
+}
+
+.stage-title {
+  font-size: 20px;
+  font-weight: 800;
+  text-align: center;
+}
+
+.stage-hint,
+.display-hint,
+.key-hint {
+  font-size: 13px;
+  color: var(--text-3);
+  text-align: center;
+}
+
+.display {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+}
+
+.display-card {
+  width: 100%;
+  padding: 28px;
+  text-align: center;
+  background: var(--card-bg-2);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+}
+
+.display-value,
+.display-label,
+.display-sub { text-align: center; }
+
+.display-label { font-size: 14px; color: var(--text-3); }
+.display-sub { font-size: 13px; color: var(--text-3); }
+
+.time-display,
+.time-value,
+.num-display,
+.q-display {
+  font-variant-numeric: tabular-nums;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  text-align: center;
+  color: var(--text-1);
+}
+
+.time-block { display: inline-flex; align-items: baseline; gap: 2px; }
+.time-label { font-size: 13px; color: var(--text-3); }
+.time-colon,
+.colon { font-size: 34px; font-weight: 800; color: var(--text-2); padding: 0 2px; }
+
+.status-bar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 22px;
+  flex-wrap: wrap;
+  font-size: 13.5px;
+  color: var(--text-2);
+}
+
+.status-item { display: inline-flex; align-items: center; gap: 6px; }
+.status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-2);
+}
+
+/* 进度环（timer） */
+.ring { display: block; margin: 0 auto; }
+.ring-bg { fill: none; stroke: var(--primary-soft-2); stroke-width: 12; }
+.ring-fg {
+  fill: none;
+  stroke: var(--primary);
+  stroke-width: 12;
+  stroke-linecap: round;
+  transform: rotate(-90deg);
+  transform-origin: center;
+  transition: stroke-dashoffset 0.3s linear;
+}
+.ring-center { position: relative; }
+
+/* 抽题专用 */
+.q-index { font-size: 14px; font-weight: 700; color: var(--primary); }
+.q-display { font-size: clamp(24px, 3.4vw, 40px); line-height: 1.4; padding: 0 10px; }
+.answer-area {
+  width: 100%;
+  max-width: 760px;
+  text-align: center;
+}
+.name-display {
+  font-size: clamp(30px, 5vw, 56px);
+  font-weight: 900;
+  text-align: center;
+  background: var(--primary-grad);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* 预设按钮组（timer） */
+.presets {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 9px;
+  margin-bottom: 20px;
+}
+.presets__label {
+  align-self: center;
+  font-size: 13.5px;
+  color: var(--text-3);
+  width: 100%;
+  text-align: center;
+}
+
+.mode-switch {
+  display: inline-flex;
+  gap: 4px;
+  padding: 5px;
+  margin: 0 auto 20px;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--r-pill);
+  box-shadow: var(--shadow-sm);
+}
+
+.custom {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  flex-wrap: wrap;
+  margin-bottom: 14px;
+}
+.custom__label { font-size: 13.5px; color: var(--text-3); }
+.time-input { display: inline-flex; align-items: center; gap: 8px; }
+.time-unit { display: inline-flex; flex-direction: column; align-items: center; gap: 2px; }
+.time-unit input { width: 88px; text-align: center; font-size: 18px; font-weight: 700; }
+.time-unit label { font-size: 12px; color: var(--text-3); }
+
+/* ---------------------------------------------------------------------------
+ * 9. 统计
+ * ------------------------------------------------------------------------- */
+.stats {
+  display: inline-flex;
+  align-items: center;
+  gap: 18px;
+  flex-wrap: wrap;
+}
+.stat {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 5px;
+  font-size: 13.5px;
+  color: var(--text-2);
+}
+.stat b { font-size: 18px; color: var(--primary); }
+
+.stat-card,
+.stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 14px 20px;
+  background: var(--card-bg-2);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  min-width: 110px;
+}
+.stat-num { font-size: 22px; font-weight: 800; color: var(--primary); }
+.stat-label { font-size: 12.5px; color: var(--text-3); }
+
+/* ---------------------------------------------------------------------------
+ * 10. 记录 / 结果 / 空状态 / 提示
+ * ------------------------------------------------------------------------- */
+.record-list {
+  /* 自动撑开，不限制高度，不出现内部滚动条 */
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-height: none;
+  overflow: visible;
+}
+
+.record-list li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  font-size: 13.5px;
+  background: var(--card-bg-2);
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+}
+
+.record-list li.empty {
+  justify-content: center;
+  color: var(--text-3);
+  background: none;
+  border: 1.5px dashed var(--border-2);
+}
+
+.rec { font-size: 13px; color: var(--text-2); }
+
+.results { margin-top: 22px; }
+.results-title { font-size: 17px; font-weight: 700; margin-bottom: 14px; }
+
+.r-grid,
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 14px;
+}
+
+.result {
+  padding: 16px;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  box-shadow: var(--shadow-sm);
+}
+
+.empty,
+.empty-tip {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 36px 20px;
+  text-align: center;
+  color: var(--text-3);
+  font-size: 14px;
+}
+
+.empty-icon { font-size: 48px; line-height: 1; }
+.empty-text { font-size: 14px; color: var(--text-2); }
+
+/* ---------------------------------------------------------------------------
+ * 10.5 统一状态组件基线（空状态 / 信息 / 错误 / 加载中）
+ *   现有 .empty / .empty-tip 保留兼容；新工具优先使用 .state 系列
+ *   设计目标：跨工具统一的"无数据/异常/加载"展示，提升体验一致性
+ *   用法：
+ *     <div class="state state--empty">
+ *       <div class="state-icon">📭<\/div>
+ *       <div class="state-title">暂无名单<\/div>
+ *       <div class="state-desc">请先导入学生名单后再使用<\/div>
+ *       <button class="state-action" onclick="...">去添加<\/button>
+ *     <\/div>
+ *   语义变体（必选其一）：
+ *     state--empty | state--info | state--success | state--warning
+ *     | state--error | state--loading
+ *   尺寸/布局修饰（可叠加）：
+ *     state--compact    紧凑变体（小区域/卡片内嵌）
+ *     state--list-item  列表项内嵌（消除 li 默认样式，水平占满）
+ *     state--inline     行内变体（pill 形，水平排列，按钮旁/表头用）
+ *     state--plain      无框变体（去掉虚线边框与背景，融入父容器）
+ *     state--hero       超大变体（整页空状态，初始未导入数据用）
+ *     state--closable   可关闭变体（右上角 ✕，可消除临时提示，配合 data-close）
+ *   按钮修饰：
+ *     state-action--ghost（次要按钮：重试/取消）
+ *   loading 动效：state--loading 的 .state-title 自动叠加省略号动画
+ * ------------------------------------------------------------------------- */
+.state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 48px 24px;
+  text-align: center;
+  border: 1.5px dashed var(--border-2);
+  border-radius: var(--r);
+  background: var(--bg-soft);
+  color: var(--text-2);
+}
+
+.state-icon {
+  display: grid;
+  place-items: center;
+  width: 64px;
+  height: 64px;
+  font-size: 36px;
+  line-height: 1;
+  background: var(--card-bg);
+  border-radius: 50%;
+  box-shadow: var(--shadow-sm);
+}
+
+.state-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text-1);
+}
+
+.state-desc {
+  font-size: 13.5px;
+  color: var(--text-3);
+  max-width: 420px;
+  line-height: 1.7;
+}
+
+.state-action {
+  margin-top: 4px;
+  padding: 8px 20px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #fff;
+  background: var(--primary-grad);
+  border: none;
+  border-radius: var(--r-pill);
+  box-shadow: var(--shadow-primary);
+  cursor: pointer;
+  transition: transform var(--t-fast) var(--ease),
+              box-shadow var(--t-fast) var(--ease);
+}
+.state-action:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 12px 28px rgba(59, 110, 246, 0.36);
+}
+.state-action:active { transform: translateY(0); }
+.state-action:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* 次要按钮（重试 / 取消），用于错误状态下的次要操作 */
+.state-action--ghost {
+  background: transparent;
+  color: var(--primary);
+  border: 1px solid var(--primary);
+  box-shadow: none;
+}
+.state-action--ghost:hover {
+  background: var(--primary-soft);
+  box-shadow: none;
+}
+
+/* 变体：通过边框色 + 图标色区分语义 */
+.state--empty  { border-color: var(--border-2); }
+.state--info   { border-color: rgba(56, 163, 232, 0.35); background: #f0f9ff; }
+.state--info   .state-icon { color: var(--info); }
+.state--success { border-color: rgba(34, 179, 106, 0.35); background: #f0fdf4; }
+.state--success .state-icon { color: var(--success); }
+.state--warning { border-color: rgba(245, 166, 35, 0.38); background: #fffbf0; }
+.state--warning .state-icon { color: var(--warning); }
+.state--error  { border-color: rgba(239, 91, 91, 0.42); background: #fef2f2; }
+.state--error  .state-icon { color: var(--danger); }
+
+/* 加载中变体：内置旋转 spinner，不依赖外部图标库 */
+.state--loading {
+  border-style: solid;
+  border-color: var(--border);
+  background: var(--card-bg);
+}
+.state--loading .state-icon {
+  width: 40px;
+  height: 40px;
+  font-size: 0;
+  border: 3px solid var(--border-2);
+  border-top-color: var(--primary);
+  border-radius: 50%;
+  animation: state-spin 0.8s linear infinite;
+}
+@keyframes state-spin { to { transform: rotate(360deg); } }
+
+/* 紧凑变体：用于列表/卡片内嵌的局部空状态或错误提示 */
+.state--compact { padding: 24px 16px; }
+.state--compact .state-icon { width: 48px; height: 48px; font-size: 28px; }
+.state--compact .state-title { font-size: 14px; }
+.state--compact .state-desc  { font-size: 12.5px; }
+
+/* 列表项内嵌变体：消除 li 默认样式干扰，让 .state 占满列表项宽度
+   用法：<li class="state state--list-item state--empty">...<\/li> 或
+        <li><div class="state state--list-item state--empty">...<\/div><\/li> */
+.state--list-item,
+li.state--list-item {
+  width: 100%;
+  list-style: none;
+  margin: 0;
+  padding: 20px 12px;
+  border-left: none;
+  border-right: none;
+  border-top: none;
+  border-radius: 0;
+  background: transparent;
+}
+.state--list-item + .state--list-item { border-top: 1px solid var(--border); }
+.state--list-item .state-icon { width: 40px; height: 40px; font-size: 22px; }
+.state--list-item .state-title { font-size: 13.5px; }
+.state--list-item .state-desc  { font-size: 12px; }
+
+/* list-item 的语义色锚点：因 border 已被去除，改用左侧 4px 色条 + 图标色区分
+   原 .state--info/-success/-warning/-error 的 background 在 list-item 下被覆盖为透明 */
+.state--list-item.state--info,
+.state--list-item.state--success,
+.state--list-item.state--warning,
+.state--list-item.state--error {
+  border-left: 4px solid currentColor;
+  padding-left: 16px;
+  background: transparent;
+}
+.state--list-item.state--info    { color: var(--info); }
+.state--list-item.state--info    .state-title { color: var(--info); }
+.state--list-item.state--success { color: var(--success); }
+.state--list-item.state--success .state-title { color: var(--success); }
+.state--list-item.state--warning { color: var(--warning); }
+.state--list-item.state--warning .state-title { color: var(--warning); }
+.state--list-item.state--error   { color: var(--danger); }
+.state--list-item.state--error   .state-title { color: var(--danger); }
+/* empty 变体无色条（默认中性），保持简洁 */
+
+/* list-item hover 态：轻微背景高亮，提示该项可点击/可操作 */
+.state--list-item.state--closable,
+.state--list-item[data-close] {
+  cursor: default;
+  transition: background var(--t-fast) var(--ease);
+}
+.state--list-item.state--closable:hover,
+.state--list-item[data-close]:hover {
+  background: var(--bg-soft);
+}
+
+/* list-item + closable 组合：关闭按钮位置调整（避开 4px 色条） */
+.state--list-item.state--closable { padding-right: 40px; }
+.state--list-item.state--closable::before { top: 14px; right: 12px; }
+
+/* list-item 在父容器 ul/ol 内的兼容：去默认 list-style 与 padding
+   兼容性：:has() 需 Firefox 121+ / Safari 15.4+ / Chrome 105+，
+   旧浏览器兜底：给 ul/ol 显式加 class="clean-list" 即可 */
+ul:has(> .state--list-item),
+ol:has(> .state--list-item),
+ul.clean-list,
+ol.clean-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+/* 嵌套容器适配：带背景的容器内不加分割线，改用卡片背景；多列网格中等高撑满 */
+.record-list .state--list-item,
+.results .state--list-item,
+.grid .state--list-item,
+.r-grid .state--list-item {
+  border-top: none;
+  border-radius: var(--r-sm);
+  background: var(--card-bg);
+}
+.record-list .state--list-item,
+.results .state--list-item { margin-bottom: 6px; }
+.grid .state--list-item,
+.r-grid .state--list-item { width: 100%; height: 100%; }
+
+/* list-item + loading 组合：spinner 与标题水平排列，避免竖向占用过多行高 */
+.state--list-item.state--loading {
+  flex-direction: row;
+  justify-content: center;
+  gap: 12px;
+  padding: 14px 12px;
+}
+.state--list-item.state--loading .state-icon {
+  width: 18px;
+  height: 18px;
+  border-width: 2px;
+}
+
+/* list-item + inline 组合：行内 pill 在列表项内自动占满 */
+.state--list-item.state--inline {
+  width: 100%;
+  justify-content: flex-start;
+  border-radius: var(--r-sm);
+  padding: 8px 12px;
+}
+
+/* 行内变体：水平排列，用于按钮组旁、表格单元格内、卡片头部的轻量提示
+   用法：<span class="state state--inline state--info"><span class="state-icon">ℹ️<\/span><span class="state-title">已保存<\/span><\/span> */
+.state--inline {
+  display: inline-flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+  width: auto;
+  max-width: 100%;
+  padding: 6px 12px;
+  border-width: 1px;
+  border-style: solid;
+  border-radius: var(--r-pill);
+  background: var(--card-bg);
+}
+.state--inline .state-icon {
+  width: 20px;
+  height: 20px;
+  font-size: 14px;
+  background: none;
+  box-shadow: none;
+  border-radius: 0;
+}
+.state--inline .state-title { font-size: 13px; font-weight: 600; }
+.state--inline .state-desc  { font-size: 12px; max-width: none; }
+.state--inline .state-action { margin-top: 0; padding: 4px 10px; font-size: 12px; }
+
+/* 无框变体：去掉虚线边框与背景，融入父容器
+   用法：卡片头部小提示、分割区段内的轻提示 */
+.state--plain {
+  border: none;
+  background: none;
+  padding: 16px 8px;
+}
+
+/* 超大变体：用于整页空状态（如初始未导入任何数据）
+   用法：<div class="state state--hero state--empty">...<\/div> */
+.state--hero {
+  padding: 80px 24px;
+  gap: 18px;
+}
+.state--hero .state-icon { width: 96px; height: 96px; font-size: 52px; }
+.state--hero .state-title { font-size: 20px; }
+.state--hero .state-desc  { font-size: 14.5px; max-width: 540px; }
+
+/* loading 文字动效：在 state--loading 内 .state-title 上叠加省略号动画
+   实现：::after content="..." + width 0→3ch 阶梯动画（step-end）
+   原因：content 不是 animatable property，旧方案在 Firefox 等浏览器失效；
+        改用 width 动画是 CSS Animations Level 1 标准做法，跨浏览器一致 */
+.state--loading .state-title::after {
+  content: "...";
+  display: inline-block;
+  width: 0;
+  overflow: hidden;
+  vertical-align: baseline;
+  font-family: ui-monospace, Menlo, Consolas, monospace;
+  animation: state-dots 1.4s step-end infinite;
+}
+@keyframes state-dots {
+  0%   { width: 0ch; }
+  25%  { width: 1ch; }
+  50%  { width: 2ch; }
+  75%  { width: 3ch; }
+  100% { width: 0ch; }
+}
+
+/* 可关闭变体：右上角关闭按钮，用于可消除的临时提示
+   用法：<div class="state state--info state--closable" data-close>...<\/div>
+        JS 中监听 [data-close] 点击事件隐藏整块 */
+.state--closable { position: relative; padding-right: 40px; }
+.state--closable::before {
+  content: "✕";
+  position: absolute;
+  top: 10px;
+  right: 12px;
+  width: 22px;
+  height: 22px;
+  display: grid;
+  place-items: center;
+  font-size: 13px;
+  color: var(--text-3);
+  cursor: pointer;
+  border-radius: 50%;
+  transition: background var(--t-fast) var(--ease), color var(--t-fast) var(--ease);
+}
+.state--closable::before:hover {
+  background: var(--bg-soft);
+  color: var(--text-1);
+}
+
+/* 行内轻量错误提示：用于表单字段下方的小字提示 */
+.field-error {
+  margin-top: 6px;
+  font-size: 12.5px;
+  color: var(--danger);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.field-error::before { content: "⚠"; font-size: 13px; }
+
+.tip,
+.hint,
+.notice {
+  padding: 10px 14px;
+  font-size: 12.5px;
+  line-height: 1.65;
+  color: var(--text-2);
+  background: var(--bg-soft);
+  border-left: 3px solid var(--primary);
+  border-radius: var(--r-sm);
+}
+.notice { margin: 10px 0; }
+.hint { background: none; border-left: none; padding: 4px; color: var(--text-3); }
+
+/* ---------------------------------------------------------------------------
+ * 11. 弹窗 / Toast
+ * ------------------------------------------------------------------------- */
+.modal-mask {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: rgba(20, 28, 48, 0.5);
+  backdrop-filter: blur(3px);
+}
+
+.modal {
+  width: 100%;
+  max-width: 520px;
+  max-height: 86vh;          /* 视口约束的弹层允许内部滚动 */
+  overflow-y: auto;
+  padding: 26px;
+  background: var(--card-bg);
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow-lg);
+  animation: modal-in 0.22s var(--ease);
+}
+
+@keyframes modal-in {
+  from { opacity: 0; transform: translateY(14px) scale(0.98); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.modal-close {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  width: 34px;
+  height: 34px;
+  font-size: 16px;
+  color: var(--text-3);
+  border-radius: 50%;
+  transition: all var(--t-fast) var(--ease);
+}
+.modal-close:hover { background: var(--bg-soft); color: var(--danger); }
+.modal { position: relative; }
+
+.toast {
+  position: fixed;
+  left: 50%;
+  bottom: 36px;
+  z-index: 1200;
+  max-width: min(90vw, 480px);
+  padding: 12px 24px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #fff;
+  background: rgba(31, 39, 51, 0.92);
+  border-radius: var(--r-pill);
+  box-shadow: var(--shadow-lg);
+  opacity: 0;
+  visibility: hidden;
+  transform: translate(-50%, 16px);
+  transition: all var(--t) var(--ease);
+  pointer-events: none;
+  text-align: center;
+}
+
+.toast.show {
+  opacity: 1;
+  visibility: visible;
+  transform: translate(-50%, 0);
+}
+
+/* ---------------------------------------------------------------------------
+ * 12. 介绍/引导（intro__* 系列）
+ * ------------------------------------------------------------------------- */
+.intro__section {
+  padding: 22px;
+  margin-bottom: 16px;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+}
+.intro__h3 { font-size: 17px; margin-bottom: 10px; }
+.intro__h4 { font-size: 14.5px; margin: 12px 0 6px; color: var(--text-1); }
+.intro__body { font-size: 14px; color: var(--text-2); line-height: 1.8; }
+.intro__qa { padding: 8px 0; font-size: 14px; line-height: 1.8; color: var(--text-2); }
+.intro__step {
+  display: flex;
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px dashed var(--border);
+  font-size: 14px;
+  color: var(--text-2);
+}
+
+.feature {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 15px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-2);
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--r-pill);
+}
+.feature-icon { font-size: 16px; }
+
+/* meta 键值 */
+.meta-key { font-size: 12.5px; color: var(--text-3); }
+.meta-val { font-size: 13.5px; font-weight: 600; }
+
+/* 表单行 */
+.form-row,
+.row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+
+/* 滑杆行 */
+.slider-line {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 0;
+}
+.slider-line input[type="range"] { flex: 1; }
+
+/* range 区间 */
+.range { display: inline-flex; align-items: center; gap: 8px; }
+.range-block { margin-bottom: 12px; }
+.range-sep { color: var(--text-3); }
+
+/* 预览/纸张区 */
+.preview-panel,
+.paper-area {
+  padding: 22px;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  box-shadow: var(--shadow-sm);
+}
+
+/* settings 通用 */
+.settings { display: flex; flex-direction: column; gap: 14px; }
+.params { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; }
+.sep { color: var(--text-3); }
+.tpl { /* 模板容器占位 */ }
+.c-text { font-size: 14px; color: var(--text-2); line-height: 1.7; }
+.screen { width: 100%; }
+
+/* ---------------------------------------------------------------------------
+ * 13. 大屏全屏模式基础（各工具可覆盖细节）
+ *     进入全屏后固定视口；正常文档流不使用这些类
+ * ------------------------------------------------------------------------- */
+.is-fullscreen,
+body:fullscreen,
+body:-webkit-full-screen {
+  background: var(--bg);
+}
+
+.is-fullscreen {
+  position: fixed;
+  inset: 0;
+  z-index: 900;
+  overflow: auto; /* 仅全屏投影时允许滚动，常规流不受影响 */
+  border-radius: 0;
+}
+
+/* ---------------------------------------------------------------------------
+ * 14. 打印
+ * ------------------------------------------------------------------------- */
+@media print {
+  body { background: #fff !important; }
+  .toolbar, .setup-panel, .stage-toolbar, .action-bar, .toast, .modal-mask,
+  .btn-row, .actions, .controls, .button-group, .tool-topbar { display: none !important; }
+  .main { display: block; padding: 0; }
+  .stage, .panel, .card, .block {
+    border: none;
+    box-shadow: none;
+    padding: 0;
+    overflow: visible;
+  }
+}
+`,
+      "assets/js/frame-bridge.js": `/* ============================================================================
+ * iframe 内工具桥 · frame-bridge.js
+ * ============================================================================
+ * 【背景】站点在 file://（离线双击 index.html）下无法用 fetch 读取工具页面
+ * （Chromium 把 file:// 互相视为不透明源，fetch/XHR 一律被 CORS 拦截），于是
+ * 所有自研工具回退为 <iframe> 兜底。跨源带来两个问题：
+ *   ① 父页拿不到 iframe 的 contentDocument → 高度自适应失效，工具页被压成
+ *      固定视口高度（"页面不能自动撑开"）；
+ *   ② file:// 下 iframe 内的 requestFullscreen 被权限策略拒绝 → 工具右上角
+ *      ⛶ 点了没反应（"全屏按钮不能用"）。
+ *
+ * 【方案】本脚本随工具页面一起被 iframe 加载（真实文档环境），通过
+ * postMessage 向父页（站点外壳）上报：
+ *   - height     ：工具内容实际高度（rAF 节流 + ResizeObserver 持续监听）；
+ *   - fullscreen ：工具内部全屏请求被拒时，请父页对 <iframe> 本身发起全屏
+ *                  （postMessage 会把 user activation 一并委托给父页；
+ *                  父页若仍失败，再降级为父页侧 CSS 伪全屏）。
+ *
+ * 【安全阀】用 self !== top 判定「真实运行在 iframe 里」：
+ *   - 独立双击打开工具页 → self === top → 本脚本整体空转；
+ *   - 站点内嵌 Shadow DOM（http 适配器）路径下，脚本在 docShim/winShim 代理里
+ *     执行，self/top 都落到真实顶层 window → self === top → 空转，
+ *     不会向父页发任何消息；
+ *   - 真实 iframe 内（含 file:// 跨源）→ self !== top → 激活。
+ *   ⚠️ 不要用 window.frameElement 判定：跨源 iframe 里访问它会抛 SecurityError
+ *     （实测），一旦 catch 成 null 桥就整体失效。
+ *   ⚠️ self / top 属于跨源 WindowProxy 的「允许访问」属性（不会抛错），
+ *     引用比较即可判定。
+ * 消息一律带 __edutoolboxFrame 命名空间标记，父页校验 e.source 后才处理。
+ * ========================================================================== */
+(function () {
+  "use strict";
+
+  /* 只在真实 iframe 内激活 */
+  var inFrame = false;
+  try {
+    var self = window.self, top = window.top;
+    inFrame = !!(self && top && self !== top && window.parent && window.parent !== window);
+  } catch (e) { inFrame = false; }
+  if (!inFrame) return;
+
+  var raf = 0;
+
+  /** rAF 节流地把当前文档高度报给父页 */
+  function reportHeight() {
+    if (raf) return;
+    raf = (window.requestAnimationFrame || function (f) { return setTimeout(f, 60); })(
+      function () {
+        raf = 0;
+        try {
+          var h = Math.max(
+            document.documentElement ? document.documentElement.scrollHeight : 0,
+            document.body ? document.body.scrollHeight : 0
+          );
+          window.parent.postMessage({
+            __edutoolboxFrame: true,
+            type: "height",
+            h: h
+          }, "*");
+        } catch (e) { /* 父页不可达：静默 */ }
+      }
+    );
+  }
+
+  /** 工具内部全屏请求失败时，委托父页对 iframe 元素本身发起全屏 */
+  function requestParentFullscreen() {
+    try {
+      window.parent.postMessage({
+        __edutoolboxFrame: true,
+        type: "fullscreen"
+      }, "*");
+    } catch (e) { /* 静默 */ }
+  }
+
+  /* 暴露给共享舞台模块（tool-stage-toolbar.js）在全屏失败分支调用 */
+  window.EduToolFrameBridge = {
+    reportHeight: reportHeight,
+    requestParentFullscreen: requestParentFullscreen
+  };
+
+  /* 首帧 + load 后补报，防首报时内容未排完 */
+  reportHeight();
+  window.addEventListener("load", function () {
+    reportHeight();
+    setTimeout(reportHeight, 300);
+  });
+
+  /* 内容持续变化（点名记录增长、生成结果插入等）→ 宿主跟着长高 */
+  if (typeof ResizeObserver === "function") {
+    try {
+      new ResizeObserver(reportHeight).observe(document.documentElement);
+    } catch (e) { /* 老浏览器无此能力：靠 load 兜底 */ }
+  }
+
+  /* 父页通知重新测量（伪全屏退出后恢复常规高度） */
+  window.addEventListener("message", function (e) {
+    var d = e.data;
+    if (d && d.__edutoolboxFrame === true && d.type === "report") reportHeight();
+  });
+})();
+`,
+      "assets/js/tool-stage-toolbar.js": `/* ============================================================================
+ * 舞台右上角工具栏（共享模块）· tool-stage-toolbar.js
+ *
+ * 【约定】
+ *   1. 本模块只做两件事：舞台全屏（对 stage 元素自身，不是整页）与设置栏显隐。
+ *      它不认识任何具体工具的业务，也不读写 localStorage。
+ *   2. 结构与「随机叫号 random-call」保持一致：舞台内第一个子元素为
+ *      <div class="stage-toolbar">，内含且仅含两个 .icon-btn，顺序固定为
+ *      #fullscreenBtn(⛶ 全屏) → #hideSetupBtn(⚙ 隐藏设置)。
+ *      .stage-toolbar / .icon-btn 的基础样式由 assets/css/tool-common.css 提供。
+ *   3. 隐藏机制：给「双栏容器」（panelHost）加/去 hiddenClass，由各工具 css 把
+ *      带该 class 的容器改成单栏并 display:none 掉 .setup-panel。
+ *   4. 【全屏专属模式】#hideSetupBtn 是可选的。很多工具（计时器、秒表、板书、
+ *      噪音检测等）根本没有可隐藏的设置栏，只有 ⛶ 一个按钮。此时只接全屏，
+ *      不做任何显隐操作 —— 否则「进入全屏自动隐藏、却没有按钮能调回来」会
+ *      把界面改坏。判定：只有 host 与 hideBtn 同时存在才启用自动隐藏。
+ *
+ * 【用法】
+ *   在工具的 <script src="<slug>.js"> 之前引入本文件，然后在工具自身的
+ *   初始化函数里调用：
+ *
+ *     if (window.EduToolStageToolbar) {
+ *       EduToolStageToolbar.init({ stage: ".stage-panel", panelHost: ".workbench" });
+ *     }
+ *
+ *   三个可选参数（缺省即下面 DEFAULTS 的值）：
+ *     stage       —— 舞台元素选择器，进入全屏的 target，也是工具栏的挂载父级
+ *     panelHost   —— 承载 hiddenClass 的双栏容器选择器
+ *     hiddenClass —— 隐藏态 class 名（与 random-call 一致用 "setup-hidden"）
+ *
+ * 【健壮性】
+ *   - 找不到 stage / panelHost / 任一按钮时静默返回，绝不抛异常（工具页可能
+ *     被站点适配器裁剪或降级渲染）。
+ *   - 全屏请求同时处理「同步抛错」与「Promise 拒绝」两种失败形态；失败时把设置
+ *     栏显隐回滚到发起请求前的状态，避免界面被改坏或产生未处理的 rejection。
+ *   - 所有 DOM 查询走 document.querySelector，以适配站点 Shadow DOM 适配器；
+ *     禁止 window.top / parent / documentElement.requestFullscreen。
+ * ========================================================================== */
+(function (global) {
+  "use strict";
+
+  /** 默认配置：与 random-call 的命名保持一致 */
+  var DEFAULTS = {
+    stage: ".stage-panel",
+    panelHost: ".workbench",
+    hiddenClass: "setup-hidden"
+  };
+
+  /**
+   * 合并配置（浅拷贝，缺省值兜底）
+   * @param {Object|undefined} opts 调用方传入的选项
+   * @returns {{stage:string, panelHost:string, hiddenClass:string}} 合并后的配置
+   */
+  function mergeOptions(opts) {
+    var o = opts || {};
+    return {
+      stage: typeof o.stage === "string" && o.stage ? o.stage : DEFAULTS.stage,
+      /* panelHost 传 null 或 "" 表示「本工具没有可隐藏的设置栏」——
+         设置区是浮层/弹窗的工具（如倒计时）用这个显式声明，避免误命中默认值。 */
+      panelHost: (o.panelHost === null || o.panelHost === "")
+        ? ""
+        : (typeof o.panelHost === "string" && o.panelHost ? o.panelHost : DEFAULTS.panelHost),
+      hiddenClass: typeof o.hiddenClass === "string" && o.hiddenClass ? o.hiddenClass : DEFAULTS.hiddenClass
+    };
+  }
+
+  /**
+   * 调用一个可能「同步抛错」或「返回 rejected Promise」的方法，两种失败都吞掉。
+   * @param {Function|undefined} fn 待调用的方法
+   * @param {Object} ctx this 指向
+   * @returns {boolean} 是否成功发起（未同步抛错）
+   */
+  function callQuietly(fn, ctx) {
+    if (typeof fn !== "function") return false;
+    try {
+      var p = fn.call(ctx);
+      if (p && typeof p.catch === "function") p.catch(function () { /* 静默：权限/手势被拒 */ });
+      return true;
+    } catch (err) {
+      return false;
+    }
+  }
+
+  /**
+   * 取得「本工具自己的」document。
+   *
+   * ⚠️ 历史缺陷（2026-09-22）：早期实现写成 \`global.document\`。站点适配器是
+   * 通过 \`new Function("document","window", code)\` 执行脚本的 —— 词法上的
+   * \`document\` 形参才是限定在影子树内的 docShim，而 \`window.document\` 会退回
+   * 真实文档，导致 querySelector 找不到 .stage-panel，init() 静默返回 false，
+   * 两个按钮完全无反应（仅在「站点内嵌」路径复现，单独打开工具页正常）。
+   * 因此这里优先取词法 document，取不到再回退 global。
+   * @returns {Document|null} 文档对象
+   */
+  function resolveDoc(global) {
+    try {
+      if (typeof document !== "undefined" && document) return document;
+    } catch (e) { /* 自由变量不存在：继续回退 */ }
+    try {
+      return global && global.document ? global.document : null;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  /**
+   * 当前是否处于全屏状态（兼容 webkit 前缀）
+   * @param {Document} doc 文档对象
+   * @returns {boolean} 是否已全屏
+   */
+  function isFullscreen(doc) {
+    return !!(doc && (doc.fullscreenElement || doc.webkitFullscreenElement));
+  }
+
+  /**
+   * 按 v 的布尔值增删 class
+   * @param {Element} el 目标元素
+   * @param {string} cls class 名
+   * @param {boolean} v true 加 / false 去
+   * @returns {void}
+   */
+  function setHidden(el, cls, v) {
+    if (v) el.classList.add(cls);
+    else el.classList.remove(cls);
+  }
+
+  /**
+   * 注册 fullscreenchange：同一目标只保留一个 handler，避免重复 init 叠加监听。
+   * @param {Array<object>} targets 监听目标（可能同时含 shim 与真实 document）
+   * @param {Function} handler 事件处理函数
+   * @returns {void}
+   */
+  function listenChange(targets, handler) {
+    for (var i = 0; i < targets.length; i++) {
+      var t = targets[i];
+      if (!t) continue;
+      var prev = registered ? registered.get(t) : null;
+      if (prev && prev !== handler) {
+        try { t.removeEventListener("fullscreenchange", prev); } catch (e) { /* 忽略 */ }
+        try { t.removeEventListener("webkitfullscreenchange", prev); } catch (e) { /* 忽略 */ }
+      }
+      t.addEventListener("fullscreenchange", handler);
+      t.addEventListener("webkitfullscreenchange", handler);
+      if (registered) registered.set(t, handler);
+    }
+  }
+
+  /** 已注册的 fullscreenchange handler：目标对象 → handler */
+  var registered = typeof WeakMap === "function" ? new WeakMap() : null;
+
+  /* ------------------------------------------------------------------
+   * 【iframe 独占模式（solo）】
+   * file:// 下 iframe 内全屏被拒，由父页对 <iframe> 本身全屏。此时如果不加
+   * 处理，全屏画面是「整个工具页」（含左侧设置栏），不是舞台。父页在发起
+   * 全屏前会 postMessage {__edutoolboxFrame,type:'fs-enter'}，本模块收到后
+   * 给舞台加 .edutf-solo（fixed 铺满 iframe 视口），退出时移除。
+   * 直接监听 window message：iframe 内共享模块能收到父页发给 iframe 的消息；
+   * 同文档挂载（站点适配器）下父页不会发这种消息，监听器永远空转，无害。
+   * ------------------------------------------------------------------ */
+  var soloCssDone = false;
+  /** 最近一次 init() 成功注册的舞台元素（模块级：iframe 独占消息处理需要）。
+   *  ⚠️ 不能在 onFrameFsMessage 里直接引用 init 作用域的 stage —— strict 模式下
+   *  未声明变量抛 ReferenceError，solo 永远加不上（zhongkao 实测踩坑：
+   *  random-call 侥幸生效只是因为它恰好在 window 上有同名全局变量）。 */
+  var currentStage = null;
+  function ensureSoloCss() {
+    if (soloCssDone) return;
+    soloCssDone = true;
+    try {
+      var st = document.createElement("style");
+      /* ⚠️ 尺寸用 100vw/100vh 而不是 100%：solo 模式下工具 body 里被盖住的
+         内容若超高会产生滚动条，100% 会被滚动条挤掉一截（实测右侧留 10px 缝）；
+         vw/vh 含滚动条槽，舞台整体铺满且把滚动条压在底下。 */
+      st.textContent =
+        ".edutf-solo{position:fixed!important;inset:0!important;z-index:2147483000!important;" +
+        "width:100vw!important;height:100vh!important;max-width:none!important;min-height:0!important;" +
+        "margin:0!important;border:none!important;border-radius:0!important;box-shadow:none!important;}";
+      (document.head || document.documentElement).appendChild(st);
+    } catch (err) { /* 静默 */ }
+  }
+
+  function onFrameFsMessage(e) {
+    var d = e.data;
+    if (!d || d.__edutoolboxFrame !== true) return;
+    if (d.type === "fs-enter") {
+      ensureSoloCss();
+      if (currentStage) currentStage.classList.add("edutf-solo");
+    } else if (d.type === "fs-exit") {
+      if (currentStage) currentStage.classList.remove("edutf-solo");
+    }
+  }
+  try { global.addEventListener("message", onFrameFsMessage, false); } catch (err) { /* 静默 */ }
+
+  /**
+   * 初始化舞台工具栏
+   * @param {Object} [opts] {stage, panelHost, hiddenClass}
+   * @returns {boolean} 是否成功初始化
+   */
+  function init(opts) {
+    var doc = resolveDoc(global);
+    if (!doc) return false;
+
+    var cfg = mergeOptions(opts);
+    var stage = doc.querySelector(cfg.stage);
+    var host = cfg.panelHost ? doc.querySelector(cfg.panelHost) : null;
+    /* 统一用 querySelector：站点 Shadow DOM 适配器会把 document 查询限定到 shadow 内部 */
+    var fsBtn = doc.querySelector("#fullscreenBtn");
+    var hideBtn = doc.querySelector("#hideSetupBtn");
+
+    /* 结构不齐（页面被裁剪 / 降级渲染）时静默退出，不影响工具其它功能。
+       #hideSetupBtn 允许缺失：见文件头约定 4「全屏专属模式」。 */
+    if (!stage || !fsBtn) return false;
+    currentStage = stage;  // 供 onFrameFsMessage（iframe 独占）使用
+
+    /* 只有「双栏容器」与「设置按钮」都在，才启用进入全屏自动隐藏设置栏 ——
+       否则用户进了全屏就再也调不回设置栏了。 */
+    var canHide = !!(host && hideBtn);
+
+    /**
+     * 进入全屏「之前」设置栏的显隐快照。
+     * 退出全屏时按它还原，而不是按全屏中最后看到的状态 —— 这样即便用户在全屏里
+     * 手动把设置栏调出来，退出后也会回到进入前的样子。
+     */
+    var wasHidden = false;
+
+    /** 隐藏/还原设置栏（无设置栏时是空操作） */
+    function applyHidden(v) {
+      if (!canHide) return;
+      setHidden(host, cfg.hiddenClass, v);
+    }
+
+  /**
+   * 全屏请求失败后的兜底：若本工具正以 iframe 形式内嵌在站点里（file:// 离线
+   * 场景下 iframe 内的 requestFullscreen 会被权限策略拒绝），通过 frame-bridge.js
+   * 请父页（站点外壳）对 iframe 元素本身发起全屏。非内嵌场景桥不存在，空操作。
+   * @param {Element} stage 舞台元素（仅用于签名，桥不需要）
+   * @returns {void}
+   */
+  function bridgeFallback() {
+    try {
+      var b = global.EduToolFrameBridge;
+      if (b && typeof b.requestParentFullscreen === "function") b.requestParentFullscreen();
+    } catch (err) { /* 静默 */ }
+  }
+
+  /**
+   * 切换舞台全屏：目标是 stage 元素自身
+   * @returns {void}
+   */
+  function toggleFullscreen() {
+    if (isFullscreen(doc)) {
+      var exit = doc.exitFullscreen || doc.webkitExitFullscreen;
+      callQuietly(exit, doc);
+      return;
+    }
+    /* 先快照再乐观隐藏：进入全屏后画面立刻铺满，不等 fullscreenchange */
+    wasHidden = canHide ? host.classList.contains(cfg.hiddenClass) : false;
+    applyHidden(true);
+
+    /* 只发起一次请求；同步抛错与异步 Promise 拒绝都要能回滚 */
+    var request = stage.requestFullscreen || stage.webkitRequestFullscreen;
+    var ok = false;
+    try {
+      if (request) {
+        var p = request.call(stage);
+        ok = true;
+        /* 异步失败（权限策略拒绝 / 缺少用户手势）→ 在 catch 里回滚 */
+        if (p && typeof p.catch === "function") {
+          p.catch(function () { applyHidden(wasHidden); bridgeFallback(); });
+        }
+      }
+    } catch (err) {
+      ok = false;
+    }
+    /* 同步失败（方法缺失 / 直接抛错）→ 立刻回滚 */
+    if (!ok) { applyHidden(wasHidden); bridgeFallback(); }
+  }
+
+    /**
+     * 全屏状态变化：进入时确保隐藏，退出时按快照还原
+     * @returns {void}
+     */
+    var onChange = function () {
+      if (!canHide) return;
+      if (isFullscreen(doc)) setHidden(host, cfg.hiddenClass, true);
+      else setHidden(host, cfg.hiddenClass, wasHidden);
+    };
+
+    /* 站点适配器把 document 代理成 ShadowRoot，其 addEventListener 也绑在影子树上；
+       而 fullscreenchange 派发在「真实 document」上、不会向下穿透进影子树。
+       因此除 shim 之外，再在 stage.ownerDocument（即真实文档）上注册一份，
+       保证「直开页面」与「站点内嵌」两种加载方式都能拿到退出全屏事件。
+       直开模式下二者是同一个对象，listenChange 只会注册一次，不会重复触发。 */
+    var realDoc = stage.ownerDocument || null;
+    var targets = (realDoc && realDoc !== doc) ? [doc, realDoc] : [doc];
+    listenChange(targets, onChange);
+
+    fsBtn.addEventListener("click", toggleFullscreen);
+    if (canHide) {
+      hideBtn.addEventListener("click", function () {
+        host.classList.toggle(cfg.hiddenClass);
+      });
+    }
+
+    return true;
+  }
+
+  /* 只暴露一个全局，不污染其它命名空间 */
+  global.EduToolStageToolbar = { init: init };
+})(typeof window !== "undefined" ? window : this);
+`,
+      "tools/award-generator/award-generator.css": `/* ============================================================
+ * EduToolbox · 电子奖状生成器 award-generator.css
+ * 依赖公共底座 tool-common.css（本文件应在其后加载，以便覆盖）
+ * ============================================================ */
+
+/* ---------- 主题变量（JS 通过 body[data-theme] 轮换主色） ---------- */
+body{ --acc:#3b6ef6; --acc-soft:#e8edff; --acc-2:#5a8dff; }
+body[data-theme="sky"]   { --primary:#0ea5e9; --primary-soft:#e0f2fe; --primary-soft-2:#ccecfc; --primary-grad:linear-gradient(135deg,#38bdf8,#0ea5e9,#0284c7); }
+body[data-theme="violet"]{ --primary:#7c3aed; --primary-soft:#f0e9fe; --primary-soft-2:#e2d5fc; --primary-grad:linear-gradient(135deg,#8b5cf6,#7c3aed,#6d28d9); }
+body[data-theme="green"]{ --primary:#16a34a; --primary-soft:#e7f6ec; --primary-soft-2:#d3f0dc; --primary-grad:linear-gradient(135deg,#22c55e,#16a34a,#15803d); }
+body[data-theme="gold"] { --primary:#d97706; --primary-soft:#fdf1dc; --primary-soft-2:#fbe3bc; --primary-grad:linear-gradient(135deg,#f59e0b,#d97706,#b45309); }
+body[data-theme="orange"]{ --primary:#ea580c; --primary-soft:#ffefe4; --primary-soft-2:#ffdec9; --primary-grad:linear-gradient(135deg,#fb923c,#ea580c,#c2410c); }
+body[data-theme="pink"] { --primary:#db2777; --primary-soft:#fce7f0; --primary-soft-2:#f9cfe1; --primary-grad:linear-gradient(135deg,#f472b6,#db2777,#be185d); }
+
+/* ---------- 工作台两栏布局 ---------- */
+.workbench{
+  display:grid; grid-template-columns:minmax(280px,340px) minmax(0,1fr);
+  gap:18px; margin-top:18px; align-items:start;
+}
+/* position:relative —— 舞台右上角 .stage-toolbar 的绝对定位基准 */
+.stage-panel{
+  position:relative;
+  background:var(--card-bg); border:1px solid var(--border);
+  border-radius:var(--r-lg); box-shadow:var(--shadow); padding:20px;
+  min-width:0;
+}
+.stage-head{ display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:14px; padding-right:96px; }
+.stage-head .panel-title{ margin-bottom:0; }
+.stage-ok{ font-size:12px; color:var(--text-3); }
+
+/* ---------- 设置面板细节 ---------- */
+.text-input{
+  width:100%; font-family:inherit; font-size:14px; padding:9px 12px;
+  border:1.5px solid var(--border); border-radius:10px;
+  background:#fafbfe; color:var(--text-1); margin-bottom:8px; transition:.15s;
+}
+.text-input:focus{ outline:none; border-color:var(--primary); box-shadow:0 0 0 3px var(--primary-soft); }
+textarea.text-input{ resize:vertical; line-height:1.6; }
+.field label{ display:block; font-size:12.5px; color:var(--text-3); margin:8px 0 4px; font-weight:600; }
+.code{ font-family:ui-monospace,Consolas,monospace; background:var(--primary-soft); padding:0 5px; border-radius:6px; }
+.chips-mini{ margin-top:8px; }
+.chips-mini .chip{ font-size:12px; padding:6px 12px; }
+.setup-panel .actions{ margin-top:16px; flex-direction:row; flex-wrap:wrap; }
+.setup-panel .actions .btn{ flex:1 1 auto; }
+
+/* ---------- 奖状样式（模板基座） ---------- */
+.cert-sheet{
+  padding:18px; background:#f3f5fa; border:1px solid var(--border);
+  border-radius:14px; display:flex; justify-content:center;
+}
+.certificate{
+  position:relative; width:min(100%,860px); aspect-ratio:21/14.02;
+  background:#fff8ec; border-radius:6px; overflow:hidden;
+  box-shadow:0 8px 30px rgba(30,30,60,.16);
+  padding:clamp(16px,3vw,36px);
+}
+.cert-inner{
+  position:relative; width:100%; height:100%;
+  border:3px solid var(--tpl-line,#c1902f); border-radius:4px;
+  display:flex; flex-direction:column; align-items:center; justify-content:space-between;
+  padding:clamp(14px,3vw,30px) clamp(18px,4vw,44px); text-align:center;
+  background:
+    radial-gradient(120% 120% at 50% 0%, var(--tpl-bg2,rgba(255,255,255,.6)), transparent 60%),
+    var(--tpl-bg,#fffdf6);
+}
+/* 四角装饰 */
+.corner{ position:absolute; width:52px; height:52px; border:4px solid var(--tpl-corner,#c1902f); z-index:2; }
+.corner.tl{ top:8px; left:8px; border-right:none; border-bottom:none; border-top-left-radius:6px; }
+.corner.tr{ top:8px; right:8px; border-left:none; border-bottom:none; border-top-right-radius:6px; }
+.corner.bl{ bottom:8px; left:8px; border-right:none; border-top:none; border-bottom-left-radius:6px; }
+.corner.br{ bottom:8px; right:8px; border-left:none; border-top:none; border-bottom-right-radius:6px; }
+@media (max-width:560px){ .corner{ width:34px; height:34px; border-width:3px; } }
+
+/* 标题（模板名称） */
+.cert-title{
+  margin:0; font-size:clamp(26px,5.6vw,54px); font-weight:900;
+  letter-spacing:.42em; text-indent:.42em; color:var(--tpl-title,#b4451c);
+  font-family:"Kaiti SC","STKaiti","KaiTi","SimSun",serif;
+}
+.cert-ribbon{
+  width:clamp(90px,22vw,200px); height:6px; margin:10px auto 0;
+  background:var(--tpl-line,#c1902f); border-radius:99px; opacity:.9;
+}
+/* 称号大字 */
+.cert-award{
+  font-size:clamp(26px,5.2vw,48px); font-weight:900; color:var(--tpl-acc,#c0392b);
+  margin:14px 0 6px; line-height:1.15; letter-spacing:.08em;
+  font-family:"Kaiti SC","STKaiti","KaiTi","SimSun",serif;
+  text-shadow:0 2px 0 rgba(0,0,0,.04);
+}
+/* 称呼行 */
+.cert-line{ font-size:clamp(14px,2.2vw,20px); color:var(--text-1,#3a3328); font-weight:600; }
+.cert-line .hl{ color:var(--tpl-acc,#c0392b); font-weight:800; border-bottom:2px solid var(--tpl-line,#c1902f); padding:0 6px; }
+/* 正文 */
+.cert-body{ font-size:clamp(12px,1.9vw,17px); color:#5b5343; line-height:1.9; margin:4px 0 0; max-width:92%; }
+/* 落款 */
+.cert-foot{ display:flex; flex-direction:column; align-items:flex-end; gap:3px; width:100%; padding-top:8px; }
+.cert-school{ font-size:clamp(13px,2vw,19px); font-weight:700; color:var(--tpl-acc,#c0392b); }
+.cert-date{ font-size:clamp(11px,1.6vw,15px); color:#8a8171; }
+
+.stage-tip{ margin-top:12px; font-size:12.5px; color:var(--text-3); text-align:center; }
+
+/* ---------- 四种模板配色 ---------- */
+/* 奖状：中国红 */
+.certificate.tpl-award{ --tpl-line:#c0392b; --tpl-title:#9b1c0e; --tpl-acc:#c0392b; --tpl-corner:#b23a2a; --tpl-bg:#fff6ec; }
+/* 荣誉证书：金黄蓝 */
+.certificate.tpl-cert{ --tpl-line:#c1902f; --tpl-title:#1e4a8a; --tpl-acc:#1e4a8a; --tpl-corner:#b58a2f; --tpl-bg:#fbfaf6; }
+/* 表扬信：清新绿 */
+.certificate.tpl-praise{ --tpl-line:#2e8b57; --tpl-title:#1f6b3f; --tpl-acc:#20784a; --tpl-corner:#2e8b57; --tpl-bg:#f6fbf6; }
+/* 喜报：喜庆渐变 */
+.certificate.tpl-happy{
+  --tpl-line:#e0a32b; --tpl-title:#c1121f; --tpl-acc:#c1121f; --tpl-corner:#d98e1f;
+  --tpl-bg:#fff1e0;
+}
+.certificate.tpl-happy .cert-inner{
+  background:
+    radial-gradient(130% 130% at 50% 0%, #ffe9c9, transparent 58%),
+    linear-gradient(180deg,#fff7ec,#fff0dc);
+}
+
+/* ---------- 响应式 ---------- */
+@media (max-width:880px){ .workbench{ grid-template-columns:1fr; } }
+@media (max-width:560px){
+  .cert-sheet{ padding:10px; }
+  .certificate{ padding:12px; }
+  .cert-inner{ padding:12px; }
+}
+
+/* ---------- 打印：仅输出奖状（A4 横向） ---------- */
+@media print{
+  html,body{ background:#fff !important; }
+  .setup-panel,.stage-head,.stage-tip,.toast{ display:none !important; }
+  .workbench{ display:block; margin:0; }
+  .stage-panel{ box-shadow:none; border:none; padding:0; }
+  .cert-sheet{ padding:0; background:#fff; border:none; }
+  .certificate{
+    width:282mm; height:188mm; aspect-ratio:auto;
+    box-shadow:none; border-radius:0; padding:8mm;
+  }
+  .cert-inner{ border-width:3px; }
+  @page{ size:A4 landscape; margin:0; }
+}
+
+/* ---------- 隐藏设置栏（⚙）：双栏 → 单栏，与 random-call 同构 ---------- */
+.workbench.setup-hidden{ grid-template-columns:minmax(0,1fr); }
+.workbench.setup-hidden .setup-panel{ display:none; }
+
+/* ---------- 舞台全屏（⛶）：全屏目标是 .stage-panel 自身，不是整页 ---------- */
+.stage-panel:fullscreen,
+.stage-panel:-webkit-full-screen,
+.stage-panel.edutf-solo{
+  display:flex; flex-direction:column; justify-content:center; align-items:stretch;
+  min-height:100vh; padding:36px 30px;
+  border-radius:0; border-color:transparent; box-shadow:none;
+  background:var(--card-bg); overflow:auto;
+}
+/* 全屏下工具栏仍可见：贴边 + 半透明，hover 恢复不透明 */
+.stage-panel:fullscreen .stage-toolbar,
+.stage-panel:-webkit-full-screen .stage-toolbar,
+.stage-panel.edutf-solo .stage-toolbar{
+  position:fixed; top:18px; right:22px; z-index:30;
+  opacity:.55; transition:opacity .18s var(--ease);
+}
+.stage-panel:fullscreen .stage-toolbar:hover,
+.stage-panel:-webkit-full-screen .stage-toolbar:hover,
+.stage-panel.edutf-solo .stage-toolbar:hover{ opacity:1; }
+@media print{ .stage-toolbar{ display:none; } }
+`,
+      "tools/award-generator/award-generator.js": `/* ============================================================
+ * EduToolbox · 电子奖状生成器 award-generator.js
+ * 功能：模板/姓名/奖项/正文 → 实时预览 → 打印 / 导出 PNG
+ * 纯前端 IIFE，全本地处理；依赖本地 vendor/html2canvas
+ * ============================================================ */
+(function () {
+  "use strict";
+
+  /* ---------- 常用工具 ---------- */
+  const $ = (id) => document.getElementById(id);
+  const esc = (s) => String(s == null ? "" : s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+
+  /* ---------- 常量 ---------- */
+  // 常用奖项快捷选项
+  const AWARDS = [
+    "三好学生", "优秀学生", "学习之星", "进步之星", "文明之星",
+    "劳动之星", "纪律之星", "体育之星", "艺术之星", "阅读之星",
+    "小小书法家", "数学之星", "英语小达人", "科学小博士", "优秀干部",
+  ];
+  // 模板标题
+  const TPL_TITLES = { award: "奖　状", cert: "荣 誉 证 书", praise: "表 扬 信", happy: "喜　报" };
+  // 状态
+  const state = { tpl: "award" };
+
+  /* ---------- 提示条 ---------- */
+  let toastTimer;
+  function toast(msg) {
+    const t = $("toast");
+    if (!t) return;
+    t.textContent = msg;
+    t.classList.add("show");
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => t.classList.remove("show"), 2200);
+  }
+
+  /* ---------- 渲染：把表单状态反映到奖状预览 ---------- */
+  function todayStr() {
+    const d = new Date();
+    const p = (n) => String(n).padStart(2, "0");
+    return d.getFullYear() + "-" + p(d.getMonth() + 1) + "-" + p(d.getDate());
+  }
+
+  function render() {
+    const name = ($("studentName").value || "张三").trim();
+    const award = ($("awardName").value || "三好学生").trim();
+    const school = ($("schoolName").value || "").trim();
+    const date = $("awardDate").value || todayStr();
+
+    // 模板
+    const cert = $("certificate");
+    cert.className = "certificate tpl-" + state.tpl;
+    $("certTitle").textContent = TPL_TITLES[state.tpl] || "奖　状";
+    $("certAward").textContent = award;
+    $("certName").textContent = name;
+    $("certSchool").textContent = school;
+    // 日期格式化为 2026年9月21日
+    let dateText = date;
+    if (/^\\d{4}-\\d{2}-\\d{2}$/.test(date)) {
+      const [y, m, d] = date.split("-");
+      dateText = y + " 年 " + parseInt(m, 10) + " 月 " + parseInt(d, 10) + " 日";
+    }
+    $("certDate").textContent = dateText;
+    // 正文：替换占位符
+    const body = ($("certBody").value || "")
+      .replace(/\\{name\\}/g, name)
+      .replace(/\\{award\\}/g, award);
+    $("certBodyView").textContent = body || "在 2025—2026 学年度中，表现优异，特授予「" + award + "」荣誉称号，以资鼓励。";
+  }
+
+  /* ---------- 导出 PNG（html2canvas） ---------- */
+  function exportPng() {
+    const node = $("certificate");
+    if (typeof html2canvas === "undefined") {
+      toast("当前环境不支持导出图片，可使用打印替代");
+      return;
+    }
+    toast("正在生成图片…");
+    html2canvas(node, {
+      scale: 2,
+      backgroundColor: null,
+      useCORS: true,
+      logging: false,
+    }).then((canvas) => {
+      const a = document.createElement("a");
+      a.download = "奖状-" + ($("studentName").value || "学生") + ".png";
+      a.href = canvas.toDataURL("image/png");
+      a.click();
+      toast("✅ 已导出 PNG 图片");
+    }).catch(() => toast("❌ 导出失败，请使用打印"));
+  }
+
+  /* ---------- 事件绑定 ---------- */
+  function bind() {
+    // 模板选择
+    $("tplChips").querySelectorAll(".chip").forEach((chip) => {
+      chip.addEventListener("click", () => {
+        state.tpl = chip.dataset.tpl;
+        $("tplChips").querySelectorAll(".chip").forEach((c) => c.classList.remove("active"));
+        chip.classList.add("active");
+        render();
+      });
+    });
+
+    // 奖项快捷 chips
+    const wrap = $("awardChips");
+    wrap.innerHTML = AWARDS.map((a) => '<button type="button" class="chip" data-v="' + esc(a) + '">' + esc(a) + "<\/button>").join("");
+    wrap.querySelectorAll(".chip").forEach((chip) => {
+      chip.addEventListener("click", () => {
+        $("awardName").value = chip.dataset.v;
+        $("awardChips").querySelectorAll(".chip").forEach((c) => c.classList.remove("active"));
+        chip.classList.add("active");
+        render();
+      });
+    });
+
+    // 表单变化 → 实时刷新
+    ["studentName", "awardName", "schoolName", "awardDate", "certBody"].forEach((id) => {
+      $(id).addEventListener("input", render);
+    });
+
+    // 按钮
+    $("btnExport").addEventListener("click", exportPng);
+    $("btnPrint").addEventListener("click", () => window.print());
+    $("btnDemo").addEventListener("click", () => {
+      $("studentName").value = "李欣怡";
+      $("awardName").value = "学习之星";
+      $("schoolName").value = "杏坛实验学校";
+      $("certBody").value = "在 2025—2026 学年度第一学期中，刻苦努力、进步显著，特授予「{award}」荣誉称号，以资鼓励。";
+      $("awardDate").value = todayStr();
+      render();
+      toast("已载入示例");
+    });
+
+  }
+
+  /* ---------- 初始化 ---------- */
+  function init() {
+    $("awardDate").value = todayStr();
+    if (window.EduToolStageToolbar) window.EduToolStageToolbar.init({ stage: ".stage-panel", panelHost: ".workbench", hiddenClass: "setup-hidden" });
+    bind();
+    render();
+  }
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init);
+  else init();
+})();
+`
     },
-    meta: {builtAt: "2026-09-28 09:10:16", sources: {"assets/css/tool-common.css": "d35dcf222690", "tools/award-generator/award-generator.css": "0fb1bbf7ba38", "assets/js/frame-bridge.js": "1131903c1e46", "assets/js/tool-stage-toolbar.js": "30f2ddfe48d2", "tools/award-generator/award-generator.js": "ea465e8fd710"}}
+    meta: {builtAt: "2026-09-28 11:07:05", sources: {"assets/css/tool-common.css": "d35dcf222690", "tools/award-generator/award-generator.css": "0fb1bbf7ba38", "assets/js/frame-bridge.js": "1131903c1e46", "assets/js/tool-stage-toolbar.js": "30f2ddfe48d2", "tools/award-generator/award-generator.js": "ea465e8fd710"}}
   };
 })();

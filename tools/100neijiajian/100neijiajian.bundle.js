@@ -1,14 +1,525 @@
-/* 自动生成，请勿手改 —— 源：tools/100neijiajian/  ·  构建：2026-09-28 09:10:16 */
+/* 自动生成，请勿手改 —— 源：tools/100neijiajian/  ·  构建：2026-09-28 11:07:05 */
 /* 用途：file:// 离线场景下 fetch 被 CORS 拦截，站点改用 <script src> 加载本文件，
    拿到工具页面与本地 CSS/JS 文本后走与 http 相同的 Shadow DOM 组件化挂载。
    工具源码改动后请重跑：python .workbuddy/scripts/build_tool_bundles.py */
 (function(){
   var g = window.EduToolboxToolBundles || (window.EduToolboxToolBundles = {});
   g["100neijiajian"] = {
-    html: "<html>\n<head>\n\t<meta charset=\"UTF-8\">\n\t<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n\t<title>100以内两位加减法<\/title>\n\t<style>\n\t\tbody {\n\t\t\t/* 屏幕显示：模拟 A4 宽度并水平居中，四周留白更像一张纸 */\n\t\t\twidth: 190mm;\n\t\t\tmax-width: 100%;\n\t\t\tmargin: 0 auto;\n\t\t\tpadding: 16px 12px 40px 12px;\n\t\t\tbackground: #f0f2f5;\n\n\t\t\tfont-family: Arial, \"Microsoft YaHei\", sans-serif;\n\t\t\tfont-size: 24px;\n\t\t\ttext-align: center;\n\t\t}\n\t\t/* 屏幕下的\"纸张\"效果，打印时去掉背景与边框 */\n\t\t.paper {\n\t\t\tbackground: #fff;\n\t\t\tpadding: 10mm 8mm;\n\t\t\tborder-radius: 4px;\n\t\t\tbox-shadow: 0 2px 12px rgba(0,0,0,0.12);\n\t\t}\n\t\t/* ===== 工具栏（仅屏幕显示，打印时隐藏）===== */\n\t\t.toolbar {\n\t\t\tposition: sticky;\n\t\t\ttop: 0;\n\t\t\tz-index: 999;\n\t\t\tdisplay: flex;\n\t\t\talign-items: center;\n\t\t\tgap: 12px;\n\t\t\tflex-wrap: wrap;\n\t\t\tpadding: 10px 16px;\n\t\t\tmargin: 0 0 12px 0;\n\t\t\tbackground: #fff;\n\t\t\tborder-bottom: 2px solid #4a90d9;\n\t\t\tbox-shadow: 0 2px 6px rgba(0,0,0,0.08);\n\t\t\ttext-align: left;\n\t\t}\n\t\t.toolbar label {\n\t\t\tfont-size: 16px;\n\t\t\tcolor: #333;\n\t\t\tdisplay: flex;\n\t\t\talign-items: center;\n\t\t\tgap: 4px;\n\t\t}\n\t\t.toolbar input[type=number] {\n\t\t\twidth: 56px;\n\t\t\tfont-size: 16px;\n\t\t\tpadding: 2px 4px;\n\t\t\ttext-align: center;\n\t\t}\n\t\t.btn {\n\t\t\tfont-size: 16px;\n\t\t\tpadding: 6px 16px;\n\t\t\tborder: none;\n\t\t\tborder-radius: 4px;\n\t\t\tcursor: pointer;\n\t\t\tcolor: #fff;\n\t\t\tbackground: #4a90d9;\n\t\t\ttransition: background .15s;\n\t\t}\n\t\t.btn:hover { background: #357ab8; }\n\t\t.btn.primary { background: #e8862c; }\n\t\t.btn.primary:hover { background: #c96d18; }\n\t\t.hint { font-size: 14px; color: #888; margin-left: auto; }\n\n\t\t.paper {\n\t\t\tdisplay: grid;\n\t\t\tgrid-template-columns: repeat(4, 1fr); /* 4列 */\n\t\t\tgrid-auto-rows: 1fr;                    /* 行高平分，保证一页装完 */\n\t\t\tbox-sizing: border-box;\n\t\t}\n\t\t.question {\n\t\t\tdisplay: flex;\n\t\t\talign-items: center;\n\t\t\ttext-align: left;\n\t\t\tline-height: 1.4;\n\t\t\toverflow: hidden;                       /* 防止个别长算式撑破行 */\n\t\t\twhite-space: nowrap;\n\t\t}\n\t\t\n\t\t.page-break { display: none; }\n\n\t\t/* ===== 打印 / PDF 导出专用样式 ===== */\n\t\t@media print {\n\t\t\t/* 隐藏工具栏 */\n\t\t\t.toolbar { display: none !important; }\n\t\t\t/* A4 纵向：边距越小，可用高度越大，越不容易溢出到第二页 */\n\t\t\t@page { size: A4 portrait; margin: 8mm 8mm; }\n\t\t\thtml, body {\n\t\t\t\twidth: auto;\n\t\t\t\theight: auto;\n\t\t\t\tmargin: 0;\n\t\t\t\tpadding: 0;\n\t\t\t\tbackground: #fff;\n\t\t\t\tfont-size: 20px;        /* 打印时字号略收，防止换行 */\n\t\t\t\t-webkit-print-color-adjust: exact;\n\t\t\t\tprint-color-adjust: exact;\n\t\t\t}\n\t\t\t/* 每页容器固定为 A4 可用高度，题目在其中纵向平均分布，保证一页装完 */\n\t\t\t.paper {\n\t\t\t\tdisplay: grid;\n\t\t\t\tgrid-template-columns: repeat(4, 1fr);\n\t\t\t\tgrid-auto-rows: 1fr;     /* 行高平分剩余空间 */\n\t\t\t\theight: 281mm;           /* A4 297mm - 上下边距 16mm */\n\t\t\t\tbox-sizing: border-box;\n\t\t\t\tpadding: 0;\n\t\t\t\tbackground: transparent;\n\t\t\t\tpadding: 0;\n\t\t\t\tborder-radius: 0;\n\t\t\t\tbox-shadow: none;\n\t\t\t}\n\t\t\t.question { line-height: 2; }\n\t\t\t.page-break {\n\t\t\t\tdisplay: block;\n\t\t\t\tpage-break-before: always;\n\t\t\t}\n\t\t}\n\t<\/style>\n<style>\n/* ============================================================================\n * EduToolbox 组件化挂载兜底（自动追加）\n * ----------------------------------------------------------------------------\n * 本工具未引入 assets/css/tool-common.css，挂载进站点（Shadow DOM）后会缺少：\n *   1) 六色主题变量 --primary / --primary-soft / --primary-grad\n *   2) .container 的宽度约束（否则内容铺满并贴边）\n * 这里补齐最小等价集，保证「独立打开」与「站点内组件化挂载」视觉一致。\n * ========================================================================== */\n\n:root,\n:host,\nbody[data-theme=\"sky\"]   { --primary:#0ea5e9; --primary-soft:#e0f2fe; --primary-soft-2:#ccecfc; --primary-grad:linear-gradient(135deg,#38bdf8,#0ea5e9,#0284c7); }\nbody[data-theme=\"violet\"]{ --primary:#7c3aed; --primary-soft:#f0e9fe; --primary-soft-2:#e2d5fc; --primary-grad:linear-gradient(135deg,#8b5cf6,#7c3aed,#6d28d9); }\nbody[data-theme=\"green\"] { --primary:#16a34a; --primary-soft:#e7f6ec; --primary-soft-2:#d3f0dc; --primary-grad:linear-gradient(135deg,#22c55e,#16a34a,#15803d); }\nbody[data-theme=\"gold\"]  { --primary:#d97706; --primary-soft:#fdf1dc; --primary-soft-2:#fbe3bc; --primary-grad:linear-gradient(135deg,#f59e0b,#d97706,#b45309); }\nbody[data-theme=\"orange\"]{ --primary:#ea580c; --primary-soft:#ffefe4; --primary-soft-2:#ffdec9; --primary-grad:linear-gradient(135deg,#fb923c,#ea580c,#c2410c); }\nbody[data-theme=\"pink\"]  { --primary:#db2777; --primary-soft:#fce7f0; --primary-soft-2:#f9cfe1; --primary-grad:linear-gradient(135deg,#f472b6,#db2777,#be185d); }\n\n/* 容器宽度兜底：仅在工具自身未声明时生效（不覆盖已有 .container 规则） */\n.container:not([data-no-fallback]) {\n  width: 100%;\n  max-width: 1180px;\n  margin: 0 auto;\n  padding: 28px 24px 56px;\n  box-sizing: border-box;\n}\n<\/style>\n<\/head>\n<body>\n\t<div class=\"toolbar\">\n\t\t<label>页数\n\t\t\t<input type=\"number\" id=\"pageCount\" value=\"1\" min=\"1\" max=\"20\">\n\t\t<\/label>\n\t\t<label>每页题数\n\t\t\t<input type=\"number\" id=\"perPage\" value=\"100\" min=\"20\" max=\"200\" step=\"20\">\n\t\t<\/label>\n\t\t<button class=\"btn\" id=\"btnRegenerate\">换一批<\/button>\n\t\t<button class=\"btn\" id=\"btnPrint\">打印 / 另存为PDF<\/button>\n\t\t<span class=\"hint\">提示：打印时目标打印机选\"另存为PDF\"即可导出PDF；Ctrl+P 也可快速打印<\/span>\n\t<\/div>\n\t<div id=\"Papers\"><\/div>\n\t<script src=\"../../assets/js/frame-bridge.js\"><\/script>\n<script>\n\t\t//辅助函数：计算[min,max)随机数\n\t\tfunction getRandMinMax(min,max) {  \n\t\t\treturn Math.floor(Math.random() * (max-min) + min);\n\t\t}\n\t\t//辅助函数：随机获取一个数组元素\n\t\tfunction getRandInArray(array) {\n\t\t\tlet pos = getRandMinMax(0, array.length)\n\t\t\treturn array[pos];\n\t\t}\n\t\t\n\t\t//二元算式(加法)\n\t\tclass MathExprAdd {\n\t\t\tconstructor(x, y) { this.op='+'; this.x = x; this.y = y; }\n\t\t\tresult(){ return this.x + this.y; }\n\t\t\ttoStr() { return `${this.x} + ${this.y}`; }\n\t\t}\n\t\t//二元算式(减法)\n\t\tclass MathExprSub {\n\t\t\tconstructor(x, y) { this.op='-'; this.x = x; this.y = y; }\n\t\t\tresult(){ return this.x - this.y; }\n\t\t\ttoStr() { return `${this.x} - ${this.y}`; }\n\t\t}\n\t\t\n\t\t// 以结果为key的Map题库（用于替换二元算式为三元算式）\n\t\tclass MathExprMap {\n\t\t\tconstructor() { this.map = new Map(); }\n\t\t\tpush(expr) {\n\t\t\t\tif (this.map.has(expr.result())){\n\t\t\t\t\tlet array = this.map.get(expr.result());\n\t\t\t\t\tarray.push(expr);\n\t\t\t\t} else {\n\t\t\t\t\tlet array = [];\n\t\t\t\t\tarray.push(expr);\n\t\t\t\t\tthis.map.set(expr.result(), array);\n\t\t\t\t}\n\t\t\t}\n\t\t\trand(ret){\n\t\t\t\tif (this.map.has(ret)){\n\t\t\t\t\treturn getRandInArray(this.map.get(ret));\n\t\t\t\t}\n\t\t\t\treturn null;\n\t\t\t}\n\t\t}\n\t\t\n\t\tvar arrayAdd = [];\t\t// 普通加法题库\n\t\tvar arrayAddCarry = [];\t// 进位加法题库\n\t\tvar arrayAddTen = [];\t// 包含整十数加法题库\n\t\tvar arraySub = [];\t\t// 普通减法题库\n\t\tvar arraySubBorrow = [];// 退位减法题库\n\t\tvar arraySubTen = [];\t// 包含整十数减法题库\n\t\t\n\t\tvar mapRet = new MathExprMap();// 以结果为key的题库(不含整十数加减法)\n\t\tvar mapGen = new Map();\t// 记录生成的算式，防止重复\n\t\t\n\t\t// 生成题库：两位数加两位数(包含进位加) (a*10+b)+(c*10+d)\n\t\tfor (let a = 1; a < 10; a++) {\n\t\t\tfor (let b = 0; b < 10; b++) {\n\t\t\t\tfor (let c = 1; c < 10; c++) {\n\t\t\t\t\tfor (let d = 0; d < 10; d++) {\n\t\t\t\t\t\tif (b == 0 && d == 0) continue;//过滤整十相加\n\t\t\t\t\t\tlet ret = (a*10+b)+(c*10+d);\n\t\t\t\t\t\tif (ret < 100){//结果小于100\n\t\t\t\t\t\t\tlet expr = new MathExprAdd(a*10+b, c*10+d);\n\t\t\t\t\t\t\tif (b == 0 || d == 0) {//含整十数\n\t\t\t\t\t\t\t\tarrayAddTen.push(expr);\n\t\t\t\t\t\t\t\t//三元运算替换时不使用整十数加法\n\t\t\t\t\t\t\t\t//mapRet.push(expt);\n\t\t\t\t\t\t\t} else if (b + d >= 10) {//进位加\n\t\t\t\t\t\t\t\tarrayAddCarry.push(expr);\n\t\t\t\t\t\t\t\tmapRet.push(expr);\n\t\t\t\t\t\t\t} else {\n\t\t\t\t\t\t\t\tarrayAdd.push(expr);\n\t\t\t\t\t\t\t\tmapRet.push(expr);\n\t\t\t\t\t\t\t}\n\t\t\t\t\t\t}\n\t\t\t\t\t}\n\t\t\t\t}\n\t\t\t}\n\t\t}\n\t\t// 生成题库：两位数减两位数(包含退位减) (a*10+b)-(c*10+d)\n\t\tfor (let a = 1; a < 10; a++) {\n\t\t\tfor (let b = 0; b < 10; b++) {\n\t\t\t\tfor (let c = 1; c < 10; c++) {\n\t\t\t\t\tfor (let d = 0; d < 10; d++) {\n\t\t\t\t\t\tif (b == 0 && d == 0) continue;//过滤整十相减\n\t\t\t\t\t\tif (b == d) continue;//过滤个位相等（太简单）\n\t\t\t\t\t\tlet ret = (a*10+b)-(c*10+d);\n\t\t\t\t\t\tif (ret > 0) {\n\t\t\t\t\t\t\tlet expr = new MathExprSub(a*10+b, c*10+d);\n\t\t\t\t\t\t\tif (d == 0) {//这里只包含减整十数，整十数减放在退位减\n\t\t\t\t\t\t\t\tarraySubTen.push(expr);\n\t\t\t\t\t\t\t\t//三元运算替换时不使用整十数加法\n\t\t\t\t\t\t\t\t//mapRet.push(expt);\n\t\t\t\t\t\t\t} else if (b < d){//退位减\n\t\t\t\t\t\t\t\tarraySubBorrow.push(expr);\n\t\t\t\t\t\t\t\tmapRet.push(expr);\n\t\t\t\t\t\t\t} else {\n\t\t\t\t\t\t\t\tarraySub.push(expr);\n\t\t\t\t\t\t\t\tmapRet.push(expr);\n\t\t\t\t\t\t\t}\n\t\t\t\t\t\t}\n\t\t\t\t\t}\n\t\t\t\t}\n\t\t\t}\n\t\t}\n\t\t\n\t\tconst RATE_NORMAL = 0.05\t// 普通比率\n\t\tconst RATE_TEN = 0.05\t\t// 含整十数比率\n\t\t//const RATE_DIGITAL = 0.90\t// 进位加和退位减比率\n\t\t\n\t\tconst RATE_THREE = 0.20\t\t// 转化三元算式比率\n\t\t\n\t\t// 随机生成1个算式\n\t\tfunction generateQuestion() {\n\t\t\tlet expr;\n\t\t\t//50%加法 50%减法\n\t\t\tif (Math.random() < 0.5) {\n\t\t\t\tlet rate = Math.random()\n\t\t\t\tif (rate < RATE_NORMAL) {\n\t\t\t\t\texpr = getRandInArray(arrayAdd);\n\t\t\t\t} else if (rate < RATE_NORMAL+RATE_TEN) {\n\t\t\t\t\texpr = getRandInArray(arrayAddTen); //整十数\n\t\t\t\t} else {\n\t\t\t\t\texpr = getRandInArray(arrayAddCarry); //进位加\n\t\t\t\t}\n\t\t\t} else {\n\t\t\t\tlet rate = Math.random()\n\t\t\t\tif (rate < RATE_NORMAL) {\n\t\t\t\t\texpr = getRandInArray(arraySub);\n\t\t\t\t} else if (rate < RATE_NORMAL+RATE_TEN) {\n\t\t\t\t\texpr = getRandInArray(arraySubTen); //整十数\n\t\t\t\t} else {\n\t\t\t\t\texpr = getRandInArray(arraySubBorrow); //退位减\n\t\t\t\t}\n\t\t\t}\n\t\t\t\n\t\t\t// 20%出现三元运算\n\t\t\tif (Math.random() < RATE_THREE) {\n\t\t\t\tif (Math.random() < 0.2) {//20%对第二个数转换算式（后括号）\n\t\t\t\t\tlet expr2 = mapRet.rand(expr.y);\n\t\t\t\t\tif(expr2!=null) {\n\t\t\t\t\t\tif (expr.op == '+' && Math.random() < 0.5) { //加法有50%几率交换加数位置\n\t\t\t\t\t\t\tif (Math.random() < 0.5) {//50%几率去掉前括号\n\t\t\t\t\t\t\t\treturn `${expr2.toStr()} + ${expr.x} =`;\n\t\t\t\t\t\t\t} else {\n\t\t\t\t\t\t\t\treturn `(${expr2.toStr()}) + ${expr.x} =`;\n\t\t\t\t\t\t\t}\n\t\t\t\t\t\t}\n\t\t\t\t\t\treturn `${expr.x} ${expr.op} (${expr2.toStr()}) =`;\n\t\t\t\t\t}\n\t\t\t\t} else { //80%对第一个数转换算式（前括号）\n\t\t\t\t\tlet expr2 = mapRet.rand(expr.x);\n\t\t\t\t\tif (expr2!=null) {\n\t\t\t\t\t\tif (expr.op == '+' && Math.random() < 0.5) { //加法有50%几率交换加数位置\n\t\t\t\t\t\t\treturn `${expr.y} + (${expr2.toStr()})  =`;\n\t\t\t\t\t\t}\n\t\t\t\t\t\tif (Math.random() < 0.5) {//50%几率去掉前括号\n\t\t\t\t\t\t\treturn `${expr2.toStr()} ${expr.op} ${expr.y} =`;\n\t\t\t\t\t\t} else {\n\t\t\t\t\t\t\treturn `(${expr2.toStr()}) ${expr.op} ${expr.y} =`;\n\t\t\t\t\t\t}\n\t\t\t\t\t}\n\t\t\t\t}\n\t\t\t}\n\t\t\treturn expr.toStr() + ' =';\n\t\t}\n\t\t\n\t\t// 随机生成1个不重复算式\n\t\tfunction generateUniqueQuestion() {\n\t\t\tvar expr = generateQuestion();\n\t\t\twhile(mapGen.has(expr))\n\t\t\t\texpr = generateQuestion();\n\t\t\tmapGen.set(expr, 1);\n\t\t\treturn expr;\n\t\t}\n\t\t\n\t\t// 按页生成算式\n\t\tfunction generateMathExpression() {\n\t\t\tconst Papers = document.getElementById('Papers');\n\t\t\twhile (Papers.firstChild) {\n\t\t\t\tPapers.removeChild(Papers.firstChild);\n\t\t\t}\n\t\t\t// 清空去重记录，保证跨页也不重复\n\t\t\tmapGen.clear();\n\t\t\tlet page_num = parseInt(document.getElementById('pageCount').value, 10) || 1;\n\t\t\tlet per_page = parseInt(document.getElementById('perPage').value, 10) || 100;\n\t\t\tfor (let p = 0; p < page_num; p++) {\n\t\t\t\tconst paper = document.createElement('div');\n\t\t\t\tpaper.className = 'paper';\n\t\t\t\tPapers.appendChild(paper);\n\t\t\t\tfor (let i = 0; i < per_page; i++) {\n\t\t\t\t\tconst question = document.createElement('div');\n\t\t\t\t\tquestion.className = 'question';\n\t\t\t\t\tquestion.textContent = generateUniqueQuestion();\n\t\t\t\t\tquestion.addEventListener('click', function() {\n\t\t\t\t\t\tthis.textContent = generateUniqueQuestion();\n\t\t\t\t\t});\n\t\t\t\t\tpaper.appendChild(question);\n\t\t\t\t}\n\t\t\t\t// 非尾页插入分页符\n\t\t\t\tif (p < page_num - 1) {\n\t\t\t\t\tconst page_break = document.createElement('div');\n\t\t\t\t\tpage_break.className = 'page-break';\n\t\t\t\t\tPapers.appendChild(page_break);\n\t\t\t\t}\n\t\t\t}\n\t\t}\n\n\t\t// ===== 工具栏交互 =====\n\t\tdocument.getElementById('btnRegenerate').addEventListener('click', generateMathExpression);\n\t\tdocument.getElementById('pageCount').addEventListener('change', generateMathExpression);\n\t\tdocument.getElementById('perPage').addEventListener('change', generateMathExpression);\n\t\t// 导出 PDF / 打印：直接调用浏览器打印，目标选\"另存为PDF\"\n\t\tdocument.getElementById('btnPrint').addEventListener('click', function () {\n\t\t\tfitPapersToPage();\n\t\t\twindow.print();\n\t\t});\n\t\t// 在打印前把每页高度设为\"一页可用高度\"，确保内容恰好装满一页不溢出\n\t\tfunction fitPapersToPage() {\n\t\t\tconst papers = document.querySelectorAll('.paper');\n\t\t\tif (!papers.length) return;\n\t\t\t// A4 高度 297mm，减去 @page 上下边距 16mm，得 281mm 可用高度\n\t\t\tpapers.forEach(p => { p.style.height = '281mm'; });\n\t\t}\n\t\t// Ctrl+P / Cmd+P 也能用（浏览器默认即触发打印）\n\t\t// Ctrl+P / Cmd+P 打印前同样重排，保证一页装完\n\t\twindow.addEventListener('beforeprint', fitPapersToPage);\n\t\tgenerateMathExpression();\n\t\t/*\n\t\tconsole.log(arrayAdd.length);\n\t\tconsole.log(arrayAddCarry.length);\n\t\tconsole.log(arrayAddTen.length);\n\t\tconsole.log(arraySub.length);\n\t\tconsole.log(arraySubBorrow.length);\n\t\tconsole.log(arraySubTen.length);\n\t\tfor (let [key, value] of mapRet.map) {\n\t\t\tconsole.log(key, value.length);\n\t\t\tfor (let i = 0; i < value.length; i++) {\n\t\t\t  console.log('\\t',value[i].toStr());\n\t\t\t}\n\t\t}\n\t\tconsole.log('end');*/\n\t<\/script>\n<\/body>\n<\/html>\n",
+    html: `<html>
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>100以内两位加减法<\/title>
+	<style>
+		body {
+			/* 屏幕显示：模拟 A4 宽度并水平居中，四周留白更像一张纸 */
+			width: 190mm;
+			max-width: 100%;
+			margin: 0 auto;
+			padding: 16px 12px 40px 12px;
+			background: #f0f2f5;
+
+			font-family: Arial, "Microsoft YaHei", sans-serif;
+			font-size: 24px;
+			text-align: center;
+		}
+		/* 屏幕下的"纸张"效果，打印时去掉背景与边框 */
+		.paper {
+			background: #fff;
+			padding: 10mm 8mm;
+			border-radius: 4px;
+			box-shadow: 0 2px 12px rgba(0,0,0,0.12);
+		}
+		/* ===== 工具栏（仅屏幕显示，打印时隐藏）===== */
+		.toolbar {
+			position: sticky;
+			top: 0;
+			z-index: 999;
+			display: flex;
+			align-items: center;
+			gap: 12px;
+			flex-wrap: wrap;
+			padding: 10px 16px;
+			margin: 0 0 12px 0;
+			background: #fff;
+			border-bottom: 2px solid #4a90d9;
+			box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+			text-align: left;
+		}
+		.toolbar label {
+			font-size: 16px;
+			color: #333;
+			display: flex;
+			align-items: center;
+			gap: 4px;
+		}
+		.toolbar input[type=number] {
+			width: 56px;
+			font-size: 16px;
+			padding: 2px 4px;
+			text-align: center;
+		}
+		.btn {
+			font-size: 16px;
+			padding: 6px 16px;
+			border: none;
+			border-radius: 4px;
+			cursor: pointer;
+			color: #fff;
+			background: #4a90d9;
+			transition: background .15s;
+		}
+		.btn:hover { background: #357ab8; }
+		.btn.primary { background: #e8862c; }
+		.btn.primary:hover { background: #c96d18; }
+		.hint { font-size: 14px; color: #888; margin-left: auto; }
+
+		.paper {
+			display: grid;
+			grid-template-columns: repeat(4, 1fr); /* 4列 */
+			grid-auto-rows: 1fr;                    /* 行高平分，保证一页装完 */
+			box-sizing: border-box;
+		}
+		.question {
+			display: flex;
+			align-items: center;
+			text-align: left;
+			line-height: 1.4;
+			overflow: hidden;                       /* 防止个别长算式撑破行 */
+			white-space: nowrap;
+		}
+		
+		.page-break { display: none; }
+
+		/* ===== 打印 / PDF 导出专用样式 ===== */
+		@media print {
+			/* 隐藏工具栏 */
+			.toolbar { display: none !important; }
+			/* A4 纵向：边距越小，可用高度越大，越不容易溢出到第二页 */
+			@page { size: A4 portrait; margin: 8mm 8mm; }
+			html, body {
+				width: auto;
+				height: auto;
+				margin: 0;
+				padding: 0;
+				background: #fff;
+				font-size: 20px;        /* 打印时字号略收，防止换行 */
+				-webkit-print-color-adjust: exact;
+				print-color-adjust: exact;
+			}
+			/* 每页容器固定为 A4 可用高度，题目在其中纵向平均分布，保证一页装完 */
+			.paper {
+				display: grid;
+				grid-template-columns: repeat(4, 1fr);
+				grid-auto-rows: 1fr;     /* 行高平分剩余空间 */
+				height: 281mm;           /* A4 297mm - 上下边距 16mm */
+				box-sizing: border-box;
+				padding: 0;
+				background: transparent;
+				padding: 0;
+				border-radius: 0;
+				box-shadow: none;
+			}
+			.question { line-height: 2; }
+			.page-break {
+				display: block;
+				page-break-before: always;
+			}
+		}
+	<\/style>
+<style>
+/* ============================================================================
+ * EduToolbox 组件化挂载兜底（自动追加）
+ * ----------------------------------------------------------------------------
+ * 本工具未引入 assets/css/tool-common.css，挂载进站点（Shadow DOM）后会缺少：
+ *   1) 六色主题变量 --primary / --primary-soft / --primary-grad
+ *   2) .container 的宽度约束（否则内容铺满并贴边）
+ * 这里补齐最小等价集，保证「独立打开」与「站点内组件化挂载」视觉一致。
+ * ========================================================================== */
+
+:root,
+:host,
+body[data-theme="sky"]   { --primary:#0ea5e9; --primary-soft:#e0f2fe; --primary-soft-2:#ccecfc; --primary-grad:linear-gradient(135deg,#38bdf8,#0ea5e9,#0284c7); }
+body[data-theme="violet"]{ --primary:#7c3aed; --primary-soft:#f0e9fe; --primary-soft-2:#e2d5fc; --primary-grad:linear-gradient(135deg,#8b5cf6,#7c3aed,#6d28d9); }
+body[data-theme="green"] { --primary:#16a34a; --primary-soft:#e7f6ec; --primary-soft-2:#d3f0dc; --primary-grad:linear-gradient(135deg,#22c55e,#16a34a,#15803d); }
+body[data-theme="gold"]  { --primary:#d97706; --primary-soft:#fdf1dc; --primary-soft-2:#fbe3bc; --primary-grad:linear-gradient(135deg,#f59e0b,#d97706,#b45309); }
+body[data-theme="orange"]{ --primary:#ea580c; --primary-soft:#ffefe4; --primary-soft-2:#ffdec9; --primary-grad:linear-gradient(135deg,#fb923c,#ea580c,#c2410c); }
+body[data-theme="pink"]  { --primary:#db2777; --primary-soft:#fce7f0; --primary-soft-2:#f9cfe1; --primary-grad:linear-gradient(135deg,#f472b6,#db2777,#be185d); }
+
+/* 容器宽度兜底：仅在工具自身未声明时生效（不覆盖已有 .container 规则） */
+.container:not([data-no-fallback]) {
+  width: 100%;
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 28px 24px 56px;
+  box-sizing: border-box;
+}
+<\/style>
+<\/head>
+<body>
+	<div class="toolbar">
+		<label>页数
+			<input type="number" id="pageCount" value="1" min="1" max="20">
+		<\/label>
+		<label>每页题数
+			<input type="number" id="perPage" value="100" min="20" max="200" step="20">
+		<\/label>
+		<button class="btn" id="btnRegenerate">换一批<\/button>
+		<button class="btn" id="btnPrint">打印 / 另存为PDF<\/button>
+		<span class="hint">提示：打印时目标打印机选"另存为PDF"即可导出PDF；Ctrl+P 也可快速打印<\/span>
+	<\/div>
+	<div id="Papers"><\/div>
+	<script src="../../assets/js/frame-bridge.js"><\/script>
+<script>
+		//辅助函数：计算[min,max)随机数
+		function getRandMinMax(min,max) {  
+			return Math.floor(Math.random() * (max-min) + min);
+		}
+		//辅助函数：随机获取一个数组元素
+		function getRandInArray(array) {
+			let pos = getRandMinMax(0, array.length)
+			return array[pos];
+		}
+		
+		//二元算式(加法)
+		class MathExprAdd {
+			constructor(x, y) { this.op='+'; this.x = x; this.y = y; }
+			result(){ return this.x + this.y; }
+			toStr() { return \`\${this.x} + \${this.y}\`; }
+		}
+		//二元算式(减法)
+		class MathExprSub {
+			constructor(x, y) { this.op='-'; this.x = x; this.y = y; }
+			result(){ return this.x - this.y; }
+			toStr() { return \`\${this.x} - \${this.y}\`; }
+		}
+		
+		// 以结果为key的Map题库（用于替换二元算式为三元算式）
+		class MathExprMap {
+			constructor() { this.map = new Map(); }
+			push(expr) {
+				if (this.map.has(expr.result())){
+					let array = this.map.get(expr.result());
+					array.push(expr);
+				} else {
+					let array = [];
+					array.push(expr);
+					this.map.set(expr.result(), array);
+				}
+			}
+			rand(ret){
+				if (this.map.has(ret)){
+					return getRandInArray(this.map.get(ret));
+				}
+				return null;
+			}
+		}
+		
+		var arrayAdd = [];		// 普通加法题库
+		var arrayAddCarry = [];	// 进位加法题库
+		var arrayAddTen = [];	// 包含整十数加法题库
+		var arraySub = [];		// 普通减法题库
+		var arraySubBorrow = [];// 退位减法题库
+		var arraySubTen = [];	// 包含整十数减法题库
+		
+		var mapRet = new MathExprMap();// 以结果为key的题库(不含整十数加减法)
+		var mapGen = new Map();	// 记录生成的算式，防止重复
+		
+		// 生成题库：两位数加两位数(包含进位加) (a*10+b)+(c*10+d)
+		for (let a = 1; a < 10; a++) {
+			for (let b = 0; b < 10; b++) {
+				for (let c = 1; c < 10; c++) {
+					for (let d = 0; d < 10; d++) {
+						if (b == 0 && d == 0) continue;//过滤整十相加
+						let ret = (a*10+b)+(c*10+d);
+						if (ret < 100){//结果小于100
+							let expr = new MathExprAdd(a*10+b, c*10+d);
+							if (b == 0 || d == 0) {//含整十数
+								arrayAddTen.push(expr);
+								//三元运算替换时不使用整十数加法
+								//mapRet.push(expt);
+							} else if (b + d >= 10) {//进位加
+								arrayAddCarry.push(expr);
+								mapRet.push(expr);
+							} else {
+								arrayAdd.push(expr);
+								mapRet.push(expr);
+							}
+						}
+					}
+				}
+			}
+		}
+		// 生成题库：两位数减两位数(包含退位减) (a*10+b)-(c*10+d)
+		for (let a = 1; a < 10; a++) {
+			for (let b = 0; b < 10; b++) {
+				for (let c = 1; c < 10; c++) {
+					for (let d = 0; d < 10; d++) {
+						if (b == 0 && d == 0) continue;//过滤整十相减
+						if (b == d) continue;//过滤个位相等（太简单）
+						let ret = (a*10+b)-(c*10+d);
+						if (ret > 0) {
+							let expr = new MathExprSub(a*10+b, c*10+d);
+							if (d == 0) {//这里只包含减整十数，整十数减放在退位减
+								arraySubTen.push(expr);
+								//三元运算替换时不使用整十数加法
+								//mapRet.push(expt);
+							} else if (b < d){//退位减
+								arraySubBorrow.push(expr);
+								mapRet.push(expr);
+							} else {
+								arraySub.push(expr);
+								mapRet.push(expr);
+							}
+						}
+					}
+				}
+			}
+		}
+		
+		const RATE_NORMAL = 0.05	// 普通比率
+		const RATE_TEN = 0.05		// 含整十数比率
+		//const RATE_DIGITAL = 0.90	// 进位加和退位减比率
+		
+		const RATE_THREE = 0.20		// 转化三元算式比率
+		
+		// 随机生成1个算式
+		function generateQuestion() {
+			let expr;
+			//50%加法 50%减法
+			if (Math.random() < 0.5) {
+				let rate = Math.random()
+				if (rate < RATE_NORMAL) {
+					expr = getRandInArray(arrayAdd);
+				} else if (rate < RATE_NORMAL+RATE_TEN) {
+					expr = getRandInArray(arrayAddTen); //整十数
+				} else {
+					expr = getRandInArray(arrayAddCarry); //进位加
+				}
+			} else {
+				let rate = Math.random()
+				if (rate < RATE_NORMAL) {
+					expr = getRandInArray(arraySub);
+				} else if (rate < RATE_NORMAL+RATE_TEN) {
+					expr = getRandInArray(arraySubTen); //整十数
+				} else {
+					expr = getRandInArray(arraySubBorrow); //退位减
+				}
+			}
+			
+			// 20%出现三元运算
+			if (Math.random() < RATE_THREE) {
+				if (Math.random() < 0.2) {//20%对第二个数转换算式（后括号）
+					let expr2 = mapRet.rand(expr.y);
+					if(expr2!=null) {
+						if (expr.op == '+' && Math.random() < 0.5) { //加法有50%几率交换加数位置
+							if (Math.random() < 0.5) {//50%几率去掉前括号
+								return \`\${expr2.toStr()} + \${expr.x} =\`;
+							} else {
+								return \`(\${expr2.toStr()}) + \${expr.x} =\`;
+							}
+						}
+						return \`\${expr.x} \${expr.op} (\${expr2.toStr()}) =\`;
+					}
+				} else { //80%对第一个数转换算式（前括号）
+					let expr2 = mapRet.rand(expr.x);
+					if (expr2!=null) {
+						if (expr.op == '+' && Math.random() < 0.5) { //加法有50%几率交换加数位置
+							return \`\${expr.y} + (\${expr2.toStr()})  =\`;
+						}
+						if (Math.random() < 0.5) {//50%几率去掉前括号
+							return \`\${expr2.toStr()} \${expr.op} \${expr.y} =\`;
+						} else {
+							return \`(\${expr2.toStr()}) \${expr.op} \${expr.y} =\`;
+						}
+					}
+				}
+			}
+			return expr.toStr() + ' =';
+		}
+		
+		// 随机生成1个不重复算式
+		function generateUniqueQuestion() {
+			var expr = generateQuestion();
+			while(mapGen.has(expr))
+				expr = generateQuestion();
+			mapGen.set(expr, 1);
+			return expr;
+		}
+		
+		// 按页生成算式
+		function generateMathExpression() {
+			const Papers = document.getElementById('Papers');
+			while (Papers.firstChild) {
+				Papers.removeChild(Papers.firstChild);
+			}
+			// 清空去重记录，保证跨页也不重复
+			mapGen.clear();
+			let page_num = parseInt(document.getElementById('pageCount').value, 10) || 1;
+			let per_page = parseInt(document.getElementById('perPage').value, 10) || 100;
+			for (let p = 0; p < page_num; p++) {
+				const paper = document.createElement('div');
+				paper.className = 'paper';
+				Papers.appendChild(paper);
+				for (let i = 0; i < per_page; i++) {
+					const question = document.createElement('div');
+					question.className = 'question';
+					question.textContent = generateUniqueQuestion();
+					question.addEventListener('click', function() {
+						this.textContent = generateUniqueQuestion();
+					});
+					paper.appendChild(question);
+				}
+				// 非尾页插入分页符
+				if (p < page_num - 1) {
+					const page_break = document.createElement('div');
+					page_break.className = 'page-break';
+					Papers.appendChild(page_break);
+				}
+			}
+		}
+
+		// ===== 工具栏交互 =====
+		document.getElementById('btnRegenerate').addEventListener('click', generateMathExpression);
+		document.getElementById('pageCount').addEventListener('change', generateMathExpression);
+		document.getElementById('perPage').addEventListener('change', generateMathExpression);
+		// 导出 PDF / 打印：直接调用浏览器打印，目标选"另存为PDF"
+		document.getElementById('btnPrint').addEventListener('click', function () {
+			fitPapersToPage();
+			window.print();
+		});
+		// 在打印前把每页高度设为"一页可用高度"，确保内容恰好装满一页不溢出
+		function fitPapersToPage() {
+			const papers = document.querySelectorAll('.paper');
+			if (!papers.length) return;
+			// A4 高度 297mm，减去 @page 上下边距 16mm，得 281mm 可用高度
+			papers.forEach(p => { p.style.height = '281mm'; });
+		}
+		// Ctrl+P / Cmd+P 也能用（浏览器默认即触发打印）
+		// Ctrl+P / Cmd+P 打印前同样重排，保证一页装完
+		window.addEventListener('beforeprint', fitPapersToPage);
+		generateMathExpression();
+		/*
+		console.log(arrayAdd.length);
+		console.log(arrayAddCarry.length);
+		console.log(arrayAddTen.length);
+		console.log(arraySub.length);
+		console.log(arraySubBorrow.length);
+		console.log(arraySubTen.length);
+		for (let [key, value] of mapRet.map) {
+			console.log(key, value.length);
+			for (let i = 0; i < value.length; i++) {
+			  console.log('\\t',value[i].toStr());
+			}
+		}
+		console.log('end');*/
+	<\/script>
+<\/body>
+<\/html>
+`,
     files: {
-      "assets/js/frame-bridge.js": "/* ============================================================================\n * iframe 内工具桥 · frame-bridge.js\n * ============================================================================\n * 【背景】站点在 file://（离线双击 index.html）下无法用 fetch 读取工具页面\n * （Chromium 把 file:// 互相视为不透明源，fetch/XHR 一律被 CORS 拦截），于是\n * 所有自研工具回退为 <iframe> 兜底。跨源带来两个问题：\n *   ① 父页拿不到 iframe 的 contentDocument → 高度自适应失效，工具页被压成\n *      固定视口高度（\"页面不能自动撑开\"）；\n *   ② file:// 下 iframe 内的 requestFullscreen 被权限策略拒绝 → 工具右上角\n *      ⛶ 点了没反应（\"全屏按钮不能用\"）。\n *\n * 【方案】本脚本随工具页面一起被 iframe 加载（真实文档环境），通过\n * postMessage 向父页（站点外壳）上报：\n *   - height     ：工具内容实际高度（rAF 节流 + ResizeObserver 持续监听）；\n *   - fullscreen ：工具内部全屏请求被拒时，请父页对 <iframe> 本身发起全屏\n *                  （postMessage 会把 user activation 一并委托给父页；\n *                  父页若仍失败，再降级为父页侧 CSS 伪全屏）。\n *\n * 【安全阀】用 self !== top 判定「真实运行在 iframe 里」：\n *   - 独立双击打开工具页 → self === top → 本脚本整体空转；\n *   - 站点内嵌 Shadow DOM（http 适配器）路径下，脚本在 docShim/winShim 代理里\n *     执行，self/top 都落到真实顶层 window → self === top → 空转，\n *     不会向父页发任何消息；\n *   - 真实 iframe 内（含 file:// 跨源）→ self !== top → 激活。\n *   ⚠️ 不要用 window.frameElement 判定：跨源 iframe 里访问它会抛 SecurityError\n *     （实测），一旦 catch 成 null 桥就整体失效。\n *   ⚠️ self / top 属于跨源 WindowProxy 的「允许访问」属性（不会抛错），\n *     引用比较即可判定。\n * 消息一律带 __edutoolboxFrame 命名空间标记，父页校验 e.source 后才处理。\n * ========================================================================== */\n(function () {\n  \"use strict\";\n\n  /* 只在真实 iframe 内激活 */\n  var inFrame = false;\n  try {\n    var self = window.self, top = window.top;\n    inFrame = !!(self && top && self !== top && window.parent && window.parent !== window);\n  } catch (e) { inFrame = false; }\n  if (!inFrame) return;\n\n  var raf = 0;\n\n  /** rAF 节流地把当前文档高度报给父页 */\n  function reportHeight() {\n    if (raf) return;\n    raf = (window.requestAnimationFrame || function (f) { return setTimeout(f, 60); })(\n      function () {\n        raf = 0;\n        try {\n          var h = Math.max(\n            document.documentElement ? document.documentElement.scrollHeight : 0,\n            document.body ? document.body.scrollHeight : 0\n          );\n          window.parent.postMessage({\n            __edutoolboxFrame: true,\n            type: \"height\",\n            h: h\n          }, \"*\");\n        } catch (e) { /* 父页不可达：静默 */ }\n      }\n    );\n  }\n\n  /** 工具内部全屏请求失败时，委托父页对 iframe 元素本身发起全屏 */\n  function requestParentFullscreen() {\n    try {\n      window.parent.postMessage({\n        __edutoolboxFrame: true,\n        type: \"fullscreen\"\n      }, \"*\");\n    } catch (e) { /* 静默 */ }\n  }\n\n  /* 暴露给共享舞台模块（tool-stage-toolbar.js）在全屏失败分支调用 */\n  window.EduToolFrameBridge = {\n    reportHeight: reportHeight,\n    requestParentFullscreen: requestParentFullscreen\n  };\n\n  /* 首帧 + load 后补报，防首报时内容未排完 */\n  reportHeight();\n  window.addEventListener(\"load\", function () {\n    reportHeight();\n    setTimeout(reportHeight, 300);\n  });\n\n  /* 内容持续变化（点名记录增长、生成结果插入等）→ 宿主跟着长高 */\n  if (typeof ResizeObserver === \"function\") {\n    try {\n      new ResizeObserver(reportHeight).observe(document.documentElement);\n    } catch (e) { /* 老浏览器无此能力：靠 load 兜底 */ }\n  }\n\n  /* 父页通知重新测量（伪全屏退出后恢复常规高度） */\n  window.addEventListener(\"message\", function (e) {\n    var d = e.data;\n    if (d && d.__edutoolboxFrame === true && d.type === \"report\") reportHeight();\n  });\n})();\n"
+      "assets/js/frame-bridge.js": `/* ============================================================================
+ * iframe 内工具桥 · frame-bridge.js
+ * ============================================================================
+ * 【背景】站点在 file://（离线双击 index.html）下无法用 fetch 读取工具页面
+ * （Chromium 把 file:// 互相视为不透明源，fetch/XHR 一律被 CORS 拦截），于是
+ * 所有自研工具回退为 <iframe> 兜底。跨源带来两个问题：
+ *   ① 父页拿不到 iframe 的 contentDocument → 高度自适应失效，工具页被压成
+ *      固定视口高度（"页面不能自动撑开"）；
+ *   ② file:// 下 iframe 内的 requestFullscreen 被权限策略拒绝 → 工具右上角
+ *      ⛶ 点了没反应（"全屏按钮不能用"）。
+ *
+ * 【方案】本脚本随工具页面一起被 iframe 加载（真实文档环境），通过
+ * postMessage 向父页（站点外壳）上报：
+ *   - height     ：工具内容实际高度（rAF 节流 + ResizeObserver 持续监听）；
+ *   - fullscreen ：工具内部全屏请求被拒时，请父页对 <iframe> 本身发起全屏
+ *                  （postMessage 会把 user activation 一并委托给父页；
+ *                  父页若仍失败，再降级为父页侧 CSS 伪全屏）。
+ *
+ * 【安全阀】用 self !== top 判定「真实运行在 iframe 里」：
+ *   - 独立双击打开工具页 → self === top → 本脚本整体空转；
+ *   - 站点内嵌 Shadow DOM（http 适配器）路径下，脚本在 docShim/winShim 代理里
+ *     执行，self/top 都落到真实顶层 window → self === top → 空转，
+ *     不会向父页发任何消息；
+ *   - 真实 iframe 内（含 file:// 跨源）→ self !== top → 激活。
+ *   ⚠️ 不要用 window.frameElement 判定：跨源 iframe 里访问它会抛 SecurityError
+ *     （实测），一旦 catch 成 null 桥就整体失效。
+ *   ⚠️ self / top 属于跨源 WindowProxy 的「允许访问」属性（不会抛错），
+ *     引用比较即可判定。
+ * 消息一律带 __edutoolboxFrame 命名空间标记，父页校验 e.source 后才处理。
+ * ========================================================================== */
+(function () {
+  "use strict";
+
+  /* 只在真实 iframe 内激活 */
+  var inFrame = false;
+  try {
+    var self = window.self, top = window.top;
+    inFrame = !!(self && top && self !== top && window.parent && window.parent !== window);
+  } catch (e) { inFrame = false; }
+  if (!inFrame) return;
+
+  var raf = 0;
+
+  /** rAF 节流地把当前文档高度报给父页 */
+  function reportHeight() {
+    if (raf) return;
+    raf = (window.requestAnimationFrame || function (f) { return setTimeout(f, 60); })(
+      function () {
+        raf = 0;
+        try {
+          var h = Math.max(
+            document.documentElement ? document.documentElement.scrollHeight : 0,
+            document.body ? document.body.scrollHeight : 0
+          );
+          window.parent.postMessage({
+            __edutoolboxFrame: true,
+            type: "height",
+            h: h
+          }, "*");
+        } catch (e) { /* 父页不可达：静默 */ }
+      }
+    );
+  }
+
+  /** 工具内部全屏请求失败时，委托父页对 iframe 元素本身发起全屏 */
+  function requestParentFullscreen() {
+    try {
+      window.parent.postMessage({
+        __edutoolboxFrame: true,
+        type: "fullscreen"
+      }, "*");
+    } catch (e) { /* 静默 */ }
+  }
+
+  /* 暴露给共享舞台模块（tool-stage-toolbar.js）在全屏失败分支调用 */
+  window.EduToolFrameBridge = {
+    reportHeight: reportHeight,
+    requestParentFullscreen: requestParentFullscreen
+  };
+
+  /* 首帧 + load 后补报，防首报时内容未排完 */
+  reportHeight();
+  window.addEventListener("load", function () {
+    reportHeight();
+    setTimeout(reportHeight, 300);
+  });
+
+  /* 内容持续变化（点名记录增长、生成结果插入等）→ 宿主跟着长高 */
+  if (typeof ResizeObserver === "function") {
+    try {
+      new ResizeObserver(reportHeight).observe(document.documentElement);
+    } catch (e) { /* 老浏览器无此能力：靠 load 兜底 */ }
+  }
+
+  /* 父页通知重新测量（伪全屏退出后恢复常规高度） */
+  window.addEventListener("message", function (e) {
+    var d = e.data;
+    if (d && d.__edutoolboxFrame === true && d.type === "report") reportHeight();
+  });
+})();
+`
     },
-    meta: {builtAt: "2026-09-28 09:10:16", sources: {"assets/js/frame-bridge.js": "1131903c1e46"}}
+    meta: {builtAt: "2026-09-28 11:07:05", sources: {"assets/js/frame-bridge.js": "1131903c1e46"}}
   };
 })();

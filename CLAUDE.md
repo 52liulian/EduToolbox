@@ -82,10 +82,12 @@ curl.exe --noproxy '*' http://127.0.0.1:18420/ -UseBasicParsing
 | file:// 下工具样式全丢/回退 iframe | bundle 过期或 `<link>` 写法未被构建器识别 | 重跑 build_tool_bundles.py；构建器已支持 rel/href 任意顺序 |
 | 工具打开后页面变窄/下拉被遮 | 工具 CSS 裸 link 进了全局 head | 改 Shadow rebase 或 injectScopedCss |
 | 独立打开正常、站内嵌套按钮无反应（控制台 `…null…addEventListener`） | 工具自有 JS 被 isVendor 误判为第三方库（文件名含 pinyin/pdf 等库名且不以 slug 打头），在主页面真实 document 执行取不到影子树元素 | 自有脚本改名 `<slug>.js`；核查 `tool-adapter.js` isVendor 四级判定（2026-09-28 事故） |
+| 独立打开正常、站内嵌套宽高滑块/版式/颜色等全部无响应（控制台无 error） | 工具用 HTML 内联事件 `onclick="render()"`，Shim 脚本经 `new Function` 注入后函数声明是局部变量不挂 `window`，内联事件在真实 window 作用域查找 → ReferenceError | 工具 `<script>` 末尾显式 `window.fn = fn` 桥接（Shim Proxy 无 set 拦截器，赋值落到真实 window，见 `makeWinShim`；2026-09-28 xingmingtie 事故） |
 | 首页整站崩、控制台 forEach undefined | 某分类缺 tools 数组 | 补 `Array.isArray()` 兜底 |
 | 全屏后样式没变（file://） | 只写了 `:fullscreen`，全屏元素是 iframe | 补 `.edutf-solo` 并列变体 |
 | 打印白底灰边/排版被压 | print.css 被加了宽度 !important | print.css 只允许 background 重置 |
 | 改了工具但运行仍旧 | bundle 未重建 / 浏览器缓存 | 重打 bundle + 硬刷新 |
+| IDE 提示「字符 U+feff 不可见」 | 源文件开头 BOM 被 `js_string()` 模板字面量原样内联进 bundle（`json.dumps` 时会被转义为可见 `\ufeff`，模板字面量下变为不可见字符） | `build_tool_bundles.py` 读入时已追加 `.replace('\ufeff','')`，重建即可（2026-09-28 修复） |
 | 本地 127.0.0.1 探活 502 | http_proxy 拦截 | curl `--noproxy '*'`；Edge `--no-proxy-server` |
 | PowerShell 输出乱码 | `>` 重定向为 UTF-16LE | 让脚本自行写 UTF-8 |
 | data.js 改完数量不对 | 用了 cat.tools.length | 统一 countTools() 口径 |
@@ -97,6 +99,7 @@ curl.exe --noproxy '*' http://127.0.0.1:18420/ -UseBasicParsing
 3. 脚本必须幂等；跑完做 `node --check` + 垃圾标记 grep（Placeholder 等未完成痕迹）。
 4. **一旦批量改坏：回滚到版本库干净版，再按既定顺序重放，绝不在损坏文件上继续叠加步骤。**
 5. 「另存网页」来源的工具入库前查扩展残留（体积异常、doubao/cici/sonner 等关键词）。
+6. **bundle 产物源文件须无 BOM**：`build_tool_bundles.py` 读入阶段已追加 `.replace('\ufeff','')` 剥除 BOM；新增源文件保存时须确认为 UTF-8 无 BOM（VS Code 右下角点击编码切换），避免 U+FEFF 被模板字面量原样内联成不可见字符（2026-09-28 事故）。
 
 ## 7. 沟通与交付偏好
 

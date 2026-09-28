@@ -82,7 +82,8 @@
 - 高度三态：独立页/iframe 兜底 `min-height:100vh`；挂载态 `:host main.stage{min-height:<卡片内容高>}` 收回（典型 460px/窄屏 380px）；适配器根 `:host{height:auto;min-height:0;border-radius:0!important}`。
 - 模态居中：`position:fixed; top/left:50%; translate(-50%,-50%)`（Shadow 内 fixed 相对视口）。
 - 全屏：目标元素是舞台本身，样式选择器写 `.stage:fullscreen`；iframe 全屏形态由工具内 `.edutf-solo`（fixed; inset:0; 100vw/100vh）并列承接同一套全屏样式，禁止写 `html:fullscreen`。
-- 脚本执行分两个作用域：第三方库（`vendor/` 路径或文件名以库名开头）以真实 `<script>` 注入主页全局；工具自有脚本（文件名以 slug 打头，约定即 `<slug>.js`）收集后在 document/window **Shim** 内执行（`new Function`，DOM 查询限定影子树，DOMContentLoaded/load 立即回调）。自有脚本必须遵守 `<slug>.js` 命名，否则会被误判入库队列注入真实 document，嵌套态取不到自身元素（2026-09-28 pinyin-annotator/pdf-image-convert 事故）。
+- 脚本执行分两个作用域：第三方库（`vendor/` 路径或文件名以库名开头）以真实 `<script>` 注入主页全局；工具自有脚本（文件名以 slug 打头，约定即 `<slug>.js`）收集后在 document/window **Shim** 内执行（`new Function`，DOM 查询限定影子树，DOMContentLoaded/load 立即回调）。自有脚本必须遵守 `<slug>.js` 命名，否则会被误判入库队列注入真实 document，嵌套态取不到自身元素（2026-09-28 pinyin-annotator/pdf-image-convert 事故）。**HTML 内联事件**（`onclick="fn()"`）的执行上下文是真实 window 而非 Shim——Shim 体内的函数声明是局部变量，内联事件找不到会 `ReferenceError`；须在 `<script>` 末尾 `window.fn = fn` 显式桥接（Shim `Proxy` 无 set 拦截器，赋值落到真实 window；2026-09-28 xingmingtie 事故）。
+- **bundle 产物格式**：`build_tool_bundles.py` 的 `js_string()` 用反引号模板字面量包裹源码（保留原始换行与缩进，便于人工查看），转义规则：反斜杠→反引号→`${`→`</script`；key 仍用 JSON 双引号（兼容 `--check`）。源文件读入阶段 `.replace('\ufeff','')` 剥除 BOM，避免 U+FEFF 被模板字面量原样内联成不可见字符（2026-09-28 事故）。
 
 ## 5. 组件规范
 

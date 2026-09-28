@@ -45,6 +45,8 @@ python .workbuddy/scripts/build_tool_bundles.py           # 重新预打包全�
 - 工具自有入口脚本必须命名 `<slug>.js`（与目录同名）：adapter 只把同名脚本放进 Shadow Shim 作用域执行；第三方库放 `assets/vendor/` 或工具内 `vendor/` 子目录、文件名以库名打头，才会注入真实全局。自有脚本文件名不得借用库名开头（html2canvas/xlsx/katex/echarts/pinyin/pdf 等）。
 - 新工具默认 `mount:"adapter"`，不再新增 `mount:true` 原生工具。
 - 正则批量改码后必须 `node --check` + DOM id 交叉引用校验；批量脚本须幂等、花括号配对守卫、先备份，失败时回滚到版本库再按序重放，**禁止在损坏文件上续跑**。
+- **源文件必须 UTF-8 无 BOM**：`build_tool_bundles.py` 读入阶段已 `.replace('\ufeff','')` 兜底，但新文件保存时仍须确认编码为「UTF-8 无 BOM」（VS Code 右下角切换），避免不可见字符污染产物。
+- **HTML 内联事件与挂载态兼容**：工具若用 `onclick="全局函数()"` 等 HTML 内联事件，由于 Shim 经 `new Function` 注入后函数声明是局部变量不挂 `window`，内联事件在真实 window 作用域查找会 `ReferenceError`——须在 `<script>` 末尾显式 `window.fn = fn` 桥接（见 `tool-adapter.js` `makeWinShim` 的 Proxy 无 set 拦截器，赋值落到真实 window；2026-09-28 xingmingtie 事故）。新工具优先用 `addEventListener` 绑事件，避免内联事件。
 
 ## 6. 数据编辑（assets/js/data.js）
 
