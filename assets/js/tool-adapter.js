@@ -57,12 +57,37 @@
 
   /**
    * 判定是否为第三方库脚本（走真实全局作用域加载）
-   * @param {string} src - 脚本地址
-   * @returns {boolean}
+   * --------------------------------------------------------------------------
+   * 历史事故（2026-09-28「自研工具单独打开可用、站内嵌套不可用」）：
+   *   旧实现是「src 任意位置命中库名关键词即视为第三方库」。关键词里有
+   *   `pinyin` / `pdf`，于是**工具自身脚本** `pinyin-annotator.js`、
+   *   `pdf-image-convert.js`、`pinyin-worksheet.js` 被误判成第三方库 ——
+   *   它们被 `<script src>` 注入站点真实全局作用域执行，而工具的 DOM 在
+   *   Shadow DOM 影子树里，脚本里的 `document.getElementById(...)` 打到
+   *   站点真实文档恒为 null，初始化第一行就抛
+   *   `TypeError: Cannot read properties of null (reading 'addEventListener')`，
+   *   事件一个都没绑上 → 站点内打开「按钮全无响应 / 内容不生成」，
+   *   而双击独立打开该 HTML 一切正常。
+   * 修正后的判定顺序（先排除自身脚本，再按库名判定）：
+   *   ① CDN / 外链（http(s) 绝对地址）→ 库
+   *   ② 路径含 `vendor/`（站点 assets/vendor 或工具自带 vendor 目录）→ 库
+   *   ③ 文件名以工具 slug 打头（约定：自研工具脚本名 = `<slug>.js`）→ **自身脚本**
+   *   ④ 其余按「文件名以库名打头」判定，避免 `sudoku-pdf-batch.js`
+   *      这类「中间含 pdf 的工具脚本」再次被误伤
+   * @param {string} src  - 原始 src（HTML 里书写的相对/绝对地址）
+   * @param {string} slug - 工具 slug（目录名 = id）
+   * @returns {boolean} true=第三方库，false=工具自身脚本
    */
-  function isVendor(src) {
-    return !src || /^https?:/i.test(src) || /vendor\//i.test(src) ||
-      /(html2canvas|xlsx|katex|pdf|jspdf|mammoth|jszip|qrcode|echarts|pinyin|chart|jquery|d3|three)/i.test(src);
+  function isVendor(src, slug) {
+    if (!src) return true;                                   // 空 src：按库处理（不影响）
+    if (/^https?:/i.test(src)) return true;                  // CDN / 外链
+    if (/(^|\/)vendor\//i.test(src)) return true;            // vendor 目录
+    var base = String(src).split(/[?#]/)[0].split("/").pop().toLowerCase();
+    var slugL = String(slug || "").toLowerCase();
+    /* 工具自身脚本优先：文件名以 slug 打头（pinyin-annotator.js / pdf-image-convert.js） */
+    if (slugL && base.indexOf(slugL) === 0) return false;
+    /* 库名必须出现在文件名开头，而不是任意子串 */
+    return /^(html2canvas|xlsx|katex|jspdf|mammoth|jszip|qrcode|echarts|pinyin|chart|jquery|d3|three)([.\-_]|$)/i.test(base);
   }
 
   /**
@@ -817,7 +842,9 @@ function applyPageRule(css) {
       var src = sc.getAttribute("src");
       if (src) {
         var url = resolveUrl(src, slug);
-        if (isVendor(src)) {
+        /* 传入 slug：让「文件名以 slug 打头的工具自身脚本」优先判定为自有脚本，
+           不被库名关键词（pinyin / pdf …）误伤成第三方库 */
+        if (isVendor(src, slug)) {
           vendorUrls.push(url);
         } else {
           pending.push({ order: j, url: url });

@@ -27,4 +27,4 @@ build/
 .env.local
 .workbuddy
 .trae
-docs
+docs/

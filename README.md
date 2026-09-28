@@ -126,6 +126,7 @@ tools/<slug>/
 4. 引入公共底座：`<link rel="stylesheet" href="../../assets/css/tool-common.css">`（单文件工具可在 `<style>` 内写等价的「组件化挂载兜底」块：六色主题变量 + `.container` 宽度）
 5. 资源一律使用**相对路径**，自动适配 http(s) 和 `file://`；工具 CSS 禁裸 `<link>` 注入全局 head（由适配器 rebase 进 Shadow DOM）
 6. 注册默认 `mount:"adapter"`；改动源码后必须重跑 `python .workbuddy/scripts/build_tool_bundles.py`，`--check` 无 STALE
+7. **脚本命名约定**：工具自有入口 JS 必须叫 `<slug>.js`（与目录同名）——挂载适配器只把同名脚本放进 Shadow DOM 作用域执行；第三方库须放 `assets/vendor/`（或工具内 `vendor/` 目录），文件名也不要借用 html2canvas/xlsx/katex/pinyin 等库名开头，否则会被误当外部库在主页面作用域执行，出现「独立打开可用、嵌套后按钮无反应」问题。
 
 ### 注册到 data.js
 
