@@ -1,0 +1,124 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>函数绘图 | EduToolbox · 函数图像绘制</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%8E%93%3C/text%3E%3C/svg%3E">
+<link rel="stylesheet" href="function-graph.css">
+<link rel="stylesheet" href="../../assets/css/tool-common.css">
+</head>
+<body>
+
+<!-- 主体容器 -->
+<main class="container">
+  <div class="layout" id="graphLayout">
+    <!-- 左侧：函数与曲线设置 -->
+    <aside class="card side-card">
+      <div class="card-head">
+        <h3 class="card-title">函数与曲线设置</h3>
+        <button type="button" class="btn btn-mini" id="btnExample" title="载入默认示例">查看示例</button>
+      </div>
+
+      <!-- 绘图模式切换 -->
+      <div class="field-row">
+        <span class="field-label">绘图模式</span>
+        <div class="seg-group" id="modeGroup">
+          <button type="button" class="seg-btn active" data-mode="func">函数模式</button>
+          <button type="button" class="seg-btn" data-mode="param">参数曲线</button>
+        </div>
+      </div>
+
+      <!-- 函数输入列表 -->
+      <div class="field-row">
+        <span class="field-label">函数表达式</span>
+      </div>
+      <div class="func-list" id="funcList"><!-- 函数行由脚本生成 --></div>
+      <button type="button" class="btn btn-add" id="btnAdd">➕ 添加函数</button>
+
+      <!-- 范围设置 -->
+      <div class="field-row range-block">
+        <span class="field-label">X 轴范围</span>
+        <div class="range-pair">
+          <input type="number" class="num-input" id="xMin" value="-10" step="any">
+          <span class="range-sep">至</span>
+          <input type="number" class="num-input" id="xMax" value="10" step="any">
+        </div>
+      </div>
+      <div class="field-row range-block">
+        <span class="field-label">Y 轴范围</span>
+        <label class="check-inline">
+          <input type="checkbox" id="yAuto" checked>
+          <span>自动计算</span>
+        </label>
+      </div>
+      <div class="field-row range-block" id="yManualRow">
+        <div class="range-pair">
+          <input type="number" class="num-input" id="yMin" value="-10" step="any">
+          <span class="range-sep">至</span>
+          <input type="number" class="num-input" id="yMax" value="10" step="any">
+        </div>
+      </div>
+
+      <!-- 绘图参数 -->
+      <div class="field-row">
+        <span class="field-label">采样点数</span>
+        <input type="number" class="num-input num-wide" id="samples" value="801" min="51" max="5001" step="50">
+      </div>
+      <div class="field-row">
+        <span class="field-label">线宽度</span>
+        <input type="number" class="num-input num-wide" id="lineWidth" value="2" min="0.5" max="8" step="0.1">
+      </div>
+
+      <!-- 显示选项 -->
+      <div class="field-row check-grid">
+        <label class="check-inline"><input type="checkbox" id="optGrid" checked><span>显示网格</span></label>
+        <label class="check-inline"><input type="checkbox" id="optAxis" checked><span>显示坐标轴</span></label>
+        <label class="check-inline"><input type="checkbox" id="optKey"><span>显示关键点</span></label>
+        <label class="check-inline"><input type="checkbox" id="optFill"><span>填充曲线下方</span></label>
+        <label class="check-inline"><input type="checkbox" id="optAnim"><span>显示动画</span></label>
+      </div>
+
+      <div class="field-row" id="animDurationRow">
+        <span class="field-label">动画时长 (ms)</span>
+        <input type="number" class="num-input num-wide" id="animDuration" value="3000" min="200" max="10000" step="100">
+      </div>
+    </aside>
+
+    <!-- 右侧：函数图像预览 -->
+    <section class="card graph-card">
+      <!-- 舞台右上角工具栏：⛶ 全屏 / ⚙ 隐藏设置（由共享模块 tool-stage-toolbar.js 接管） -->
+      <div class="stage-toolbar">
+        <button type="button" class="icon-btn" id="fullscreenBtn" title="全屏">⛶</button>
+        <button type="button" class="icon-btn" id="hideSetupBtn" title="隐藏设置">⚙</button>
+      </div>
+      <div class="graph-toolbar">
+        <div class="tool-group">
+          <button type="button" class="btn btn-small" id="btnZoomIn">🔍＋ 放大</button>
+          <button type="button" class="btn btn-small" id="btnZoomOut">🔍－ 缩小</button>
+          <button type="button" class="btn btn-small" id="btnCenter">🎯 居中</button>
+          <button type="button" class="btn btn-small" id="btnReset">↩️ 复位</button>
+          <button type="button" class="btn btn-small btn-primary" id="btnGenerate">⚡ 生成图像</button>
+          <button type="button" class="btn btn-small" id="btnExport">🖼️ 导出 PNG</button>
+        </div>
+        <div class="range-info" id="rangeInfo"></div>
+      </div>
+      <div class="canvas-wrap" id="canvasWrap">
+        <canvas id="graphCanvas"></canvas>
+        <div class="hint">💡 鼠标滚轮以指针为锚点缩放，按住左键拖拽平移</div>
+        <div class="live-coord" id="liveCoord" hidden></div>
+      </div>
+      <div class="expr-hints">
+        <strong>表达式提示：</strong>
+        支持 <code>sin</code> <code>cos</code> <code>tan</code> <code>log</code> <code>ln</code> <code>sqrt</code> <code>abs</code> <code>exp</code> <code>pow</code> <code>pi</code> <code>e</code>，
+        乘法请显式输入 <code>*</code>，幂运算用 <code>x^2</code> 或 <code>pow(x,2)</code>。
+      </div>
+    </section>
+  </div>
+</main>
+
+<script src="../../assets/js/frame-bridge.js"></script>
+<script src="../../assets/js/tool-stage-toolbar.js"></script>
+<script src="function-graph.js"></script>
+</body>
+</html>

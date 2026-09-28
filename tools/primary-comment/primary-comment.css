@@ -1,0 +1,104 @@
+/* ============================================================================
+ * 小学评语生成 · primary-comment.css
+ * 仅包含本工具特有样式：维度工具按钮 / 设置项提示 / 评语结果卡片
+ * 公共底座（wrap、panels、panel、panel-names/dims/settings、panel-head、chips、
+ *   setting-grid、setting-item、switch、seg-group、action-bar、stats、toolbar、
+ *   results、r-grid、toast、btn、btn-mini 等）见 tool-common.css
+ * 高度策略：评语卡片随内容自然增高，textarea 可纵向拖拽，仅 body 主滚动条
+ * ========================================================================== */
+
+/* ---------------------------------------------------------------------------
+ * 一、维度面板头部的「全选 / 全不选」按钮组
+ * ------------------------------------------------------------------------- */
+.dim-tools { display: flex; gap: 8px; }
+
+/* ---------------------------------------------------------------------------
+ * 二、设置项下方提示文字
+ * ------------------------------------------------------------------------- */
+.setting-hint {
+  margin-top: 6px;
+  font-size: 12.5px;
+  line-height: 1.6;
+  color: var(--text-3);
+}
+
+/* ---------------------------------------------------------------------------
+ * 三、评语结果卡片网格：放宽最小列宽，便于阅读长评语
+ * ------------------------------------------------------------------------- */
+.results .r-grid {
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 16px;
+}
+
+/* 单张评语卡片 */
+.r-card {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 16px;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  box-shadow: var(--shadow-sm);
+  transition: box-shadow var(--t-fast) var(--ease);
+}
+.r-card:hover { box-shadow: var(--shadow); }
+
+.r-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.r-no {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  flex-shrink: 0;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--primary);
+  background: var(--primary-soft);
+  border-radius: 50%;
+}
+.r-name {
+  flex: 1;
+  min-width: 0;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text-1);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.r-head .btn-mini { margin-left: auto; flex-shrink: 0; }
+
+/* 评语可编辑文本域 */
+.r-text {
+  width: 100%;
+  min-height: 150px;
+  padding: 12px 14px;
+  font-size: 14px;
+  line-height: 1.8;
+  color: var(--text-1);
+  background: var(--card-bg-2);
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  resize: vertical;
+  outline: none;
+  transition: border-color var(--t-fast) var(--ease),
+              box-shadow var(--t-fast) var(--ease);
+}
+.r-text:focus {
+  border-color: var(--primary);
+  background: #fff;
+  box-shadow: 0 0 0 3px rgba(59, 110, 246, 0.12);
+}
+
+/* ---------------------------------------------------------------------------
+ * 四、小屏微调
+ * ------------------------------------------------------------------------- */
+@media (max-width: 640px) {
+  .results .r-grid { grid-template-columns: 1fr; }
+  .r-name { font-size: 14px; }
+}

@@ -1,0 +1,259 @@
+/* ============================================================================
+ * PDF 与图片转换 · pdf-image-convert.css
+ * 仅包含本工具特有样式：文件信息条 / 选项组 / 进度条 / 图片排序列表 / 说明卡
+ * 公共底座（wrap、head、tabs、tab、card、dropzone、radio、actions、btn、tip 等）
+ *   见 tool-common.css
+ * 高度策略：所有容器高度自动撑开，仅 body 主滚动条
+ * ========================================================================== */
+
+/* ---------------------------------------------------------------------------
+ * 一、页头副标题与提示徽标
+ * ------------------------------------------------------------------------- */
+.head .sub { color: var(--text-2); font-size: 14px; line-height: 1.7; }
+.head .notice {
+  display: inline-block;
+  margin-top: 10px;
+  font-size: 12.5px;
+}
+
+/* Tab 面板：用 hidden 属性切换，.active 仅作初始标记，无需 display 规则 */
+
+/* ---------------------------------------------------------------------------
+ * 二、已选文件信息条
+ * ------------------------------------------------------------------------- */
+.file-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 16px;
+  padding: 14px 18px;
+  background: var(--card-bg-2);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+}
+
+.fb-icon { font-size: 24px; flex-shrink: 0; }
+
+.fb-name {
+  flex: 1;
+  min-width: 0;
+  font-weight: 600;
+  color: var(--text-1);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.fb-meta {
+  font-size: 13px;
+  color: var(--text-3);
+  flex-shrink: 0;
+  font-variant-numeric: tabular-nums;
+}
+
+.fb-del {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  flex-shrink: 0;
+  font-size: 14px;
+  color: var(--text-3);
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all var(--t-fast) var(--ease);
+}
+.fb-del:hover {
+  color: var(--danger);
+  border-color: #ffd4d4;
+  background: #fff5f5;
+}
+
+/* ---------------------------------------------------------------------------
+ * 三、选项组（格式 / 分辨率 / 页码范围 / 页面设置 / 边距）
+ * ------------------------------------------------------------------------- */
+.opts {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  margin-top: 18px;
+}
+
+/* 单选项中内嵌输入框（页码范围） */
+.range-line {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.range-line input[type="text"] { max-width: 160px; }
+
+/* ---------------------------------------------------------------------------
+ * 四、进度条
+ * ------------------------------------------------------------------------- */
+.progress-box {
+  margin-top: 18px;
+  padding: 16px 18px;
+  background: var(--card-bg-2);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+}
+
+.progress-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 10px;
+  font-size: 13px;
+  color: var(--text-2);
+}
+.progress-head span:last-child {
+  font-weight: 700;
+  color: var(--primary);
+  font-variant-numeric: tabular-nums;
+}
+
+.progress {
+  height: 10px;
+  background: var(--primary-soft-2);
+  border-radius: var(--r-pill);
+  overflow: hidden;
+}
+
+.progress-bar {
+  height: 100%;
+  width: 0;
+  background: var(--primary-grad);
+  border-radius: var(--r-pill);
+  transition: width .25s var(--ease);
+}
+
+/* ---------------------------------------------------------------------------
+ * 五、图片排序列表（图片转 PDF）
+ * ------------------------------------------------------------------------- */
+.img-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.img-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding: 10px 14px;
+  background: var(--card-bg-2);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+}
+
+.ii-idx {
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  flex-shrink: 0;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--primary);
+  background: var(--primary-soft);
+  border-radius: 50%;
+}
+
+.ii-thumb {
+  width: 48px;
+  height: 48px;
+  object-fit: cover;
+  border-radius: var(--r-sm);
+  border: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.ii-name {
+  flex: 1;
+  min-width: 120px;
+  font-weight: 600;
+  color: var(--text-1);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ii-meta {
+  font-size: 12.5px;
+  color: var(--text-3);
+  flex-shrink: 0;
+  font-variant-numeric: tabular-nums;
+}
+
+.ii-btn {
+  padding: 6px 12px;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--text-2);
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--r-pill);
+  cursor: pointer;
+  transition: all var(--t-fast) var(--ease);
+  flex-shrink: 0;
+}
+.ii-btn:hover:not(:disabled) {
+  color: var(--primary);
+  border-color: var(--primary-soft-2);
+  background: var(--primary-soft);
+}
+.ii-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+.ii-btn.danger {
+  color: var(--danger);
+  border-color: #ffd4d4;
+  background: #fff5f5;
+}
+.ii-btn.danger:hover {
+  color: #fff;
+  background: var(--danger);
+  border-color: var(--danger);
+}
+
+/* ---------------------------------------------------------------------------
+ * 六、说明卡（公共 .tip 提供左侧色条与底色，这里仅放宽内边距 + 列表项样式）
+ * ------------------------------------------------------------------------- */
+.card.tip { padding: 20px 22px; }
+
+.tip ul {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 8px;
+}
+.tip li {
+  position: relative;
+  padding-left: 18px;
+  font-size: 13.5px;
+  line-height: 1.7;
+  color: var(--text-2);
+}
+.tip li::before {
+  content: "•";
+  position: absolute;
+  left: 4px;
+  color: var(--primary);
+  font-weight: 700;
+}
+
+/* ---------------------------------------------------------------------------
+ * 七、小屏微调
+ * ------------------------------------------------------------------------- */
+@media (max-width: 640px) {
+  .img-item { gap: 8px; }
+  .ii-name { min-width: 100px; }
+}

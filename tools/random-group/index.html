@@ -1,0 +1,116 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>随机分组 | EduToolbox · 名单分组</title>
+<meta name="description" content="根据人数或组数随机分组，支持重新分组、性别平衡、动画演示、全屏展示、本地保存。适合课堂讨论与小组活动。本地处理，隐私安全，离线可用。">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%8E%93%3C/text%3E%3C/svg%3E">
+<link rel="stylesheet" href="random-group.css">
+<link rel="stylesheet" href="../../assets/css/tool-common.css">
+</head>
+<body>
+<div id="app">
+  <!-- 顶栏 -->
+
+  <main class="main">
+    <!-- 左侧：设置面板 -->
+    <section class="setup-panel">
+      <!-- 名单设置 -->
+      <div class="block">
+        <h2 class="block-title">📋 名单列表</h2>
+        <p class="block-hint">在此粘贴名单，默认一行一个；可在姓名后加 男/女 以启用性别平衡</p>
+        <div class="textarea-wrap">
+          <textarea id="names" placeholder="张三&#10;李四 女&#10;王五 男&#10;赵六&#10;...">张三
+李四 女
+王五 男
+赵六
+钱七 女
+孙八 男
+周九
+吴十 女
+郑十一
+王十二
+刘十三 男
+陈十四
+杨十五 女</textarea>
+          <div class="textarea-toolbar">
+            <button class="btn-mini" id="exampleBtn" title="加载示例">示例</button>
+            <button class="btn-mini" id="clearBtn" title="清空">清空</button>
+          </div>
+        </div>
+        <div class="count-bar">共 <span id="count">13</span> 人</div>
+      </div>
+
+      <!-- 分组设置 -->
+      <div class="block">
+        <h2 class="block-title">⚙️ 分组设置</h2>
+        <div class="seg-bar">
+          <button class="seg-btn active" data-mode="group">按组数分</button>
+          <button class="seg-btn" data-mode="size">按每组人数分</button>
+        </div>
+        <div class="setting-row">
+          <label for="num" id="numLabel">组数</label>
+          <div class="num-control">
+            <button class="num-btn" id="numMinus">−</button>
+            <input type="number" id="num" min="1" value="4" step="1">
+            <button class="num-btn" id="numPlus">+</button>
+          </div>
+        </div>
+
+        <div class="setting-row">
+          <label for="sep">分隔符</label>
+          <select id="sep">
+            <option value="auto">换行符 (自动)</option>
+            <option value="comma">逗号 (,)</option>
+            <option value="space">空格 ( )</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- 选项 -->
+      <div class="block">
+        <h2 class="block-title">🎨 高级选项</h2>
+        <label class="check-line">
+          <input type="checkbox" id="balance">
+          <span>性别平衡（男女均匀分配）</span>
+        </label>
+        <label class="check-line">
+          <input type="checkbox" id="animate" checked>
+          <span>分组动画演示</span>
+        </label>
+        <label class="check-line">
+          <input type="checkbox" id="autoSave" checked>
+          <span>本地保存名单 (localStorage)</span>
+        </label>
+      </div>
+
+      <!-- 操作按钮 -->
+      <div class="actions">
+        <button class="btn-primary" id="genBtn">🎲 开始分组</button>
+        <button class="btn-ghost" id="copyBtn">📋 复制结果</button>
+      </div>
+    </section>
+
+    <!-- 右侧：分组结果 -->
+    <section class="stage" id="stage">
+      <!-- 舞台工具栏：⛶ 全屏 / ⚙ 隐藏设置（交互由共享模块 tool-stage-toolbar.js 提供） -->
+      <div class="stage-toolbar">
+        <button type="button" class="icon-btn" id="fullscreenBtn" title="全屏">⛶</button>
+        <button type="button" class="icon-btn" id="hideSetupBtn" title="隐藏设置">⚙</button>
+      </div>
+      <div class="stage-inner">
+        <h2 class="stage-title">🎯 分组结果</h2>
+        <div class="result" id="result">
+          <div class="tip">输入名单并点击"开始分组"按钮</div>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<script src="../../assets/js/frame-bridge.js"></script>
+<script src="../../assets/js/tool-stage-toolbar.js"></script>
+<script src="random-group.js"></script>
+</body>
+</html>

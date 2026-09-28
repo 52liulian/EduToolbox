@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>安静值 | EduToolbox · 课堂安静度检测</title>
+    <meta name="description" content="在线课堂安静值检测器，通过麦克风实时检测课堂音量，动态计算 0-100 安静值并以圆环可视化呈现，支持全屏投影、5 秒采样记录与 CSV 导出，适合自习、监考、图书馆等场景。" />
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%8E%93%3C/text%3E%3C/svg%3E" />
+    <link rel="stylesheet" href="quiet-meter.css" />
+    <link rel="stylesheet" href="../../assets/css/tool-common.css" />
+</head>
+<body>
+    <!-- 顶栏导航 -->
+
+    <!-- 主容器 -->
+    <main class="main" id="app">
+        <!-- 工具主区域 -->
+        <section class="tool" id="toolBox">
+            <div class="stage-toolbar">
+                <button type="button" class="icon-btn" id="fullscreenBtn" title="全屏">⛶</button>
+            </div>
+
+            <!-- 控制栏 -->
+            <div class="controls">
+                <div class="controls__item">
+                    <label class="controls__label" for="sensitivity">灵敏度</label>
+                    <input type="range" id="sensitivity" class="controls__range" min="1" max="10" value="5" step="1" />
+                    <span class="controls__value" id="sensitivityValue">5</span>
+                </div>
+                <div class="controls__item">
+                    <label class="controls__label" for="threshold">警告阈值</label>
+                    <input type="range" id="threshold" class="controls__range" min="0" max="100" value="60" step="1" />
+                    <span class="controls__value" id="thresholdValue">60</span>
+                </div>
+                <div class="controls__buttons">
+                    <button type="button" id="toggleBtn" class="btn btn--primary">
+                        <span class="btn__icon" id="toggleIcon">▶</span>
+                        <span class="btn__text" id="toggleText">开始检测</span>
+                    </button>
+                    <button type="button" id="exportBtn" class="btn btn--ghost" disabled>
+                        <span class="btn__icon">📥</span>
+                        <span class="btn__text">导出记录</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- 圆环可视化 -->
+            <div class="meter" id="meter">
+                <div class="meter__ring-wrap">
+                    <svg class="meter__ring" viewBox="0 0 220 220" aria-hidden="true">
+                        <!-- 背景轨道 -->
+                        <circle class="meter__track" cx="110" cy="110" r="98" />
+                        <!-- 进度圆环 -->
+                        <circle class="meter__progress" id="ringProgress" cx="110" cy="110" r="98" />
+                    </svg>
+                    <!-- 中心数值 -->
+                    <div class="meter__center">
+                        <div class="meter__number" id="meterNumber">100</div>
+                        <div class="meter__unit">安静值</div>
+                        <div class="meter__db" id="meterDb">0 dB</div>
+                    </div>
+                </div>
+                <div class="meter__status" id="meterStatus">等待检测...</div>
+                <div class="meter__hint" id="meterHint">点击「开始检测」并允许麦克风权限</div>
+            </div>
+
+            <!-- 检测记录 -->
+            <section class="records">
+                <div class="records__head">
+                    <h2 class="records__title">📊 检测记录 <span class="records__cadence">(5秒/次)</span></h2>
+                    <span class="records__count">共 <span id="recordsCount">0</span> 条数据</span>
+                </div>
+                <div class="records__table-wrap">
+                    <table class="records__table">
+                        <thead>
+                            <tr>
+                                <th>时间</th>
+                                <th>平均分贝</th>
+                                <th>最高分贝</th>
+                                <th>状态</th>
+                            </tr>
+                        </thead>
+                        <tbody id="recordsBody">
+                            <tr class="records__empty" id="recordsEmpty">
+                                <td colspan="4">暂无记录，请点击开始检测</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </section>
+
+        <!-- 介绍区 -->
+        <section class="intro">
+            <h2 class="intro__title">课堂安静值检测器介绍</h2>
+            <div class="intro__section">
+                <h3 class="intro__h3">工具介绍</h3>
+                <div class="intro__body">
+                    <p>课堂安静值检测器是一款专为班级自习、考试监考、图书馆等场景设计的在线环境噪音监测工具。它利用设备麦克风实时采集声音数据，通过智能算法将音量换算为 0-100 的「安静值」（数值越大表示越安静），并以圆环可视化与状态文字直观反馈。</p>
+                    <p>工具不仅能实时反馈当前噪音水平，还会每 5 秒自动进行一次采样记录，生成历史记录列表，方便教师课后复盘班级纪律走势。</p>
+                    <p>主要特点：</p>
+                    <ul class="intro__list">
+                        <li><strong>实时可视化：</strong>圆环动态填充，绿→黄→红渐变实时反馈环境噪音。</li>
+                        <li><strong>自动采样记录：</strong>每 5 秒自动计算平均分贝与安静值，写入历史记录列表。</li>
+                        <li><strong>智能状态判定：</strong>自动判定「非常安静 / 较为安静 / 有些吵闹 / 非常吵闹」四档状态。</li>
+                        <li><strong>数据导出功能：</strong>支持一键导出 CSV 检测记录表格，方便后续复盘分析。</li>
+                        <li><strong>沉浸全屏模式：</strong>适配投影仪与大屏设备，全屏投影效果更佳。</li>
+                        <li><strong>本地隐私保护：</strong>音频不上传服务器，全部在浏览器本地处理。</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="intro__section">
+                <h3 class="intro__h3">使用说明</h3>
+                <div class="intro__body">
+                    <div class="intro__step">
+                        <h4 class="intro__h4">1. 开启检测</h4>
+                        <p>首次使用时，浏览器会询问麦克风权限，请点击「允许」。点击顶部的「开始检测」按钮即可开始监测环境声音。</p>
+                    </div>
+                    <div class="intro__step">
+                        <h4 class="intro__h4">2. 调节设置</h4>
+                        <p>您可以根据环境底噪调整「灵敏度」和「警告阈值」。例如在较吵闹的环境下，可以适当调低阈值，使圆环更早进入警告色。</p>
+                    </div>
+                    <div class="intro__step">
+                        <h4 class="intro__h4">3. 全屏投影</h4>
+                        <p>点击「全屏」按钮进入沉浸模式，此时只有核心的安静值与状态提示，非常适合投影在黑板上作为无声的提醒。</p>
+                    </div>
+                    <div class="intro__step">
+                        <h4 class="intro__h4">4. 导出报告</h4>
+                        <p>检测结束后，点击「导出记录」按钮，即可下载一份包含时间点、平均分贝、最高分贝和状态的 CSV 表格文件。</p>
+                    </div>
+                </div>
+            </div>
+            <div class="intro__section">
+                <h3 class="intro__h3">常见问题解答</h3>
+                <div class="intro__body">
+                    <div class="intro__qa">
+                        <h4 class="intro__h4">Q：为什么显示「浏览器不支持麦克风」？</h4>
+                        <p>A：请确保您使用的是 Chrome、Edge 或 Safari 等现代浏览器，并检查系统设置中是否允许浏览器访问麦克风；同时本工具必须在 https 或 file 协议下加载才能获取麦克风权限。</p>
+                    </div>
+                    <div class="intro__qa">
+                        <h4 class="intro__h4">Q：导出的文件怎么打开？</h4>
+                        <p>A：导出的文件为 .csv 格式，可以直接使用 Excel、WPS 表格或记事本打开。</p>
+                    </div>
+                    <div class="intro__qa">
+                        <h4 class="intro__h4">Q：数据会上传到服务器吗？</h4>
+                        <p>A：不会。所有的声音处理都在您的浏览器本地进行，音频数据不会上传，也不会被保存，请放心使用。</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script src="../../assets/js/frame-bridge.js"></script>
+<script src="../../assets/js/tool-stage-toolbar.js"></script>
+    <script src="quiet-meter.js"></script>
+</body>
+</html>

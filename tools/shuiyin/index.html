@@ -1,0 +1,365 @@
+
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>水印添加工具</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 20px;
+            background-color: #f0f0f0;
+        }
+        h1 {
+            color: #333;
+        }
+        .container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        input[type="file"], input[type="text"] {
+            margin: 10px 0;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            width: 300px;
+        }
+        select, input[type="number"], input[type="range"], input[type="color"] {
+            margin: 10px 0;
+            padding: 5px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            width: 150px;
+        }
+        button {
+            margin: 10px;
+            padding: 10px 20px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        #canvas {
+            display: none; /* 初始隐藏 canvas */
+            max-width: none; /* 允许canvas超出容器宽度 */
+        }
+        .canvas-container {
+            display: none; /* 初始隐藏容器 */
+        }
+        .options {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            width: 100%;
+            max-width: 800px;
+        }
+        .option-group {
+            margin: 5px 10px;
+            padding: 5px;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            width: 180px;
+        }
+        .option-group label {
+            margin-bottom: 3px;
+            font-size: 14px;
+        }
+        .zoom-controls {
+            margin: 10px 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .canvas-container {
+            max-width: 100%;
+            overflow: auto;
+            margin-top: 10px;
+            border: 1px solid #ccc;
+            box-shadow: 0 0 5px rgba(0,0,0,0.2);
+        }
+    </style>
+<style>
+/* ============================================================================
+ * EduToolbox 组件化挂载兜底（自动追加）
+ * ----------------------------------------------------------------------------
+ * 本工具未引入 assets/css/tool-common.css，挂载进站点（Shadow DOM）后会缺少：
+ *   1) 六色主题变量 --primary / --primary-soft / --primary-grad
+ *   2) .container 的宽度约束（否则内容铺满并贴边）
+ * 这里补齐最小等价集，保证「独立打开」与「站点内组件化挂载」视觉一致。
+ * ========================================================================== */
+
+:root,
+:host,
+body[data-theme="sky"]   { --primary:#0ea5e9; --primary-soft:#e0f2fe; --primary-soft-2:#ccecfc; --primary-grad:linear-gradient(135deg,#38bdf8,#0ea5e9,#0284c7); }
+body[data-theme="violet"]{ --primary:#7c3aed; --primary-soft:#f0e9fe; --primary-soft-2:#e2d5fc; --primary-grad:linear-gradient(135deg,#8b5cf6,#7c3aed,#6d28d9); }
+body[data-theme="green"] { --primary:#16a34a; --primary-soft:#e7f6ec; --primary-soft-2:#d3f0dc; --primary-grad:linear-gradient(135deg,#22c55e,#16a34a,#15803d); }
+body[data-theme="gold"]  { --primary:#d97706; --primary-soft:#fdf1dc; --primary-soft-2:#fbe3bc; --primary-grad:linear-gradient(135deg,#f59e0b,#d97706,#b45309); }
+body[data-theme="orange"]{ --primary:#ea580c; --primary-soft:#ffefe4; --primary-soft-2:#ffdec9; --primary-grad:linear-gradient(135deg,#fb923c,#ea580c,#c2410c); }
+body[data-theme="pink"]  { --primary:#db2777; --primary-soft:#fce7f0; --primary-soft-2:#f9cfe1; --primary-grad:linear-gradient(135deg,#f472b6,#db2777,#be185d); }
+
+/* 容器宽度兜底：仅在工具自身未声明时生效（不覆盖已有 .container 规则） */
+.container:not([data-no-fallback]) {
+  width: 100%;
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 28px 24px 56px;
+  box-sizing: border-box;
+}
+</style>
+</head>
+<body>
+    <div class="container">
+        <h1>水印添加工具</h1>
+        <input type="file" id="upload" accept="image/*">
+        <input type="text" id="watermark-text" placeholder="输入水印文字">
+        <div class="options">
+            <div class="option-group">
+                <label for="font-size">文字大小：<span id="font-size-value">20</span>px</label>
+                <input type="range" id="font-size" min="10" max="100" value="20" step="1">
+            </div>
+            <div class="option-group">
+                <label for="rotation">旋转角度（度）：</label>
+                <input type="number" id="rotation" value="-45" step="1">
+            </div>
+            <div class="option-group">
+                <label for="font-family">字体：</label>
+                <select id="font-family">
+                    <option value="Arial" selected>Arial</option>
+                    <option value="Times New Roman">Times New Roman</option>
+                    <option value="Courier New">Courier New</option>
+                    <option value="Verdana">Verdana</option>
+                </select>
+            </div>
+            <div class="option-group">
+                <label for="opacity">透明度（0-100）：</label>
+                <input type="range" id="opacity" min="0" max="100" value="50">
+            </div>
+            <div class="option-group">
+                <label for="horizontal-spacing">水平间距（像素）：</label>
+                <input type="number" id="horizontal-spacing" value="50" min="10" step="10">
+            </div>
+            <div class="option-group">
+                <label for="vertical-spacing">行间距（像素）：</label>
+                <input type="number" id="vertical-spacing" value="100" min="10" step="10">
+            </div>
+            <div class="option-group">
+                <label for="font-color">字体颜色：</label>
+                <input type="color" id="font-color" value="#FFFFFF">
+            </div>
+        </div>
+        <button id="add-watermark">添加水印</button>
+        <div class="zoom-controls">
+            <label for="zoom">缩放：<span id="zoom-value">100</span>%</label>
+            <input type="range" id="zoom" min="10" max="200" value="100" step="5">
+            <button id="fit-screen">适应屏幕</button>
+        </div>
+        <div class="canvas-container">
+            <canvas id="canvas"></canvas>
+        </div>
+        <button id="download" style="display: none;">下载图片</button>
+    </div>
+    <script src="../../assets/js/frame-bridge.js"></script>
+<script>
+        let originalImage = null;
+        let currentZoom = 100;
+        let lastAppliedWatermark = null;
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        // 更新字体大小显示
+        document.getElementById('font-size').addEventListener('input', function() {
+            document.getElementById('font-size-value').textContent = this.value;
+            if (originalImage && document.getElementById('watermark-text').value) {
+                applyWatermark();
+            }
+        });
+        // 更新缩放比例显示
+        document.getElementById('zoom').addEventListener('input', function() {
+            currentZoom = parseInt(this.value);
+            document.getElementById('zoom-value').textContent = currentZoom;
+            applyZoom();
+        });
+        // 适应屏幕按钮
+        document.getElementById('fit-screen').addEventListener('click', function() {
+            if (!originalImage) return;
+            
+            const container = document.querySelector('.canvas-container');
+            const containerWidth = container.clientWidth;
+            const containerHeight = window.innerHeight * 0.6; // 使用屏幕高度的60%作为最大高度
+            
+            const imageRatio = originalImage.width / originalImage.height;
+            let newZoom = 100;
+            
+            if (originalImage.width > containerWidth) {
+                newZoom = (containerWidth / originalImage.width) * 100;
+            }
+            
+            if (originalImage.height * (newZoom / 100) > containerHeight) {
+                newZoom = (containerHeight / originalImage.height) * 100;
+            }
+            
+            document.getElementById('zoom').value = newZoom;
+            document.getElementById('zoom-value').textContent = Math.round(newZoom);
+            currentZoom = newZoom;
+            applyZoom();
+        });
+        // 应用缩放
+        function applyZoom() {
+            if (!originalImage) return;
+            
+            const scaleFactor = currentZoom / 100;
+            canvas.style.width = `${originalImage.width * scaleFactor}px`;
+            canvas.style.height = `${originalImage.height * scaleFactor}px`;
+            
+            // 如果已经应用了水印，重新应用
+            if (lastAppliedWatermark) {
+                applyWatermark();
+            } else {
+                // 只重绘原图
+                redrawOriginalImage();
+            }
+        }
+        // 重绘原图
+        function redrawOriginalImage() {
+            if (!originalImage) return;
+            
+            // 保持canvas的实际尺寸为原图尺寸
+            canvas.width = originalImage.width;
+            canvas.height = originalImage.height;
+            
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.drawImage(originalImage, 0, 0, canvas.width, canvas.height);
+        }
+        // 应用水印
+        function applyWatermark() {
+            if (!originalImage) {
+                alert('请先上传图片');
+                return;
+            }
+            const text = document.getElementById('watermark-text').value;
+            if (!text) {
+                alert('请输入水印文字');
+                return;
+            }
+            
+            // 保存当前水印设置
+            lastAppliedWatermark = {
+                text: text,
+                fontSize: document.getElementById('font-size').value,
+                rotation: parseFloat(document.getElementById('rotation').value),
+                fontFamily: document.getElementById('font-family').value,
+                opacity: parseInt(document.getElementById('opacity').value) / 100,
+                horizontalSpacing: parseInt(document.getElementById('horizontal-spacing').value),
+                verticalSpacing: parseInt(document.getElementById('vertical-spacing').value),
+                fontColor: document.getElementById('font-color').value
+            };
+            
+            // 重绘原图
+            redrawOriginalImage();
+            
+            // 设置水印样式
+            ctx.font = `${lastAppliedWatermark.fontSize}px ${lastAppliedWatermark.fontFamily}`;
+            ctx.fillStyle = `rgba(${parseInt(lastAppliedWatermark.fontColor.slice(1, 3), 16)}, ${parseInt(lastAppliedWatermark.fontColor.slice(3, 5), 16)}, ${parseInt(lastAppliedWatermark.fontColor.slice(5, 7), 16)}, ${lastAppliedWatermark.opacity})`;
+            ctx.textBaseline = 'middle';
+            ctx.save();
+            
+            // 移动到 canvas 中心并旋转
+            ctx.translate(canvas.width / 2, canvas.height / 2);
+            const angle = lastAppliedWatermark.rotation * Math.PI / 180;
+            ctx.rotate(angle);
+            
+            // 计算水印布局
+            const textWidth = ctx.measureText(text).width;
+            const diagonal = Math.sqrt(canvas.width * canvas.width + canvas.height * canvas.height);
+            const cols = Math.ceil(diagonal / (textWidth + lastAppliedWatermark.horizontalSpacing));
+            const rows = Math.ceil(diagonal / lastAppliedWatermark.verticalSpacing);
+            
+            // 绘制水印
+            for (let i = -rows; i < rows; i++) {
+                for (let j = -cols; j < cols; j++) {
+                    const x = j * (textWidth + lastAppliedWatermark.horizontalSpacing);
+                    const y = i * lastAppliedWatermark.verticalSpacing;
+                    ctx.fillText(text, x, y);
+                }
+            }
+            ctx.restore();
+            document.getElementById('download').style.display = 'inline-block';
+        }
+        // 上传图片
+        document.getElementById('upload').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                const img = new Image();
+                img.onload = function() {
+                    originalImage = img;
+                    // 重置缩放
+                    currentZoom = 100;
+                    document.getElementById('zoom').value = 100;
+                    document.getElementById('zoom-value').textContent = 100;
+                    
+                    // 重绘原图
+                    redrawOriginalImage();
+                    
+                    // 显示 canvas 和容器
+                    canvas.style.display = 'block';
+                    document.querySelector('.canvas-container').style.display = 'block';
+                    document.getElementById('download').style.display = 'none';
+                    
+                    // 自动适应屏幕
+                    document.getElementById('fit-screen').click();
+                    
+                    // 清除上次应用的水印记录
+                    lastAppliedWatermark = null;
+                };
+                img.src = event.target.result;
+            };
+            reader.readAsDataURL(file);
+        });
+        // 添加水印按钮
+        document.getElementById('add-watermark').addEventListener('click', applyWatermark);
+        // 实时预览的事件监听
+        const realTimePreviewElements = [
+            'rotation', 'font-family', 'opacity', 
+            'horizontal-spacing', 'vertical-spacing', 'font-color'
+        ];
+        
+        realTimePreviewElements.forEach(id => {
+            document.getElementById(id).addEventListener('input', function() {
+                if (originalImage && document.getElementById('watermark-text').value) {
+                    applyWatermark();
+                }
+            });
+        });
+        
+        // 水印文字输入实时预览
+        document.getElementById('watermark-text').addEventListener('input', function() {
+            if (originalImage && this.value) {
+                applyWatermark();
+            }
+        });
+        // 下载图片
+        document.getElementById('download').addEventListener('click', function() {
+            const dataURL = canvas.toDataURL('image/png');
+            const a = document.createElement('a');
+            a.href = dataURL;
+            a.download = 'watermarked-image.png';
+            a.click();
+        });
+    </script>
+</body>
+</html>

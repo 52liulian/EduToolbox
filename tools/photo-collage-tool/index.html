@@ -1,0 +1,2284 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', 'Microsoft YaHei', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+            min-height: 100vh;
+            padding: 20px;
+            animation: backgroundShift 10s ease-in-out infinite alternate;
+        }
+
+        @keyframes backgroundShift {
+            0% { background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%); }
+            100% { background: linear-gradient(135deg, #f093fb 0%, #f5576c 50%, #4facfe 100%); }
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 25px;
+            padding: 40px;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        .header h1 {
+            color: #333;
+            font-size: 3em;
+            margin-bottom: 15px;
+            background: linear-gradient(45deg, #667eea, #764ba2, #f093fb);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: 800;
+            text-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .header p {
+            color: #666;
+            font-size: 1.2em;
+            margin-bottom: 20px;
+        }
+
+        .mode-selector {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .mode-card {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            padding: 20px 30px;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            min-width: 200px;
+            border: 3px solid transparent;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .mode-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            transition: all 0.6s;
+        }
+
+        .mode-card:hover::before {
+            left: 100%;
+        }
+
+        .mode-card:hover {
+            transform: translateY(-5px) scale(1.05);
+            box-shadow: 0 15px 30px rgba(102, 126, 234, 0.4);
+        }
+
+        .mode-card.active {
+            background: linear-gradient(45deg, #f093fb, #f5576c);
+            border-color: #fff;
+            box-shadow: 0 10px 25px rgba(240, 147, 251, 0.4);
+        }
+
+        .mode-card h3 {
+            font-size: 1.3em;
+            margin-bottom: 8px;
+        }
+
+        .mode-card p {
+            font-size: 0.9em;
+            opacity: 0.9;
+        }
+        
+        .controls-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+
+        .control-section {
+            background: linear-gradient(145deg, #f8f9fa, #e9ecef);
+            padding: 25px;
+            border-radius: 20px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            transition: all 0.3s ease;
+        }
+
+        .control-section:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+        }
+
+        .control-section h3 {
+            color: #333;
+            font-size: 1.4em;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .control-group {
+            margin-bottom: 20px;
+        }
+        
+        .control-group label {
+            display: block;
+            font-weight: 600;
+            color: #333;
+            font-size: 1em;
+            margin-bottom: 8px;
+        }
+        
+        .control-group input, .control-group select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e1e5e9;
+            border-radius: 10px;
+            font-size: 1em;
+            transition: all 0.3s ease;
+            background: white;
+        }
+        
+        .control-group input:focus, .control-group select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+            transform: translateY(-1px);
+        }
+
+        .input-group {
+            display: flex;
+            gap: 10px;
+        }
+
+        .input-group input {
+            flex: 1;
+        }
+        
+        .file-input-wrapper {
+            position: relative;
+            overflow: hidden;
+            width: 100%;
+        }
+        
+        .file-input-wrapper input[type=file] {
+            position: absolute;
+            left: -9999px;
+        }
+        
+        .file-input-label {
+            display: block;
+            padding: 15px 25px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border-radius: 12px;
+            cursor: pointer;
+            text-align: center;
+            font-weight: 600;
+            font-size: 1.1em;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .file-input-label::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            transition: all 0.6s;
+        }
+
+        .file-input-label:hover::before {
+            left: 100%;
+        }
+        
+        .file-input-label:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn {
+            padding: 15px 30px;
+            background: linear-gradient(45deg, #f093fb, #f5576c);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 1.1em;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            transition: all 0.6s;
+        }
+
+        .btn:hover::before {
+            left: 100%;
+        }
+        
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(240, 147, 251, 0.4);
+        }
+        
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .btn-secondary {
+            background: linear-gradient(45deg, #6c757d, #495057);
+        }
+
+        .btn-secondary:hover {
+            box-shadow: 0 10px 25px rgba(108, 117, 125, 0.4);
+        }
+        
+        .preview-section {
+            margin-top: 40px;
+            background: linear-gradient(145deg, #f8f9fa, #e9ecef);
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        }
+        
+        .preview-section h3 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .preview-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+        
+        .preview-item {
+            text-align: center;
+            padding: 15px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            border: 2px solid #e1e5e9;
+        }
+
+        .preview-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+            border-color: #667eea;
+        }
+        
+        .preview-item img {
+            width: 80px;
+            height: 110px;
+            object-fit: cover;
+            border-radius: 8px;
+            border: 2px solid #e1e5e9;
+        }
+        
+        .preview-item span {
+            display: block;
+            margin-top: 10px;
+            font-size: 0.85em;
+            color: #666;
+            font-weight: 500;
+        }
+
+        .preview-item .size-info {
+            font-size: 0.75em;
+            color: #888;
+            margin-top: 5px;
+        }
+
+        .canvas-container {
+            margin-top: 30px;
+            text-align: center;
+            padding: 30px;
+            background: linear-gradient(145deg, #f8f9fa, #e9ecef);
+            border-radius: 20px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        }
+        
+        .canvas-container canvas {
+            border: 3px solid #e1e5e9;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            max-width: 100%;
+            height: auto;
+            background: white;
+        }
+        
+        .download-section {
+            margin-top: 25px;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .info-box {
+            background: linear-gradient(145deg, #e3f2fd, #bbdefb);
+            border-left: 5px solid #2196f3;
+            padding: 20px;
+            margin: 25px 0;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(33, 150, 243, 0.2);
+        }
+        
+        .info-box h4 {
+            color: #1976d2;
+            margin-bottom: 10px;
+            font-size: 1.2em;
+        }
+        
+        .info-box p {
+            color: #424242;
+            line-height: 1.6;
+        }
+
+        .warning-box {
+            background: linear-gradient(145deg, #fff3cd, #ffeaa7);
+            border-left: 5px solid #ffc107;
+        }
+
+        .warning-box h4 {
+            color: #856404;
+        }
+
+        .success-box {
+            background: linear-gradient(145deg, #d4edda, #c3e6cb);
+            border-left: 5px solid #28a745;
+        }
+
+        .success-box h4 {
+            color: #155724;
+        }
+
+        .generate-section {
+            text-align: center;
+            margin: 40px 0;
+            padding: 30px;
+            background: linear-gradient(145deg, #f8f9fa, #e9ecef);
+            border-radius: 20px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .advanced-controls {
+            display: none;
+            margin-top: 20px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.7);
+            border-radius: 15px;
+            border: 2px dashed #ccc;
+        }
+
+        .toggle-advanced {
+            background: linear-gradient(45deg, #6c757d, #495057);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9em;
+            margin-bottom: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .toggle-advanced:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(108, 117, 125, 0.3);
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 25px;
+            }
+            
+            .controls-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .header h1 {
+                font-size: 2.2em;
+            }
+
+            .mode-selector {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .mode-card {
+                width: 100%;
+                max-width: 300px;
+            }
+        }
+
+        .photo-size-selector {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .size-option {
+            padding: 8px 12px;
+            background: white;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            cursor: pointer;
+            text-align: center;
+            font-size: 0.9em;
+            transition: all 0.3s ease;
+        }
+
+        .size-option:hover {
+            border-color: #667eea;
+            background: #f8f9ff;
+        }
+
+        .size-option.active {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        .layout-preview {
+            margin-top: 15px;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 10px;
+            font-size: 0.9em;
+            color: #666;
+        }
+
+                @keyframes pulseGlow {
+            0% { box-shadow: 0 0 0 0 rgba(102, 126, 234, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(102, 126, 234, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(102, 126, 234, 0); }
+        }
+        
+        .btn:hover {
+            animation: pulseGlow 1.5s infinite;
+        }
+        
+        /* 拖拽上传区域 */
+        .drop-zone {
+            border: 3px dashed #ccc;
+            border-radius: 15px;
+            padding: 40px;
+            text-align: center;
+            transition: all 0.3s ease;
+            background: linear-gradient(145deg, #f8f9fa, #e9ecef);
+            margin: 20px 0;
+        }
+        
+        .drop-zone.dragover {
+            border-color: #667eea;
+            background: linear-gradient(145deg, #e3f2fd, #bbdefb);
+            transform: scale(1.02);
+        }
+        
+        .drop-zone-text {
+            font-size: 1.2em;
+            color: #666;
+            margin-bottom: 15px;
+        }
+        
+        .drop-zone-subtext {
+            font-size: 0.9em;
+            color: #888;
+        }
+        
+        /* 进度条样式 */
+        .progress-container {
+            width: 100%;
+            height: 8px;
+            background: #e1e5e9;
+            border-radius: 4px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            border-radius: 4px;
+            transition: width 0.3s ease;
+            position: relative;
+        }
+        
+        .progress-bar::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            animation: shimmer 2s infinite;
+        }
+        
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+        
+        /* 照片预览增强 */
+        .preview-item {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .preview-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, transparent, rgba(102, 126, 234, 0.1), transparent);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .preview-item:hover::before {
+            opacity: 1;
+        }
+        
+        .preview-item img {
+            transition: transform 0.3s ease;
+        }
+        
+        .preview-item:hover img {
+            transform: scale(1.05);
+        }
+        
+        /* 成本节省显示 */
+        .cost-savings {
+            background: linear-gradient(145deg, #d4edda, #c3e6cb);
+            border: 2px solid #28a745;
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: center;
+        }
+        
+        .cost-savings h4 {
+            color: #155724;
+            font-size: 1.3em;
+            margin-bottom: 10px;
+        }
+        
+        .cost-savings .savings-amount {
+            font-size: 2em;
+            font-weight: bold;
+            color: #28a745;
+            margin: 10px 0;
+        }
+        
+        .cost-savings .savings-detail {
+            color: #155724;
+            font-size: 0.9em;
+        }
+        
+        /* 布局优化指示器 */
+        .layout-efficiency {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 15px 0;
+        }
+        
+        .efficiency-bar {
+            flex: 1;
+            height: 6px;
+            background: #e1e5e9;
+            border-radius: 3px;
+            overflow: hidden;
+        }
+        
+        .efficiency-fill {
+            height: 100%;
+            background: linear-gradient(45deg, #28a745, #20c997);
+            border-radius: 3px;
+            transition: width 0.5s ease;
+        }
+        
+        .efficiency-text {
+            font-weight: bold;
+            color: #28a745;
+        }
+        
+        /* 照片尺寸预览 */
+        .size-preview {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 10px;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.7);
+            border-radius: 8px;
+        }
+        
+        .size-preview-box {
+            width: 30px;
+            height: 40px;
+            background: linear-gradient(145deg, #667eea, #764ba2);
+            border-radius: 3px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 0.7em;
+            font-weight: bold;
+        }
+        
+        /* 打印预览模式 */
+        .print-preview {
+            background: white;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            margin: 20px auto;
+            position: relative;
+        }
+        
+        .print-preview::before {
+            content: '打印预览';
+            position: absolute;
+            top: -30px;
+            left: 0;
+            font-size: 0.9em;
+            color: #666;
+            font-weight: bold;
+        }
+        
+        /* 响应式优化 */
+        @media (max-width: 480px) {
+            .header h1 {
+                font-size: 1.8em;
+            }
+            
+            .mode-card {
+                min-width: 150px;
+                padding: 15px 20px;
+            }
+            
+            .controls-grid {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+            
+            .input-group {
+                flex-direction: column;
+            }
+            
+            .download-section {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .download-section .btn {
+                width: 100%;
+                max-width: 300px;
+                margin: 5px 0;
+            }
+        }
+        
+        /* 工具提示 */
+        .tooltip {
+            position: relative;
+            cursor: help;
+        }
+        
+        .tooltip::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 0.8em;
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+            z-index: 1000;
+        }
+        
+        .tooltip:hover::after {
+            opacity: 1;
+        }
+        
+        /* 加载状态 */
+        .loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 20px;
+            color: #666;
+        }
+        
+        .loading-spinner {
+            width: 20px;
+            height: 20px;
+            border: 2px solid #e1e5e9;
+            border-top: 2px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .template-section {
+            margin-bottom: 40px;
+            background: linear-gradient(145deg, #ffffff, #f8f9fa);
+            padding: 30px;
+            border-radius: 25px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .template-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+
+        .template-card {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid #e1e5e9;
+            text-align: center;
+        }
+
+        .template-card:hover {
+            transform: translateY(-5px);
+            border-color: #667eea;
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.2);
+        }
+
+        .color-picker-group {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .btn-sm {
+            padding: 8px 16px;
+            font-size: 0.9em;
+        }
+
+
+    </style>
+<style>
+/* ============================================================================
+ * EduToolbox 组件化挂载兜底（自动追加）
+ * ----------------------------------------------------------------------------
+ * 本工具未引入 assets/css/tool-common.css，挂载进站点（Shadow DOM）后会缺少：
+ *   1) 六色主题变量 --primary / --primary-soft / --primary-grad
+ *   2) .container 的宽度约束（否则内容铺满并贴边）
+ * 这里补齐最小等价集，保证「独立打开」与「站点内组件化挂载」视觉一致。
+ * ========================================================================== */
+
+:root,
+:host,
+body[data-theme="sky"]   { --primary:#0ea5e9; --primary-soft:#e0f2fe; --primary-soft-2:#ccecfc; --primary-grad:linear-gradient(135deg,#38bdf8,#0ea5e9,#0284c7); }
+body[data-theme="violet"]{ --primary:#7c3aed; --primary-soft:#f0e9fe; --primary-soft-2:#e2d5fc; --primary-grad:linear-gradient(135deg,#8b5cf6,#7c3aed,#6d28d9); }
+body[data-theme="green"] { --primary:#16a34a; --primary-soft:#e7f6ec; --primary-soft-2:#d3f0dc; --primary-grad:linear-gradient(135deg,#22c55e,#16a34a,#15803d); }
+body[data-theme="gold"]  { --primary:#d97706; --primary-soft:#fdf1dc; --primary-soft-2:#fbe3bc; --primary-grad:linear-gradient(135deg,#f59e0b,#d97706,#b45309); }
+body[data-theme="orange"]{ --primary:#ea580c; --primary-soft:#ffefe4; --primary-soft-2:#ffdec9; --primary-grad:linear-gradient(135deg,#fb923c,#ea580c,#c2410c); }
+body[data-theme="pink"]  { --primary:#db2777; --primary-soft:#fce7f0; --primary-soft-2:#f9cfe1; --primary-grad:linear-gradient(135deg,#f472b6,#db2777,#be185d); }
+
+/* 容器宽度兜底：仅在工具自身未声明时生效（不覆盖已有 .container 规则） */
+.container:not([data-no-fallback]) {
+  width: 100%;
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 28px 24px 56px;
+  box-sizing: border-box;
+}
+</style>
+</head>
+
+
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎨 智能照片拼接大师</h1>
+            <p>多功能照片拼接工具 · 节省成本 · 智能布局 · 专业打印</p>
+        </div>
+
+        <div class="mode-selector">
+            <div class="mode-card active" data-mode="multi">
+                <h3>🏫 多人拼接模式</h3>
+                <p>将多张不同尺寸的照片智能拼接到一张相纸</p>
+            </div>
+            <div class="mode-card" data-mode="repeat">
+                <h3>🔄 单人重复模式</h3>
+                <p>将一张照片重复排版多次，节省洗照片成本</p>
+            </div>
+            <div class="mode-card" data-mode="smart">
+                <h3>🤖 智能混合模式</h3>
+                <p>自动分析照片，智能安排最佳布局</p>
+            </div>
+        </div>
+
+        <div class="template-section">
+            <h3>📋 快速模板</h3>
+            <div class="template-grid">
+                <div class="template-card" onclick="loadTemplate('id_photo')">
+                    <h4>🆔 证件照模板</h4>
+                    <p>标准1寸证件照，蓝色背景</p>
+                </div>
+                <div class="template-card" onclick="loadTemplate('graduation')">
+                    <h4>🎓 毕业照模板</h4>
+                    <p>2寸毕业照，红色背景</p>
+                </div>
+                <div class="template-card" onclick="loadTemplate('passport')">
+                    <h4>✈️ 护照照片模板</h4>
+                    <p>护照规格，白色背景</p>
+                </div>
+                <div class="template-card" onclick="loadTemplate('custom')">
+                    <h4>⚙️ 自定义模板</h4>
+                    <p>保存/加载自定义设置</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="info-box">
+            <h4>🚀 功能特色：</h4>
+            <p>✨ 支持1寸、2寸、3寸、5寸等多种规格混合拼接<br>
+               📐 精确的纸张尺寸计算，完美适配A4、6寸、5寸相纸<br>
+               🎯 智能布局算法，自动优化空间利用率<br>
+               🖨️ 专业打印质量，支持150-600 DPI输出<br>
+               💰 显著节省相纸成本，提高工作效率</p>
+        </div>
+
+        <div class="main-layout" style="display: flex; flex-wrap: wrap; gap: 30px;">
+            <div class="left-panel" style="flex: 1 1 65%;">
+            </div>
+            <div class="right-panel" style="flex: 1 1 30%; display: flex; flex-direction: column; gap: 20px;">
+            </div>
+        </div>
+
+
+        <div class="controls-grid">
+            <div class="control-section">
+                <h3>📄 纸张设置</h3>
+                <div class="control-group">
+                    <label>纸张规格：</label>
+                    <select id="paperSize" onchange="updatePaperSize()">
+                        <option value="a4">A4纸 (21×29.7cm)</option>
+                        <option value="6inch" selected>6寸相纸 (10.2×15.2cm)</option>
+                        <option value="5inch">5寸相纸 (8.9×12.7cm)</option>
+                        <option value="4inch">4寸相纸 (10.2×15.2cm)</option>
+                        <option value="custom">自定义尺寸</option>
+                    </select>
+                </div>
+
+                <div class="control-group">
+                    <label>纸张方向：</label>
+                    <select id="paperOrientation" onchange="updatePaperOrientation()">
+                        <option value="portrait" selected>📄 纵向 (竖版)</option>
+                        <option value="landscape">📄 横向 (横版)</option>
+                    </select>
+                </div>
+                
+                <div class="control-group" id="customSizeGroup" style="display: none;">
+                    <label>自定义纸张尺寸 (厘米)：</label>
+                    <div class="input-group">
+                        <input type="number" id="customWidth" placeholder="宽度" step="0.1" min="5" max="50">
+                        <input type="number" id="customHeight" placeholder="高度" step="0.1" min="5" max="50">
+                    </div>
+                </div>
+                
+                <div class="control-group">
+                    <label>打印DPI：</label>
+                    <select id="printDPI" onchange="calculateLayout()">
+                        <option value="150">150 DPI (快速打印)</option>
+                        <option value="300" selected>300 DPI (标准质量)</option>
+                        <option value="600">600 DPI (高质量)</option>
+                    </select>
+                </div>
+
+                <div class="control-group">
+                    <div style="display: flex; align-items: center; justify-content: space-between;">
+                        <label for="showGrid" style="font-weight: 600; color: #333;" title="生成拼接图时在每张照片边缘显示辅助线，便于裁剪">显示裁剪网格线（打印辅助线）</label>
+                        <input type="checkbox" id="showGrid" onchange="generateCollage()" style="transform: scale(1.2);">
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <label>添加水印：</label>
+                    <div class="watermark-controls">
+                        <input type="text" id="watermarkText" placeholder="输入水印文字">
+                        <select id="watermarkPosition">
+                            <option value="bottom-right">右下角</option>
+                            <option value="bottom-left">左下角</option>
+                            <option value="top-right">右上角</option>
+                            <option value="top-left">左上角</option>
+                            <option value="center">居中</option>
+                        </select>
+                        <input type="range" id="watermarkOpacity" min="10" max="100" value="50">
+                    </div>
+                </div>   
+            </div>
+
+
+            <div class="control-section">
+                <h3>📸 照片设置</h3>
+                <div class="control-group">
+                    <label>选择照片：</label>
+                    <div class="file-input-wrapper">
+                        <input type="file" id="photoInput" multiple accept="image/*">
+                        <label for="photoInput" class="file-input-label">
+                            📁 选择多张照片
+                        </label>
+                    </div>
+                    <div class="drop-zone" id="dropZone">
+                        <div class="drop-zone-text">📁 拖拽照片到这里</div>
+                        <div class="drop-zone-subtext">或点击上方按钮选择文件</div>
+                    </div>
+                </div>
+
+                <div class="control-group" id="photoSizeGroup">
+                    <label>照片规格设置：</label>
+                    <div class="photo-size-selector">
+                        <div class="size-option active" data-size="1inch">1寸</div>
+                        <div class="size-option" data-size="2inch">2寸</div>
+                        <div class="size-option" data-size="3inch">3寸</div>
+                        <div class="size-option" data-size="5inch">5寸</div>
+                    </div>
+                </div>
+
+                <div class="control-group" id="repeatCountGroup" style="display: none;">
+                    <label>重复数量：</label>
+                    <input type="number" id="repeatCount" value="8" min="1" max="50" onchange="calculateLayout()">
+                </div>
+            </div>
+
+            <div class="control-section">
+                <h3>🎨 布局设置</h3>
+                <div class="control-group">
+                    <label>布局模式：</label>
+                    <select id="layoutMode" onchange="calculateLayout()">
+                        <option value="auto" selected>🤖 智能自动布局</option>
+                        <option value="manual">🎯 手动行列设置</option>
+                        <option value="optimal">⚡ 最优空间利用</option>
+                    </select>
+                </div>
+
+                <div class="control-group" id="manualLayoutGroup" style="display: none;">
+                    <label>手动布局：</label>
+                    <div class="input-group">
+                        <select id="rows" onchange="calculateLayout()">
+                            <option value="2">2行</option>
+                            <option value="3">3行</option>
+                            <option value="4" selected>4行</option>
+                            <option value="5">5行</option>
+                            <option value="6">6行</option>
+                        </select>
+                        <select id="cols" onchange="calculateLayout()">
+                            <option value="2" selected>2列</option>
+                            <option value="3">3列</option>
+                            <option value="4">4列</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="control-group">
+                    <label>照片间距 (毫米)：</label>
+                    <input type="number" id="spacing" value="3" min="0" max="10" step="0.5" onchange="calculateLayout()">
+                </div>
+                
+                <div class="control-group">
+                    <label>页面边距 (毫米)：</label>
+                    <input type="number" id="margin" value="5" min="0" max="20" step="0.5" onchange="calculateLayout()">
+                </div>
+
+                <button class="toggle-advanced" onclick="toggleAdvanced()">🔧 高级设置</button>
+                <div class="advanced-controls" id="advancedControls">
+                    <div class="control-group">
+                        <label>背景颜色：</label>
+                        <input type="color" id="bgColor" value="#ffffff" onchange="calculateLayout()">
+                    </div>
+                    <div class="control-group">
+                        <label>边框宽度 (像素)：</label>
+                        <input type="number" id="borderWidth" value="1" min="0" max="5" onchange="calculateLayout()">
+                    </div>
+                </div>
+            </div>
+
+            <div class="control-section">
+                <h3>✂️ 照片编辑</h3>
+                <div class="control-group">
+                    <label>亮度调节：</label>
+                    <input type="range" id="brightness" min="0" max="200" value="100" oninput="applyFilters()">
+                </div>
+                <div class="control-group">
+                    <label>对比度调节：</label>
+                    <input type="range" id="contrast" min="0" max="200" value="100" oninput="applyFilters()">
+                </div>
+                <div class="control-group">
+                    <label>饱和度调节：</label>
+                    <input type="range" id="saturation" min="0" max="200" value="100" oninput="applyFilters()">
+                </div>
+                <div class="control-group">
+                    <label>背景替换：</label>
+                    <div class="color-picker-group">
+                        <input type="color" id="bgColor" value="#ffffff">
+                        <button class="btn btn-sm" onclick="removeBackground()">🎭 智能抠图</button>
+                    </div>
+                </div>
+
+                <h3>⚡ 批量处理</h3>
+                <div class="control-group">
+                    <label>批量重命名：</label>
+                    <div class="input-group">
+                        <input type="text" id="batchNamePrefix" placeholder="前缀名称" value="证件照">
+                        <select id="numberFormat">
+                            <option value="001">001, 002, 003...</option>
+                            <option value="01">01, 02, 03...</option>
+                            <option value="1">1, 2, 3...</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="control-group">
+                    <label>批量压缩：</label>
+                    <div class="input-group">
+                        <input type="range" id="compressionLevel" min="10" max="100" value="85">
+                        <span id="compressionValue">85%</span>
+                    </div>
+                </div>
+                <div class="control-group">
+                    <button class="btn btn-secondary" onclick="batchProcess()">🔄 批量处理</button>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="info-box warning-box" id="layoutInfo">
+            <h4>📐 布局信息：</h4>
+            <p id="layoutDetails">请选择纸张规格和照片后查看布局信息</p>
+        </div>
+
+        <div class="generate-section">
+            <button class="btn" onclick="generateCollage()">🎨 生成拼接图片</button>
+            <button class="btn btn-secondary" onclick="previewLayout()" style="margin-left: 15px;">👁️ 预览布局</button>
+        </div>
+
+        <div class="preview-section" id="previewSection" style="display: none;">
+            <h3>📷 照片预览与设置</h3>
+            <div class="preview-grid" id="previewGrid"></div>
+        </div>
+
+        <div class="canvas-container" id="canvasContainer" style="display: none;">
+            <h3>🖼️ 拼接结果预览</h3>
+            <canvas id="collageCanvas"></canvas>
+            <div class="download-section">
+                <button class="btn" onclick="downloadCollage()">💾 下载高清图片</button>
+                <button class="btn btn-secondary" onclick="downloadPreview()">📱 下载预览图</button>
+                <button class="btn btn-secondary" onclick="downloadPDF()">📄 导出PDF</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="../../assets/js/frame-bridge.js"></script>
+<script>
+        let selectedFiles = [];
+        let loadedImages = [];
+        let currentLayout = {};
+        let currentMode = 'multi';
+        let photoSizes = [];
+        // 历史记录和撤销功能
+        let historyStack = [];
+        let currentHistoryIndex = -1;
+        let savedTemplates = JSON.parse(localStorage.getItem('photoTemplates') || '[]');
+
+        // 照片尺寸定义 (毫米)
+        const photoDimensions = {
+            '1inch': { width: 25, height: 35, name: '一寸' },
+            '2inch': { width: 35, height: 49, name: '二寸' },
+            '3inch': { width: 55, height: 84, name: '三寸' },
+            '5inch': { width: 89, height: 127, name: '五寸' }
+        };
+
+        // 纸张尺寸定义 (毫米)
+        const paperSizes = {
+            'a4': { width: 210, height: 297, name: 'A4纸' },
+            '6inch': { width: 102, height: 152, name: '6寸相纸' },
+            '5inch': { width: 89, height: 127, name: '5寸相纸' },
+            '4inch': { width: 102, height: 152, name: '4寸相纸' }
+        };
+
+        // 模式切换
+        document.querySelectorAll('.mode-card').forEach(card => {
+            card.addEventListener('click', function() {
+                document.querySelectorAll('.mode-card').forEach(c => c.classList.remove('active'));
+                this.classList.add('active');
+                currentMode = this.dataset.mode;
+                updateModeInterface();
+            });
+        });
+
+        // 照片尺寸选择
+        document.querySelectorAll('.size-option').forEach(option => {
+            option.addEventListener('click', function() {
+                if (currentMode === 'multi') {
+                    // 多选模式
+                    this.classList.toggle('active');
+                } else {
+                    // 单选模式
+                    document.querySelectorAll('.size-option').forEach(o => o.classList.remove('active'));
+                    this.classList.add('active');
+                }
+                updatePhotoSizes();
+            });
+        });
+
+
+        // 更新纸张方向
+        function updatePaperOrientation() {
+            const orientation = document.getElementById('paperOrientation').value;
+            const paperSize = document.getElementById('paperSize').value;
+            
+            // 获取标准尺寸
+            let width, height;
+            if (paperSize === 'custom') {
+                width = parseFloat(document.getElementById('customWidth').value) || 152;
+                height = parseFloat(document.getElementById('customHeight').value) || 102;
+            } else {
+                width = paperSizes[paperSize].width;
+                height = paperSizes[paperSize].height;
+            }
+            
+            // 根据选择的方向调整尺寸
+            if (orientation === 'landscape') {
+                // 横向：确保宽 > 高
+                if (width < height) {
+                    [width, height] = [height, width];
+                }
+            } else {
+                // 纵向：确保高 > 宽
+                if (width > height) {
+                    [width, height] = [height, width];
+                }
+            }
+            
+            // 更新输入框显示
+            document.getElementById('customWidth').value = width;
+            document.getElementById('customHeight').value = height;
+            
+            // 重新计算布局
+            calculateLayout();
+        }
+
+        // 获取标准纸张尺寸的函数（如果不存在的话）
+        function getPaperSizes() {
+            return {
+                'a4': { width: 21.0, height: 29.7 },
+                '6inch': { width: 10.2, height: 15.2 },
+                '5inch': { width: 8.9, height: 12.7 },
+                '4inch': { width: 10.2, height: 15.2 }
+            };
+        }
+
+        function updateModeInterface() {
+            const repeatCountGroup = document.getElementById('repeatCountGroup');
+            const photoSizeGroup = document.getElementById('photoSizeGroup');
+            
+            switch(currentMode) {
+                case 'multi':
+                    repeatCountGroup.style.display = 'none';
+                    photoSizeGroup.style.display = 'block';
+                    document.querySelector('label[for="photoInput"]').textContent = '📁 选择多张照片';
+                    break;
+                case 'repeat':
+                    repeatCountGroup.style.display = 'block';
+                    photoSizeGroup.style.display = 'block';
+                    document.querySelector('label[for="photoInput"]').textContent = '📁 选择一张照片';
+                    break;
+                case 'smart':
+                    repeatCountGroup.style.display = 'none';
+                    photoSizeGroup.style.display = 'block';
+                    document.querySelector('label[for="photoInput"]').textContent = '📁 选择照片（自动识别）';
+                    break;
+            }
+            calculateLayout();
+        }
+
+        // 拖拽上传功能
+        function initDragDrop() {
+            const dropZone = document.getElementById('dropZone');
+            
+            if (!dropZone) return;
+            
+            // 防止默认拖拽行为
+            ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                dropZone.addEventListener(eventName, preventDefaults, false);
+                document.body.addEventListener(eventName, preventDefaults, false);
+            });
+            
+            // 高亮拖拽区域
+            ['dragenter', 'dragover'].forEach(eventName => {
+                dropZone.addEventListener(eventName, highlight, false);
+            });
+            
+            ['dragleave', 'drop'].forEach(eventName => {
+                dropZone.addEventListener(eventName, unhighlight, false);
+            });
+            
+            // 处理文件拖放
+            dropZone.addEventListener('drop', handleDrop, false);
+        }
+        
+        function preventDefaults(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+        
+        function highlight(e) {
+            const dropZone = document.getElementById('dropZone');
+            dropZone.classList.add('dragover');
+        }
+        
+        function unhighlight(e) {
+            const dropZone = document.getElementById('dropZone');
+            dropZone.classList.remove('dragover');
+        }
+        
+        function handleDrop(e) {
+            const dt = e.dataTransfer;
+            const files = dt.files;
+            
+            selectedFiles = Array.from(files).filter(file => file.type.startsWith('image/'));
+            
+            if (selectedFiles.length === 0) {
+                alert('请拖拽图片文件！');
+                return;
+            }
+            
+            // 更新文件输入显示
+            const fileInput = document.getElementById('photoInput');
+            const label = document.querySelector('label[for="photoInput"]');
+            label.textContent = `📁 已选择 ${selectedFiles.length} 张照片`;
+            
+            loadImages();
+        }
+        
+        // 在文档加载完成后初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            initDragDrop();
+            updatePhotoSizes();
+            calculateLayout();
+        });
+
+
+        function updatePhotoSizes() {
+            photoSizes = [];
+            document.querySelectorAll('.size-option.active').forEach(option => {
+                photoSizes.push(option.dataset.size);
+            });
+            calculateLayout();
+        }
+
+        function toggleAdvanced() {
+            const advanced = document.getElementById('advancedControls');
+            const btn = document.querySelector('.toggle-advanced');
+            if (advanced.style.display === 'none' || !advanced.style.display) {
+                advanced.style.display = 'block';
+                btn.textContent = '🔧 隐藏高级设置';
+            } else {
+                advanced.style.display = 'none';
+                btn.textContent = '🔧 高级设置';
+            }
+        }
+
+        document.getElementById('photoInput').addEventListener('change', function(e) {
+            selectedFiles = Array.from(e.target.files);
+            loadImages();
+        });
+
+        document.getElementById('layoutMode').addEventListener('change', function() {
+            const manualGroup = document.getElementById('manualLayoutGroup');
+            if (this.value === 'manual') {
+                manualGroup.style.display = 'block';
+            } else {
+                manualGroup.style.display = 'none';
+            }
+            calculateLayout();
+        });
+
+        function updatePaperSize() {
+            const paperSize = document.getElementById('paperSize').value;
+            const customGroup = document.getElementById('customSizeGroup');
+            
+            if (paperSize === 'custom') {
+                customGroup.style.display = 'block';
+            } else {
+                customGroup.style.display = 'none';
+                const sizes = getPaperSizes();
+                document.getElementById('customWidth').value = sizes[paperSize].width;
+                document.getElementById('customHeight').value = sizes[paperSize].height;
+            }
+            
+            // 应用当前选择的方向
+            updatePaperOrientation();
+        }
+
+        function calculateLayout() {
+            const paperSize = document.getElementById('paperSize').value;
+            const spacing = parseFloat(document.getElementById('spacing').value);
+            const margin = parseFloat(document.getElementById('margin').value);
+            const dpi = parseInt(document.getElementById('printDPI').value);
+            const layoutMode = document.getElementById('layoutMode').value;
+
+            let paperWidth, paperHeight;
+    
+            // 获取纸张尺寸
+            if (paperSize === 'custom') {
+                paperWidth = parseFloat(document.getElementById('customWidth').value) || 152;
+                paperHeight = parseFloat(document.getElementById('customHeight').value) || 102;
+            } else {
+                paperWidth = paperSizes[paperSize].width;
+                paperHeight = paperSizes[paperSize].height;
+            }
+
+                // 应用方向设置
+            const orientation = document.getElementById('paperOrientation').value;
+            if (orientation === 'landscape') {
+                if (paperWidth < paperHeight) {
+                    [paperWidth, paperHeight] = [paperHeight, paperWidth];
+                }
+            } else {
+                if (paperWidth > paperHeight) {
+                    [paperWidth, paperHeight] = [paperHeight, paperWidth];
+                }
+            }
+
+            // 根据纸张方向调整宽高
+            function getCurrentPaperSize() {
+                const width = parseFloat(document.getElementById('customWidth').value) || 10.2;
+                const height = parseFloat(document.getElementById('customHeight').value) || 15.2;
+                return { width, height };
+            }
+            
+            // 计算可用空间
+            const availableWidth = paperWidth - (2 * margin);
+            const availableHeight = paperHeight - (2 * margin);
+            
+            // 根据模式计算布局
+            let layout = {};
+            
+            if (currentMode === 'repeat' && photoSizes.length > 0) {
+                layout = calculateRepeatLayout(availableWidth, availableHeight, photoSizes[0], spacing);
+            } else if (currentMode === 'multi' && photoSizes.length > 0) {
+                layout = calculateMultiLayout(availableWidth, availableHeight, photoSizes, spacing);
+            } else if (currentMode === 'smart' && loadedImages.length > 0) {
+                layout = calculateSmartLayout(availableWidth, availableHeight, spacing);
+            }
+            
+            // 更新布局信息显示
+            updateLayoutInfo(layout, paperWidth, paperHeight, dpi);
+            currentLayout = layout;      
+        }
+
+        // 计算重复模式布局
+        function calculateRepeatLayout(availableWidth, availableHeight, photoSize, spacing) {
+            const photoDim = photoDimensions[photoSize];
+            const repeatCount = parseInt(document.getElementById('repeatCount').value) || 8;
+            
+            // 计算最佳行列数
+            let bestLayout = { rows: 1, cols: 1, count: 1, efficiency: 0 };
+            
+            for (let rows = 1; rows <= 10; rows++) {
+                for (let cols = 1; cols <= 10; cols++) {
+                    const totalWidth = (cols * photoDim.width) + ((cols - 1) * spacing);
+                    const totalHeight = (rows * photoDim.height) + ((rows - 1) * spacing);
+                    
+                    if (totalWidth <= availableWidth && totalHeight <= availableHeight) {
+                        const count = rows * cols;
+                        const efficiency = count / repeatCount;
+                        
+                        if (efficiency > bestLayout.efficiency) {
+                            bestLayout = { rows, cols, count, efficiency, totalWidth, totalHeight };
+                        }
+                    }
+                }
+            }
+            
+            return {
+                type: 'repeat',
+                photoSize: photoSize,
+                ...bestLayout,
+                spacing: spacing
+            };
+        }
+        
+        // 计算多人模式布局
+        function calculateMultiLayout(availableWidth, availableHeight, photoSizes, spacing) {
+            // 假设每张照片都是一样规格（第一个选项）
+            const photoSize = photoSizes[0] || '1inch';
+            const photoDim = photoDimensions[photoSize];
+            const totalPhotos = loadedImages.length;
+        
+            let bestLayout = { rows: 1, cols: 1, count: 1, efficiency: 0 };
+        
+            for (let cols = 1; cols <= totalPhotos; cols++) {
+                const rows = Math.ceil(totalPhotos / cols);
+                const totalWidth = cols * photoDim.width + (cols - 1) * spacing;
+                const totalHeight = rows * photoDim.height + (rows - 1) * spacing;
+        
+                if (totalWidth <= availableWidth && totalHeight <= availableHeight) {
+                    const efficiency = totalPhotos / (rows * cols);
+                    if (efficiency > bestLayout.efficiency) {
+                        bestLayout = { rows, cols, count: totalPhotos, efficiency, totalWidth, totalHeight };
+                    }
+                }
+            }
+        
+            return {
+                type: 'multi',
+                photoSize,
+                ...bestLayout,
+                spacing
+            };
+        }
+        
+        // 计算智能模式布局
+        function calculateSmartLayout(availableWidth, availableHeight, spacing) {
+            // 智能分析照片比例，自动选择最佳尺寸
+            const recommendedSize = analyzePhotoRatios();
+            return calculateRepeatLayout(availableWidth, availableHeight, recommendedSize, spacing);
+        }
+        
+        // 分析照片比例
+        function analyzePhotoRatios() {
+            if (loadedImages.length === 0) return '1inch';
+            
+            // 简化版：根据第一张照片的比例推荐尺寸
+            const firstImage = loadedImages[0];
+            const ratio = firstImage.width / firstImage.height;
+            
+            if (ratio > 0.8) return '2inch'; // 接近方形
+            if (ratio > 0.6) return '1inch'; // 标准证件照比例
+            return '3inch'; // 长方形
+        }
+        
+        // 更新布局信息显示
+        function updateLayoutInfo(layout, paperWidth, paperHeight, dpi) {
+            const layoutDetails = document.getElementById('layoutDetails');
+            const layoutInfo = document.getElementById('layoutInfo');
+            
+            if (!layout || !layout.count) {
+                layoutDetails.innerHTML = '请选择照片和设置参数';
+                layoutInfo.className = 'info-box warning-box';
+                return;
+            }
+            
+            const pixelWidth = Math.round(paperWidth * dpi / 25.4);
+            const pixelHeight = Math.round(paperHeight * dpi / 25.4);
+            const photoDim = photoDimensions[layout.photoSize] || photoDimensions['1inch'];
+            
+            // 计算成本节省
+            const costSavings = calculateCostSavings(layout.count);
+            
+            // 更新布局信息类别
+            if (layout.efficiency > 0.8) {
+                layoutInfo.className = 'info-box success-box';
+            } else if (layout.efficiency > 0.5) {
+                layoutInfo.className = 'info-box';
+            } else {
+                layoutInfo.className = 'info-box warning-box';
+            }
+            
+            layoutDetails.innerHTML = `
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                    <div>
+                        <strong>📐 布局方案：</strong>${layout.rows}行×${layout.cols}列<br>
+                        <strong>📸 照片数量：</strong>${layout.count}张<br>
+                        <strong>📏 照片规格：</strong>${photoDim.name} (${photoDim.width}×${photoDim.height}mm)<br>
+                        <strong>📄 纸张尺寸：</strong>${paperWidth}×${paperHeight}mm<br>
+                        <strong>🖨️ 输出分辨率：</strong>${pixelWidth}×${pixelHeight}像素
+                    </div>
+                    <div>
+                        <div class="layout-efficiency">
+                            <span>空间利用率：</span>
+                            <div class="efficiency-bar">
+                                <div class="efficiency-fill" style="width: ${layout.efficiency * 100}%"></div>
+                            </div>
+                            <span class="efficiency-text">${Math.round(layout.efficiency * 100)}%</span>
+                        </div>
+                        ${costSavings.html}
+                    </div>
+                </div>
+            `;
+        }
+        
+        function calculateCostSavings(photoCount) {
+            if (photoCount <= 1) {
+                return {
+                    percentage: 0,
+                    html: '<div style="color: #666;">💡 建议增加照片数量以节省成本</div>'
+                };
+            }
+            
+            const savingsPercentage = Math.round((1 - 1/photoCount) * 100);
+            const costPerPhoto = 0.5; // 假设每张照片成本0.5元
+            const totalSavings = (photoCount - 1) * costPerPhoto;
+            
+            return {
+                percentage: savingsPercentage,
+                html: `
+                    <div class="cost-savings" style="margin: 10px 0; padding: 15px; background: linear-gradient(145deg, #d4edda, #c3e6cb);">
+                        <h4>💰 成本节省：</h4>
+                        <div class="savings-amount">节省约 ${totalSavings.toFixed(2)} 元</div>
+                        <div class="savings-detail">相较于单独打印每张照片，节省约 ${savingsPercentage}% 的成本</div>
+                    </div>
+                `
+            };
+        }
+        
+        // 加载图片
+        async function loadImages() {
+            loadedImages = [];
+            const previewGrid = document.getElementById('previewGrid');
+            const previewSection = document.getElementById('previewSection');
+            
+            previewGrid.innerHTML = '';
+            
+            if (selectedFiles.length === 0) {
+                previewSection.style.display = 'none';
+                return;
+            }
+            
+            previewSection.style.display = 'block';
+            
+            for (let i = 0; i < selectedFiles.length; i++) {
+                const file = selectedFiles[i];
+                
+                try {
+                    const img = await loadImageFromFile(file);
+                    loadedImages.push(img);
+                    
+                    // 创建预览项
+                    const previewItem = document.createElement('div');
+                    previewItem.className = 'preview-item';
+                    previewItem.innerHTML = `
+                        <img src="${img.src}" alt="预览">
+                        <span>${file.name}</span>
+                        <div class="size-info">${img.width}×${img.height}px</div>
+                    `;
+                    
+                    previewGrid.appendChild(previewItem);
+                } catch (error) {
+                    console.error('加载图片失败:', error);
+                }
+            }
+            
+            calculateLayout();
+        }
+        
+        // 从文件加载图片
+        function loadImageFromFile(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const img = new Image();
+                    img.onload = function() {
+                        resolve(img);
+                    };
+                    img.onerror = reject;
+                    img.src = e.target.result;
+                };
+                reader.onerror = reject;
+                reader.readAsDataURL(file);
+            });
+        }
+        
+        // 生成拼接图片
+        function generateCollage() {
+            if (loadedImages.length === 0) {
+                alert('请先选择照片！');
+                return;
+            }
+            
+            if (!currentLayout || !currentLayout.count) {
+                alert('请先计算布局！');
+                return;
+            }
+            
+            const canvas = document.getElementById('collageCanvas');
+            const ctx = canvas.getContext('2d');
+            const dpi = parseInt(document.getElementById('printDPI').value);
+            const paperSize = document.getElementById('paperSize').value;
+            const margin = parseFloat(document.getElementById('margin').value);
+            const spacing = parseFloat(document.getElementById('spacing').value);
+            const bgColor = document.getElementById('bgColor').value;
+            const borderWidth = parseInt(document.getElementById('borderWidth').value);
+
+            // 纸张方向
+            const orientation = document.getElementById('paperOrientation').value;      
+
+            // 获取纸张尺寸
+            let paperWidth, paperHeight;
+            if (paperSize === 'custom') {
+                paperWidth = parseFloat(document.getElementById('customWidth').value) || 152;
+                paperHeight = parseFloat(document.getElementById('customHeight').value) || 102;
+            } else {
+                paperWidth = paperSizes[paperSize].width;
+                paperHeight = paperSizes[paperSize].height;
+            }
+
+            // 🔥 关键修改：根据方向调整纸张尺寸
+            if (orientation === 'landscape') {
+                // 横向：确保宽度大于高度
+                if (paperWidth < paperHeight) {
+                    [paperWidth, paperHeight] = [paperHeight, paperWidth];
+                }
+            } else {
+                // 纵向：确保高度大于宽度  
+                if (paperWidth > paperHeight) {
+                    [paperWidth, paperHeight] = [paperHeight, paperWidth];
+                }
+            }
+            
+            // 设置画布尺寸（像素）
+            const canvasWidth = Math.round(paperWidth * dpi / 25.4);
+            const canvasHeight = Math.round(paperHeight * dpi / 25.4);
+            
+            canvas.width = canvasWidth;
+            canvas.height = canvasHeight;
+            
+            // 设置背景
+            ctx.fillStyle = bgColor;
+            ctx.fillRect(0, 0, canvasWidth, canvasHeight);
+            
+            // 计算照片在画布上的尺寸
+            const photoDim = photoDimensions[currentLayout.photoSize] || photoDimensions['1inch'];
+            const photoWidthPx = Math.round(photoDim.width * dpi / 25.4);
+            const photoHeightPx = Math.round(photoDim.height * dpi / 25.4);
+            const spacingPx = Math.round(spacing * dpi / 25.4);
+            const marginPx = Math.round(margin * dpi / 25.4);
+            
+            // 绘制照片
+            let photoIndex = 0;
+            for (let row = 0; row < currentLayout.rows && photoIndex < currentLayout.count; row++) {
+                for (let col = 0; col < currentLayout.cols && photoIndex < currentLayout.count; col++) {
+                    const x = marginPx + col * (photoWidthPx + spacingPx);
+                    const y = marginPx + row * (photoHeightPx + spacingPx);
+                    
+                    // 选择要绘制的图片
+                    let imgToDraw;
+                    if (currentMode === 'repeat') {
+                        imgToDraw = loadedImages[0]; // 重复模式使用第一张图片
+                    } else {
+                        imgToDraw = loadedImages[photoIndex % loadedImages.length];
+                    }
+                    
+                    if (imgToDraw) {
+                        // 绘制边框
+                        if (borderWidth > 0) {
+                            ctx.fillStyle = '#000000';
+                            ctx.fillRect(x - borderWidth, y - borderWidth, 
+                                        photoWidthPx + 2 * borderWidth, photoHeightPx + 2 * borderWidth);
+                        }
+                        
+                        // 绘制照片（保持比例裁剪）
+                        drawImageCropped(ctx, imgToDraw, x, y, photoWidthPx, photoHeightPx);
+                    }
+                    
+                    photoIndex++;
+                }
+            }
+            
+            // 显示结果
+            document.getElementById('canvasContainer').style.display = 'block';
+            canvas.scrollIntoView({ behavior: 'smooth' });
+        }
+        
+        // 按比例裁剪绘制图片
+        function drawImageCropped(ctx, img, x, y, width, height) {
+            const imgRatio = img.width / img.height;
+            const targetRatio = width / height;
+            
+            let sourceX = 0, sourceY = 0, sourceWidth = img.width, sourceHeight = img.height;
+            
+            if (imgRatio > targetRatio) {
+                // 图片更宽，裁剪左右
+                sourceWidth = img.height * targetRatio;
+                sourceX = (img.width - sourceWidth) / 2;
+            } else {
+                // 图片更高，裁剪上下
+                sourceHeight = img.width / targetRatio;
+                sourceY = (img.height - sourceHeight) / 2;
+            }
+            
+            ctx.drawImage(img, sourceX, sourceY, sourceWidth, sourceHeight, x, y, width, height);
+        }
+
+        if (document.getElementById('showGrid').checked) {
+            ctx.strokeStyle = '#888';
+            ctx.lineWidth = 0.5;
+            ctx.strokeRect(x, y, photoWidthPx, photoHeightPx);
+        }
+        
+        // 预览布局
+        function previewLayout() {
+            calculateLayout();
+            if (currentLayout && currentLayout.count > 0) {
+                const info = document.getElementById('layoutInfo');
+                info.className = 'info-box success-box';
+                info.scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+        
+        // 下载高清图片
+        function downloadCollage() {
+            const canvas = document.getElementById('collageCanvas');
+            if (canvas.width === 0) {
+                alert('请先生成拼接图片！');
+                return;
+            }
+            
+            const link = document.createElement('a');
+            link.download = `照片拼接_${new Date().getTime()}.png`;
+            link.href = canvas.toDataURL('image/png', 1.0);
+            link.click();
+        }
+        
+        // 下载预览图
+        function downloadPreview() {
+            const canvas = document.getElementById('collageCanvas');
+            if (canvas.width === 0) {
+                alert('请先生成拼接图片！');
+                return;
+            }
+            
+            // 创建缩放后的预览图
+            const previewCanvas = document.createElement('canvas');
+            const previewCtx = previewCanvas.getContext('2d');
+            
+            const scale = Math.min(800 / canvas.width, 600 / canvas.height);
+            previewCanvas.width = canvas.width * scale;
+            previewCanvas.height = canvas.height * scale;
+            
+            previewCtx.drawImage(canvas, 0, 0, previewCanvas.width, previewCanvas.height);
+            
+            const link = document.createElement('a');
+            link.download = `照片拼接_预览_${new Date().getTime()}.png`;
+            link.href = previewCanvas.toDataURL('image/jpeg', 0.8);
+            link.click();
+        }
+        
+        function downloadPDF() {
+            const canvas = document.getElementById('collageCanvas');
+            if (canvas.width === 0) {
+                alert('请先生成拼接图片！');
+                return;
+            }
+        
+            const imgData = canvas.toDataURL('image/jpeg', 1.0);
+            const pdf = new jspdf.jsPDF({
+                orientation: canvas.width > canvas.height ? 'l' : 'p',
+                unit: 'px',
+                format: [canvas.width, canvas.height]
+            });
+        
+            pdf.addImage(imgData, 'JPEG', 0, 0, canvas.width, canvas.height);
+            pdf.save(`拼图_${new Date().getTime()}.pdf`);
+        }
+
+        // 初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            updatePhotoSizes();
+            calculateLayout();
+        });
+
+        // 监听键盘快捷键
+        document.addEventListener('keydown', function(e) {
+            if (e.ctrlKey || e.metaKey) {
+                switch(e.key) {
+                    case 'z':
+                        e.preventDefault();
+                        if (e.shiftKey) {
+                            redo();
+                        } else {
+                            undo();
+                        }
+                        break;
+                    case 's':
+                        e.preventDefault();
+                        downloadCollage();
+                        break;
+                    case 'o':
+                        e.preventDefault();
+                        document.getElementById('photoInput').click();
+                        break;
+                }
+            }
+        });
+
+        // 照片编辑功能
+        let currentFilters = {
+            brightness: 100,
+            contrast: 100,
+            saturation: 100
+        };
+
+        function applyFilters() {
+            const brightness = document.getElementById('brightness').value;
+            const contrast = document.getElementById('contrast').value;
+            const saturation = document.getElementById('saturation').value;
+            
+            currentFilters = { brightness, contrast, saturation };
+            
+            // 应用到所有预览图片
+            const previewImages = document.querySelectorAll('.preview-item img');
+            previewImages.forEach(img => {
+                img.style.filter = `brightness(${brightness}%) contrast(${contrast}%) saturate(${saturation}%)`;
+            });
+            
+            // 重新生成拼接图
+            if (photos.length > 0) {
+                generateCollage();
+            }
+        }
+
+        function removeBackground() {
+            showStatus('智能抠图功能开发中，敬请期待！', 'info');
+            // 这里可以集成AI抠图API
+        }
+
+        // 批量处理功能
+        function batchProcess() {
+            const prefix = document.getElementById('batchNamePrefix').value || '照片';
+            const format = document.getElementById('numberFormat').value;
+            const compression = document.getElementById('compressionLevel').value;
+            
+            if (photos.length === 0) {
+                showStatus('请先选择照片', 'error');
+                return;
+            }
+            
+            showProgress('正在批量处理...', 0);
+            
+            photos.forEach((photo, index) => {
+                let fileName;
+                switch(format) {
+                    case '001':
+                        fileName = `${prefix}_${String(index + 1).padStart(3, '0')}`;
+                        break;
+                    case '01':
+                        fileName = `${prefix}_${String(index + 1).padStart(2, '0')}`;
+                        break;
+                    default:
+                        fileName = `${prefix}_${index + 1}`;
+                }
+                
+                photo.fileName = fileName;
+                
+                // 更新进度
+                const progress = ((index + 1) / photos.length) * 100;
+                showProgress(`正在处理: ${fileName}`, progress);
+            });
+            
+            setTimeout(() => {
+                hideProgress();
+                showStatus(`成功处理 ${photos.length} 张照片`, 'success');
+                updatePreview();
+            }, 1000);
+        }
+
+        // 监听压缩滑块变化
+        document.addEventListener('DOMContentLoaded', function() {
+            const compressionSlider = document.getElementById('compressionLevel');
+            const compressionValue = document.getElementById('compressionValue');
+            
+            if (compressionSlider && compressionValue) {
+                compressionSlider.addEventListener('input', function() {
+                    compressionValue.textContent = this.value + '%';
+                });
+            }
+        });
+
+        // 预设模板功能
+        const templates = {
+            id_photo: {
+                name: '证件照模板',
+                photoSize: '1inch',
+                paperSize: '6inch',
+                backgroundColor: '#4285f4',
+                layoutMode: 'grid',
+                spacing: 3,
+                margin: 5
+            },
+            graduation: {
+                name: '毕业照模板',
+                photoSize: '2inch',
+                paperSize: '6inch',
+                backgroundColor: '#dc3545',
+                layoutMode: 'auto',
+                spacing: 4,
+                margin: 8
+            },
+            passport: {
+                name: '护照照片模板',
+                photoSize: '2inch',
+                paperSize: 'a4',
+                backgroundColor: '#ffffff',
+                layoutMode: 'grid',
+                spacing: 5,
+                margin: 10
+            }
+        };
+
+        function loadTemplate(templateId) {
+            if (templateId === 'custom') {
+                showCustomTemplateDialog();
+                return;
+            }
+            
+            const template = templates[templateId];
+            if (!template) return;
+            
+            // 应用模板设置
+            document.getElementById('paperSize').value = template.paperSize;
+            document.getElementById('layoutMode').value = template.layoutMode;
+            document.getElementById('spacing').value = template.spacing;
+            document.getElementById('margin').value = template.margin;
+            
+            // 设置照片规格
+            document.querySelectorAll('.size-option').forEach(option => {
+                option.classList.remove('active');
+                if (option.dataset.size === template.photoSize) {
+                    option.classList.add('active');
+                }
+            });
+            
+            // 设置背景色
+            if (document.getElementById('bgColor')) {
+                document.getElementById('bgColor').value = template.backgroundColor;
+            }
+            
+            // 更新界面
+            updatePaperSize();
+            calculateLayout();
+            
+            showStatus(`已加载模板: ${template.name}`, 'success');
+        }
+
+        function showCustomTemplateDialog() {
+            const templateName = prompt('请输入模板名称:');
+            if (templateName) {
+                saveCustomTemplate(templateName);
+            }
+        }
+
+        function saveCustomTemplate(name) {
+            const template = {
+                name: name,
+                photoSize: document.querySelector('.size-option.active')?.dataset.size || '1inch',
+                paperSize: document.getElementById('paperSize').value,
+                layoutMode: document.getElementById('layoutMode').value,
+                spacing: document.getElementById('spacing').value,
+                margin: document.getElementById('margin').value,
+                timestamp: Date.now()
+            };
+            
+            savedTemplates.push(template);
+            localStorage.setItem('photoTemplates', JSON.stringify(savedTemplates));
+            showStatus(`模板 "${name}" 已保存`, 'success');
+        }
+
+        // 历史记录和撤销功能
+        let photos = []; // 确保photos数组已定义
+
+        function getCurrentSettings() {
+            return {
+                paperSize: document.getElementById('paperSize').value,
+                layoutMode: document.getElementById('layoutMode').value,
+                spacing: document.getElementById('spacing').value,
+                margin: document.getElementById('margin').value,
+                printDPI: document.getElementById('printDPI').value,
+                filters: {...currentFilters}
+            };
+        }
+
+        function saveToHistory() {
+            const currentState = {
+                timestamp: Date.now(),
+                settings: getCurrentSettings(),
+                photos: JSON.parse(JSON.stringify(photos)) // 深拷贝
+            };
+            
+            // 清除当前位置之后的历史记录
+            historyStack = historyStack.slice(0, currentHistoryIndex + 1);
+            historyStack.push(currentState);
+            currentHistoryIndex = historyStack.length - 1;
+            
+            // 限制历史记录数量
+            if (historyStack.length > 20) {
+                historyStack.shift();
+                currentHistoryIndex--;
+            }
+            
+            updateHistoryButtons();
+        }
+
+        function restoreFromHistory(state) {
+            // 恢复设置
+            const settings = state.settings;
+            document.getElementById('paperSize').value = settings.paperSize;
+            document.getElementById('layoutMode').value = settings.layoutMode;
+            document.getElementById('spacing').value = settings.spacing;
+            document.getElementById('margin').value = settings.margin;
+            document.getElementById('printDPI').value = settings.printDPI;
+            
+            // 恢复滤镜
+            if (settings.filters) {
+                currentFilters = settings.filters;
+                if (document.getElementById('brightness')) {
+                    document.getElementById('brightness').value = settings.filters.brightness;
+                    document.getElementById('contrast').value = settings.filters.contrast;
+                    document.getElementById('saturation').value = settings.filters.saturation;
+                }
+            }
+            
+            // 恢复照片
+            photos = [...state.photos];
+            
+            // 更新界面
+            updatePaperSize();
+            calculateLayout();
+            updatePreview();
+            applyFilters();
+        }
+
+        function undo() {
+            if (currentHistoryIndex > 0) {
+                currentHistoryIndex--;
+                restoreFromHistory(historyStack[currentHistoryIndex]);
+                updateHistoryButtons();
+                showStatus('已撤销', 'info');
+            }
+        }
+
+        function redo() {
+            if (currentHistoryIndex < historyStack.length - 1) {
+                currentHistoryIndex++;
+                restoreFromHistory(historyStack[currentHistoryIndex]);
+                updateHistoryButtons();
+                showStatus('已重做', 'info');
+            }
+        }
+
+        function updateHistoryButtons() {
+            const undoBtn = document.getElementById('undoBtn');
+            const redoBtn = document.getElementById('redoBtn');
+            
+            if (undoBtn) undoBtn.disabled = currentHistoryIndex <= 0;
+            if (redoBtn) redoBtn.disabled = currentHistoryIndex >= historyStack.length - 1;
+        }
+
+        // 在关键操作后调用saveToHistory()
+        function enhanceExistingFunctions() {
+            // 增强现有的照片选择功能
+            const originalPhotoInput = document.getElementById('photoInput');
+            if (originalPhotoInput) {
+                originalPhotoInput.addEventListener('change', function() {
+                    setTimeout(() => {
+                        saveToHistory();
+                    }, 100);
+                });
+            }
+        }
+
+        // 水印功能
+        function addWatermark(canvas, ctx) {
+            const watermarkText = document.getElementById('watermarkText')?.value;
+            const position = document.getElementById('watermarkPosition')?.value || 'bottom-right';
+            const opacity = (document.getElementById('watermarkOpacity')?.value || 50) / 100;
+            
+            if (!watermarkText) return;
+            
+            // 保存当前canvas状态
+            ctx.save();
+            
+            // 设置水印样式
+            const fontSize = Math.min(canvas.width, canvas.height) * 0.03;
+            ctx.font = `${fontSize}px Arial`;
+            ctx.fillStyle = `rgba(255, 255, 255, ${opacity})`;
+            ctx.strokeStyle = `rgba(0, 0, 0, ${opacity * 0.5})`;
+            ctx.lineWidth = 1;
+            
+            // 计算文字尺寸
+            const textMetrics = ctx.measureText(watermarkText);
+            const textWidth = textMetrics.width;
+            const textHeight = fontSize;
+            
+            // 计算位置
+            let x, y;
+            const padding = 20;
+            
+            switch(position) {
+                case 'top-left':
+                    x = padding;
+                    y = padding + textHeight;
+                    break;
+                case 'top-right':
+                    x = canvas.width - textWidth - padding;
+                    y = padding + textHeight;
+                    break;
+                case 'bottom-left':
+                    x = padding;
+                    y = canvas.height - padding;
+                    break;
+                case 'bottom-right':
+                    x = canvas.width - textWidth - padding;
+                    y = canvas.height - padding;
+                    break;
+                case 'center':
+                    x = (canvas.width - textWidth) / 2;
+                    y = (canvas.height + textHeight) / 2;
+                    break;
+                default:
+                    x = canvas.width - textWidth - padding;
+                    y = canvas.height - padding;
+            }
+            
+            // 绘制水印
+            ctx.strokeText(watermarkText, x, y);
+            ctx.fillText(watermarkText, x, y);
+            
+            // 恢复canvas状态
+            ctx.restore();
+        }
+
+        // 状态提示和进度条
+        function showStatus(message, type = 'info') {
+            const statusContainer = document.getElementById('statusMessages');
+            if (!statusContainer) return;
+            
+            const statusDiv = document.createElement('div');
+            statusDiv.className = `status-message ${type}`;
+            statusDiv.textContent = message;
+            
+            statusContainer.appendChild(statusDiv);
+            
+            // 3秒后自动移除
+            setTimeout(() => {
+                if (statusDiv.parentNode) {
+                    statusDiv.remove();
+                }
+            }, 3000);
+        }
+
+        function showProgress(text, percentage) {
+            const progressContainer = document.getElementById('progressContainer');
+            const progressFill = document.getElementById('progressFill');
+            const progressText = document.getElementById('progressText');
+            
+            if (progressContainer) {
+                progressContainer.style.display = 'block';
+                progressFill.style.width = percentage + '%';
+                progressText.textContent = text;
+            }
+        }
+
+        function hideProgress() {
+            const progressContainer = document.getElementById('progressContainer');
+            if (progressContainer) {
+                progressContainer.style.display = 'none';
+            }
+        }
+
+        // 初始化功能
+        document.addEventListener('DOMContentLoaded', function() {
+            enhanceExistingFunctions();
+            
+            // 添加撤销重做按钮（如果页面上有的话）
+            const undoBtn = document.getElementById('undoBtn');
+            const redoBtn = document.getElementById('redoBtn');
+            
+            if (undoBtn) undoBtn.addEventListener('click', undo);
+            if (redoBtn) redoBtn.addEventListener('click', redo);
+            
+            // 初始化历史记录
+            saveToHistory();
+            
+            showStatus('照片拼接工具已加载完成', 'success');
+        });
+
+
+
+
+    </script>
+    <script src="../../assets/vendor/jspdf.umd.min.js"></script>
+</body>
+</html>
+
+
+
+
+
+
+

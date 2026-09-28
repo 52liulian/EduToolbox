@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>常用2500汉字表 | EduToolbox · 汉字查询学习</title>
+<meta name="description" content="在线常用 2500 汉字查询与学习工具，支持拼音标注、笔画筛选、字号调节、全屏展示，适合语文教学、识字训练与基础汉字记忆场景。">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%8E%93%3C/text%3E%3C/svg%3E">
+<link rel="stylesheet" href="common-2500-hanzi.css">
+<link rel="stylesheet" href="../../assets/css/tool-common.css">
+</head>
+<body>
+
+  <!-- ===================== 主体 ===================== -->
+  <main class="container" id="appRoot">
+
+    <!-- 工具区：搜索 + 设置开关 -->
+    <section class="toolbar" id="toolbar">
+      <div class="search-wrap">
+        <span class="search-icon">🔍</span>
+        <input
+          type="text"
+          id="searchInput"
+          placeholder="输入汉字或拼音搜索，如：我 / wǒ / wo"
+          autocomplete="off"
+          spellcheck="false">
+        <button class="search-clear" id="searchClear" hidden>✕</button>
+      </div>
+
+      <div class="tool-actions">
+        <label class="toggle" title="开启/关闭拼音标注">
+          <input type="checkbox" id="pinyinToggle" checked>
+          <span>拼音</span>
+        </label>
+
+        <div class="font-ctrl" title="字号调节">
+          <span class="font-label">字号</span>
+          <button class="font-btn" id="fontDec" aria-label="减小字号">A-</button>
+          <span class="font-size-val" id="fontSizeVal">64</span>
+          <button class="font-btn" id="fontInc" aria-label="增大字号">A+</button>
+        </div>
+
+        <button class="action-btn" id="copyBtn" title="复制当前结果">📋 复制</button>
+      </div>
+    </section>
+
+    <!-- 统计与笔画筛选 -->
+    <section class="filter-bar">
+      <div class="stats" id="stats">共 0 字</div>
+      <div class="strokes-filter" id="strokesFilter"><!-- JS 注入 --></div>
+    </section>
+
+    <!-- 汉字网格 -->
+    <section class="grid-wrap">
+      <div class="stage-toolbar">
+        <button type="button" class="icon-btn" id="fullscreenBtn" title="全屏">⛶</button>
+        <button type="button" class="icon-btn" id="hideSetupBtn" title="隐藏设置">⚙</button>
+      </div>
+      <div class="grid" id="grid"></div>
+      <div class="state state--compact state--empty" id="emptyState" hidden><div class="state-icon">📚</div><div class="state-title">未找到匹配的汉字</div></div>
+    </section>
+
+    <!-- 分页 -->
+    <section class="pagination" id="pagination"><!-- JS 注入 --></section>
+  </main>
+
+  <!-- ===================== 汉字详情弹窗 ===================== -->
+  <div class="modal-mask" id="modalMask" hidden>
+    <div class="modal" id="modal" role="dialog" aria-modal="true">
+      <button class="modal-close" id="modalClose" aria-label="关闭">✕</button>
+      <div class="modal-char" id="modalChar">—</div>
+      <div class="modal-pinyin" id="modalPinyin">—</div>
+      <ul class="modal-meta">
+        <li><span class="meta-key">笔画数</span><span class="meta-val" id="modalStrokes">—</span></li>
+        <li><span class="meta-key">部首</span><span class="meta-val" id="modalRadical">—</span></li>
+        <li><span class="meta-key">释义</span><span class="meta-val" id="modalDef">—</span></li>
+      </ul>
+      <div class="modal-hint">提示：本工具仅收录字形、拼音等基础信息；释义以《现代汉语词典》为准。</div>
+    </div>
+  </div>
+
+  <!-- ===================== Toast 提示 ===================== -->
+  <div class="toast" id="toast" hidden></div>
+
+  <!-- ===================== 依赖 ===================== -->
+  <script src="../../assets/js/frame-bridge.js"></script>
+<script src="../../assets/vendor/pinyin-pro.min.js"></script>
+  <script src="../../assets/js/tool-stage-toolbar.js"></script>
+  <script src="common-2500-hanzi.js"></script>
+</body>
+</html>

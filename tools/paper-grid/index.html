@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>备课本/方格纸生成 | EduToolbox · 稿纸打印</title>
+<meta name="description" content="在线生成可打印稿纸：横线本、方格本、田字格、米字格、作文格，支持 A4/A5/B5 纸张、页边距与行高格宽调节、页眉页脚，一键打印或下载 SVG。">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%96%A8%3C/text%3E">
+<link rel="stylesheet" href="../../assets/css/tool-common.css">
+<link rel="stylesheet" href="paper-grid.css">
+<style id="pageRule"></style>
+</head>
+<body>
+
+<div class="container">
+  <div class="workbench">
+    <!-- ======================= 左侧设置面板 ======================= -->
+    <aside class="panel setup-panel">
+      <div class="block">
+        <h2 class="block-title">① 纸张与版式</h2>
+        <div class="chips chips-mini" id="paperChips">
+          <button type="button" class="chip active" data-paper="A4">A4 210×297</button>
+          <button type="button" class="chip" data-paper="A5">A5 148×210</button>
+          <button type="button" class="chip" data-paper="B5">B5 176×250</button>
+        </div>
+        <div class="chips chips-mini" id="typeChips">
+          <button type="button" class="chip active" data-type="ruled">📏 横线本</button>
+          <button type="button" class="chip" data-type="grid">🔲 方格本</button>
+          <button type="button" class="chip" data-type="tian">田 田字格</button>
+          <button type="button" class="chip" data-type="mi">✳ 米字格</button>
+          <button type="button" class="chip" data-type="compose">📝 作文格</button>
+        </div>
+
+        <div class="setting-row">
+          <label for="marginVal">页边距 (mm)</label>
+          <input type="number" id="marginVal" value="15" min="5" max="40" step="1">
+        </div>
+        <div class="setting-row">
+          <label for="sizeVal" id="sizeLabel">行高 (mm)</label>
+          <input type="number" id="sizeVal" value="9" min="4" max="30" step="0.5">
+        </div>
+        <div class="setting-row" id="perRowRow" hidden>
+          <label for="perRowVal">每行格数</label>
+          <input type="number" id="perRowVal" value="20" min="6" max="40" step="1">
+        </div>
+        <div class="setting-row">
+          <label for="lineColor">线条颜色</label>
+          <select id="lineColor">
+            <option value="#c9d4e6">浅灰</option>
+            <option value="#9db8e0" selected>淡蓝</option>
+            <option value="#a9cfae">淡绿</option>
+            <option value="#d8b58a">淡棕</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="block">
+        <h2 class="block-title">② 页眉页脚</h2>
+        <label class="check"><input type="checkbox" id="chkHeader" checked><span>显示页眉（学校/班级/姓名/日期）</span></label>
+        <div class="setting-row" id="titleRow">
+          <label for="headerText">页眉标题</label>
+          <input type="text" id="headerText" value="" maxlength="24" placeholder="可留空，如：五（2）班听写">
+        </div>
+        <label class="check"><input type="checkbox" id="chkPageNum"><span>页脚显示页码</span></label>
+      </div>
+
+      <div class="block">
+        <h2 class="block-title">③ 操作</h2>
+        <div class="actions">
+          <button type="button" class="btn btn-primary" id="btnPrint">🖨️ 打印稿纸</button>
+          <div class="btn-row">
+            <button type="button" class="btn btn-small" id="btnDownload">📥 下载 SVG</button>
+            <button type="button" class="btn btn-small btn-ghost" id="btnReset">↺ 恢复默认</button>
+          </div>
+        </div>
+        <div class="stat-grid pg-stats">
+          <div class="stat-card"><span class="stat-num" id="statSize">A4</span><span class="stat-label">纸张</span></div>
+          <div class="stat-card"><span class="stat-num" id="statRows">0</span><span class="stat-label">行数</span></div>
+          <div class="stat-card"><span class="stat-num" id="statCols">0</span><span class="stat-label">每行格数</span></div>
+          <div class="stat-card"><span class="stat-num" id="statCells">0</span><span class="stat-label">总格数</span></div>
+        </div>
+        <p class="block-hint">打印时请在浏览器打印设置里选择「无边距 / 默认」并关闭页眉页脚，效果最佳。</p>
+      </div>
+    </aside>
+
+    <!-- ======================= 右侧预览 ======================= -->
+    <main class="stage-panel">
+      <div class="stage-toolbar">
+        <button type="button" class="icon-btn" id="fullscreenBtn" title="全屏展示">⛶</button>
+        <button type="button" class="icon-btn" id="hideSetupBtn" title="隐藏设置栏">⚙</button>
+      </div>
+      <div class="stage-head">
+        <h2 class="panel-title">👀 稿纸预览</h2>
+        <span class="stage-ok" id="stageOk">已就绪</span>
+      </div>
+      <div class="paper-wrap" id="paperWrap">
+        <svg id="paperSvg" viewBox="0 0 210 297" xmlns="http://www.w3.org/2000/svg" aria-label="稿纸预览"></svg>
+      </div>
+    </main>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="../../assets/js/frame-bridge.js"></script>
+<script src="../../assets/js/tool-stage-toolbar.js"></script>
+<script src="paper-grid.js"></script>
+</body>
+</html>

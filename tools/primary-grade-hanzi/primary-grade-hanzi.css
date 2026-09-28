@@ -1,0 +1,385 @@
+/* ============================================================================
+ * 小学生字表 · primary-grade-hanzi.css
+ * 仅包含本工具特有样式：册次标签 / 工具条开关 / 生字网格 / 详情弹层 / 全屏大字预览
+ * 公共底座（container、tabs、tab、card、toolbar、grid、icon-btn、btn、empty、
+ *   modal、modal-mask、modal-close、field、field-label 等）见 tool-common.css
+ * 高度策略：网格随字数自然增高，仅 body 主滚动条；详情弹层与全屏预览为投影覆盖层
+ * ========================================================================== */
+
+/* ---------------------------------------------------------------------------
+ * 一、册次标签卡（紧凑内边距）+ 标签内字数
+ * ------------------------------------------------------------------------- */
+.tabs.card { padding: 14px 16px; }
+.tab-count {
+  margin-left: 2px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-3);
+}
+.tab.active .tab-count { color: rgba(255, 255, 255, 0.88); }
+
+/* ---------------------------------------------------------------------------
+ * 二、工具条：拼音开关（自定义 .switch-track 结构）+ 字号 + 字数 + 复制
+ *   公共 .switch 面向 .slider；本工具使用 .switch-track，这里完整重绘
+ * ------------------------------------------------------------------------- */
+.toolbar.card { padding: 16px 20px; }
+.toolbar .field { margin-bottom: 0; }
+.toolbar .field-label {
+  display: inline;
+  margin: 0;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--text-2);
+}
+
+/* 拼音开关：inline-flex 容器（覆盖公共 .switch 的 46×26 固定盒） */
+.toolbar .switch {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  width: auto;
+  height: auto;
+  cursor: pointer;
+  user-select: none;
+}
+.toolbar .switch .switch-track {
+  position: relative;
+  display: inline-block;
+  width: 44px;
+  height: 24px;
+  flex-shrink: 0;
+  background: #c7cfdd;
+  border-radius: 999px;
+  transition: background var(--t-fast) var(--ease);
+}
+.toolbar .switch .switch-track::before {
+  content: "";
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 18px;
+  height: 18px;
+  background: #fff;
+  border-radius: 50%;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  transition: transform var(--t-fast) var(--ease);
+}
+.toolbar .switch input {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 44px;
+  height: 24px;
+  opacity: 0;
+  margin: 0;
+  cursor: pointer;
+  z-index: 2;
+}
+.toolbar .switch input:checked + .switch-track { background: var(--primary); }
+.toolbar .switch input:checked + .switch-track::before { transform: translateX(20px); }
+.toolbar .switch .switch-label {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--text-2);
+}
+
+/* 字号字段 */
+.font-field { display: flex; align-items: center; gap: 8px; }
+.font-value {
+  min-width: 30px;
+  text-align: center;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-1);
+}
+
+/* 字数字段 */
+.count-field { display: flex; align-items: center; gap: 8px; }
+.count-field strong { font-size: 16px; color: var(--primary); }
+
+/* 按钮内图标 */
+.ico { font-size: 15px; }
+
+/* ---------------------------------------------------------------------------
+ * 三、册次标题
+ * ------------------------------------------------------------------------- */
+.grade-title {
+  font-size: 18px;
+  font-weight: 700;
+  margin: 22px 0 14px;
+  color: var(--text-1);
+}
+
+/* ---------------------------------------------------------------------------
+ * 四、生字网格：列宽与字号由 CSS 变量 --cell / --fs 驱动（JS 按字号等级设置）
+ * ------------------------------------------------------------------------- */
+#grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, var(--cell, 66px));
+  gap: 12px;
+  justify-content: start;
+}
+
+.cell {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: var(--cell, 66px);
+  height: var(--cell, 66px);
+  padding: 6px;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  cursor: pointer;
+  transition: transform var(--t-fast) var(--ease),
+              box-shadow var(--t-fast) var(--ease),
+              border-color var(--t-fast) var(--ease);
+}
+.cell:hover {
+  border-color: var(--primary-soft-2);
+  box-shadow: var(--shadow-sm);
+  transform: translateY(-2px);
+}
+
+.py {
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.2;
+  color: var(--primary);
+  min-height: 14px;
+  margin-bottom: 2px;
+  text-align: center;
+}
+.py.hidden { visibility: hidden; }
+
+.ch {
+  font-size: var(--fs, 30px);
+  line-height: 1;
+  font-weight: 500;
+  color: var(--text-1);
+  font-family: "SimSun", "宋体", serif;
+}
+
+.zoom-ico {
+  position: absolute;
+  top: 3px;
+  right: 5px;
+  font-size: 11px;
+  color: var(--text-3);
+  opacity: 0;
+  transition: opacity var(--t-fast) var(--ease);
+}
+.cell:hover .zoom-ico { opacity: 0.7; }
+
+/* ---------------------------------------------------------------------------
+ * 五、单字详情弹层（#modal 为覆盖层，.modal-panel 为对话框）
+ *   公共 .modal 是对话框盒，本工具把 #modal 用作覆盖层，故用 id 覆盖
+ *   定位策略：position:absolute + JS 动态设置 top/height，仅覆盖「当前屏幕」
+ *   原因：本工具在 iframe 内被父页撑开到全文档高度，position:fixed 会相对
+ *        整个 iframe 文档视口居中（即整个生字表高度中心），而非当前可见屏幕；
+ *        改为 absolute 后由 JS 在 openModal 时按 scrollY/innerHeight 定位
+ * ------------------------------------------------------------------------- */
+#modal {
+  position: absolute;
+  left: 0;
+  top: 0;            /* 由 JS 在 openModal 时动态写入 = window.scrollY */
+  width: 100%;
+  height: 100vh;     /* 由 JS 在 openModal 时动态写入 = window.innerHeight */
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  max-width: none;
+  max-height: none;
+  overflow: hidden;
+  background: rgba(20, 28, 48, 0.5);
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+  animation: none;
+}
+
+/* 透明点击层（关闭用），背景由 #modal 提供 */
+#modal .modal-mask {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background: none;
+  backdrop-filter: none;
+  cursor: pointer;
+}
+
+.modal-panel {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 420px;
+  padding: 30px 26px 26px;
+  text-align: center;
+  background: var(--card-bg);
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow-lg);
+  animation: modal-in 0.22s var(--ease);
+}
+
+.modal-char {
+  font-size: 96px;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--text-1);
+  font-family: "SimSun", "宋体", serif;
+  margin-bottom: 8px;
+}
+.modal-pinyin {
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--primary);
+  letter-spacing: 2px;
+  margin-bottom: 20px;
+}
+.modal-meta {
+  display: flex;
+  justify-content: center;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+.modal-meta > div {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.modal-meta dt { font-size: 12px; color: var(--text-3); }
+.modal-meta dd { font-size: 15px; font-weight: 600; color: var(--text-1); }
+
+/* ---------------------------------------------------------------------------
+ * 六、全屏大字预览（课堂展示覆盖层）
+ * ------------------------------------------------------------------------- */
+#preview {
+  position: fixed;
+  inset: 0;
+  z-index: 900;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #fff;
+  overflow: auto;
+}
+
+.preview-inner {
+  text-align: center;
+  padding: 40px 24px;
+}
+.preview-char {
+  font-size: clamp(120px, 42vmin, 340px);
+  font-weight: 700;
+  line-height: 1;
+  color: var(--text-1);
+  font-family: "SimSun", "宋体", serif;
+}
+.preview-pinyin {
+  margin-top: 16px;
+  font-size: clamp(24px, 5vmin, 42px);
+  font-weight: 600;
+  color: var(--primary);
+  letter-spacing: 4px;
+}
+.preview-foot {
+  margin-top: 28px;
+  display: flex;
+  justify-content: center;
+  gap: 32px;
+  flex-wrap: wrap;
+  font-size: 15px;
+  color: var(--text-3);
+}
+.preview-foot b { color: var(--text-1); font-weight: 700; }
+
+.preview-close {
+  position: absolute;
+  top: 20px;
+  right: 24px;
+  width: 44px;
+  height: 44px;
+  font-size: 24px;
+  color: var(--text-2);
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  cursor: pointer;
+  box-shadow: var(--shadow-sm);
+  transition: all var(--t-fast) var(--ease);
+}
+.preview-close:hover {
+  color: var(--danger);
+  border-color: #ffd4d4;
+  background: #fff5f5;
+}
+
+.preview-nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 56px;
+  height: 56px;
+  font-size: 32px;
+  color: var(--text-2);
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  cursor: pointer;
+  box-shadow: var(--shadow);
+  transition: all var(--t-fast) var(--ease);
+}
+.preview-nav:hover {
+  color: var(--primary);
+  border-color: var(--primary-soft-2);
+  background: var(--primary-soft);
+}
+.preview-nav.prev { left: 24px; }
+.preview-nav.next { right: 24px; }
+
+/* ---------------------------------------------------------------------------
+ * 七、浏览器全屏（html 为全屏元素，仅给个底色）
+ * ------------------------------------------------------------------------- */
+:fullscreen,
+.edutf-solo{ background: var(--bg); }
+:-webkit-full-screen,
+.edutf-solo{ background: var(--bg); }
+
+/* ---------------------------------------------------------------------------
+ * 八、小屏微调
+ * ------------------------------------------------------------------------- */
+@media (max-width: 720px) {
+  .toolbar.card { padding: 14px 16px; }
+  .toolbar { gap: 14px; }
+}
+
+/* 舞台容器： ⛶ 按钮所在的 .stage-toolbar 绝对定位于此 */
+main.container {
+  position: relative;
+}
+
+/* 生字动辄数百条，舞台自身进入全屏后没有 body 滚动条可用，
+   这里让舞台自己滚动，避免内容被裁切到不可达区域 */
+main.container:fullscreen,
+main.container:-webkit-full-screen,
+main.container.edutf-solo{
+  overflow: auto;
+}
+
+/* #modal 使用 position:absolute + JS 写入 top/height 来覆盖「当前屏幕」
+   （见 JS openModal 注释）。舞台成为它的包含块后，横向基准从初始包含块变成
+   main.container（受 max-width 1180px 居中影响），这里显式改回视口基准，
+   保证改动前后的覆盖范围完全一致（纵向基准不受影响：main 紧贴文档原点）。 */
+#modal {
+  left: 50%;
+  width: 100vw;
+  margin-left: -50vw;
+}

@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>古诗文背诵打卡 | EduToolbox · 打卡日历·随机抽背</title>
+<meta name="description" content="管理古诗文背诵篇目，每日打卡记录进度，日历视图查看打卡分布，随机抽背抽查掌握情况，数据本地保存。">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%93%9A%3C/text%3E%3C/svg%3E">
+<link rel="stylesheet" href="../../assets/css/tool-common.css">
+<link rel="stylesheet" href="poem-checkin.css">
+</head>
+<body>
+
+<div class="container">
+  <div class="workbench">
+    <!-- ======================= 左侧设置面板 ======================= -->
+    <aside class="panel setup-panel">
+      <div class="block">
+        <h2 class="block-title">① 篇目清单</h2>
+        <p class="block-hint">每行一篇，格式：<code>标题｜作者</code>（作者可省略）</p>
+        <textarea id="poemInput" class="text-input" rows="6" placeholder="静夜思｜李白&#10;春晓｜孟浩然&#10;悯农｜李绅"></textarea>
+        <div class="chips chips-mini" id="presetChips"></div>
+        <div class="btn-row">
+          <button type="button" class="btn btn-small" id="btnLoadList">📥 载入清单</button>
+          <button type="button" class="btn btn-small btn-ghost" id="btnClearAll">🗑 清空数据</button>
+        </div>
+        <div class="count-bar">共 <span id="poemCount">0</span> 篇 · 已背 <span id="doneCount">0</span> 篇</div>
+      </div>
+
+      <div class="block">
+        <h2 class="block-title">② 进度概览</h2>
+        <div class="stat-grid">
+          <div class="stat-card"><span class="stat-num" id="statDone">0</span><span class="stat-label">已背篇目</span></div>
+          <div class="stat-card"><span class="stat-num" id="statTimes">0</span><span class="stat-label">累计打卡</span></div>
+          <div class="stat-card"><span class="stat-num" id="statStreak">0</span><span class="stat-label">连续天数</span></div>
+          <div class="stat-card"><span class="stat-num" id="statToday">0</span><span class="stat-label">今日打卡</span></div>
+        </div>
+        <div class="progress-line"><div class="progress-fill" id="progressFill"></div></div>
+        <div class="progress-text" id="progressText">完成度 0%</div>
+      </div>
+
+      <div class="block">
+        <h2 class="block-title">③ 抽查</h2>
+        <div class="actions">
+          <button type="button" class="btn btn-primary" id="btnDraw">🎯 随机抽背</button>
+          <button type="button" class="btn btn-small btn-ghost" id="btnDrawUndo">↩ 撤销上次打卡</button>
+        </div>
+      </div>
+    </aside>
+
+    <!-- ======================= 右侧主区 ======================= -->
+    <main class="stage-panel">
+      <!-- 舞台右上角工具栏：⛶ 舞台全屏（自动隐藏设置栏） / ⚙ 切换设置栏显隐 -->
+      <div class="stage-toolbar">
+        <button type="button" class="icon-btn" id="fullscreenBtn" title="全屏">⛶</button>
+        <button type="button" class="icon-btn" id="hideSetupBtn" title="隐藏设置">⚙</button>
+      </div>
+      <div class="stage-head">
+        <h2 class="panel-title">✅ 打卡面板</h2>
+        <span class="stage-ok" id="stageOk">等待载入清单</span>
+      </div>
+
+      <div class="state state--empty" id="emptyState">
+        <div class="state-icon">📖</div>
+        <div class="state-title">还没有背诵篇目</div>
+        <div class="state-desc">在左侧填写篇目或选择内置古诗预设，点「载入清单」后即可开始打卡</div>
+      </div>
+
+      <div id="mainArea" hidden>
+        <!-- 抽背大卡 -->
+        <div class="draw-card" id="drawCard" hidden>
+          <div class="draw-tag">🎯 抽背篇目</div>
+          <div class="draw-title" id="drawTitle">—</div>
+          <div class="draw-author" id="drawAuthor"></div>
+          <div class="draw-actions">
+            <button type="button" class="btn btn-small" id="btnDrawOk">✅ 背出来了（打卡）</button>
+            <button type="button" class="btn btn-small btn-ghost" id="btnDrawAgain">🔁 换一篇</button>
+          </div>
+        </div>
+
+        <!-- 日历 -->
+        <div class="cal-block">
+          <div class="cal-head">
+            <button type="button" class="btn btn-small" id="calPrev">‹</button>
+            <span class="cal-month" id="calMonth">—</span>
+            <button type="button" class="btn btn-small" id="calNext">›</button>
+          </div>
+          <div class="cal-week">
+            <span>日</span><span>一</span><span>二</span><span>三</span><span>四</span><span>五</span><span>六</span>
+          </div>
+          <div class="cal-grid" id="calGrid"></div>
+          <div class="cal-legend">
+            <span class="lg lg-0"></span>无打卡
+            <span class="lg lg-1"></span>1-2 次
+            <span class="lg lg-2"></span>3-4 次
+            <span class="lg lg-3"></span>5 次以上
+          </div>
+        </div>
+
+        <!-- 篇目列表 -->
+        <div class="poem-block">
+          <div class="chart-head">
+            <span class="chart-title">📜 篇目打卡</span>
+            <span class="chart-sub">点击任意篇目完成一次打卡</span>
+          </div>
+          <div class="poem-list" id="poemList"></div>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="../../assets/js/frame-bridge.js"></script>
+<script src="../../assets/js/tool-stage-toolbar.js"></script>
+<script src="poem-checkin.js"></script>
+</body>
+</html>

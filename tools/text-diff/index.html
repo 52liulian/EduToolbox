@@ -1,0 +1,45 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>文本差异对比</title>
+<link rel="stylesheet" href="text-diff.css">
+<link rel="stylesheet" href="../../assets/css/tool-common.css">
+</head>
+<body>
+<div class="container">
+  <div class="diff-mode">
+    <button class="mode-btn active" data-mode="line">按行对比</button>
+    <button class="mode-btn" data-mode="word">按词对比</button>
+    <button class="mode-btn" data-mode="char">逐字对比</button>
+  </div>
+
+  <div class="inputs">
+    <div class="input-col">
+      <label>原文本</label>
+      <textarea id="orig" placeholder="粘贴原始文本…"></textarea>
+    </div>
+    <div class="input-col">
+      <label>新文本</label>
+      <textarea id="edit" placeholder="粘贴修改后的文本…"></textarea>
+    </div>
+  </div>
+
+  <div class="actions">
+    <button class="btn btn-primary" id="btn-diff">开始对比</button>
+    <button class="btn btn-ghost" id="btn-clear">清空</button>
+  </div>
+
+  <div class="legend">
+    <span><i class="dot del"></i> 删除</span>
+    <span><i class="dot add"></i> 新增</span>
+    <span><i class="dot same"></i> 相同</span>
+  </div>
+
+  <div id="result" class="result"></div>
+</div>
+<script src="../../assets/js/frame-bridge.js"></script>
+<script src="text-diff.js"></script>
+</body>
+</html>

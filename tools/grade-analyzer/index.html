@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>成绩统计分析 | EduToolbox · 均分·分数段·柱状分布</title>
+<meta name="description" content="粘贴/导入单科成绩，自动计算平均分、最高/最低、中位数、标准差、及格率与优秀率，绘制分数段柱状分布与累计曲线，可打印分析报告。">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%93%8A%3C/text%3E%3C/svg%3E">
+<link rel="stylesheet" href="../../assets/css/tool-common.css">
+<link rel="stylesheet" href="grade-analyzer.css">
+</head>
+<body>
+
+<div class="container">
+  <div class="workbench">
+    <!-- ======================= 左侧设置面板 ======================= -->
+    <aside class="panel setup-panel">
+      <div class="block">
+        <h2 class="block-title">① 分析标题</h2>
+        <input type="text" id="reportTitle" class="text-input" placeholder="如：三年级数学期末卷面分析" maxlength="30">
+      </div>
+
+      <div class="block">
+        <h2 class="block-title">② 成绩数据</h2>
+        <p class="block-hint">每行「姓名 + 空格/Tab/逗号 + 分数」；姓名可省略</p>
+        <textarea id="rawData" class="text-input" rows="7" placeholder="例如：&#10;张三 92&#10;李四 78&#10;王五 66&#10;85"></textarea>
+        <div class="btn-row mini-row">
+          <button type="button" class="btn btn-small btn-soft" id="btnDemo">🎲 载入示例</button>
+        </div>
+      </div>
+
+      <div class="block">
+        <h2 class="block-title">③ 计算参数</h2>
+        <div class="field row">
+          <label for="fullScore">满分</label>
+          <input type="number" id="fullScore" class="text-input" value="100" min="1" max="1000">
+        </div>
+        <div class="field row">
+          <label for="excLine">优秀线（%）</label>
+          <input type="number" id="excLine" class="text-input" value="85" min="0" max="100">
+        </div>
+        <div class="field row">
+          <label for="passLine">及格线（%）</label>
+          <input type="number" id="passLine" class="text-input" value="60" min="0" max="100">
+        </div>
+      </div>
+
+      <div class="actions">
+        <button type="button" class="btn btn-primary" id="btnAnalyze">📈 开始分析</button>
+        <button type="button" class="btn btn-small" id="btnPrint">🖨 打印报告</button>
+      </div>
+    </aside>
+
+    <!-- ======================= 右侧分析舞台 ======================= -->
+    <main class="stage-panel">
+      <!-- 舞台右上角工具栏：⛶ 舞台全屏（自动隐藏设置栏） / ⚙ 切换设置栏显隐 -->
+      <div class="stage-toolbar">
+        <button type="button" class="icon-btn" id="fullscreenBtn" title="全屏">⛶</button>
+        <button type="button" class="icon-btn" id="hideSetupBtn" title="隐藏设置">⚙</button>
+      </div>
+      <div class="stage-head">
+        <h2 class="panel-title">📋 分析结果</h2>
+        <span class="stage-ok" id="stageOk">待分析</span>
+      </div>
+
+      <!-- 空状态 -->
+      <div class="stage-empty" id="emptyView">
+        <div class="ready-icon">📈</div>
+        <div class="ready-title">还没有数据</div>
+        <div class="ready-desc">点「载入示例」体验，或粘贴你的成绩后点「开始分析」</div>
+      </div>
+
+      <!-- 结果区 -->
+      <div id="resultView" style="display:none">
+        <!-- KPI 卡 -->
+        <div class="kpi-grid" id="kpiGrid"></div>
+
+        <!-- 四率 -->
+        <div class="four-rate" id="rateRow"></div>
+
+        <!-- 分数段柱状图 -->
+        <div class="card-in">
+          <h3 class="sub-title">📊 分数段分布</h3>
+          <div class="bars" id="bars"></div>
+          <div class="x-axis" id="xAxis"></div>
+          <div class="legend-line">
+            <span class="lg" style="background:var(--primary)"></span>本段人数
+            <span class="lg g" style="background:#16a34a"></span>优秀段（≥优秀线）
+            <span class="lg r" style="background:#dc2626"></span>低分段（<及格线）
+          </div>
+        </div>
+
+        <!-- 分数段明细表 -->
+        <div class="card-in">
+          <h3 class="sub-title">📋 分数段明细</h3>
+          <div class="seg-scroll">
+            <table class="seg-table" id="segTable"></table>
+          </div>
+        </div>
+
+        <!-- 小结 -->
+        <div class="card-in note-box" id="noteLine"></div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- 提示条 -->
+<div class="toast" id="toast"></div>
+
+<script src="../../assets/js/frame-bridge.js"></script>
+<script src="../../assets/js/tool-stage-toolbar.js"></script>
+<script src="grade-analyzer.js"></script>
+</body>
+</html>

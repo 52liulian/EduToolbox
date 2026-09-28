@@ -1,0 +1,67 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>生词提取（Word 生词表 → Excel）</title>
+<link rel="stylesheet" href="word-extract.css">
+<link rel="stylesheet" href="../../assets/css/tool-common.css">
+</head>
+<body>
+<div class="wrap">
+  <section class="card">
+    <h2 class="card-title">1. 导入内容</h2>
+    <div id="dropzone" class="dropzone">
+      <div class="dz-icon">📥</div>
+      <p>拖入 <b>.docx</b> 或 <b>.txt</b> 文件，或<button type="button" class="link-btn" id="pickBtn">点击选择</button></p>
+      <p class="dz-hint">支持 Word 生词表（.docx，旧版 .doc 请先另存为 .docx）；表格单元格内文字也能识别</p>
+      <input type="file" id="fileInput" accept=".docx,.txt" hidden>
+    </div>
+
+    <div class="paste-box">
+      <span class="opt-label">或直接粘贴文本：</span>
+      <textarea id="pasteArea" rows="4" placeholder="将生词表内容粘贴到这里，然后点击「识别粘贴文本」&#10;例如：&#10;第一单元&#10;天地 人 你我 他"></textarea>
+      <button class="btn btn-ghost btn-sm" id="pasteBtn">识别粘贴文本</button>
+    </div>
+  </section>
+
+  <section class="card" id="editCard" hidden>
+    <h2 class="card-title">2. 校对与编辑</h2>
+    <p class="edit-hint">
+      每行一个词语；以 <b>【组名】</b> 开头的行是分组标题，可直接增删改；
+      <span class="py-mark">//拼音</span> 开头的行为自动识别的“可能拼音行”，不会进入词语列表。
+    </p>
+    <div class="editor">
+      <aside class="group-list" id="groupList"></aside>
+      <textarea id="editArea" class="edit-area" spellcheck="false"></textarea>
+    </div>
+
+    <h2 class="card-title" style="margin-top:20px;">3. 导出</h2>
+    <div class="opt-inline">
+      <label class="check"><input type="checkbox" id="optPinyin" checked> 带拼音列（本地拼音库自动生成）</label>
+      <label class="check"><input type="checkbox" id="optGroup" checked> 首列显示分组名</label>
+    </div>
+    <div class="actions">
+      <button class="btn btn-primary" id="exportXlsxBtn">💾 导出 生词表.xlsx</button>
+      <button class="btn btn-ghost" id="exportTxtBtn">📄 导出 生词表.txt</button>
+      <button class="btn btn-ghost" id="clearBtn">重新开始</button>
+    </div>
+    <div id="status" class="status"></div>
+  </section>
+
+  <section class="card tip">
+    <h2 class="card-title">识别规则说明</h2>
+    <ul>
+      <li>分组标题：包含「第X单元 / 第X课 / 语文园地 / 识字 / 口语交际 / 习作 / 快乐读书吧」的行；其下词语归入该组，其余归入「未分组」。</li>
+      <li>按空格、制表符、顿号、逗号切分词语，自动过滤空串与纯标点；组内重复词语只保留第一次出现。</li>
+      <li>不含汉字且长度小于 30 的行视为“可能的拼音行”，单独标注、不进入词语列表。</li>
+    </ul>
+  </section>
+</div>
+<script src="../../assets/js/frame-bridge.js"></script>
+<script src="../../assets/vendor/jszip.min.js"></script>
+<script src="../../assets/vendor/xlsx.full.min.js"></script>
+<script src="../../assets/vendor/pinyin-pro.min.js"></script>
+<script src="word-extract.js"></script>
+</body>
+</html>

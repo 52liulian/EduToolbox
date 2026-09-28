@@ -1,0 +1,283 @@
+/* ============================================================================
+ * 座位表生成 · seat-generator.css
+ * 仅包含本工具特有样式：座位纸 / 讲台 / 座位网格 / 行列提示 / 拖拽视觉 / 全屏投影
+ * 公共底座（双栏布局、面板、按钮、表单、stage）见 tool-common.css
+ * 高度策略：所有容器高度自动撑开，仅 body 主滚动条；仅全屏投影时固定视口
+ * ========================================================================== */
+
+/* ---------------------------------------------------------------------------
+ * 一、双栏布局：窄屏回落（提高特异性以覆盖公共 .main 的固定列宽）
+ * ------------------------------------------------------------------------- */
+@media (max-width: 900px) {
+  #app .main { grid-template-columns: 1fr; }
+}
+
+/* 颜色行：让多个颜色项在一行内紧凑排布 */
+.setting-row.color-row {
+  justify-content: flex-start;
+  gap: 14px;
+}
+
+/* 名字字号滑杆行：限制滑杆宽度避免吃满整行 */
+#app .setting-row input[type="range"] { max-width: 220px; }
+
+/* 座位表信息文本域：收窄最小高度 */
+#infoText { min-height: 60px; resize: vertical; }
+
+/* 学生名单 textarea：稍高一些便于多行输入 */
+#names { min-height: 180px; }
+
+/* ---------------------------------------------------------------------------
+ * 二、舞台标题栏：标题 + 工具按钮组左右对齐
+ *     （原名 .stage-toolbar；该 class 已让给共享的右上角 ⛶/⚙ 工具栏，故改名 .stage-head）
+ * ------------------------------------------------------------------------- */
+#stage .stage-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 16px;
+  padding: 0;
+  padding-right: 96px; /* 给右上角 .stage-toolbar 的两个圆形图标按钮让位 */
+}
+
+.stage-tools {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+/* 舞台内容区：去除默认内边距（toolbar 已占位） */
+#stage .stage-inner {
+  padding: 0;
+  min-height: auto;
+  display: block;
+}
+
+/* ---------------------------------------------------------------------------
+ * 三、座位纸张区：模拟一张可打印的座位表
+ * ------------------------------------------------------------------------- */
+.seat-paper {
+  width: 100%;
+  padding: 28px 24px;
+  background: var(--paper-bg, #ffffff);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  box-shadow: var(--shadow-sm);
+}
+
+.paper-title {
+  font-size: clamp(20px, 2.4vw, 26px);
+  font-weight: 800;
+  text-align: center;
+  margin-bottom: 8px;
+  color: var(--text-1);
+}
+
+.paper-info {
+  text-align: center;
+  font-size: 14px;
+  color: var(--text-2);
+  margin-bottom: 22px;
+  white-space: pre-wrap;
+}
+
+.paper-area {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* 空提示：占位文案 */
+.paper-area .empty-tip {
+  padding: 40px 20px;
+  font-size: 14px;
+  color: var(--text-3);
+  background: var(--bg-soft);
+  border: 1.5px dashed var(--border-2);
+  border-radius: var(--r);
+  text-align: center;
+}
+
+/* ---------------------------------------------------------------------------
+ * 四、讲台：长条形深色面板
+ * ------------------------------------------------------------------------- */
+.podium {
+  width: 60%;
+  margin: 0 auto;
+  padding: 14px 24px;
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: 8px;
+  text-align: center;
+  color: #fff;
+  background: #374151;
+  border-radius: var(--r);
+  box-shadow: var(--shadow-sm);
+}
+
+.podium.top    { margin-bottom: 12px; }
+.podium.bottom { margin-top:    12px; }
+
+/* ---------------------------------------------------------------------------
+ * 五、座位网格容器：列提示行 + 多个座位行
+ * ------------------------------------------------------------------------- */
+.seat-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* 列提示行：与座位列对齐，左侧留出 row-tip 宽度 */
+.col-tips {
+  display: flex;
+  gap: 10px;
+  padding-left: 64px; /* 与 .row-tip 宽度对齐 */
+}
+
+.col-tip {
+  flex: 1;
+  text-align: center;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--text-3);
+  padding: 4px 0;
+}
+
+/* 单个座位行：行提示 + 座位格子横向排列（flex 替代 inline gridTemplateColumns） */
+.seat-row {
+  display: flex;
+  gap: 10px;
+  align-items: stretch;
+}
+
+.row-tip {
+  flex-shrink: 0;
+  width: 54px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--text-3);
+  background: var(--bg-soft);
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+}
+
+/* ---------------------------------------------------------------------------
+ * 六、座位格：可拖拽、hover 抬升、空态虚化
+ * ------------------------------------------------------------------------- */
+.seat-cell {
+  flex: 1;
+  min-width: 0;
+  min-height: 56px;
+  padding: 8px 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  background: var(--seat-bg, #eaf3ff);
+  color: var(--seat-fg, #0369a1);
+  border: 1.5px solid var(--seat-border, #7dd3fc);
+  border-radius: var(--r-sm);
+  cursor: grab;
+  transition: transform var(--t-fast) var(--ease), box-shadow var(--t-fast) var(--ease);
+  user-select: none;
+  word-break: break-all;
+}
+
+.seat-cell:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-sm);
+}
+
+.seat-cell:active { cursor: grabbing; }
+
+/* 空座位：浅化外观 */
+.seat-cell.empty {
+  color: var(--text-3);
+  background: var(--bg-soft);
+  border-style: dashed;
+  border-color: var(--border-2);
+}
+
+/* 隐藏的空座位（visibility:hidden 由 JS 设置） */
+.seat-cell.hidden-empty { visibility: hidden; }
+
+/* 拖拽中：源座位虚化 + 蓝色描边 */
+.seat-cell.dragging {
+  opacity: 0.5;
+  box-shadow: 0 0 0 2px var(--primary);
+}
+
+/* 拖拽悬停目标：高亮描边 */
+.seat-cell.drop-target {
+  border-color: var(--primary);
+  background: var(--primary-soft);
+  box-shadow: 0 0 0 3px rgba(59, 110, 246, 0.18);
+}
+
+/* ---------------------------------------------------------------------------
+ * 七、全屏态（Fullscreen API：#stage 自身为全屏元素，不再用 .fullscreen 类）
+ * ------------------------------------------------------------------------- */
+#stage:fullscreen,
+#stage:-webkit-full-screen,
+#stage.edutf-solo{
+  display: flex;
+  flex-direction: column;
+  padding: 32px;
+  border: none;
+  border-radius: 0;
+  background: var(--bg);
+  overflow: auto;
+}
+
+#stage:fullscreen .stage-inner,
+#stage:-webkit-full-screen .stage-inner,
+#stage.edutf-solo .stage-inner{ flex: 1; }
+
+#stage:fullscreen .seat-paper,
+#stage:-webkit-full-screen .seat-paper,
+#stage.edutf-solo .seat-paper{
+  max-width: 1200px;
+  margin: 0 auto;
+  box-shadow: var(--shadow-lg);
+}
+
+/* ⚙ 隐藏设置：双栏容器变单栏并隐藏左侧设置面板 */
+#app .main.setup-hidden { grid-template-columns: 1fr; }
+.main.setup-hidden .setup-panel { display: none; }
+
+/* ---------------------------------------------------------------------------
+ * 八、打印样式：仅保留座位纸内容
+ * ------------------------------------------------------------------------- */
+@media print {
+  body { background: #fff !important; }
+  .setup-panel,
+  .stage-head,
+  .stage-toolbar,
+  .actions { display: none !important; }
+  #stage {
+    border: none;
+    box-shadow: none;
+    padding: 0;
+    background: #fff;
+  }
+  .seat-paper {
+    box-shadow: none;
+    border: none;
+    padding: 0;
+  }
+  .seat-cell { break-inside: avoid; }
+}
+
+/* ---------------------------------------------------------------------------
+ * 九、小屏微调
+ * ------------------------------------------------------------------------- */
+@media (max-width: 640px) {
+  .col-tips { padding-left: 48px; }
+  .row-tip  { width: 42px; font-size: 11px; }
+  .seat-cell { min-height: 44px; padding: 6px 4px; }
+  .podium   { width: 80%; padding: 10px 18px; font-size: 16px; }
+}

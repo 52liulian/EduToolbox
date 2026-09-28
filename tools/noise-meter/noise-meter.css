@@ -1,0 +1,465 @@
+/* ============================================================================
+ * noise-meter.css · 课堂噪音计（麦克风实时音量检测）
+ * ----------------------------------------------------------------------------
+ * 仅写本工具特有样式；公共底座见 ../../assets/css/tool-common.css
+ * 页面结构：main.container > header.hero + #meterPanel 仪表卡 +
+ *           #permissionTip 权限提示 + .records 超标记录 + .usage 使用说明
+ * 设计要点：
+ *   1. 圆环 #ringFg 由 JS 写 stroke-dasharray/stroke-dashoffset（r=100）；
+ *   2. #meterPanel.warn（橙）/ .danger（红）切换面板与圆环配色；
+ *   3. #meterPanel.danger-overlay 用固定定位 inset 阴影做红色脉动（挂在舞台上，
+ *      舞台自身进入全屏后 overlay 仍在顶层可见），body 保持浅色；
+ *   4. 所有容器高度自动撑开，仅 body 主滚动条；全屏只在 html:fullscreen
+ *      （JS 对 documentElement 请求）时固定视口并隐藏辅助区块。
+ * ========================================================================== */
+
+/* ===================== 1. 页面骨架（main.container 改为单列居中） ===================== */
+
+main.container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  max-width: 880px;
+}
+
+/* ===================== 2. 主仪表卡（白底圆角卡，warn / danger 换边框与投影） ===================== */
+
+#meterPanel {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
+  padding: 38px 28px 30px;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow);
+  transition: border-color 0.25s var(--ease), box-shadow 0.25s var(--ease);
+}
+
+/* 接近阈值：橙色描边与淡橙光晕 */
+#meterPanel.warn {
+  border-color: rgba(245, 166, 35, 0.45);
+  box-shadow: 0 10px 30px rgba(245, 166, 35, 0.15);
+}
+
+/* 超标：红色描边与淡红光晕 */
+#meterPanel.danger {
+  border-color: rgba(239, 91, 91, 0.5);
+  box-shadow: 0 12px 34px rgba(239, 91, 91, 0.18);
+}
+
+/* ===================== 3. 圆形分贝仪表（SVG 进度环 + 中心大字） ===================== */
+
+/* 环形容器：尺寸随视口收敛在 220-260px */
+#meterPanel .ring-wrap {
+  position: relative;
+  width: clamp(220px, 40vw, 260px);
+}
+
+#meterPanel .ring-wrap .ring {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 1 / 1;
+  margin: 0;
+}
+
+/* 覆盖 tool-common 默认 primary 蓝：正常态安静绿，并补 stroke 颜色过渡 */
+#meterPanel .ring-fg {
+  stroke: var(--success);
+  transition: stroke-dashoffset 0.3s linear, stroke 0.2s var(--ease);
+}
+#meterPanel.warn .ring-fg {
+  stroke: var(--warning);
+}
+#meterPanel.danger .ring-fg {
+  stroke: var(--danger);
+}
+
+/* 中心数值组：绝对定位叠在圆环正中 */
+#meterPanel .ring-center {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+}
+
+.db-value {
+  font-size: clamp(58px, 9.5vw, 78px);
+  font-weight: 900;
+  line-height: 1;
+  color: var(--success);
+  font-variant-numeric: tabular-nums;
+  transition: color 0.2s var(--ease);
+}
+#meterPanel.warn .db-value {
+  color: var(--warning);
+}
+#meterPanel.danger .db-value {
+  color: var(--danger);
+}
+
+.db-unit {
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--text-3);
+}
+
+.db-label {
+  margin-top: 2px;
+  font-size: 11.5px;
+  letter-spacing: 0.14em;
+  color: var(--text-3);
+}
+
+/* ===================== 4. 状态文字（默认中性；运行正常显绿，warn/danger 变色） ===================== */
+
+#status {
+  justify-content: center;
+  min-height: 26px;
+  font-size: 16px;
+  font-weight: 700;
+  text-align: center;
+}
+
+/* 监测中且无 warn/danger 修饰：音量正常（安静绿）。:is 兼容写法，:has 需 Chromium 105+ */
+#meterPanel:has(.running) #status:not(.warn):not(.danger) {
+  color: var(--success);
+}
+
+#status.warn {
+  color: var(--warning);
+}
+
+#status.danger {
+  color: var(--danger);
+  animation: nm-status-pulse 1.1s ease-in-out infinite;
+}
+
+@keyframes nm-status-pulse {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: 0.55; }
+}
+
+/* ===================== 5. 控制按钮（开始/停止 + 全屏） ===================== */
+
+.ctrls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.ctrls .btn {
+  min-width: 136px;
+  padding: 11px 24px;
+  font-size: 15px;
+}
+
+/* 监测进行中：主按钮变为红色渐变（点击即停止） */
+#startBtn.running,
+#startBtn.running:hover {
+  color: #fff;
+  background: linear-gradient(135deg, #ff7a7a 0%, #ef5b5b 55%, #d94444 100%);
+  border-color: transparent;
+  box-shadow: 0 10px 24px rgba(239, 91, 91, 0.32);
+  filter: none;
+}
+#startBtn.running:active {
+  transform: translateY(0);
+}
+
+/* ===================== 6. 报警阈值滑块行 ===================== */
+
+.threshold {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  max-width: 440px;
+  padding-top: 16px;
+  border-top: 1px dashed var(--border);
+}
+
+.threshold-label {
+  flex-shrink: 0;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--text-2);
+  white-space: nowrap;
+}
+
+.threshold input[type="range"] {
+  flex: 1;
+  min-width: 120px;
+}
+
+.threshold-value {
+  flex-shrink: 0;
+  min-width: 66px;
+  padding: 4px 12px;
+  font-size: 13px;
+  font-weight: 800;
+  text-align: center;
+  color: var(--primary);
+  background: var(--primary-soft);
+  border-radius: var(--r-pill);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ===================== 7. 麦克风权限友好提示（默认 hidden，由 JS 控制） ===================== */
+
+.permission-tip .tip-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 32px 26px;
+  text-align: center;
+  background: var(--card-bg);
+  border: 1px solid #ffd9d9;
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow-sm);
+}
+
+.tip-icon {
+  font-size: 44px;
+  line-height: 1;
+}
+
+.tip-card h3 {
+  margin-top: 6px;
+  font-size: 17px;
+  color: var(--danger);
+}
+
+.tip-card p {
+  max-width: 560px;
+  font-size: 14px;
+  line-height: 1.75;
+  color: var(--text-2);
+}
+
+.tip-card .tip-sub {
+  margin-top: 4px;
+  font-size: 12.5px;
+  color: var(--text-3);
+}
+
+/* ===================== 8. 超标记录（列表自动撑高，无内部滚动） ===================== */
+
+.records {
+  padding: 20px 24px;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow-sm);
+}
+
+.records-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.records-head h2 {
+  font-size: 17px;
+}
+
+/* 记录列表：flex 纵向排列，不设高度、不滚动，条目多了由页面整体滚动 */
+.records-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.record-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 16px;
+  font-size: 14px;
+  background: var(--card-bg-2);
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  animation: nm-rec-in 0.28s var(--ease) both;
+}
+
+@keyframes nm-rec-in {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.rec-time {
+  color: var(--text-2);
+  font-variant-numeric: tabular-nums;
+}
+
+.rec-db {
+  font-size: 14.5px;
+  font-weight: 800;
+  color: var(--danger);
+  font-variant-numeric: tabular-nums;
+}
+
+/* 覆盖 tool-common 中 .empty 的大留白与无框样式，这里用虚线小胶囊 */
+.records-list > .empty {
+  padding: 24px 20px;
+  font-size: 13.5px;
+  border: 1.5px dashed var(--border-2);
+  border-radius: var(--r-sm);
+}
+
+/* ===================== 9. 使用说明（有序列表） ===================== */
+
+.usage {
+  padding: 22px 26px;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow-sm);
+}
+
+.usage h2 {
+  margin-bottom: 12px;
+  font-size: 17px;
+}
+
+/* tool-common reset 去掉了列表序号，这里恢复 decimal 样式 */
+.usage ol {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-left: 24px;
+  list-style: decimal;
+  font-size: 14px;
+  line-height: 1.75;
+  color: var(--text-2);
+}
+
+.usage li::marker {
+  font-weight: 800;
+  color: var(--primary);
+}
+
+/* ===================== 10. 超标全屏红警（固定阴影层，不拦截点击，body 保持浅色） ===================== */
+
+#meterPanel.danger-overlay::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 999;
+  pointer-events: none;
+  box-shadow: inset 0 0 80px 14px rgba(239, 91, 91, 0.4);
+  animation: nm-danger-pulse 1.1s ease-in-out infinite;
+}
+
+@keyframes nm-danger-pulse {
+  0%, 100% { box-shadow: inset 0 0 70px 8px rgba(239, 91, 91, 0.32); }
+  50%      { box-shadow: inset 0 0 120px 28px rgba(239, 91, 91, 0.6); }
+}
+
+/* ===================== 11. 全屏投影（舞台 #meterPanel 自身进入全屏） ===================== */
+
+/* 舞台自身全屏：面板铺满视口，四周用主体底色兜边 */
+#meterPanel:fullscreen::backdrop,
+#meterPanel:-webkit-full-screen::backdrop,
+/* 舞台自身全屏：面板铺满视口，四周用主体底色兜边 */
+#meterPanel.edutf-solo::backdrop,
+#meterPanel.edutf-solo::backdrop{
+  background: var(--bg);
+}
+
+#meterPanel:fullscreen,
+#meterPanel:-webkit-full-screen,
+#meterPanel.edutf-solo{
+  justify-content: center;
+  width: 100%;
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 32px 28px;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+  background: var(--card-bg);
+}
+
+#meterPanel:fullscreen .ring-wrap,
+#meterPanel:-webkit-full-screen .ring-wrap,
+#meterPanel.edutf-solo .ring-wrap{
+  width: min(48vh, 420px);
+}
+
+#meterPanel:fullscreen .db-value,
+#meterPanel:-webkit-full-screen .db-value,
+#meterPanel.edutf-solo .db-value{
+  font-size: clamp(96px, 22vh, 180px);
+}
+
+#meterPanel:fullscreen .db-unit,
+#meterPanel:-webkit-full-screen .db-unit,
+#meterPanel.edutf-solo .db-unit{
+  font-size: 16px;
+}
+
+#meterPanel:fullscreen #status,
+#meterPanel:-webkit-full-screen #status,
+#meterPanel.edutf-solo #status{
+  font-size: clamp(18px, 3.4vh, 26px);
+}
+
+#meterPanel:fullscreen .ctrls .btn,
+#meterPanel:-webkit-full-screen .ctrls .btn,
+#meterPanel.edutf-solo .ctrls .btn{
+  min-width: 160px;
+  padding: 12px 28px;
+  font-size: 16px;
+}
+
+#meterPanel:fullscreen .threshold,
+#meterPanel:-webkit-full-screen .threshold,
+#meterPanel.edutf-solo .threshold{
+  max-width: 560px;
+}
+
+/* ===================== 12. 窄屏适配 ===================== */
+
+@media (max-width: 640px) {
+  main.container {
+    padding: 18px 14px 44px;
+  }
+
+  #meterPanel {
+    padding: 30px 16px 24px;
+  }
+
+  .ctrls .btn {
+    width: 100%;
+    max-width: 320px;
+  }
+
+  .threshold {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .threshold-label {
+    width: 100%;
+    text-align: center;
+  }
+
+  .records,
+  .usage {
+    padding: 18px 16px;
+  }
+}

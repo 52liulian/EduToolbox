@@ -1,0 +1,813 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>口算题生成器 | EduToolbox · 批量生成打印练习</title>
+<meta name="description" content="一键批量生成口算练习卷：加减乘除、混合运算、括号、竖式，可设难度与题量，直接打印或导出PDF。本地生成，答案自动算好。">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%A7%AE%3C/text%3E%3C/svg%3E">
+<style>
+/* ============================================================================
+ * 口算题批量生成器 · 单文件版
+ * 设计令牌 + 布局 + 组件样式 + 题目打印排版 全部内联
+ * ========================================================================== */
+:root {
+  --primary: #0ea5e9;
+  --primary-soft: #e0f2fe;
+  --accent: #22c55e;
+  --accent-soft: #dcfce7;
+  --warn: #f59e0b;
+  --text-1: #1e293b;
+  --text-2: #475569;
+  --text-3: #94a3b8;
+  --bg: #f1f5f9;
+  --card: #ffffff;
+  --line: #e2e8f0;
+  --ease: cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+  background: var(--bg);
+  color: var(--text-1);
+  font-size: 15px;
+  line-height: 1.6;
+}
+#app { max-width: 1200px; margin: 0 auto; padding: 20px 16px 60px; }
+
+/* ---------- 顶栏 ---------- */
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 18px;
+  gap: 12px;
+}
+.topbar h1 {
+  margin: 0;
+  font-size: 22px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.topbar .sub { font-size: 13px; color: var(--text-3); font-weight: 400; margin-top: 2px; }
+.toolbar { display: flex; gap: 8px; }
+.btn {
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  padding: 9px 18px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: #fff;
+  color: var(--text-2);
+  cursor: pointer;
+  transition: .15s;
+}
+.btn:hover { background: var(--primary-soft); color: var(--primary); border-color: var(--primary); }
+.btn-primary {
+  background: linear-gradient(135deg, #38bdf8, #0ea5e9);
+  color: #fff; border: none;
+  box-shadow: 0 6px 18px rgba(14,165,233,.3);
+}
+.btn-primary:hover { color: #fff; filter: brightness(1.06); transform: translateY(-1px); }
+.btn-accent {
+  background: linear-gradient(135deg, #4ade80, #22c55e);
+  color: #fff; border: none;
+  box-shadow: 0 6px 18px rgba(34,197,94,.3);
+}
+.btn-accent:hover { color: #fff; filter: brightness(1.06); }
+
+/* ---------- 主体双栏 ---------- */
+.layout { display: grid; grid-template-columns: 320px 1fr; gap: 16px; }
+@media (max-width: 860px) { .layout { grid-template-columns: 1fr; } }
+
+/* ---------- 设置面板 ---------- */
+.panel {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 18px;
+  box-shadow: 0 1px 3px rgba(15,23,42,.05);
+}
+.block { margin-bottom: 18px; }
+.block:last-child { margin-bottom: 0; }
+.block-title {
+  margin: 0 0 10px;
+  font-size: 15px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.block-hint { margin: 0 0 10px; font-size: 12.5px; color: var(--text-3); }
+
+/* 题型卡片 */
+.type-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.type-card {
+  position: relative;
+  border: 1.5px solid var(--line);
+  border-radius: 10px;
+  padding: 10px 12px;
+  cursor: pointer;
+  transition: .15s;
+  background: #fff;
+  user-select: none;
+}
+.type-card:hover { border-color: var(--primary); }
+.type-card.active {
+  border-color: var(--primary);
+  background: var(--primary-soft);
+}
+.type-card .tc-name { font-size: 14px; font-weight: 700; }
+.type-card .tc-desc { font-size: 11.5px; color: var(--text-3); margin-top: 2px; }
+.type-card .tc-check {
+  position: absolute;
+  top: 8px; right: 8px;
+  width: 16px; height: 16px;
+  border-radius: 4px;
+  border: 1.5px solid var(--line);
+  background: #fff;
+  display: grid; place-items: center;
+  font-size: 11px; color: #fff;
+}
+.type-card.active .tc-check { background: var(--primary); border-color: var(--primary); }
+.type-card.active .tc-check::after { content: "✓"; }
+
+/* 选项行 */
+.opt-row { display: flex; align-items: center; gap: 10px; padding: 7px 0; flex-wrap: wrap; }
+.opt-row > label:first-child { font-size: 14px; min-width: 76px; color: var(--text-2); }
+select, input[type=number], input[type=text] {
+  font-family: inherit;
+  font-size: 14px;
+  padding: 6px 10px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fafbfc;
+  color: var(--text-1);
+}
+select:focus, input:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(14,165,233,.12); }
+input[type=number] { width: 78px; }
+select { cursor: pointer; }
+
+.check-line { display: flex; align-items: center; gap: 8px; padding: 6px 0; font-size: 14px; cursor: pointer; user-select: none; }
+.check-line input { width: 16px; height: 16px; accent-color: var(--primary); cursor: pointer; }
+
+.hint-tag {
+  display: inline-block;
+  font-size: 11.5px;
+  padding: 2px 8px;
+  border-radius: 20px;
+  background: var(--accent-soft);
+  color: #15803d;
+  margin-left: auto;
+}
+.hint-tag.warn { background: #fef3c7; color: #b45309; }
+
+/* 数字徽标 */
+.badge {
+  display: inline-grid; place-items: center;
+  min-width: 22px; height: 22px;
+  padding: 0 6px;
+  border-radius: 11px;
+  font-size: 12px; font-weight: 700;
+  background: var(--primary-soft); color: var(--primary);
+}
+
+/* ---------- 预览区 ---------- */
+.workspace {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 20px 24px;
+  box-shadow: 0 1px 3px rgba(15,23,42,.05);
+  min-height: 500px;
+}
+.ws-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.ws-title { font-size: 15px; font-weight: 700; }
+.ws-title small { font-weight: 400; color: var(--text-3); margin-left: 8px; font-size: 12.5px; }
+
+/* 题目网格 */
+.sheet {
+  font-family: "WenQuanYi Micro Hei", "PingFang SC", "Microsoft YaHei", sans-serif;
+}
+.sheet-head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  border-bottom: 2px solid var(--text-1);
+  padding-bottom: 6px;
+  margin-bottom: 18px;
+}
+.sheet-head .sh-title { font-size: 18px; font-weight: 800; letter-spacing: .04em; }
+.sheet-head .sh-info { font-size: 13px; color: var(--text-2); }
+.sheet-head .sh-info span { display: inline-block; min-width: 70px; border-bottom: 1px solid var(--text-2); text-align: center; }
+
+/* 横式题目 */
+.prob-grid {
+  display: grid;
+  gap: 0 20px;
+}
+.prob {
+  display: flex;
+  align-items: baseline;
+  font-size: 18px;
+  font-weight: 600;
+  padding: 6px 0;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  overflow: hidden;
+}
+.prob .p-no {
+  color: var(--text-3);
+  font-size: 13px;
+  font-weight: 600;
+  min-width: 26px;
+  flex-shrink: 0;
+}
+.prob .p-expr { flex: 1; }
+.prob .p-ans {
+  min-width: 48px;
+  border-bottom: 1.5px solid var(--text-2);
+  margin-left: 4px;
+}
+.prob.v .p-ans { display: none; } /* 竖式无答题线 */
+
+/* 竖式 */
+.vgrid { display: grid; gap: 24px; }
+.vcol { display: flex; flex-direction: column; gap: 10px; }
+.vbox {
+  border: 1px dashed var(--line);
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-family: "Courier New", monospace;
+  font-size: 16px;
+  line-height: 1.5;
+  letter-spacing: .03em;
+  white-space: pre;
+  color: var(--text-1);
+  min-height: 72px;
+}
+
+/* 答案区 */
+.answer-sheet { margin-top: 28px; border-top: 2px dashed var(--line); padding-top: 18px; }
+.answer-sheet h3 { margin: 0 0 12px; font-size: 15px; }
+.ans-grid { display: grid; gap: 6px 20px; font-size: 14px; font-variant-numeric: tabular-nums; }
+.ans-item { display: flex; gap: 8px; }
+.ans-item .a-no { color: var(--text-3); min-width: 26px; }
+.ans-item .a-val { font-weight: 600; color: var(--primary); }
+
+/* 空状态 */
+.empty {
+  text-align: center;
+  padding: 80px 20px;
+  color: var(--text-3);
+}
+.empty .e-icon { font-size: 48px; margin-bottom: 12px; }
+.empty .e-t { font-size: 15px; margin-bottom: 4px; color: var(--text-2); }
+.empty .e-s { font-size: 13px; }
+
+/* 提示条 */
+.toast {
+  position: fixed;
+  bottom: 24px; left: 50%;
+  transform: translateX(-50%) translateY(20px);
+  background: #1e293b; color: #fff;
+  padding: 10px 20px;
+  border-radius: 10px;
+  font-size: 14px;
+  opacity: 0; pointer-events: none;
+  transition: .25s var(--ease);
+  z-index: 99;
+  box-shadow: 0 8px 30px rgba(0,0,0,.25);
+}
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+/* ---------- 打印样式 ---------- */
+@media print {
+  body { background: #fff; }
+  #app { max-width: none; padding: 0; }
+  .topbar, .panel, .ws-head .btn, .toolbar { display: none !important; }
+  .layout { display: block; }
+  .workspace {
+    border: none; border-radius: 0; box-shadow: none; padding: 0;
+    min-height: auto;
+  }
+  .sheet { font-size: 15px; }
+  .prob { font-size: 15px; break-inside: avoid; }
+  .vbox { break-inside: avoid; }
+  .answer-sheet { break-before: page; }
+  @page { size: A4; margin: 12mm 10mm; }
+}
+</style>
+<style>
+/* ============================================================================
+ * EduToolbox 组件化挂载兜底（自动追加）
+ * ----------------------------------------------------------------------------
+ * 本工具未引入 assets/css/tool-common.css，挂载进站点（Shadow DOM）后会缺少：
+ *   1) 六色主题变量 --primary / --primary-soft / --primary-grad
+ *   2) .container 的宽度约束（否则内容铺满并贴边）
+ * 这里补齐最小等价集，保证「独立打开」与「站点内组件化挂载」视觉一致。
+ * ========================================================================== */
+
+:root,
+:host,
+body[data-theme="sky"]   { --primary:#0ea5e9; --primary-soft:#e0f2fe; --primary-soft-2:#ccecfc; --primary-grad:linear-gradient(135deg,#38bdf8,#0ea5e9,#0284c7); }
+body[data-theme="violet"]{ --primary:#7c3aed; --primary-soft:#f0e9fe; --primary-soft-2:#e2d5fc; --primary-grad:linear-gradient(135deg,#8b5cf6,#7c3aed,#6d28d9); }
+body[data-theme="green"] { --primary:#16a34a; --primary-soft:#e7f6ec; --primary-soft-2:#d3f0dc; --primary-grad:linear-gradient(135deg,#22c55e,#16a34a,#15803d); }
+body[data-theme="gold"]  { --primary:#d97706; --primary-soft:#fdf1dc; --primary-soft-2:#fbe3bc; --primary-grad:linear-gradient(135deg,#f59e0b,#d97706,#b45309); }
+body[data-theme="orange"]{ --primary:#ea580c; --primary-soft:#ffefe4; --primary-soft-2:#ffdec9; --primary-grad:linear-gradient(135deg,#fb923c,#ea580c,#c2410c); }
+body[data-theme="pink"]  { --primary:#db2777; --primary-soft:#fce7f0; --primary-soft-2:#f9cfe1; --primary-grad:linear-gradient(135deg,#f472b6,#db2777,#be185d); }
+
+/* 容器宽度兜底：仅在工具自身未声明时生效（不覆盖已有 .container 规则） */
+.container:not([data-no-fallback]) {
+  width: 100%;
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 28px 24px 56px;
+  box-sizing: border-box;
+}
+</style>
+</head>
+<body>
+<div id="app">
+  <div class="topbar">
+    <div>
+      <h1>🧮 口算题生成器</h1>
+      <div class="sub">批量生成练习卷 · 支持加减乘除 / 混合运算 / 括号 / 竖式 · 本地生成 · 答案自动算好</div>
+    </div>
+    <div class="toolbar">
+      <button class="btn" id="btnGen">🎲 重新生成</button>
+      <button class="btn btn-primary" id="btnPrint">🖨 打印 / 导出PDF</button>
+      <button class="btn btn-accent" id="btnAns">👁 显示答案</button>
+    </div>
+  </div>
+
+  <div class="layout">
+    <!-- 左侧设置 -->
+    <aside class="panel">
+      <!-- 题型选择 -->
+      <div class="block">
+        <h2 class="block-title">① 选择题型</h2>
+        <p class="block-hint">可多选，勾选的题型会混合出题</p>
+        <div class="type-grid" id="typeGrid"></div>
+      </div>
+
+      <!-- 数值范围 -->
+      <div class="block">
+        <h2 class="block-title">② 数值范围</h2>
+        <div class="opt-row">
+          <label>运算数位数</label>
+          <select id="digit">
+            <option value="1">一位数 (0–9)</option>
+            <option value="2" selected>两位数 (10–99)</option>
+            <option value="3">三位数 (100–999)</option>
+            <option value="mix">混合位数</option>
+          </select>
+        </div>
+        <div class="opt-row">
+          <label>结果范围</label>
+          <select id="resultRange">
+            <option value="100">不超过 100</option>
+            <option value="1000" selected>不超过 1000</option>
+            <option value="10000">不超过 10000</option>
+            <option value="any">不限制</option>
+          </select>
+        </div>
+        <div class="opt-row">
+          <label>允许结果</label>
+          <select id="allowNeg">
+            <option value="no" selected>仅正整数</option>
+            <option value="yes">允许负数</option>
+          </select>
+        </div>
+        <div class="opt-row">
+          <label>余数</label>
+          <select id="remainder">
+            <option value="no" selected>整除（无余数）</option>
+            <option value="yes">可以有余数</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- 题目形式 -->
+      <div class="block">
+        <h2 class="block-title">③ 题目形式</h2>
+        <div class="check-line">
+          <input type="checkbox" id="fmtHoriz" checked>
+          <span>横式（如 25 + 37 =）</span>
+        </div>
+        <div class="check-line">
+          <input type="checkbox" id="fmtVert">
+          <span>竖式（预留计算空格）</span>
+          <span class="hint-tag warn">仅加减乘</span>
+        </div>
+      </div>
+
+      <!-- 布局 -->
+      <div class="block">
+        <h2 class="block-title">④ 排版设置</h2>
+        <div class="opt-row">
+          <label>题目数量</label>
+          <input type="number" id="qCount" value="60" min="4" max="300">
+        </div>
+        <div class="opt-row">
+          <label>每行题数</label>
+          <input type="number" id="qPerRow" value="3" min="1" max="5">
+        </div>
+        <div class="opt-row">
+          <label>试卷标题</label>
+          <input type="text" id="sheetTitle" value="口算练习" style="width:150px">
+        </div>
+        <div class="check-line">
+          <input type="checkbox" id="showNo" checked>
+          <span>显示题号</span>
+        </div>
+        <div class="check-line">
+          <input type="checkbox" id="showNameLine">
+          <span>显示姓名/班级/日期栏</span>
+        </div>
+      </div>
+    </aside>
+
+    <!-- 右侧预览 -->
+    <section class="workspace">
+      <div class="ws-head">
+        <div class="ws-title">题目预览 <small id="wsStat"></small></div>
+      </div>
+      <div id="sheetWrap"></div>
+    </section>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script src="../../assets/js/frame-bridge.js"></script>
+<script>
+/* EduToolbox · 口算题生成器核心逻辑
+ * 纯前端 IIFE，无后端、无外链，file:// 可离线运行
+ */
+(function () {
+  "use strict";
+  const $ = (s) => document.querySelector(s);
+  const $$ = (s) => document.querySelectorAll(s);
+
+  /* ========== 题型配置 ========== */
+  const TYPES = [
+    { id: "add",  name: "加法",     desc: "a + b",      op: "+", arity: 2 },
+    { id: "sub",  name: "减法",     desc: "a − b",      op: "−", arity: 2 },
+    { id: "mul",  name: "乘法",     desc: "a × b",      op: "×", arity: 2 },
+    { id: "div",  name: "除法",     desc: "a ÷ b",      op: "÷", arity: 2 },
+    { id: "mix2", name: "两步混合", desc: "a+b×c 等",   op: "mix", arity: 3 },
+    { id: "mix3", name: "三步混合", desc: "a±b±c 等",   op: "mix", arity: 4 },
+    { id: "paren",name: "带括号",   desc: "(a+b)×c 等", op: "paren", arity: 3 },
+  ];
+  const activeTypes = new Set(["add", "sub", "mul"]);
+
+  /* ========== 工具函数 ========== */
+  const rand = (lo, hi) => lo + Math.floor(Math.random() * (hi - lo + 1));
+  const pick = (arr) => arr[Math.floor(Math.random() * arr.length)];
+  function randByDigit(mode) {
+    if (mode === "1") return rand(0, 9);
+    if (mode === "2") return rand(10, 99);
+    if (mode === "3") return rand(100, 999);
+    return pick([rand(0,9), rand(10,99), rand(100,999)]); // mix
+  }
+  function gcd(a, b) { return b === 0 ? a : gcd(b, a % b); }
+
+  /* ========== 单个算式生成
+   * 返回 { expr: 字符串表达式, value: 结果数值, tokens: 供竖式用 }
+   */
+  function genProblem(typeId, cfg) {
+    const tries = 80;
+    for (let t = 0; t < tries; t++) {
+      const p = genOnce(typeId, cfg);
+      if (!p) continue;
+      if (cfg.allowNeg === "no" && p.value < 0) continue;
+      if (cfg.resultRange !== "any" && p.value > +cfg.resultRange) continue;
+      // 除法余数约束
+      if (typeId === "div" && cfg.remainder === "no" && p.remainder) continue;
+      return p;
+    }
+    return null;
+  }
+
+  function genOnce(id, cfg) {
+    const d = cfg.digit;
+    const R = () => randByDigit(d);
+    switch (id) {
+      case "add": {
+        const a = R(), b = R();
+        return { expr: `${a} + ${b} =`, value: a + b, parts: [a, b], op: "+" };
+      }
+      case "sub": {
+        let a = R(), b = R();
+        if (cfg.allowNeg === "no" && b > a) { const t = a; a = b; b = t; }
+        return { expr: `${a} − ${b} =`, value: a - b, parts: [a, b], op: "−" };
+      }
+      case "mul": {
+        // 乘法用一位/两位混合更合理，避免三位数乘三位数结果爆炸
+        const a = d === "3" ? rand(10,99) : R();
+        const b = d === "3" ? rand(2,9) : (d === "1" ? rand(2,9) : R());
+        return { expr: `${a} × ${b} =`, value: a * b, parts: [a, b], op: "×" };
+      }
+      case "div": {
+        const b = Math.max(2, R());
+        const q = rand(2, d === "3" ? 30 : (d === "2" ? 20 : 12));
+        const rem = (cfg.remainder === "yes") ? rand(0, b - 1) : 0;
+        const a = b * q + rem;
+        return { expr: `${a} ÷ ${b} =`, value: q, remainder: rem > 0, parts: [a, b], op: "÷" };
+      }
+      case "mix2": {
+        // 形如 a ± b × c，× 优先级高，先算 b×c 再算 a±
+        // 为保证结果非负：加法固定；减法时先确定 b×c，再让 a > b×c
+        const op1 = pick(["+", "−"]);
+        if (op1 === "+") {
+          const a = R(), b = R(), c = d === "3" ? rand(2,9) : (d === "1" ? rand(2,9) : R());
+          const value = a + b * c;
+          const expr = `${a} + ${b} × ${c} =`;
+          return { expr, value, parts: [a, b, c], op: "mix" };
+        } else {
+          const b = R(), c = d === "3" ? rand(2,9) : (d === "1" ? rand(2,9) : R());
+          const bc = b * c;
+          const a = bc + rand(1, d === "3" ? 200 : (d === "1" ? 20 : 50)); // a > b×c
+          const value = a - bc;
+          const expr = `${a} − ${b} × ${c} =`;
+          return { expr, value, parts: [a, b, c], op: "mix" };
+        }
+      }
+      case "mix3": {
+        // 形如 a ± b ± c，从左到右依次计算（与显示顺序严格一致）
+        // 生成策略：先随机确定 a、中间结果 m=a±b，最终结果 v=m±c，再反推 c
+        const op1 = pick(["+", "−"]), op2 = pick(["+", "−"]);
+        const a = R(), b = R();
+        const m = op1 === "+" ? a + b : a - b;
+        // 为保证最终结果 v 在合理范围且为正，随机生成目标结果 v 再反推 c
+        const v = randByDigit(d);
+        let c;
+        if (op2 === "+") c = v - m;        // m + c = v  → c = v - m
+        else c = m - v;                    // m - c = v  → c = m - v
+        // 要求 c 为正整数，若不满足则放弃此题重来
+        if (c <= 0) return null;
+        const value = op2 === "+" ? m + c : m - c;
+        const expr = `${a} ${op1} ${b} ${op2} ${c} =`;
+        return { expr, value, parts: [a, b, c], op: "mix" };
+      }
+      case "paren": {
+        // (a + b) × c 或 (a − b) × c
+        const inner = pick(["+", "−"]);
+        let a = R(), b = R();
+        if (inner === "−" && b > a) { const t = a; a = b; b = t; }
+        const c = d === "3" ? rand(2,6) : (d === "1" ? rand(2,5) : rand(2,9));
+        const value = (inner === "+" ? a + b : a - b) * c;
+        return { expr: `(${a} ${inner} ${b}) × ${c} =`, value, parts: [a, b, c], op: "paren" };
+      }
+    }
+    return null;
+  }
+
+  /* ========== 生成整卷 ========== */
+  function generate() {
+    const cfg = {
+      digit: $("#digit").value,
+      resultRange: $("#resultRange").value,
+      allowNeg: $("#allowNeg").value,
+      remainder: $("#remainder").value,
+    };
+    const count = Math.max(4, Math.min(300, +$("#qCount").value || 60));
+    const ids = [...activeTypes];
+    if (ids.length === 0) {
+      $("#sheetWrap").innerHTML = emptyHtml("请至少勾选一种题型");
+      $("#wsStat").textContent = "";
+      return;
+    }
+    const problems = [];
+    const seen = new Set(); // 去重：避免完全相同的算式
+    let guard = 0;
+    while (problems.length < count && guard < count * 60) {
+      guard++;
+      const p = genProblem(pick(ids), cfg);
+      if (!p) continue;
+      const key = p.expr;
+      if (seen.has(key)) continue;
+      seen.add(key);
+      problems.push(p);
+    }
+    render(problems);
+  }
+
+  /* ========== 渲染 ========== */
+  let CURRENT = []; // 当前卷
+  let SHOW_ANS = false;
+
+  function render(problems) {
+    CURRENT = problems;
+    const perRow = Math.max(1, Math.min(5, +$("#qPerRow").value || 3));
+    const showNo = $("#showNo").checked;
+    const showLine = $("#showNameLine").checked;
+    const title = $("#sheetTitle").value || "口算练习";
+    const doVert = $("#fmtVert").checked;
+    const doHoriz = $("#fmtHoriz").checked;
+
+    let html = "";
+    if (showLine) {
+      html += `<div class="sheet-head">
+        <div class="sh-title">${esc(title)}</div>
+        <div class="sh-info">姓名 <span></span> 班级 <span></span> 日期 <span></span> 得分 <span></span></div>
+      </div>`;
+    } else {
+      html += `<div class="sheet-head">
+        <div class="sh-title">${esc(title)}</div>
+        <div class="sh-info">姓名 <span></span> 日期 <span></span></div>
+      </div>`;
+    }
+
+    if (doHoriz && doVert) {
+      // 横式 + 竖式分两个区块
+      html += renderHoriz(problems, perRow, showNo, false);
+      html += `<div style="margin-top:30px">` + renderVert(problems, perRow, showNo, false) + `</div>`;
+    } else if (doVert) {
+      html += renderVert(problems, perRow, showNo, true);
+    } else {
+      html += renderHoriz(problems, perRow, showNo, true);
+    }
+
+    if (SHOW_ANS) html += renderAnswers(problems);
+
+    $("#sheetWrap").innerHTML = `<div class="sheet">${html}</div>`;
+    $("#wsStat").textContent = `共 ${problems.length} 题 · ${activeTypes.size} 种题型 · ${perRow} 题/行`;
+  }
+
+  function renderHoriz(problems, perRow, showNo, withAns) {
+    const cols = perRow;
+    let g = `<div class="prob-grid" style="grid-template-columns:repeat(${cols},1fr)">`;
+    problems.forEach((p, i) => {
+      const ans = withAns && SHOW_ANS ? `<span class="p-ans" style="border:none;color:var(--primary);font-weight:700">${fmtAns(p)}</span>` : `<span class="p-ans"></span>`;
+      g += `<div class="prob">
+        ${showNo ? `<span class="p-no">${i+1}.</span>` : ""}
+        <span class="p-expr">${p.expr}</span>${ans}
+      </div>`;
+    });
+    g += `</div>`;
+    return g;
+  }
+
+  function renderVert(problems, perRow, showNo, withAns) {
+    const cols = perRow;
+    let g = `<div class="vgrid" style="grid-template-columns:repeat(${cols},1fr)">`;
+    // 每列一组
+    const rows = Math.ceil(problems.length / cols);
+    for (let c = 0; c < cols; c++) {
+      g += `<div class="vcol">`;
+      for (let r = 0; r < rows; r++) {
+        const i = r * cols + c;
+        if (i >= problems.length) { g += `<div class="vbox"></div>`; continue; }
+        const p = problems[i];
+        g += `<div class="vbox">${vertFormat(p)}${withAns && SHOW_ANS ? `\n${"—".repeat(6)}\n= ${fmtAns(p)}` : ""}</div>`;
+      }
+      g += `</div>`;
+    }
+    g += `</div>`;
+    return g;
+  }
+
+  /* 竖式排版：按运算符输出右对齐算式 */
+  function vertFormat(p) {
+    const lines = [];
+    const [a, b] = p.parts;
+    switch (p.op) {
+      case "+": case "−": {
+        const w = Math.max(String(a).length, String(b).length) + 2;
+        lines.push(padL(a, w));
+        lines.push(`${p.op} ${padL(b, w-2)}`);
+        lines.push("─".repeat(w));
+        break;
+      }
+      case "×": {
+        const w = String(a).length + String(b).length + 1;
+        lines.push(padL(a, w));
+        lines.push(`× ${padL(b, w-2)}`);
+        lines.push("─".repeat(w));
+        break;
+      }
+      case "÷": {
+        lines.push(`${a} ÷ ${b}`);
+        lines.push("─".repeat(String(a).length + 3));
+        break;
+      }
+      default:
+        return p.expr; // 混合/括号不生成竖式
+    }
+    return lines.join("\n");
+  }
+  function padL(n, w) { return String(n).padStart(w, " "); }
+
+  function renderAnswers(problems) {
+    const perRow = Math.max(3, Math.min(6, +$("#qPerRow").value + 1));
+    let g = `<div class="answer-sheet"><h3>参考答案</h3><div class="ans-grid" style="grid-template-columns:repeat(${perRow},1fr)">`;
+    problems.forEach((p, i) => {
+      g += `<div class="ans-item"><span class="a-no">${i+1}.</span><span class="a-val">${fmtAns(p)}</span></div>`;
+    });
+    g += `</div></div>`;
+    return g;
+  }
+
+  function fmtAns(p) {
+    if (p.op === "÷" && p.remainder) {
+      const r = p.parts[0] - p.parts[1] * p.value;
+      return `${p.value}…${r}`;
+    }
+    return p.value;
+  }
+
+  function emptyHtml(msg) {
+    return `<div class="empty">
+      <div class="e-icon">🧮</div>
+      <div class="e-t">${msg}</div>
+      <div class="e-s">调整左侧设置后点「重新生成」</div>
+    </div>`;
+  }
+  function esc(s) { return String(s).replace(/[&<>"']/g, c => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[c])); }
+
+  /* ========== 渲染题型卡片 ========== */
+  function renderTypeCards() {
+    $("#typeGrid").innerHTML = TYPES.map(t => `
+      <div class="type-card ${activeTypes.has(t.id) ? "active" : ""}" data-id="${t.id}">
+        <div class="tc-check"></div>
+        <div class="tc-name">${t.name}</div>
+        <div class="tc-desc">${t.desc}</div>
+      </div>`).join("");
+    $$(".type-card").forEach(el => {
+      el.onclick = () => {
+        const id = el.dataset.id;
+        if (activeTypes.has(id)) {
+          if (activeTypes.size === 1) { toast("至少保留一种题型"); return; }
+          activeTypes.delete(id);
+        } else {
+          activeTypes.add(id);
+        }
+        el.classList.toggle("active");
+        generate();
+      };
+    });
+  }
+
+  /* ========== 提示 ========== */
+  let toastTimer;
+  function toast(msg) {
+    const t = $("#toast");
+    t.textContent = msg;
+    t.classList.add("show");
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => t.classList.remove("show"), 1800);
+  }
+
+  /* ========== 事件 ========== */
+  function bind() {
+    ["digit","resultRange","allowNeg","remainder","qCount","qPerRow","fmtHoriz","fmtVert","showNo","showNameLine","sheetTitle"]
+      .forEach(id => {
+        const el = $("#" + id);
+        const ev = (el.tagName === "INPUT" && el.type === "checkbox") ? "change" : "input";
+        el.addEventListener(ev, () => {
+          // 竖式互斥提示
+          if (id === "fmtVert" && el.checked) {
+            const hasIncompat = [...activeTypes].some(x => x === "mix2" || x === "mix3" || x === "paren");
+            if (hasIncompat) toast("提示：混合运算与带括号题不会生成竖式");
+          }
+          generate();
+        });
+      });
+
+    $("#btnGen").onclick = generate;
+    $("#btnPrint").onclick = () => {
+      if (SHOW_ANS) {
+        if (!confirm("当前显示着答案，确定要连同答案一起打印吗？")) return;
+      }
+      window.print();
+    };
+    $("#btnAns").onclick = (e) => {
+      SHOW_ANS = !SHOW_ANS;
+      e.target.textContent = SHOW_ANS ? "🙈 隐藏答案" : "👁 显示答案";
+      e.target.classList.toggle("btn-accent", SHOW_ANS);
+      render(CURRENT);
+      $("#btnAns").blur();
+    };
+  }
+
+  function init() {
+    renderTypeCards();
+    bind();
+    generate();
+  }
+  document.addEventListener("DOMContentLoaded", init);
+})();
+</script>
+</body>
+</html>

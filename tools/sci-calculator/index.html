@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>科学计算器 | EduToolbox · 课堂投屏·函数运算</title>
+<meta name="description" content="课堂投屏用科学计算器：四则运算、三角函数、对数、幂与根号，支持角度制/弧度制切换、括号优先级、历史记录与键盘输入。">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%A7%AE%3C/text%3E%3C/svg%3E">
+<link rel="stylesheet" href="../../assets/css/tool-common.css">
+<link rel="stylesheet" href="sci-calculator.css">
+</head>
+<body>
+
+<div class="container">
+  <div class="workbench">
+    <!-- ======================= 计算器主体 ======================= -->
+    <main class="calc-panel">
+      <div class="stage-toolbar">
+        <button type="button" class="icon-btn" id="fullscreenBtn" title="全屏展示">⛶</button>
+        <button type="button" class="icon-btn" id="hideSetupBtn" title="隐藏设置栏">⚙</button>
+      </div>
+      <div class="screen">
+        <div class="screen-mode">
+          <div class="chips" id="angleChips">
+            <button type="button" class="chip active" data-angle="deg">DEG 角度</button>
+            <button type="button" class="chip" data-angle="rad">RAD 弧度</button>
+          </div>
+          <span class="screen-ans" id="ansTag" title="上一结果 ANS">ANS 0</span>
+        </div>
+        <div class="expr" id="expr">&nbsp;</div>
+        <div class="result" id="result">0</div>
+        <div class="err" id="errMsg" hidden></div>
+      </div>
+
+      <div class="func-grid" id="funcGrid">
+        <button type="button" class="fkey" data-ins="sin(">sin</button>
+        <button type="button" class="fkey" data-ins="cos(">cos</button>
+        <button type="button" class="fkey" data-ins="tan(">tan</button>
+        <button type="button" class="fkey" data-ins="ln(">ln</button>
+        <button type="button" class="fkey" data-ins="log(">log</button>
+        <button type="button" class="fkey" data-ins="sqrt(">√</button>
+        <button type="button" class="fkey" data-ins="^2">x²</button>
+        <button type="button" class="fkey" data-ins="^">xʸ</button>
+        <button type="button" class="fkey" data-ins="!">n!</button>
+        <button type="button" class="fkey" data-ins="pi">π</button>
+        <button type="button" class="fkey" data-ins="e">e</button>
+        <button type="button" class="fkey" data-ins="ANS">ANS</button>
+        <button type="button" class="fkey" data-ins="abs(">abs</button>
+        <button type="button" class="fkey" data-act="rec">1/x</button>
+        <button type="button" class="fkey" data-ins="%">%</button>
+        <button type="button" class="fkey" data-ins="neg">±</button>
+      </div>
+
+      <div class="pad">
+        <button type="button" class="key key-fn" data-act="clear">CE</button>
+        <button type="button" class="key key-fn" data-act="back">⌫</button>
+        <button type="button" class="key key-fn" data-ins="(">(</button>
+        <button type="button" class="key key-fn" data-ins=")">)</button>
+
+        <button type="button" class="key" data-ins="7">7</button>
+        <button type="button" class="key" data-ins="8">8</button>
+        <button type="button" class="key" data-ins="9">9</button>
+        <button type="button" class="key key-op" data-ins="÷">÷</button>
+
+        <button type="button" class="key" data-ins="4">4</button>
+        <button type="button" class="key" data-ins="5">5</button>
+        <button type="button" class="key" data-ins="6">6</button>
+        <button type="button" class="key key-op" data-ins="×">×</button>
+
+        <button type="button" class="key" data-ins="1">1</button>
+        <button type="button" class="key" data-ins="2">2</button>
+        <button type="button" class="key" data-ins="3">3</button>
+        <button type="button" class="key key-op" data-ins="-">−</button>
+
+        <button type="button" class="key" data-ins="0">0</button>
+        <button type="button" class="key" data-ins=".">.</button>
+        <button type="button" class="key key-op" data-ins="+">+</button>
+        <button type="button" class="key key-eq" data-act="eq">=</button>
+      </div>
+
+      <p class="pad-tip">键盘直输：<kbd>0-9</kbd> <kbd>+ - * /</kbd> <kbd>^</kbd> <kbd>(</kbd> <kbd>)</kbd> · <kbd>Enter</kbd> 计算 · <kbd>Backspace</kbd> 退格 · <kbd>Esc</kbd> 清空</p>
+    </main>
+
+    <!-- ======================= 历史 ======================= -->
+    <aside class="panel hist-panel">
+      <div class="panel-head">
+        <h2 class="panel-title">🕘 计算历史</h2>
+        <button type="button" class="btn btn-small btn-ghost" id="btnClearHist">清空</button>
+      </div>
+      <ul class="record-list" id="history"></ul>
+      <div class="hist-tip">点击任意记录可将结果填回表达式</div>
+    </aside>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="../../assets/js/frame-bridge.js"></script>
+<script src="../../assets/js/tool-stage-toolbar.js"></script>
+<script src="sci-calculator.js"></script>
+</body>
+</html>

@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>语文听写报词助手 | EduToolbox · 逐词朗读·间隔默写</title>
+<meta name="description" content="导入生词，设置报词间隔与遍数，逐词朗读（合成语音）供学生听写默写，可暂停/重报/回放。本地运行，无网络依赖。">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%94%89%3C/text%3E%3C/svg%3E">
+<link rel="stylesheet" href="../../assets/css/tool-common.css">
+<link rel="stylesheet" href="dictation-chinese.css">
+</head>
+<body>
+
+<div class="container">
+  <div class="workbench">
+    <!-- ======================= 左侧设置面板 ======================= -->
+    <aside class="panel setup-panel">
+      <div class="block">
+        <h2 class="block-title">① 生词列表</h2>
+        <p class="block-hint">每行一个词；可用「词语+空格+组词」增强记忆</p>
+        <textarea id="words" class="text-input" rows="6" placeholder="例如：&#10;茁壮&#10;蜿蜒 蜿蜒的山路&#10;辉煌"></textarea>
+        <div class="chips chips-mini" id="libChips"></div>
+      </div>
+
+      <div class="block">
+        <h2 class="block-title">② 报读设置</h2>
+        <div class="field row">
+          <label for="repeatCount">每词报读次数</label>
+          <select id="repeatCount" class="text-input sel">
+            <option value="1">1 次</option>
+            <option value="2" selected>2 次</option>
+            <option value="3">3 次</option>
+          </select>
+        </div>
+        <div class="field row">
+          <label for="gapSec">词间间隔（秒）</label>
+          <select id="gapSec" class="text-input sel">
+            <option value="3">3 秒</option>
+            <option value="5" selected>5 秒</option>
+            <option value="8">8 秒</option>
+            <option value="10">10 秒</option>
+          </select>
+        </div>
+        <div class="field row">
+          <label for="rate">朗读语速</label>
+          <select id="rate" class="text-input sel">
+            <option value="0.7">较慢</option>
+            <option value="0.9" selected>正常</option>
+            <option value="1.1">稍快</option>
+          </select>
+        </div>
+        <label class="check">
+          <input type="checkbox" id="withIndex" checked>
+          <span>报词前播报序号（“第 X 个”）</span>
+        </label>
+        <label class="check">
+          <input type="checkbox" id="withGroup" checked>
+          <span>报词语后再报组词（如有）</span>
+        </label>
+      </div>
+
+      <div class="actions">
+        <button type="button" class="btn btn-primary" id="btnStart">▶ 开始听写</button>
+        <button type="button" class="btn btn-ghost btn-small" id="btnPause" disabled>⏸ 暂停</button>
+        <button type="button" class="btn btn-small" id="btnRepeat">↻ 重报当前</button>
+        <button type="button" class="btn btn-small" id="btnStop" disabled>■ 结束</button>
+      </div>
+    </aside>
+
+    <!-- ======================= 右侧展示舞台 ======================= -->
+    <main class="stage-panel">
+      <!-- 舞台右上角工具栏：⛶ 舞台全屏（自动隐藏设置栏） / ⚙ 切换设置栏显隐 -->
+      <div class="stage-toolbar">
+        <button type="button" class="icon-btn" id="fullscreenBtn" title="全屏">⛶</button>
+        <button type="button" class="icon-btn" id="hideSetupBtn" title="隐藏设置">⚙</button>
+      </div>
+      <div class="stage-head">
+        <h2 class="panel-title">🎤 听写进行中</h2>
+        <span class="stage-ok" id="stageOk">未开始</span>
+      </div>
+
+      <!-- 就绪态 -->
+      <div class="stage-ready" id="readyView">
+        <div class="ready-icon">📝</div>
+        <div class="ready-title">准备就绪</div>
+        <div class="ready-desc">共 <b id="wordCount">0</b> 个词 · 点「开始听写」后逐词朗读</div>
+      </div>
+
+      <!-- 听写态 -->
+      <div class="stage-running" id="runningView" style="display:none">
+        <div class="progress-line"><div class="progress-bar" id="progressBar"></div></div>
+        <div class="big-index" id="curIndex">1 / 12</div>
+        <div class="big-word" id="curWord">茁壮</div>
+        <div class="word-note" id="curGroup"></div>
+        <div class="word-shadow" id="shadowWord">茁壮</div>
+        <div class="timer-line">⏱ 本轮 <span id="elapsed">00:00</span></div>
+      </div>
+
+      <!-- 结束态 -->
+      <div class="stage-done" id="doneView" style="display:none">
+        <div class="done-icon">🎉</div>
+        <div class="done-title">听写结束</div>
+        <div class="done-desc" id="doneDesc">共 12 个词，用时 02:30</div>
+        <div class="done-actions">
+          <button type="button" class="btn btn-primary" id="btnReplay">↻ 从头重报</button>
+          <button type="button" class="btn btn-small" id="btnAgain">再写一轮</button>
+        </div>
+      </div>
+
+      <div class="stage-tip" id="tipLine">💡 建议先让学生翻页，再点开始。听写中可随时暂停或重报当前词。</div>
+    </main>
+  </div>
+</div>
+
+<!-- 提示条 -->
+<div class="toast" id="toast"></div>
+
+<script src="../../assets/js/frame-bridge.js"></script>
+<script src="../../assets/js/tool-stage-toolbar.js"></script>
+<script src="dictation-chinese.js"></script>
+</body>
+</html>

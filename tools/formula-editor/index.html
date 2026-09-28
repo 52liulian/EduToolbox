@@ -1,0 +1,110 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LaTeX公式编辑器 | EduToolbox · 公式可视化</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%8E%93%3C/text%3E%3C/svg%3E">
+<link rel="stylesheet" href="../../assets/vendor/katex/katex.min.css">
+<link rel="stylesheet" href="../../assets/css/tool-common.css">
+<link rel="stylesheet" href="formula-editor.css">
+</head>
+<body>
+
+<!-- ====================================================================
+     主体容器
+     ==================================================================== -->
+<main class="container">
+  <!-- ==================================================================
+       符号工具条（按分块：上下标 / 分式根号 / 运算符 / 关系 / 希腊字母 /
+       求和积分 / 矩阵分段 / 函数 / 箭头）
+       ================================================================== -->
+  <section class="card toolbar-card" id="toolbarCard">
+    <div class="toolbar-head">
+      <span class="toolbar-title">🧩 常用符号面板</span>
+      <span class="toolbar-hint">点击按钮在光标位置插入 LaTeX 片段</span>
+    </div>
+    <div class="toolbar-groups" id="toolbarGroups"><!-- 符号按钮由脚本生成 --></div>
+  </section>
+
+  <!-- ==================================================================
+       左右分栏：左侧输入 / 右侧预览
+       ================================================================== -->
+  <section class="editor-grid">
+    <!-- 左侧：源码输入 -->
+    <div class="card pane pane-input">
+      <div class="pane-head">
+        <span class="pane-label">✏️ LaTeX 源码</span>
+        <select id="exampleSelect" class="example-select" title="选择示例公式">
+          <option value="">📚 选择示例公式…</option>
+        </select>
+      </div>
+      <textarea id="latexInput" class="latex-input" spellcheck="false"
+        placeholder="在此输入 LaTeX，例如：\frac{-b \pm \sqrt{b^2-4ac}}{2a}"></textarea>
+      <div class="pane-foot">
+        <label class="display-toggle">
+          <input type="checkbox" id="displayMode" checked>
+          <span>行间公式（displayMode，居中放大）</span>
+        </label>
+        <label class="display-toggle">
+          <input type="checkbox" id="autoRender" checked>
+          <span>输入后自动渲染</span>
+        </label>
+      </div>
+    </div>
+
+    <!-- 右侧：实时预览 -->
+    <div class="card pane pane-preview" id="previewPane">
+      <!-- 舞台右上角工具栏：⛶ 全屏预览 / ⚙ 隐藏源码栏（由共享模块 tool-stage-toolbar.js 接管） -->
+      <div class="stage-toolbar">
+        <button type="button" class="icon-btn" id="fullscreenBtn" title="全屏">⛶</button>
+        <button type="button" class="icon-btn" id="hideSetupBtn" title="隐藏设置">⚙</button>
+      </div>
+      <div class="pane-head">
+        <span class="pane-label">👁️ 实时预览</span>
+        <div class="pane-head-right">
+          <span class="status" id="status">就绪</span>
+        </div>
+      </div>
+      <div class="preview-box" id="previewBox">
+        <div class="preview-content" id="previewContent"></div>
+      </div>
+      <div class="error-box" id="errorBox"></div>
+    </div>
+  </section>
+
+  <!-- ==================================================================
+       操作按钮区
+       ================================================================== -->
+  <section class="actions">
+    <button class="btn btn-primary" id="btnRender">⚡ 生成预览</button>
+    <button class="btn btn-primary" id="btnCopy">📋 复制 LaTeX 源码</button>
+    <button class="btn btn-primary" id="btnPng">🖼️ 导出 PNG</button>
+    <button class="btn btn-primary" id="btnSvg">📐 导出 SVG</button>
+    <button class="btn btn-ghost" id="btnClear">🗑️ 重置</button>
+  </section>
+
+  <!-- ==================================================================
+       底部说明（输入提示）
+       ================================================================== -->
+  <section class="tips">
+    <h3 class="tips-title">💡 输入提示</h3>
+    <ol class="tips-list">
+      <li>分数推荐使用 <code>\frac{a}{b}</code>，上下标使用 <code>x^2</code>、<code>a_{n}</code>。</li>
+      <li>根式使用 <code>\sqrt{x}</code>，积分与求和可写成 <code>\int_0^1</code>、<code>\sum_{i=1}^{n}</code>。</li>
+      <li>矩阵可使用 <code>\begin{bmatrix}...\end{bmatrix}</code>，并用 <code>\\</code> 换行。</li>
+      <li>关闭"输入后自动渲染"后，请手动点击"生成预览"按钮刷新公式。</li>
+    </ol>
+  </section>
+</main>
+
+<!-- ====================================================================
+     全屏预览：不再使用自定义浮层，改为 Fullscreen API 直接放大 #previewPane
+     ==================================================================== -->
+<script src="../../assets/js/frame-bridge.js"></script>
+<script src="../../assets/vendor/katex/katex.min.js"></script>
+<script src="../../assets/vendor/html2canvas.min.js"></script>
+<script src="../../assets/js/tool-stage-toolbar.js"></script>
+<script src="formula-editor.js"></script>
+</body>
+</html>

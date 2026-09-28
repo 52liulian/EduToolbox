@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+  <title>融会贯通 · 中小学数学教练 | EduToolbox</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%E2%88%91%3C/text%3E%3C/svg%3E">
+  <link rel="stylesheet" href="math-mastery.css" />
+  <link rel="stylesheet" href="../../assets/css/tool-common.css" />
+</head>
+<body>
+
+  <!-- 舞台容器：⛶ 的全屏目标就是本元素自身；右上角的 .stage-toolbar 是它的第一个
+       子元素，形态对齐基准工具 random-call。 -->
+  <div class="app-stage" id="appStage">
+    <!-- 舞台右上角工具栏：⛶ 全屏（纯图标无文字，交互由共享模块
+         assets/js/tool-stage-toolbar.js 提供）。本工具没有可隐藏的设置栏，
+         按该模块「约定 4」只挂 ⛶、不挂 ⚙。 -->
+    <div class="stage-toolbar">
+      <button type="button" class="icon-btn" id="fullscreenBtn" title="全屏">⛶</button>
+    </div>
+
+    <header class="topbar">
+      <div class="brand">
+        <span class="logo">∑</span>
+        <div>
+          <div class="brand-title">融会贯通</div>
+          <div class="brand-sub">中小学数学技巧教练</div>
+        </div>
+      </div>
+      <div class="nav">
+        <a href="#/path" class="nav-link" data-route="path">学习路径</a>
+        <a href="#/review" class="nav-link" data-route="review">薄弱点复习<span class="badge" id="weakBadge">0</span></a>
+        <a href="#/progress" class="nav-link" data-route="progress">我的进度</a>
+        <a href="#/ai" class="nav-link" data-route="ai">AI诊断</a>
+        <a href="#/resources" class="nav-link" data-route="resources">相关项目</a>
+      </div>
+    </header>
+
+    <main id="view" class="view"><!-- 路由渲染区 --></main>
+
+    <footer class="attrib">
+      本工具引用自开源项目
+      <a href="https://github.com/kenowong/math-mastery" target="_blank" rel="noopener noreferrer">kenowong/math-mastery</a>
+      <span class="dot">·</span>遵循原项目开源许可，由杏坛网络工作室（EduToolbox）适配集成，数据均在本机浏览器中处理。
+    </footer>
+
+    <!-- 轻提示浮层放在舞台内部，保证全屏态下依然可见 -->
+    <div id="toast" class="toast"></div>
+  </div>
+
+  <script src="../../assets/js/frame-bridge.js"></script>
+<script src="../../assets/js/tool-stage-toolbar.js"></script>
+  <script src="math-mastery.js"></script>
+</body>
+</html>

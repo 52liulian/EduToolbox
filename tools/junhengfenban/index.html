@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <script src="../../assets/js/frame-bridge.js"></script>
+<script src="../../assets/vendor/xlsx.full.min.js"></script>
+    <script src="../../assets/vendor/echarts.min.js"></script>
+    <style>
+        *{box-sizing:border-box;margin:0;padding:0;font-family:"Microsoft Yahei",sans-serif}
+        body{background:#f5f7fa;padding:20px}
+        .container{max-width:1400px;margin:0 auto;background:#fff;padding:24px;border-radius:12px;box-shadow:0 2px 12px #e0e5ec}
+        h1{text-align:center;color:#222;margin-bottom:20px;font-size:22px}
+        .row{display:flex;gap:16px;margin-bottom:16px;flex-wrap:wrap}
+        .card{border:1px solid #e5e7eb;padding:16px;border-radius:8px;flex:1;min-width:280px}
+        .card h3{font-size:16px;margin-bottom:12px;color:#333}
+        input,select,button{padding:8px 12px;font-size:14px;border:1px solid #ccc;border-radius:6px}
+        input[type="file"]{border:none;padding:0}
+        button{background:#1677ff;color:#fff;border:none;cursor:pointer;margin-right:8px;transition:opacity .2s}
+        button:hover{opacity:.9}
+        button.gray{background:#888}button.green{background:#00b42a}
+        button.orange{background:#ff7d00}button.red{background:#f53f3f}button.purple{background:#722ed1}
+        button:disabled{background:#ccc;cursor:not-allowed}
+        .table-box{margin-top:20px;overflow:auto;max-height:400px;border:1px solid #eee;border-radius:8px}
+        table{width:100%;border-collapse:collapse;min-width:1100px}
+        th,td{border:1px solid #eee;padding:8px 10px;font-size:13px;text-align:center}
+        th{background:#f0f7ff;position:sticky;top:0;z-index:1}
+        .tip{color:#666;font-size:13px;margin:8px 0}
+        .tip.error{color:#f53f3f}.tip.success{color:#00b42a}
+        .stat-box{margin-top:16px;padding:16px;background:#f8fafc;border-radius:8px;border:1px solid #e5e7eb}
+        .hidden{display:none!important}
+        .preview-table{max-height:350px}
+        .constraint-box{margin:8px 0;padding:12px;background:#fffbeb;border-radius:6px;border:1px solid #fff3cd}
+        #chartContainer{display:flex;gap:16px;margin-top:16px;flex-wrap:wrap;width:100%;min-height:350px}
+        .chart-wrapper{flex:1;min-width:400px;height:350px!important;width:auto!important;border:1px solid #eee;border-radius:8px;background:#fff}
+        .batch-list{margin-top:12px;max-height:200px;overflow-y:auto;border:1px solid #eee;border-radius:6px}
+        .batch-item{display:flex;justify-content:space-between;align-items:center;padding:8px 12px;border-bottom:1px solid #f0f0f0;font-size:13px}
+        .batch-item:last-child{border-bottom:none}.batch-item:hover{background:#f9f9f9}
+        .batch-tag{display:inline-block;padding:2px 8px;border-radius:4px;font-size:12px;margin-right:6px}
+        .tag-done{background:#e8ffea;color:#00b42a}.batch-info{color:#666}
+        .source-tag{display:inline-block;padding:2px 8px;border-radius:4px;font-size:12px;font-weight:bold}
+        .source-fixed{background:#fff1f0;color:#cf1322;border:1px solid #ffa39e}
+        .source-algo{background:#e6f7ff;color:#096dd9;border:1px solid #91d5ff}
+
+        /* 🔑 打印专用样式 */
+        @media print {
+            body * { visibility: hidden; }
+            #printArea, #printArea * { visibility: visible; }
+            #printArea { position: absolute; left: 0; top: 0; width: 100%; padding: 20px; background: #fff; }
+            .print-page { page-break-after: always; margin-bottom: 40px; }
+            .print-page:last-child { page-break-after: avoid; }
+            .print-title { text-align: center; font-size: 22px; font-weight: bold; margin-bottom: 10px; color: #000; }
+            .print-subtitle { text-align: center; font-size: 14px; color: #555; margin-bottom: 20px; }
+            .print-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+            .print-table th, .print-table td { border: 1px solid #000; padding: 6px 8px; text-align: center; }
+            .print-table th { background: #f0f0f0 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; font-weight: bold; }
+            .print-footer { margin-top: 30px; display: flex; justify-content: space-between; font-size: 12px; color: #333; }
+            .no-print { display: none !important; }
+        }
+    </style>
+<style>
+/* ============================================================================
+ * EduToolbox 组件化挂载兜底（自动追加）
+ * ----------------------------------------------------------------------------
+ * 本工具未引入 assets/css/tool-common.css，挂载进站点（Shadow DOM）后会缺少：
+ *   1) 六色主题变量 --primary / --primary-soft / --primary-grad
+ *   2) .container 的宽度约束（否则内容铺满并贴边）
+ * 这里补齐最小等价集，保证「独立打开」与「站点内组件化挂载」视觉一致。
+ * ========================================================================== */
+
+:root,
+:host,
+body[data-theme="sky"]   { --primary:#0ea5e9; --primary-soft:#e0f2fe; --primary-soft-2:#ccecfc; --primary-grad:linear-gradient(135deg,#38bdf8,#0ea5e9,#0284c7); }
+body[data-theme="violet"]{ --primary:#7c3aed; --primary-soft:#f0e9fe; --primary-soft-2:#e2d5fc; --primary-grad:linear-gradient(135deg,#8b5cf6,#7c3aed,#6d28d9); }
+body[data-theme="green"] { --primary:#16a34a; --primary-soft:#e7f6ec; --primary-soft-2:#d3f0dc; --primary-grad:linear-gradient(135deg,#22c55e,#16a34a,#15803d); }
+body[data-theme="gold"]  { --primary:#d97706; --primary-soft:#fdf1dc; --primary-soft-2:#fbe3bc; --primary-grad:linear-gradient(135deg,#f59e0b,#d97706,#b45309); }
+body[data-theme="orange"]{ --primary:#ea580c; --primary-soft:#ffefe4; --primary-soft-2:#ffdec9; --primary-grad:linear-gradient(135deg,#fb923c,#ea580c,#c2410c); }
+body[data-theme="pink"]  { --primary:#db2777; --primary-soft:#fce7f0; --primary-soft-2:#f9cfe1; --primary-grad:linear-gradient(135deg,#f472b6,#db2777,#be185d); }
+
+/* 容器宽度兜底：仅在工具自身未声明时生效（不覆盖已有 .container 规则） */
+.container:not([data-no-fallback]) {
+  width: 100%;
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 28px 24px 56px;
+  box-sizing: border-box;
+}
+</style>
+</head>
+<body>
+<div class="container no-print">
+    <!-- 1. 导入模块 -->
+    <div class="card">
+        <h3>1. 导入学生模板Excel</h3>
+        <div style="margin-bottom:12px;padding:10px;background:#f0f7ff;border-radius:6px;border:1px dashed #91caff;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
+            <span class="tip" style="margin:0;color:#1677ff">📥 F列同名公式 | 固定班预扣 | 同名异班 | 性别配额精确均衡 | 🖨️ 支持按班打印</span>
+            <button id="downloadTemplateBtn" style="background:#1677ff;font-size:13px;padding:6px 16px">下载导入模板</button>
+        </div>
+        <input type="file" id="fileInput" accept=".xlsx,.xls">
+        <div id="uploadControls" class="hidden" style="margin-top:12px">
+            <div style="margin:8px 0;display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+                <label>选择工作表：</label><select id="sheetSelect" style="min-width:150px"></select>
+                <button id="previewSheetBtn">预览选中工作表</button>
+            </div>
+            <div style="margin:8px 0;display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+                <label>表头行号：</label><input type="number" id="headerRow" value="1" min="1" style="width:80px">
+                <label>数据起始行号：</label><input type="number" id="dataStartRow" value="2" min="1" style="width:80px">
+                <button id="confirmImportBtn" class="green">确认导入数据</button>
+            </div>
+        </div>
+        <div id="uploadTip" class="tip"></div>
+        <div id="previewBox" class="hidden table-box preview-table"></div>
+    </div>
+
+    <!-- 2. 参数与操作模块 -->
+    <div class="row">
+        <div class="card" style="flex:2">
+            <h3>2. 分班参数配置</h3>
+            <div class="tip">💡 P0核心：固定班预扣 → 同名异班 → 多胞胎约束 → 性别独立配额分配</div>
+            <div style="margin:8px 0;display:flex;align-items:center;gap:8px">
+                <label>起始序号：</label><input type="number" id="startIdx" value="1" min="1" style="width:100px">
+                <label>结束序号：</label><input type="number" id="endIdx" value="300" min="1" style="width:100px">
+            </div>
+            <div class="constraint-box">
+                <div style="margin:6px 0;display:flex;align-items:center;gap:8px">
+                    <label>目标班级数量：</label><input type="number" id="classNum" value="6" min="2" max="50" style="width:100px">
+                </div>
+                <div style="margin:6px 0;display:flex;align-items:center;gap:8px">
+                    <label>每班人数上限：</label><input type="number" id="fixedClassSize" value="50" min="10" max="200" style="width:100px">
+                </div>
+                <div style="margin:6px 0;display:flex;align-items:center;gap:8px">
+                    <label>本批导出起始班号：</label><input type="number" id="exportStartClassNum" value="1" min="1" max="99" style="width:100px">
+                </div>
+            </div>
+            <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">
+                <button id="startSplit" class="orange">▶ 执行当前批次分班并暂存</button>
+                <button class="gray" id="resetBtn">重置所有数据</button>
+            </div>
+            <div style="margin-top:16px">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+                    <strong style="font-size:14px">📋 已暂存分班批次</strong>
+                    <button id="clearBatchesBtn" class="red" style="font-size:12px;padding:4px 10px" disabled>清空暂存</button>
+                </div>
+                <div id="batchList" class="batch-list"><div style="padding:20px;text-align:center;color:#999;font-size:13px">暂无分班记录</div></div>
+            </div>
+        </div>
+        <div class="card" style="flex:1">
+            <h3>3. 导出与打印</h3>
+            <p class="tip">支持合并导出Excel或按班级生成标准A4打印名单。</p>
+            <div style="margin:12px 0;padding:12px;background:#f0f7ff;border-radius:6px;font-size:13px">
+                <div>总人数：<strong id="totalCountDisplay">0</strong></div>
+                <div>已分班：<strong id="assignedCountDisplay" style="color:#00b42a">0</strong></div>
+                <div>未分班：<strong id="unassignedCountDisplay" style="color:#ff7d00">0</strong></div>
+            </div>
+            <button class="green" id="exportMergedBtn" disabled style="width:100%;padding:12px;font-size:15px;margin-bottom:8px">📥 导出合并后的总分班结果</button>
+            <button class="purple" id="printClassListBtn" disabled style="width:100%;padding:12px;font-size:15px">🖨️ 打印各班分班名单</button>
+            <div id="exportTip" class="tip" style="margin-top:8px"></div>
+        </div>
+    </div>
+
+    <!-- 统计与预览模块 -->
+    <div class="stat-box hidden" id="statPanel">
+        <h3>最近一次分班统计概览</h3>
+        <div id="statContent" class="tip"></div>
+        <div id="chartContainer"></div>
+    </div>
+    <div class="table-box hidden" id="resultBox">
+        <table id="resultTable"><thead id="resultThead"></thead><tbody id="resultTbody"></tbody></table>
+    </div>
+</div>
+
+<!-- 🔑 打印专用隐藏区域 -->
+<div id="printArea" class="hidden"></div>
+
+<script>
+let allStudent=[],extraColumns=[],workbook=null,chartInstances=[];
+let mergedAssignmentMap={},batchRecords=[],globalClassStats={};
+// 🔑 新增初中毕业学校字段映射
+const FIXED_FIELD_KEYS={serial:'序号',name:'姓名',gender:'性别',idCard:'身份证',score:'总分',sameNameGroup:'同名',twinGroup:'多胞胎组',twinSameClass:'多胞胎同班',fixedClass:'固定班级',assignedClass:'分配班级',middleSchool:'初中毕业学校'};
+const $=id=>document.getElementById(id);
+const fileInput=$('fileInput'),uploadTip=$('uploadTip'),uploadControls=$('uploadControls');
+const sheetSelect=$('sheetSelect'),previewSheetBtn=$('previewSheetBtn');
+const headerRow=$('headerRow'),dataStartRow=$('dataStartRow'),confirmImportBtn=$('confirmImportBtn');
+const previewBox=$('previewBox'),startIdx=$('startIdx'),endIdx=$('endIdx');
+const classNumInput=$('classNum'),fixedClassSizeInput=$('fixedClassSize');
+const exportStartClassNumInput=$('exportStartClassNum'),startSplitBtn=$('startSplit');
+const resetBtn=$('resetBtn'),clearBatchesBtn=$('clearBatchesBtn'),exportMergedBtn=$('exportMergedBtn');
+const printClassListBtn=$('printClassListBtn');
+const exportTip=$('exportTip'),statPanel=$('statPanel'),statContent=$('statContent');
+const resultBox=$('resultBox'),resultThead=$('resultThead'),resultTbody=$('resultTbody');
+const chartContainer=$('chartContainer'),batchList=$('batchList');
+const totalCountDisplay=$('totalCountDisplay'),assignedCountDisplay=$('assignedCountDisplay');
+const unassignedCountDisplay=$('unassignedCountDisplay'),printArea=$('printArea');
+
+// ==================== 下载模板（含初中毕业学校列） ====================
+$('downloadTemplateBtn').addEventListener('click',function(){
+    const headers=['序号','姓名','性别','身份证号码','总分','初中毕业学校','同名或近音','多胞胎组','多胞胎同班','固定班级','分配班级'];
+    const sampleData=[[1,'张三','男','110101201401010011',580,'市第一中学','','','否','',''],[2,'李四','女','110101201402020022',575,'区实验中学','','','否','','']];
+    const wb=XLSX.utils.book_new(),ws=XLSX.utils.aoa_to_sheet([headers,...sampleData]);
+    for(let row=2;row<=201;row++){ws['G'+row]={t:'n',f:`IF(COUNTIF($B:$B,B${row})>1,B${row}&"组","")`,v:''};}
+    ws['!cols']=[{wch:6},{wch:10},{wch:6},{wch:20},{wch:8},{wch:16},{wch:14},{wch:12},{wch:12},{wch:10},{wch:10}];
+    XLSX.utils.book_append_sheet(wb,ws,'学生导入模板');XLSX.writeFile(wb,'学生导入模板.xlsx');
+});
+
+// ==================== 文件读取 & 导入 ====================
+fileInput.addEventListener('change',function(e){
+    const file=e.target.files[0];if(!file)return;
+    const reader=new FileReader();
+    reader.onload=function(ev){
+        try{
+            workbook=XLSX.read(new Uint8Array(ev.target.result),{type:'array',cellFormula:true});
+            sheetSelect.innerHTML='';workbook.SheetNames.forEach(n=>{const o=document.createElement('option');o.value=n;o.textContent=n;sheetSelect.appendChild(o);});
+            uploadControls.classList.remove('hidden');uploadTip.innerHTML=`<span class="success">✅ 读取成功，共 ${workbook.SheetNames.length} 个工作表</span>`;previewBox.classList.add('hidden');
+        }catch(err){uploadTip.innerHTML=`<span class="error">❌ ${err.message}</span>`;}
+    };reader.readAsArrayBuffer(file);
+});
+previewSheetBtn.addEventListener('click',function(){
+    const sn=sheetSelect.value;if(!sn||!workbook)return;
+    try{
+        const d=XLSX.utils.sheet_to_json(workbook.Sheets[sn],{header:1,range:0,raw:false});
+        previewBox.classList.remove('hidden');
+        let h='<table><thead><tr>';if(d[0])d[0].forEach((c,i)=>{h+=`<th>${c||'列'+(i+1)}</th>`;});h+='</tr></thead><tbody>';
+        d.slice(1,21).forEach(r=>{h+='<tr>'+r.map(c=>`<td>${c||''}</td>`).join('')+'</tr>';});h+='</tbody></table>';
+        previewBox.innerHTML=h;uploadTip.innerHTML='<span class="success">✅ 预览成功</span>';
+    }catch(err){uploadTip.innerHTML=`<span class="error">❌ ${err.message}</span>`;}
+});
+confirmImportBtn.addEventListener('click',function(){
+    const sn=sheetSelect.value,hr=parseInt(headerRow.value)-1,dr=parseInt(dataStartRow.value)-1;
+    if(!sn||!workbook){uploadTip.innerHTML='<span class="error">❌ 请先选择工作表</span>';return;}
+    if(isNaN(hr)||isNaN(dr)||hr>=dr){uploadTip.innerHTML='<span class="error">❌ 行号设置无效</span>';return;}
+    try{
+        const allRows=XLSX.utils.sheet_to_json(workbook.Sheets[sn],{header:1,raw:false});
+        const hc=allRows[hr]||[],validRows=allRows.slice(dr).filter(r=>r.some(c=>c!=null&&c!==undefined&&c!==''));
+        const fim={};Object.entries(FIXED_FIELD_KEYS).forEach(([f,k])=>{const i=hc.findIndex(c=>String(c||'').includes(k));if(i!==-1)fim[f]=i;});
+        if(fim.serial===undefined||fim.name===undefined){uploadTip.innerHTML='<span class="error">❌ 未找到「序号」或「姓名」列</span>';return;}
+        extraColumns=[];hc.forEach((c,i)=>{const s=String(c||'');if(!Object.values(FIXED_FIELD_KEYS).some(k=>s.includes(k))&&s.trim())extraColumns.push({name:s,index:i});});
+        allStudent=validRows.map(r=>{
+            const stu={serial:Number(r[fim.serial])||0,name:r[fim.name]||'',gender:String(r[fim.gender]||'').trim(),idCard:String(r[fim.idCard]||'').trim(),score:Number(r[fim.score])||0,middleSchool:r[fim.middleSchool]||'',sameNameGroup:r[fim.sameNameGroup]||'',twinGroup:r[fim.twinGroup]||'',twinSameClass:String(r[fim.twinSameClass]).trim()==='是',fixedClass:String(r[fim.fixedClass]||'').trim(),assignedClass:'',segment:null,extraData:{},originalIndex:0};
+            extraColumns.forEach(col=>{stu.extraData[col.name]=r[col.index]??'';});return stu;
+        });
+        if(!allStudent.length){uploadTip.innerHTML='<span class="error">❌ 无有效数据</span>';return;}
+        uploadTip.innerHTML=`<span class="success">✅ 导入 ${allStudent.length} 人，${extraColumns.length} 个扩展列</span>`;
+        endIdx.value=allStudent.length;updateMergeStats();
+    }catch(err){uploadTip.innerHTML=`<span class="error">❌ ${err.message}</span>`;}
+});
+
+function updateMergeStats(){
+    const total=allStudent.length,assigned=Object.keys(mergedAssignmentMap).length;
+    totalCountDisplay.textContent=total;assignedCountDisplay.textContent=assigned;unassignedCountDisplay.textContent=total-assigned;
+    exportMergedBtn.disabled=total===0;printClassListBtn.disabled=assigned===0;clearBatchesBtn.disabled=batchRecords.length===0;
+    batchList.innerHTML=batchRecords.length?batchRecords.map((b,idx)=>`<div class="batch-item"><div><span class="batch-tag tag-done">批次${idx+1}</span><strong>序号 ${b.start}-${b.end}</strong><span class="batch-info" style="margin-left:8px">${b.count}人→${b.classCount}班(${b.labelStart}~${b.labelEnd})</span></div><span class="batch-info">${b.time}</span></div>`).join(''):'<div style="padding:20px;text-align:center;color:#999;font-size:13px">暂无分班记录</div>';
+}
+
+// ==================== 🔑 P0核心引擎（数学级性别均衡版） ====================
+startSplitBtn.addEventListener('click',function(){
+    const cNum=parseInt(classNumInput.value),fSize=parseInt(fixedClassSizeInput.value);
+    const sIdx=parseInt(startIdx.value),eIdx=parseInt(endIdx.value);
+    const labelStart=parseInt(exportStartClassNumInput.value)||1;
+    if(!allStudent.length){alert('请先导入数据');return;}
+    if(cNum<2||fSize<1){alert('参数无效');return;}
+
+    const classLabels=Array.from({length:cNum},(_,i)=>`${labelStart+i}班`);
+    const baseOccupied={},baseMale={},baseFemale={};
+    classLabels.forEach(cl=>{baseOccupied[cl]=0;baseMale[cl]=0;baseFemale[cl]=0;});
+    
+    Object.entries(mergedAssignmentMap).forEach(([serial,cl])=>{
+        if(classLabels.includes(cl)){
+            const stu=allStudent.find(s=>String(s.serial)===String(serial));
+            if(stu){baseOccupied[cl]++;if(stu.gender==='男')baseMale[cl]++;else baseFemale[cl]++;}
+        }
+    });
+
+    const toSplit=[];
+    allStudent.forEach((stu,i)=>{
+        stu.originalIndex=i;
+        if(stu.serial>=sIdx&&stu.serial<=eIdx&&!mergedAssignmentMap[stu.serial])toSplit.push(stu);
+    });
+    if(!toSplit.length){alert(`序号 ${sIdx}-${eIdx} 范围内没有新的待分班学生`);return;}
+
+    const sortedByScore = [...toSplit].sort((a,b) => b.score - a.score);
+    const segSize = Math.ceil(sortedByScore.length / 5);
+    sortedByScore.forEach((s, idx) => { s.segment = Math.min(4, Math.floor(idx / segSize)); });
+
+    const fixedInBatch=[],poolForAlgo=[];
+    toSplit.forEach(s=>{
+        if(s.fixedClass&&classLabels.includes(s.fixedClass))fixedInBatch.push(s);
+        else poolForAlgo.push(s);
+    });
+
+    const fixedMale={},fixedFemale={};
+    classLabels.forEach(cl=>{fixedMale[cl]=0;fixedFemale[cl]=0;});
+    fixedInBatch.forEach(s=>{if(s.gender==='男')fixedMale[s.fixedClass]++;else fixedFemale[s.fixedClass]++;});
+
+    const remainCap={};let totalRemain=0;
+    classLabels.forEach(cl=>{
+        remainCap[cl]=Math.max(0,fSize-baseOccupied[cl]-fixedInBatch.filter(s=>s.fixedClass===cl).length);
+        totalRemain+=remainCap[cl];
+    });
+    if(poolForAlgo.length>totalRemain){alert(`⚠️ 容量不足！可分配 ${totalRemain} 人，待分配 ${poolForAlgo.length} 人`);return;}
+
+    const twinsSame={},twinsDiff={},sameNameGroups={};
+    const normalStudents=[];
+    poolForAlgo.forEach(s=>{
+        if(s.twinGroup&&s.twinSameClass){if(!twinsSame[s.twinGroup])twinsSame[s.twinGroup]=[];twinsSame[s.twinGroup].push(s);}
+        else if(s.twinGroup&&!s.twinSameClass){if(!twinsDiff[s.twinGroup])twinsDiff[s.twinGroup]=[];twinsDiff[s.twinGroup].push(s);}
+        else if(s.sameNameGroup){if(!sameNameGroups[s.sameNameGroup])sameNameGroups[s.sameNameGroup]=[];sameNameGroups[s.sameNameGroup].push(s);}
+        else normalStudents.push(s);
+    });
+
+    const classVirtualCount={},classMaleCount={},classFemaleCount={};
+    classLabels.forEach(cl=>{
+        classVirtualCount[cl]=baseOccupied[cl]+fixedInBatch.filter(s=>s.fixedClass===cl).length;
+        classMaleCount[cl]=baseMale[cl]+fixedMale[cl];
+        classFemaleCount[cl]=baseFemale[cl]+fixedFemale[cl];
+    });
+
+    const classes=Array.from({length:cNum},()=>[]);
+    const getAvg=(cl)=>{const st=globalClassStats[cl];return st&&st.count>0?st.totalScore/st.count:0;};
+    const getClassPriorityOrder=()=>{
+        return Array.from({length:cNum},(_,i)=>i).sort((a,b)=>{
+            const la=classLabels[a],lb=classLabels[b];
+            if(classVirtualCount[la]!==classVirtualCount[lb])return classVirtualCount[la]-classVirtualCount[lb];
+            return getAvg(la)-getAvg(lb);
+        });
+    };
+
+    const safeAssign=(student,classIdx)=>{
+        const cl=classLabels[classIdx];
+        if(classVirtualCount[cl]>=fSize){
+            for(let tc=0;tc<cNum;tc++){const ni=(classIdx+tc)%cNum;if(classVirtualCount[classLabels[ni]]<fSize){classIdx=ni;break;}}
+        }
+        if(classVirtualCount[classLabels[classIdx]]>=fSize)return false;
+        classes[classIdx].push(student);classVirtualCount[classLabels[classIdx]]++;
+        if(student.gender==='男')classMaleCount[classLabels[classIdx]]++;else classFemaleCount[classLabels[classIdx]]++;
+        return true;
+    };
+
+    Object.values(twinsSame).forEach(group=>{
+        const order=getClassPriorityOrder();let ok=false;
+        for(const ci of order){
+            if(classVirtualCount[classLabels[ci]]+group.length<=fSize){
+                group.forEach(s=>{classes[ci].push(s);classVirtualCount[classLabels[ci]]++;if(s.gender==='男')classMaleCount[classLabels[ci]]++;else classFemaleCount[classLabels[ci]]++;});ok=true;break;
+            }
+        }
+        if(!ok)group.forEach(s=>{safeAssign(s,getClassPriorityOrder()[0]);});
+    });
+    Object.values(twinsDiff).forEach(group=>{
+        const order=getClassPriorityOrder();group.forEach((s,idx)=>{safeAssign(s,order[idx%cNum]);});
+    });
+    let conflictCnt=0;
+    Object.values(sameNameGroups).forEach(group=>{
+        const order=getClassPriorityOrder();const used=new Set();
+        group.forEach(s=>{
+            let targetCi=-1;
+            for(const ci of order){if(!used.has(ci)&&classVirtualCount[classLabels[ci]]<fSize){targetCi=ci;break;}}
+            if(targetCi!==-1){classes[targetCi].push(s);classVirtualCount[classLabels[targetCi]]++;if(s.gender==='男')classMaleCount[classLabels[targetCi]]++;else classFemaleCount[classLabels[targetCi]]++;used.add(targetCi);}
+            else{if(!safeAssign(s,getClassPriorityOrder()[0]))conflictCnt++;}
+        });
+    });
+
+    normalStudents.sort((a,b)=>b.score-a.score);
+    const males=normalStudents.filter(s=>s.gender==='男');
+    const females=normalStudents.filter(s=>s.gender!=='男');
+    const totalMaleToAssign=males.length,totalFemaleToAssign=females.length;
+    const idealMalePerClass=(Object.values(classMaleCount).reduce((a,b)=>a+b,0)+totalMaleToAssign)/cNum;
+    const idealFemalePerClass=(Object.values(classFemaleCount).reduce((a,b)=>a+b,0)+totalFemaleToAssign)/cNum;
+    const maleQuota={},femaleQuota={};
+    classLabels.forEach(cl=>{
+        maleQuota[cl]=Math.max(0,Math.round(idealMalePerClass)-classMaleCount[cl]);
+        femaleQuota[cl]=Math.max(0,Math.round(idealFemalePerClass)-classFemaleCount[cl]);
+    });
+
+    let maleIdx=0;
+    while(maleIdx<males.length){
+        let bestCi=-1,bestQuota=-1;
+        for(let ci=0;ci<cNum;ci++){const cl=classLabels[ci];if(classVirtualCount[cl]<fSize&&maleQuota[cl]>bestQuota){bestQuota=maleQuota[cl];bestCi=ci;}}
+        if(bestCi===-1){const order=getClassPriorityOrder();for(const ci of order){if(classVirtualCount[classLabels[ci]]<fSize){bestCi=ci;break;}}}
+        if(bestCi!==-1&&maleIdx<males.length){safeAssign(males[maleIdx],bestCi);maleQuota[classLabels[bestCi]]--;maleIdx++;}else break;
+    }
+    let femaleIdx=0;
+    while(femaleIdx<females.length){
+        let bestCi=-1,bestQuota=-1;
+        for(let ci=0;ci<cNum;ci++){const cl=classLabels[ci];if(classVirtualCount[cl]<fSize&&femaleQuota[cl]>bestQuota){bestQuota=femaleQuota[cl];bestCi=ci;}}
+        if(bestCi===-1){const order=getClassPriorityOrder();for(const ci of order){if(classVirtualCount[classLabels[ci]]<fSize){bestCi=ci;break;}}}
+        if(bestCi!==-1&&femaleIdx<females.length){safeAssign(females[femaleIdx],bestCi);femaleQuota[classLabels[bestCi]]--;femaleIdx++;}else break;
+    }
+
+    fixedInBatch.forEach(s=>{
+        s.assignedClass=s.fixedClass;mergedAssignmentMap[s.serial]=s.fixedClass;
+        if(!globalClassStats[s.fixedClass])globalClassStats[s.fixedClass]={count:0,totalScore:0};
+        globalClassStats[s.fixedClass].count++;globalClassStats[s.fixedClass].totalScore+=(Number(s.score)||0);
+    });
+    classes.forEach((cls,idx)=>{
+        const cn=classLabels[idx];
+        cls.forEach(s=>{
+            s.assignedClass=cn;mergedAssignmentMap[s.serial]=cn;
+            if(!globalClassStats[cn])globalClassStats[cn]={count:0,totalScore:0};
+            globalClassStats[cn].count++;globalClassStats[cn].totalScore+=(Number(s.score)||0);
+        });
+    });
+
+    const now=new Date();
+    const ts=`${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}:${String(now.getSeconds()).padStart(2,'0')}`;
+    batchRecords.push({start:sIdx,end:eIdx,count:toSplit.length,classCount:cNum,labelStart:`${labelStart}班`,labelEnd:`${labelStart+cNum-1}班`,time:ts});
+    updateMergeStats();
+    renderCurrentBatchPreview(toSplit, classes, cNum, sIdx, eIdx, fixedInBatch);
+
+    const maleCounts=classLabels.map(cl=>classMaleCount[cl]);
+    const maleMax=Math.max(...maleCounts),maleMin=Math.min(...maleCounts);
+    const twinCnt=Object.keys(twinsSame).length+Object.keys(twinsDiff).length;
+    const snCnt=Object.keys(sameNameGroups).length;
+    let msg=`✅ 批次分班完成！\n序号 ${sIdx}-${eIdx}，共 ${toSplit.length} 人\n固定班 ${fixedInBatch.length} 人，算法分配 ${poolForAlgo.length} 人\n多胞胎组 ${twinCnt} | 同名组 ${snCnt}（强制异班）\n📊 各班男生数极差：${maleMax-maleMin}人`;
+    if(conflictCnt>0)msg+=`\n⚠️ ${conflictCnt} 名同名学生因容量不足被迫同班`;
+    msg+='\n结果已暂存。';alert(msg);
+});
+
+// ==================== 🔑 完整版精准可视化预览 ====================
+function renderCurrentBatchPreview(toSplit, classes, cNum, sIdx, eIdx, fixedInBatch) {
+    const fixedSerialSet = new Set(fixedInBatch.map(s => s.serial));
+    let th = '<tr><th>序号</th><th>姓名</th><th>性别</th><th>总分</th><th>同名组</th><th>多胞胎组</th><th>固定班级</th><th>分配班级</th><th>来源</th></tr>';
+    resultThead.innerHTML = th;
+    const sorted = [...toSplit].sort((a, b) => a.serial - b.serial);
+    resultTbody.innerHTML = sorted.map(s => {
+        const isFixed = fixedSerialSet.has(s.serial);
+        const sourceTag = isFixed ? '<span class="source-tag source-fixed">固定</span>' : '<span class="source-tag source-algo">算法</span>';
+        return `<tr><td>${s.serial}</td><td>${s.name}</td><td>${s.gender}</td><td>${s.score}</td><td>${s.sameNameGroup || '-'}</td><td>${s.twinGroup || '-'}</td><td>${s.fixedClass || '-'}</td><td style="font-weight:bold;color:#1677ff">${s.assignedClass}</td><td>${sourceTag}</td></tr>`;
+    }).join('');
+    resultBox.classList.remove('hidden');
+    
+    statPanel.classList.remove('hidden');
+    const fixedCount = fixedInBatch.length;
+    const algoCount = toSplit.length - fixedCount;
+    statContent.innerHTML = `<span class="success">当前批次：序号 ${sIdx}-${eIdx}，共 ${toSplit.length} 人（固定 ${fixedCount} 人 + 算法 ${algoCount} 人）</span>`;
+    
+    chartInstances.forEach(i => i.dispose()); chartInstances = [];
+    chartContainer.innerHTML = '<div id="segChart" class="chart-wrapper"></div><div id="genderChart" class="chart-wrapper"></div>';
+    
+    requestAnimationFrame(() => {
+        const sd = document.getElementById('segChart');
+        const gd = document.getElementById('genderChart');
+        if (!sd || !gd || sd.offsetWidth === 0) return;
+        const xl = Array.from({length: cNum}, (_, i) => `${i + 1}班`);
+        const segColors = ['#4e79a7', '#f28e2c', '#e15759', '#76b7b2', '#59a14f']; 
+        
+        const c1 = echarts.init(sd);
+        c1.setOption({
+            title: { text: '本批次各班分段分布', left: 'center', textStyle: { fontSize: 14 } },
+            tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' }, formatter: function(params) { let html = `<b>${params[0].name}</b><br/>`; params.forEach(p => { if(p.value > 0) html += `${p.marker} ${p.seriesName}: ${p.value}人<br/>`; }); return html; } },
+            legend: { bottom: 0, itemWidth: 16, itemHeight: 16, textStyle: { fontSize: 12 } },
+            grid: { top: 45, bottom: 50, left: 60, right: 20 },
+            xAxis: { type: 'category', data: xl, axisLabel: { fontSize: 12 } },
+            yAxis: { type: 'value', name: '人数', axisLabel: { fontSize: 12 } },
+            series: [0, 1, 2, 3, 4].map((seg, idx) => ({ name: `${seg + 1}段`, type: 'bar', stack: 'total', barWidth: '40%', itemStyle: { color: segColors[idx] }, emphasis: { focus: 'series' }, data: classes.map(cls => cls.filter(s => s.segment === seg).length) }))
+        });
+        chartInstances.push(c1);
+        
+        const c2 = echarts.init(gd);
+        c2.setOption({
+            title: { text: '本批次各班男女对比', left: 'center', textStyle: { fontSize: 14 } },
+            tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' }, formatter: '{b}<br/>{a0}: {c0}人<br/>{a1}: {c1}人' },
+            legend: { bottom: 0, itemWidth: 16, itemHeight: 16, textStyle: { fontSize: 12 } },
+            grid: { top: 45, bottom: 50, left: 60, right: 20 },
+            xAxis: { type: 'category', data: xl, axisLabel: { fontSize: 12 } },
+            yAxis: { type: 'value', name: '人数', axisLabel: { fontSize: 12 } },
+            series: [
+                { name: '男生', type: 'bar', barWidth: '30%', itemStyle: { color: '#4e79a7' }, data: classes.map(c => c.filter(s => s.gender === '男').length) },
+                { name: '女生', type: 'bar', barWidth: '30%', itemStyle: { color: '#f28e2c' }, data: classes.map(c => c.filter(s => s.gender !== '男').length) }
+            ]
+        });
+        chartInstances.push(c2);
+    });
+}
+
+// ==================== 🔑 打印各班分班名单 ====================
+printClassListBtn.addEventListener('click', function() {
+    if (!allStudent.length) { alert('请先导入数据'); return; }
+    
+    const fullResult = allStudent.map(s => ({...s, finalAssignedClass: mergedAssignmentMap[s.serial] || ''}))
+        .filter(s => s.finalAssignedClass)
+        .sort((a, b) => a.serial - b.serial);
+    
+    if (!fullResult.length) { alert('暂无已分班学生可打印'); return; }
+    
+    // 按班级分组
+    const classMap = {};
+    fullResult.forEach(s => {
+        if (!classMap[s.finalAssignedClass]) classMap[s.finalAssignedClass] = [];
+        classMap[s.finalAssignedClass].push(s);
+    });
+    
+    // 按班号排序
+    const sortedClasses = Object.keys(classMap).sort((a, b) => 
+        (parseInt(a.replace(/[^0-9]/g, '')) || 0) - (parseInt(b.replace(/[^0-9]/g, '')) || 0)
+    );
+    
+    const printDate = new Date().toLocaleDateString('zh-CN');
+    let printHTML = '';
+    
+    sortedClasses.forEach(className => {
+        const students = classMap[className];
+        const maleCount = students.filter(s => s.gender === '男').length;
+        const femaleCount = students.length - maleCount;
+        
+        let rows = '';
+        students.forEach((s, idx) => {
+            rows += `<tr>
+                <td>${idx + 1}</td>
+                <td>${s.name}</td>
+                <td>${s.gender}</td>
+                <td>${s.idCard || ''}</td>
+                <td>${s.score}</td>
+                <td>${s.middleSchool || ''}</td>
+            </tr>`;
+        });
+        
+        printHTML += `
+        <div class="print-page">
+            <div class="print-title">新生分班名单</div>
+            <div class="print-subtitle">${className} | 共 ${students.length} 人（男 ${maleCount} / 女 ${femaleCount}）</div>
+            <table class="print-table">
+                <thead>
+                    <tr>
+                        <th style="width:8%">序号</th>
+                        <th style="width:15%">姓名</th>
+                        <th style="width:8%">性别</th>
+                        <th style="width:28%">身份证号码</th>
+                        <th style="width:10%">总分</th>
+                        <th style="width:31%">初中毕业学校</th>
+                    </tr>
+                </thead>
+                <tbody>${rows}</tbody>
+            </table>
+            <div class="print-footer">
+                <span>打印日期：${printDate}</span>
+                <span>班主任签字：______________</span>
+            </div>
+        </div>`;
+    });
+    
+    printArea.innerHTML = printHTML;
+    printArea.classList.remove('hidden');
+    
+    // 延迟确保DOM渲染完成后触发打印
+    setTimeout(() => {
+        window.print();
+        // 打印完成后隐藏打印区域
+        setTimeout(() => { printArea.classList.add('hidden'); }, 500);
+    }, 200);
+});
+
+// ==================== 合并导出 ====================
+exportMergedBtn.addEventListener('click',function(){
+    if(!allStudent.length){alert('请先导入数据');return;}
+    const wb=XLSX.utils.book_new();
+    const fullResult=allStudent.map(s=>({...s,finalAssignedClass:mergedAssignmentMap[s.serial]||''})).sort((a,b)=>a.serial-b.serial);
+    const allCN=new Set();fullResult.forEach(s=>{if(s.finalAssignedClass)allCN.add(s.finalAssignedClass);if(s.fixedClass)allCN.add(s.fixedClass);});
+    const sortedCN=[...allCN].sort((a,b)=>(parseInt(a.replace(/[^0-9]/g,''))||0)-(parseInt(b.replace(/[^0-9]/g,''))||0));
+    const sh=['班级','男生','女生','总人数','男生占比%','平均分','上限','是否超限'],sd=[sh];
+    const fSize=parseInt(fixedClassSizeInput.value)||50;
+    sortedCN.forEach(cn=>{
+        const sts=fullResult.filter(s=>s.finalAssignedClass===cn||s.fixedClass===cn);
+        const mc=sts.filter(s=>s.gender==='男').length,fc=sts.length-mc;
+        const ts=sts.reduce((sum,s)=>sum+(Number(s.score)||0),0);
+        const avg=sts.length?(ts/sts.length).toFixed(2):'0.00';
+        const mr=sts.length>0?(mc/sts.length*100).toFixed(1):'0.0';
+        sd.push([cn,mc,fc,sts.length,Number(mr),Number(avg),fSize,sts.length>fSize?'⚠️ 是':'否']);
+    });
+    const tc=sd.slice(1).reduce((s,r)=>s+r[3],0);
+    const ta=tc?(fullResult.reduce((s,x)=>s+(Number(x.score)||0),0)/tc).toFixed(2):'0.00';
+    const tm=sd.slice(1).reduce((s,r)=>s+r[1],0);
+    const tmr=tc>0?(tm/tc*100).toFixed(1):'0.0';
+    sd.push(['合计',tm,sd.slice(1).reduce((s,r)=>s+r[2],0),tc,Number(tmr),Number(ta),'','']);
+    const sw=XLSX.utils.aoa_to_sheet(sd);sw['!cols']=[{wch:10},{wch:8},{wch:8},{wch:8},{wch:10},{wch:10},{wch:8},{wch:10}];
+    XLSX.utils.book_append_sheet(wb,sw,'总统计表');
+    sortedCN.forEach(cn=>{
+        const sts=fullResult.filter(s=>s.finalAssignedClass===cn||s.fixedClass===cn).sort((a,b)=>a.serial-b.serial);
+        const ch=['序号','姓名','性别','身份证号码','总分','初中毕业学校'];extraColumns.forEach(c=>ch.push(c.name));
+        ch.push('同名或近音','多胞胎组','多胞胎同班','固定班级','分配班级');
+        const cd=[ch];sts.forEach(s=>{const row=[s.serial,s.name,s.gender,s.idCard,s.score,s.middleSchool||''];extraColumns.forEach(c=>row.push(s.extraData[c.name]??''));row.push(s.sameNameGroup||'',s.twinGroup||'',s.twinSameClass?'是':'否',s.fixedClass||'',s.finalAssignedClass||'');cd.push(row);});
+        const cw=XLSX.utils.aoa_to_sheet(cd);const w=[{wch:6},{wch:10},{wch:6},{wch:20},{wch:8},{wch:16}];extraColumns.forEach(()=>w.push({wch:12}));w.push({wch:12},{wch:12},{wch:12},{wch:10},{wch:10});cw['!cols']=w;
+        XLSX.utils.book_append_sheet(wb,cw,cn.substring(0,31).replace(/[:\\/?*\[\]]/g,'_'));
+    });
+    const dh=['序号','姓名','性别','身份证号码','总分','初中毕业学校'];extraColumns.forEach(c=>dh.push(c.name));
+    dh.push('同名组','多胞胎组','多胞胎同班','固定班级','分配班级');
+    const dd=[dh];fullResult.forEach(s=>{const row=[s.serial,s.name,s.gender,s.idCard,s.score,s.middleSchool||''];extraColumns.forEach(c=>row.push(s.extraData[c.name]??''));row.push(s.sameNameGroup||'',s.twinGroup||'',s.twinSameClass?'是':'否',s.fixedClass||'',s.finalAssignedClass||'');dd.push(row);});
+    const dw=XLSX.utils.aoa_to_sheet(dd);const dW=[{wch:6},{wch:10},{wch:6},{wch:20},{wch:8},{wch:16}];extraColumns.forEach(()=>dW.push({wch:12}));dW.push({wch:10},{wch:10},{wch:10},{wch:10},{wch:10});dw['!cols']=dW;
+    XLSX.utils.book_append_sheet(wb,dw,'全量分班明细');
+    XLSX.writeFile(wb,'合并分班结果.xlsx');
+    exportTip.innerHTML=`<span class="success">✅ 导出成功！共 ${sortedCN.length} 个班级，${fullResult.length} 名学生</span>`;
+});
+
+clearBatchesBtn.addEventListener('click',function(){if(!confirm('确定清空所有已暂存的分班批次？'))return;mergedAssignmentMap={};batchRecords=[];globalClassStats={};updateMergeStats();statPanel.classList.add('hidden');resultBox.classList.add('hidden');chartInstances.forEach(i=>i.dispose());chartInstances=[];chartContainer.innerHTML='';exportTip.innerHTML='';});
+resetBtn.addEventListener('click',function(){if(!confirm('确定重置所有数据？'))return;allStudent=[];mergedAssignmentMap={};batchRecords=[];globalClassStats={};workbook=null;extraColumns=[];fileInput.value='';uploadTip.innerHTML='';uploadControls.classList.add('hidden');previewBox.classList.add('hidden');statPanel.classList.add('hidden');resultBox.classList.add('hidden');exportTip.innerHTML='';chartInstances.forEach(i=>i.dispose());chartInstances=[];chartContainer.innerHTML='';updateMergeStats();});
+window.addEventListener('resize',()=>{chartInstances.forEach(i=>i.resize());});
+</script>
+</body>
+</html>

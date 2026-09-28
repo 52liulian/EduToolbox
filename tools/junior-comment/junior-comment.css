@@ -1,0 +1,277 @@
+/* ============================================================================
+ * 初中评语生成 · junior-comment.css
+ * 仅包含本工具特有样式：名单管理 / 维度标签 / 生成设置 /
+ *                       操作按钮 + 统计 / 导出工具栏 / 评语结果卡
+ * 公共底座（reset、按钮、卡片、表单、seg-group、switch、chips、toolbar）见 tool-common.css
+ * 高度策略：所有容器高度自动撑开，仅 body 主滚动条；textarea resize:vertical
+ * ========================================================================== */
+
+/* ---------------------------------------------------------------------------
+ * 一、容器与标题
+ * ------------------------------------------------------------------------- */
+.wrap {
+  max-width: 1240px;
+  padding: 24px 24px 56px;
+}
+
+/* 标题区变体：默认蓝色渐变 hdr 已由公共底座提供，此处微调间距 */
+.hdr {
+  margin-bottom: 22px;
+  padding: 24px 28px;
+}
+.hdr-text h1 { margin-bottom: 6px; }
+.hdr-text p { max-width: none; }
+
+/* ---------------------------------------------------------------------------
+ * 二、三栏控制面板：名单 + 维度 + 设置（设置占满整行）
+ * ------------------------------------------------------------------------- */
+.panels {
+  grid-template-columns: minmax(260px, 320px) minmax(0, 1fr);
+  gap: 16px;
+  margin-bottom: 18px;
+}
+
+.panel-names,
+.panel-dims,
+.panel-settings {
+  padding: 18px;
+}
+
+.panel-names { grid-column: 1; }
+.panel-dims  { grid-column: 2; }
+.panel-settings { grid-column: 1 / -1; }
+
+@media (max-width: 760px) {
+  .panels { grid-template-columns: 1fr; }
+  .panel-names, .panel-dims, .panel-settings { grid-column: auto; }
+}
+
+.panel-title {
+  font-size: 15.5px;
+  font-weight: 700;
+  margin-bottom: 12px;
+  color: var(--text-1);
+}
+
+.panel-head {
+  margin-bottom: 10px;
+}
+.panel-head .panel-title { margin-bottom: 0; }
+.dim-tools {
+  display: inline-flex;
+  gap: 6px;
+}
+
+.panel-tip {
+  margin-top: 10px;
+  font-size: 12.5px;
+  line-height: 1.6;
+  color: var(--text-3);
+}
+
+/* 名单输入域 */
+.panel-names textarea {
+  width: 100%;
+  min-height: 200px;
+  padding: 10px 14px;
+  font-size: 13.5px;
+  line-height: 1.8;
+  resize: vertical;
+  font-family: -apple-system, "PingFang SC", "Microsoft YaHei", monospace;
+}
+.panel-names .btn-row {
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
+}
+.panel-names .btn-row .btn { flex: 1; }
+
+/* 维度标签云：自动换行 */
+.chips {
+  gap: 8px;
+}
+.chip {
+  padding: 7px 14px;
+  font-size: 13px;
+}
+
+/* 设置网格 */
+.setting-grid {
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 12px;
+}
+.setting-item {
+  align-items: flex-start;
+  flex-direction: column;
+  gap: 8px;
+  padding: 14px 16px;
+}
+.setting-item .setting-label {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--text-1);
+}
+.setting-item .switch-wrap {
+  justify-content: flex-start;
+}
+.setting-item .seg-group { flex-wrap: wrap; }
+
+/* ---------------------------------------------------------------------------
+ * 三、生成按钮 + 统计 / 导出工具栏
+ * ------------------------------------------------------------------------- */
+.action-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin: 18px 0;
+  padding: 16px 20px;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  box-shadow: var(--shadow-sm);
+}
+.action-bar .btn-primary { flex-shrink: 0; }
+.action-bar .stats {
+  display: inline-flex;
+  gap: 18px;
+  flex-wrap: wrap;
+}
+.action-bar .stat {
+  font-size: 14px;
+  color: var(--text-2);
+}
+.action-bar .stat b {
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--primary);
+  margin: 0 4px;
+}
+
+/* 导出工具栏：覆盖公共 .toolbar 的 space-between 与 padding */
+.toolbar {
+  justify-content: flex-start;
+  padding: 12px 16px;
+  margin-bottom: 18px;
+}
+.toolbar .btn { padding: 9px 16px; font-size: 13px; }
+
+/* ---------------------------------------------------------------------------
+ * 四、评语结果区
+ * ------------------------------------------------------------------------- */
+.results { margin-top: 18px; }
+.results-title {
+  font-size: 17px;
+  font-weight: 700;
+  margin-bottom: 14px;
+  color: var(--text-1);
+}
+
+.empty-tip {
+  padding: 40px 20px;
+  font-size: 14px;
+  color: var(--text-3);
+  background: var(--card-bg-2);
+  border: 1.5px dashed var(--border-2);
+  border-radius: var(--r);
+}
+
+.r-grid {
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 14px;
+}
+
+/* 单个评语卡片 */
+.r-card {
+  padding: 16px;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  box-shadow: var(--shadow-sm);
+  transition: box-shadow var(--t-fast) var(--ease), transform var(--t-fast) var(--ease);
+}
+.r-card:hover {
+  box-shadow: var(--shadow);
+  transform: translateY(-1px);
+}
+
+.r-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  padding-bottom: 10px;
+  margin-bottom: 10px;
+  border-bottom: 1px dashed var(--border);
+}
+.r-no {
+  display: inline-grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  flex-shrink: 0;
+  font-size: 12.5px;
+  font-weight: 700;
+  color: #fff;
+  background: var(--primary-grad);
+  border-radius: 50%;
+}
+.r-name {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text-1);
+}
+.r-gender {
+  font-size: 12.5px;
+  color: var(--text-3);
+}
+.r-head .btn-mini {
+  margin-left: auto;
+  padding: 5px 12px;
+  font-size: 12px;
+}
+
+.r-text {
+  width: 100%;
+  min-height: 140px;
+  padding: 10px 12px;
+  font-size: 13.5px;
+  line-height: 1.8;
+  resize: vertical;
+  background: var(--card-bg-2);
+  border: 1.5px solid var(--border);
+  border-radius: var(--r-sm);
+  outline: none;
+  transition: border-color var(--t-fast) var(--ease), box-shadow var(--t-fast) var(--ease);
+}
+.r-text:focus {
+  border-color: var(--primary);
+  background: #fff;
+  box-shadow: 0 0 0 3px rgba(59, 110, 246, 0.12);
+}
+
+/* ---------------------------------------------------------------------------
+ * 五、小屏微调
+ * ------------------------------------------------------------------------- */
+@media (max-width: 640px) {
+  .wrap { padding: 16px 12px 40px; }
+  .hdr { padding: 18px 18px; }
+  .panel-names, .panel-dims, .panel-settings { padding: 14px; }
+  .action-bar { padding: 12px 14px; }
+  .toolbar { padding: 10px 12px; }
+  .r-grid { grid-template-columns: 1fr; }
+  .r-head .btn-mini { margin-left: 0; flex: 1; text-align: center; }
+}
+
+/* ---------------------------------------------------------------------------
+ * 六、打印：仅打印评语结果卡片
+ * ------------------------------------------------------------------------- */
+@media print {
+  body { background: #fff !important; }
+  .hdr, .panels, .action-bar, .toolbar, .results-title, .empty-tip { display: none !important; }
+  .results { margin: 0; }
+  .r-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  .r-card { box-shadow: none; border: 1px solid #ccc; break-inside: avoid; }
+  .r-head .btn-mini { display: none; }
+}

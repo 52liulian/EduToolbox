@@ -1,0 +1,92 @@
+/* ============================================================
+ * EduToolbox · 文本表格互转 table-convert.css
+ * 依赖公共底座 tool-common.css（本文件应在其后加载）
+ * ============================================================ */
+
+body[data-theme="sky"]   { --primary:#0ea5e9; --primary-soft:#e0f2fe; --primary-soft-2:#ccecfc; --primary-grad:linear-gradient(135deg,#38bdf8,#0ea5e9,#0284c7); }
+body[data-theme="violet"]{ --primary:#7c3aed; --primary-soft:#f0e9fe; --primary-soft-2:#e2d5fc; --primary-grad:linear-gradient(135deg,#8b5cf6,#7c3aed,#6d28d9); }
+body[data-theme="green"] { --primary:#16a34a; --primary-soft:#e7f6ec; --primary-soft-2:#d3f0dc; --primary-grad:linear-gradient(135deg,#22c55e,#16a34a,#15803d); }
+body[data-theme="gold"]  { --primary:#d97706; --primary-soft:#fdf1dc; --primary-soft-2:#fbe3bc; --primary-grad:linear-gradient(135deg,#f59e0b,#d97706,#b45309); }
+body[data-theme="orange"]{ --primary:#ea580c; --primary-soft:#ffefe4; --primary-soft-2:#ffdec9; --primary-grad:linear-gradient(135deg,#fb923c,#ea580c,#c2410c); }
+body[data-theme="pink"]  { --primary:#db2777; --primary-soft:#fce7f0; --primary-soft-2:#f9cfe1; --primary-grad:linear-gradient(135deg,#f472b6,#db2777,#be185d); }
+
+.workbench { display:grid; grid-template-columns:320px minmax(0,1fr); gap:20px; align-items:start; }
+
+.tc-stats { grid-template-columns:repeat(2,minmax(0,1fr)); }
+.tc-stats .stat-num { font-size:18px; }
+.stat-num { word-break:break-all; }
+
+.block-hint code {
+  padding:0 4px; border-radius:4px; background:var(--primary-soft);
+  color:var(--primary); font-size:11.5px;
+}
+
+/* ---------- 输入 / 输出 ---------- */
+/* position:relative —— 舞台右上角 .stage-toolbar 的绝对定位基准 */
+.stage-panel { position:relative; min-width:0; }
+/* padding-right 为右上角 ⛶⚙ 工具栏（40+8+40=88px）留出避让空间 */
+.stage-head { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:14px; padding-right:96px; }
+.stage-head .panel-title { margin-bottom:0; }
+.stage-ok { font-size:13px; font-weight:600; color:var(--primary); }
+
+.tc-input, .tc-output {
+  width:100%; padding:14px 16px; border:1px solid var(--border); border-radius:var(--r);
+  background:var(--card-bg); color:var(--text-1); font-size:13.5px; line-height:1.7;
+  font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,"Courier New",monospace;
+  resize:vertical; outline:none; transition:border-color .16s var(--ease);
+}
+.tc-input:focus, .tc-output:focus { border-color:var(--primary); }
+.tc-output { background:var(--card-bg-2); }
+
+.tc-block {
+  margin-top:18px; padding:18px 20px; background:var(--card-bg);
+  border:1px solid var(--border); border-radius:var(--r); box-shadow:var(--shadow-sm);
+}
+.chart-head { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:12px; }
+.chart-title { font-size:15px; font-weight:700; }
+.chart-sub { font-size:12.5px; color:var(--text-3); }
+
+/* ---------- 预览表格 ---------- */
+.tc-preview { overflow:auto; max-height:340px; border:1px solid var(--border); border-radius:10px; }
+.tc-preview table { width:100%; border-collapse:collapse; font-size:13.5px; }
+.tc-preview th, .tc-preview td {
+  padding:9px 12px; border-bottom:1px solid var(--border); border-right:1px solid var(--border);
+  text-align:left; vertical-align:top; word-break:break-all;
+}
+.tc-preview th:last-child, .tc-preview td:last-child { border-right:none; }
+.tc-preview thead th { background:var(--primary-grad); color:#fff; font-weight:700; position:sticky; top:0; }
+.tc-preview tbody tr:nth-child(even) { background:var(--card-bg-2); }
+.tc-preview tbody tr:hover { background:var(--primary-soft); }
+.tc-preview td.idx, .tc-preview th.idx {
+  width:42px; text-align:right; color:var(--text-3); font-variant-numeric:tabular-nums; background:var(--card-bg-2);
+}
+
+@media (max-width:900px){ .workbench { grid-template-columns:1fr; } }
+@media print {
+  .setup-panel, .state, .stage-toolbar { display:none; }
+  .tc-input { display:none; }
+}
+
+/* ---------- 隐藏设置栏（⚙）：双栏 → 单栏，与 random-call 同构 ---------- */
+.workbench.setup-hidden { grid-template-columns:minmax(0,1fr); }
+.workbench.setup-hidden .setup-panel { display:none; }
+
+/* ---------- 舞台全屏（⛶）：全屏目标是 .stage-panel 自身，不是整页 ---------- */
+.stage-panel:fullscreen,
+.stage-panel:-webkit-full-screen,
+.stage-panel.edutf-solo{
+  display:flex; flex-direction:column; justify-content:center; align-items:stretch;
+  min-height:100vh; padding:36px 30px;
+  border-radius:0; border-color:transparent; box-shadow:none;
+  background:var(--bg); overflow:auto;
+}
+/* 全屏下工具栏仍可见：贴边 + 半透明，hover 恢复不透明 */
+.stage-panel:fullscreen .stage-toolbar,
+.stage-panel:-webkit-full-screen .stage-toolbar,
+.stage-panel.edutf-solo .stage-toolbar{
+  position:fixed; top:18px; right:22px; z-index:30;
+  opacity:.55; transition:opacity .18s var(--ease);
+}
+.stage-panel:fullscreen .stage-toolbar:hover,
+.stage-panel:-webkit-full-screen .stage-toolbar:hover,
+.stage-panel.edutf-solo .stage-toolbar:hover{ opacity:1; }

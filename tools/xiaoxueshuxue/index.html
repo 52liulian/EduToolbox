@@ -1,0 +1,935 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>小学数学自动出题器</title>
+    <link href="../../assets/vendor/bootstrap/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .result-area {
+            width: 210mm;
+            height: 297mm;
+            padding: 10mm;
+            margin: 0 auto;
+            background-color: white;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            position: relative;
+            overflow: hidden; /* 防止内容溢出 */
+        }
+        .question-number {
+            color: #888;
+            margin-right: 1em;
+        }
+        .question-text {
+            font-weight: normal; /* 移除加粗效果 */
+        }
+        .question-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 30px;
+        }
+        .question-item {
+            width: 30%;
+            font-size: 13px;
+        }
+        .result-title {
+            font-size: 24px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+            .result-area, .result-area * {
+                visibility: visible;
+            }
+            .result-area {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 210mm;
+                height: 297mm;
+            }
+        }
+        .fraction {
+            display: inline-block;
+            text-align: center;
+            vertical-align: middle;
+            margin: 0 0.2em;
+        }
+        .fraction > span {
+            display: block;
+        }
+        .fraction .numerator {
+            border-bottom: 1px solid black;
+        }
+        .fraction .denominator {
+            border-top: 1px solid black;
+        }
+        .answer {
+            color: #D3D3D3;
+            display: none;
+        }
+    </style>
+    <script src="../../assets/js/frame-bridge.js"></script>
+<script src="../../assets/vendor/html2canvas.min.js"></script>
+<style>
+/* ============================================================================
+ * EduToolbox 组件化挂载兜底（自动追加）
+ * ----------------------------------------------------------------------------
+ * 本工具未引入 assets/css/tool-common.css，挂载进站点（Shadow DOM）后会缺少：
+ *   1) 六色主题变量 --primary / --primary-soft / --primary-grad
+ *   2) .container 的宽度约束（否则内容铺满并贴边）
+ * 这里补齐最小等价集，保证「独立打开」与「站点内组件化挂载」视觉一致。
+ * ========================================================================== */
+
+:root,
+:host,
+body[data-theme="sky"]   { --primary:#0ea5e9; --primary-soft:#e0f2fe; --primary-soft-2:#ccecfc; --primary-grad:linear-gradient(135deg,#38bdf8,#0ea5e9,#0284c7); }
+body[data-theme="violet"]{ --primary:#7c3aed; --primary-soft:#f0e9fe; --primary-soft-2:#e2d5fc; --primary-grad:linear-gradient(135deg,#8b5cf6,#7c3aed,#6d28d9); }
+body[data-theme="green"] { --primary:#16a34a; --primary-soft:#e7f6ec; --primary-soft-2:#d3f0dc; --primary-grad:linear-gradient(135deg,#22c55e,#16a34a,#15803d); }
+body[data-theme="gold"]  { --primary:#d97706; --primary-soft:#fdf1dc; --primary-soft-2:#fbe3bc; --primary-grad:linear-gradient(135deg,#f59e0b,#d97706,#b45309); }
+body[data-theme="orange"]{ --primary:#ea580c; --primary-soft:#ffefe4; --primary-soft-2:#ffdec9; --primary-grad:linear-gradient(135deg,#fb923c,#ea580c,#c2410c); }
+body[data-theme="pink"]  { --primary:#db2777; --primary-soft:#fce7f0; --primary-soft-2:#f9cfe1; --primary-grad:linear-gradient(135deg,#f472b6,#db2777,#be185d); }
+
+/* 容器宽度兜底：仅在工具自身未声明时生效（不覆盖已有 .container 规则） */
+.container:not([data-no-fallback]) {
+  width: 100%;
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 28px 24px 56px;
+  box-sizing: border-box;
+}
+</style>
+</head>
+<body class="bg-light">
+    <div class="container mt-4">
+        <div class="settings-area">
+            <ul class="nav nav-tabs" id="gradeTabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="preschool-tab" data-bs-toggle="tab" data-bs-target="#preschool" type="button" role="tab">学龄前</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="grade1-tab" data-bs-toggle="tab" data-bs-target="#grade1" type="button" role="tab">一年级</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="grade2-tab" data-bs-toggle="tab" data-bs-target="#grade2" type="button" role="tab">二年级</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="grade3-tab" data-bs-toggle="tab" data-bs-target="#grade3" type="button" role="tab">三年级</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="grade4-tab" data-bs-toggle="tab" data-bs-target="#grade4" type="button" role="tab">四年级</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="grade5-tab" data-bs-toggle="tab" data-bs-target="#grade5" type="button" role="tab">五年级</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="grade6-tab" data-bs-toggle="tab" data-bs-target="#grade6" type="button" role="tab">六年级</button>
+                </li>
+            </ul>
+            <div class="tab-content" id="gradeTabsContent">
+                <div class="tab-pane fade show active" id="preschool" role="tabpanel">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="preschool-add">
+                        <label class="form-check-label" for="preschool-add">10以内的加法 (例: 1+2=?)</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="preschool-sub">
+                        <label class="form-check-label" for="preschool-sub">10以内的减法 (例: 3-1=?)</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="preschool-mix">
+                        <label class="form-check-label" for="preschool-mix">10以内的加减混合 (例: 2+3-1=?)</label>
+                    </div>
+                </div>
+                <div class="tab-pane fade" id="grade1" role="tabpanel">
+                    <h5>上册</h5>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="grade1-up-add">
+                        <label class="form-check-label" for="grade1-up-add">10以内连加 (例: 1+2+3=?)</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="grade1-up-sub">
+                        <label class="form-check-label" for="grade1-up-sub">10以内连减 (例: 5-2-1=?)</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="grade1-up-mix">
+                        <label class="form-check-label" for="grade1-up-mix">10以内加减混合 (例: 3+2-1=?)</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="grade1-up-11to20">
+                        <label class="form-check-label" for="grade1-up-11to20">11~20的加减法 (例: 11+5=?)</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="grade1-up-20carry">
+                        <label class="form-check-label" for="grade1-up-20carry">20以内加法（进位） (例: 9+5=?)</label>
+                    </div>
+                    <h5>下册</h5>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="grade1-down-add10">
+                        <label class="form-check-label" for="grade1-down-add10">100以内整十加法 (例: 10+20=?)</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="grade1-down-sub10">
+                        <label class="form-check-label" for="grade1-down-sub10">100以内整十减法 (例: 30-20=?)</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="grade1-down-mix10">
+                        <label class="form-check-label" for="grade1-down-mix10">100以内整十加减法 (例: 30+20-10=?)</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="grade1-down-2d1d">
+                        <label class="form-check-label" for="grade1-down-2d1d">2位数加1位数 (例: 23+5=?)</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="grade1-down-2d1dsub">
+                        <label class="form-check-label" for="grade1-down-2d1dsub">2位数减1位数 (例: 23-5=?)</label>
+                    </div>
+                </div>
+                <div class="tab-pane fade" id="grade2" role="tabpanel">
+                    <h5>上册</h5>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="grade2-up-add100">
+                        <label class="form-check-label" for="grade2-up-add100">100以内加法 (例: 34+25=?)</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="grade2-up-sub100">
+                        <label class="form-check-label" for="grade2-up-sub100">100以内减法 (例: 34-25=?)</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="grade2-up-mix100">
+                        <label class="form-check-label" for="grade2-up-mix100">100内加减法 (例: 34+25=?、42-12=?)</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="grade2-up-add100chain">
+                        <label class="form-check-label" for="grade2-up-add100chain">100以内连加 (例: 34+25+15=?)</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="grade2-up-sub100chain">
+                        <label class="form-check-label" for="grade2-up-sub100chain">100以内连减 (例: 64-25-15=?)</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="grade2-up-mix100chain">
+                        <label class="form-check-label" for="grade2-up-mix100chain">100以内加减混合 (例: 34+25-15=?)</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="grade2-up-mul">
+                        <label class="form-check-label" for="grade2-up-mul">表内乘法 (例: 3*4=?)</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="grade2-up-muladd">
+                        <label class="form-check-label" for="grade2-up-muladd">乘加乘减 (例: 3*4+2=?)</label>
+                    </div>
+                    <h5>下册</h5>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="grade2-down-div">
+                        <label class="form-check-label" for="grade2-down-div">表内除法 (例: 6/3=?)</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="grade2-down-muldiv">
+                        <label class="form-check-label" for="grade2-down-muldiv">100以内乘除混合 (例: 3*4/2=?)</label>
+                    </div>
+                </div>
+                <div class="tab-pane fade" id="grade3" role="tabpanel">
+                    <h5>上册</h5>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="grade3-up-add2d">
+                        <label class="form-check-label" for="grade3-up-add2d">两位数加两位数口算 (例: 34+25=?)</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="grade3-up-sub2d">
+                        <label class="form-check-label" for="grade3-up-sub2d">两位数减两数口算 (例: 34-25=?)</label>
+                    </div>
+                    <h5>下册</h5>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="grade3-down-div2d1d">
+                        <label class="form-check-label" for="grade3-down-div2d1d">两位数除以一位数 (例: 34/2=?)</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="grade3-down-div3d1d">
+                        <label class="form-check-label" for="grade3-down-div3d1d">三位数除以一位数 (例: 342/2=?)</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="grade3-down-mul2d1d">
+                        <label class="form-check-label" for="grade3-down-mul2d1d">两位数乘一位数 (例: 34*2=?)</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="grade3-down-mul2d2d">
+                        <label class="form-check-label" for="grade3-down-mul2d2d">两位数乘两位数 (例: 34*25=?)</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="grade3-down-mul3d">
+                        <label class="form-check-label" for="grade3-down-mul3d">三位数连乘 (例: 34*25*15=?)</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="grade3-down-div3d">
+                        <label class="form-check-label" for="grade3-down-div3d">三位数连除 (例: 90/2/3=?) 被除数最大数为两位数</label>
+                    </div>
+                </div>
+                <div class="tab-pane fade" id="grade4" role="tabpanel">
+                    <h5>上册</h5>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="grade4-up-mul3d2d">
+                        <label class="form-check-label" for="grade4-up-mul3d2d">3位数乘2位数 (例: 342*25=?)</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="grade4-up-div2d">
+                        <label class="form-check-label" for="grade4-up-div2d">除数是两位数的除法 (例: 342/25=?)</label>
+                    </div>
+                    <h5>下册</h5>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="grade4-down-decadd">
+                        <label class="form-check-label" for="grade4-down-decadd">小数加法 (例: 3.4+2.5=?)</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="grade4-down-decsub">
+                        <label class="form-check-label" for="grade4-down-decsub">小数减法 (例: 3.4-2.5=?)</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="grade4-down-decmix">
+                        <label class="form-check-label" for="grade4-down-decmix">小数加减混合运算 (例: 3.4+2.5-1.5=?)</label>
+                    </div>
+                </div>
+                <div class="tab-pane fade" id="grade5" role="tabpanel">
+                    <h5>上册</h5>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="grade5-up-decmulint">
+                        <label class="form-check-label" for="grade5-up-decmulint">小数乘整数 (例: 3.4*2=?)</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="grade5-up-decmuldec">
+                        <label class="form-check-label" for="grade5-up-decmuldec">小数乘小数 (例: 3.4*2.5=?)</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="grade5-up-decdivint">
+                        <label class="form-check-label" for="grade5-up-decdivint">小数除以整数 (例: 3.4/2=?)</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="grade5-up-intdivdec">
+                        <label class="form-check-label" for="grade5-up-intdivdec">整数除以小数 (例: 34/0.5=?)</label>
+                    </div>
+                    <h5>下册</h5>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="grade5-down-intdivfrac">
+                        <label class="form-check-label" for="grade5-down-intdivfrac">整除法变分数 (例: 3/4=?)</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="grade5-down-fracadd">
+                        <label class="form-check-label" for="grade5-down-fracadd">分数加法 (例: 3/4+2/5=?)</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="grade5-down-fracsub">
+                        <label class="form-check-label" for="grade5-down-fracsub">分数减法 (例: 3/4-2/5=?)</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="grade5-down-fracmix">
+                        <label class="form-check-label" for="grade5-down-fracmix">分数加减混合运算 (例: 3/4+2/5-1/5=?)</label>
+                    </div>
+                </div>
+                <div class="tab-pane fade" id="grade6" role="tabpanel">
+                    <h5>上册</h5>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="grade6-up-fracmulint">
+                        <label class="form-check-label" for="grade6-up-fracmulint">分数乘整数 (例: 3/4*2=?)</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="grade6-up-fracmulfrac">
+                        <label class="form-check-label" for="grade6-up-fracmulfrac">分数乘分数 (例: 3/4*2/5=?)</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="grade6-up-fracmuldec">
+                        <label class="form-check-label" for="grade6-up-fracmuldec">分数乘小数 (例: 3/4*0.5=?)</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="grade6-up-fracdivint">
+                        <label class="form-check-label" for="grade6-up-fracdivint">分数除以整数 (例: 3/4/2=?)</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="grade6-up-fracdivfrac">
+                        <label class="form-check-label" for="grade6-up-fracdivfrac">分数除以分数 (例: 3/4/2/5=?)</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="grade6-up-fracdivdec">
+                        <label class="form-check-label" for="grade6-up-fracdivdec">分数除以小数 (例: 3/4/0.5=?)</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="grade6-up-fracmixop">
+                        <label class="form-check-label" for="grade6-up-fracmixop">分数乘除混合运算 (例: 3/4*2/5/1/5=?)</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 操作按钮区 -->
+        <div class="mt-3 text-center">
+            <button class="btn btn-primary" id="generateQuestions">生成计算题</button>
+            <button class="btn btn-success" id="saveAsImage">保存为图片</button>
+            <button class="btn btn-info" id="showAnswers" style="display: none;">显示答案</button>
+        </div>
+    </div>
+
+    <!-- 题目显示区 -->
+    <div class="container mt-4">
+        <div class="result-area">
+            <div id="questionList" class="row"></div>
+        </div>
+    </div>
+
+    <script src="../../assets/vendor/bootstrap/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const generateButton = document.getElementById('generateQuestions');
+            const saveButton = document.getElementById('saveAsImage');
+            const showAnswersButton = document.getElementById('showAnswers');
+            const questionList = document.getElementById('questionList');
+            const gradeTabs = document.querySelectorAll('#gradeTabs .nav-link');
+
+            generateButton.addEventListener('click', generateQuestions);
+            saveButton.addEventListener('click', saveAsImage);
+            showAnswersButton.addEventListener('click', showAnswers);
+
+            // 为每个年级Tab添加点击事件监听器
+            gradeTabs.forEach(tab => {
+                tab.addEventListener('click', function(event) {
+                    // 阻止默认的Tab切换行为
+                    event.preventDefault();
+                    
+                    // 如果点击的不是当前激活的Tab，则进行切换
+                    if (!this.classList.contains('active')) {
+                        // 清空有选择项
+                        clearAllCheckboxes();
+                        
+                        // 移除所有Tab的active类
+                        gradeTabs.forEach(t => t.classList.remove('active'));
+                        
+                        // 为当前点击的Tab添加active类
+                        this.classList.add('active');
+                        
+                        // 隐藏所有Tab内容
+                        document.querySelectorAll('.tab-pane').forEach(pane => {
+                            pane.classList.remove('show', 'active');
+                        });
+                        
+                        // 显示当前Tab对应的内容
+                        const targetId = this.getAttribute('data-bs-target');
+                        const targetPane = document.querySelector(targetId);
+                        targetPane.classList.add('show', 'active');
+                    }
+                });
+            });
+
+            function clearAllCheckboxes() {
+                document.querySelectorAll('.form-check-input').forEach(checkbox => {
+                    checkbox.checked = false;
+                });
+            }
+
+            function generateQuestions() {
+                const selectedOptions = getSelectedOptions();
+                if (selectedOptions.length === 0) {
+                    alert('请至少选择一个题型');
+                    return;
+                }
+
+                const title = selectedOptions.map(option => option.label).join('+') + ' 计算题';
+                const questions = generateUniqueQuestions(selectedOptions, 50); // 生成50道题目
+
+                questionList.innerHTML = `
+                    <h3 class="result-title">${title}</h3>
+                `;
+
+                for (let i = 0; i < 17; i++) { // 17行
+                    const rowElement = document.createElement('div');
+                    rowElement.className = 'question-row';
+                    for (let j = 0; j < 3; j++) { // 每行3
+                        const index = i * 3 + j;
+                        if (index < questions.length) {
+                            const questionElement = createQuestionElement(questions[index], index + 1);
+                            rowElement.appendChild(questionElement);
+                        } else {
+                            // 如果题目不足,添加空白元素保持布局
+                            const emptyElement = document.createElement('div');
+                            emptyElement.className = 'question-item';
+                            rowElement.appendChild(emptyElement);
+                        }
+                    }
+                    questionList.appendChild(rowElement);
+                }
+
+                // 显示"显示答案"按钮
+                showAnswersButton.style.display = 'inline-block';
+            }
+
+            function getSelectedOptions() {
+                const checkboxes = document.querySelectorAll('.form-check-input:checked');
+                return Array.from(checkboxes).map(checkbox => ({
+                    id: checkbox.id,
+                    label: checkbox.nextElementSibling.textContent.split('(')[0].trim()
+                }));
+            }
+
+            function generateUniqueQuestions(options, count) {
+                const questions = new Set();
+                let attempts = 0;
+                const maxAttempts = count * 10;
+
+                while (questions.size < count && attempts < maxAttempts) {
+                    const option = options[Math.floor(Math.random() * options.length)];
+                    const question = generateQuestion(option);
+                    questions.add(question);
+                    attempts++;
+                }
+
+                return Array.from(questions);
+            }
+
+            function formatAnswer(answer) {
+                // 如果答案是整数，直接返回
+                if (Number.isInteger(answer)) {
+                    return answer.toString();
+                }
+                // 否则，将答案四舍五入到两位小数
+                return Number(answer.toFixed(2)).toString();
+            }
+
+            function generateQuestion(option) {
+                let a, b, c, d, e, f, question, answer;
+                switch (option.id) {
+                    // 学龄前
+                    case 'preschool-add':
+                        a = Math.floor(Math.random() * 10);
+                        b = Math.floor(Math.random() * (10 - a));
+                        question = `${a} + ${b} = `;
+                        answer = a + b;
+                        break;
+                    case 'preschool-sub':
+                        a = Math.floor(Math.random() * 10);
+                        b = Math.floor(Math.random() * a);
+                        question = `${a} - ${b} = `;
+                        answer = a - b;
+                        break;
+                    case 'preschool-mix':
+                        a = Math.floor(Math.random() * 10);
+                        b = Math.floor(Math.random() * (10 - a));
+                        c = Math.floor(Math.random() * (a + b));
+                        question = `${a} + ${b} - ${c} = `;
+                        answer = a + b - c;
+                        break;
+
+                    // 一年级
+                    case 'grade1-up-add':
+                        a = Math.floor(Math.random() * 10);
+                        b = Math.floor(Math.random() * 10);
+                        c = Math.floor(Math.random() * 10);
+                        question = `${a} + ${b} + ${c} = `;
+                        answer = a + b + c;
+                        break;
+                    case 'grade1-up-sub':
+                        a = Math.floor(Math.random() * 20);
+                        b = Math.floor(Math.random() * a);
+                        c = Math.floor(Math.random() * b);
+                        question = `${a} - ${b} - ${c} = `;
+                        answer = a - b - c;
+                        break;
+                    case 'grade1-up-mix':
+                        a = Math.floor(Math.random() * 10);
+                        b = Math.floor(Math.random() * 10);
+                        c = Math.floor(Math.random() * 10);
+                        question = `${a} + ${b} - ${c} = `;
+                        answer = a + b - c;
+                        break;
+                    case 'grade1-up-11to20':
+                        a = Math.floor(Math.random() * 10) + 11;
+                        b = Math.floor(Math.random() * 10);
+                        question = Math.random() < 0.5 ? `${a} + ${b} = ` : `${a} - ${b} = `;
+                        answer = Math.random() < 0.5 ? a + b : a - b;
+                        break;
+                    case 'grade1-up-20carry':
+                        a = Math.floor(Math.random() * 10) + 10;
+                        b = Math.floor(Math.random() * 10) + 1;
+                        question = `${a} + ${b} = `;
+                        answer = a + b;
+                        break;
+                    case 'grade1-down-add10':
+                        a = Math.floor(Math.random() * 10) * 10;
+                        b = Math.floor(Math.random() * 10) * 10;
+                        question = `${a} + ${b} = `;
+                        answer = a + b;
+                        break;
+                    case 'grade1-down-sub10':
+                        a = Math.floor(Math.random() * 10) * 10;
+                        b = Math.floor(Math.random() * (a / 10)) * 10;
+                        question = `${a} - ${b} = `;
+                        answer = a - b;
+                        break;
+                    case 'grade1-down-mix10':
+                        a = Math.floor(Math.random() * 10) * 10;
+                        b = Math.floor(Math.random() * 10) * 10;
+                        c = Math.floor(Math.random() * 10) * 10;
+                        question = `${a} + ${b} - ${c} = `;
+                        answer = a + b - c;
+                        break;
+                    case 'grade1-down-2d1d':
+                        a = Math.floor(Math.random() * 90) + 10;
+                        b = Math.floor(Math.random() * 10);
+                        question = `${a} + ${b} = `;
+                        answer = a + b;
+                        break;
+                    case 'grade1-down-2d1dsub':
+                        a = Math.floor(Math.random() * 90) + 10;
+                        b = Math.floor(Math.random() * 10);
+                        question = `${a} - ${b} = `;
+                        answer = a - b;
+                        break;
+
+                    // 二年级
+                    case 'grade2-up-add100':
+                    case 'grade2-up-sub100':
+                    case 'grade2-up-mix100':
+                        a = Math.floor(Math.random() * 100);
+                        b = Math.floor(Math.random() * 100);
+                        question = Math.random() < 0.5 ? `${a} + ${b} = ` : `${a} - ${b} = `;
+                        answer = Math.random() < 0.5 ? a + b : a - b;
+                        break;
+                    case 'grade2-up-add100chain':
+                        a = Math.floor(Math.random() * 100);
+                        b = Math.floor(Math.random() * 100);
+                        c = Math.floor(Math.random() * 100);
+                        question = `${a} + ${b} + ${c} = `;
+                        answer = a + b + c;
+                        break;
+                    case 'grade2-up-sub100chain':
+                        a = Math.floor(Math.random() * 100);
+                        b = Math.floor(Math.random() * a);
+                        c = Math.floor(Math.random() * b);
+                        question = `${a} - ${b} - ${c} = `;
+                        answer = a - b - c;
+                        break;
+                    case 'grade2-up-mix100chain':
+                        a = Math.floor(Math.random() * 100);
+                        b = Math.floor(Math.random() * 100);
+                        c = Math.floor(Math.random() * 100);
+                        question = `${a} + ${b} - ${c} = `;
+                        answer = a + b - c;
+                        break;
+                    case 'grade2-up-mul':
+                        a = Math.floor(Math.random() * 9) + 1;
+                        b = Math.floor(Math.random() * 9) + 1;
+                        question = `${a} × ${b} = `;
+                        answer = a * b;
+                        break;
+                    case 'grade2-up-muladd':
+                        a = Math.floor(Math.random() * 9) + 1;
+                        b = Math.floor(Math.random() * 9) + 1;
+                        c = Math.floor(Math.random() * 10);
+                        question = Math.random() < 0.5 ? `${a} × ${b} + ${c} = ` : `${a} × ${b} - ${c} = `;
+                        answer = Math.random() < 0.5 ? a * b + c : a * b - c;
+                        break;
+                    case 'grade2-down-div':
+                        a = Math.floor(Math.random() * 9) + 1;
+                        b = Math.floor(Math.random() * 9) + 1;
+                        question = `${a * b} ÷ ${b} = `;
+                        answer = a * b / b;
+                        break;
+                    case 'grade2-down-muldiv':
+                        a = Math.floor(Math.random() * 9) + 1;
+                        b = Math.floor(Math.random() * 9) + 1;
+                        c = Math.floor(Math.random() * 9) + 1;
+                        question = `${a} × ${b} ÷ ${c} = `;
+                        answer = (a * b) / c;
+                        break;
+
+                    // 三年级
+                    case 'grade3-up-add2d':
+                    case 'grade3-up-sub2d':
+                        a = Math.floor(Math.random() * 90) + 10;
+                        b = Math.floor(Math.random() * 90) + 10;
+                        question = Math.random() < 0.5 ? `${a} + ${b} = ` : `${a} - ${b} = `;
+                        answer = Math.random() < 0.5 ? a + b : a - b;
+                        break;
+                    case 'grade3-down-div2d1d':
+                        a = Math.floor(Math.random() * 90) + 10;
+                        b = Math.floor(Math.random() * 9) + 1;
+                        question = `${a} ÷ ${b} = `;
+                        answer = formatAnswer(a / b);
+                        break;
+                    case 'grade3-down-div3d1d':
+                        a = Math.floor(Math.random() * 900) + 100;
+                        b = Math.floor(Math.random() * 9) + 1;
+                        question = `${a} ÷ ${b} = `;
+                        answer = formatAnswer(a / b);
+                        break;
+                    case 'grade3-down-mul2d1d':
+                        a = Math.floor(Math.random() * 90) + 10;
+                        b = Math.floor(Math.random() * 9) + 1;
+                        question = `${a} × ${b} = `;
+                        answer = a * b;
+                        break;
+                    case 'grade3-down-mul2d2d':
+                        a = Math.floor(Math.random() * 90) + 10;
+                        b = Math.floor(Math.random() * 90) + 10;
+                        question = `${a} × ${b} = `;
+                        answer = a * b;
+                        break;
+                    case 'grade3-down-mul3d':
+                        a = Math.floor(Math.random() * 90) + 10;
+                        b = Math.floor(Math.random() * 90) + 10;
+                        c = Math.floor(Math.random() * 90) + 10;
+                        question = `${a} × ${b} × ${c} = `;
+                        answer = a * b * c;
+                        break;
+                    case 'grade3-down-div3d':
+                        a = Math.floor(Math.random() * 90) + 10;
+                        b = Math.floor(Math.random() * 9) + 1;
+                        c = Math.floor(Math.random() * 9) + 1;
+                        question = `${a} ÷ ${b} ÷ ${c} = `;
+                        answer = formatAnswer(a / b / c);
+                        break;
+
+                    // 四年级
+                    case 'grade4-up-mul3d2d':
+                        a = Math.floor(Math.random() * 900) + 100;
+                        b = Math.floor(Math.random() * 90) + 10;
+                        question = `${a} × ${b} = `;
+                        answer = a * b;
+                        break;
+                    case 'grade4-up-div2d':
+                        a = Math.floor(Math.random() * 900) + 100;
+                        b = Math.floor(Math.random() * 90) + 10;
+                        question = `${a} ÷ ${b} = `;
+                        answer = formatAnswer(a / b);
+                        break;
+                    case 'grade4-down-decadd':
+                    case 'grade4-down-decsub':
+                        a = (Math.floor(Math.random() * 100) / 10).toFixed(1);
+                        b = (Math.floor(Math.random() * 100) / 10).toFixed(1);
+                        question = Math.random() < 0.5 ? `${a} + ${b} = ` : `${a} - ${b} = `;
+                        answer = Math.random() < 0.5 ? (parseFloat(a) + parseFloat(b)).toFixed(2) : (parseFloat(a) - parseFloat(b)).toFixed(2);
+                        break;
+                    case 'grade4-down-decmix':
+                        a = (Math.floor(Math.random() * 100) / 10).toFixed(1);
+                        b = (Math.floor(Math.random() * 100) / 10).toFixed(1);
+                        c = (Math.floor(Math.random() * 100) / 10).toFixed(1);
+                        question = `${a} + ${b} - ${c} = `;
+                        answer = (parseFloat(a) + parseFloat(b) - parseFloat(c)).toFixed(2);
+                        break;
+
+                    // 五年级
+                    case 'grade5-up-decmulint':
+                        a = (Math.floor(Math.random() * 100) / 10).toFixed(1);
+                        b = Math.floor(Math.random() * 10);
+                        question = `${a} × ${b} = `;
+                        answer = (parseFloat(a) * b).toFixed(2);
+                        break;
+                    case 'grade5-up-decmuldec':
+                        a = (Math.floor(Math.random() * 100) / 10).toFixed(1);
+                        b = (Math.floor(Math.random() * 100) / 10).toFixed(1);
+                        question = `${a} × ${b} = `;
+                        answer = (parseFloat(a) * parseFloat(b)).toFixed(2);
+                        break;
+                    case 'grade5-up-decdivint':
+                        a = (Math.floor(Math.random() * 100) / 10).toFixed(1);
+                        b = Math.floor(Math.random() * 10) + 1;
+                        question = `${a} ÷ ${b} = `;
+                        answer = (parseFloat(a) / b).toFixed(2);
+                        break;
+                    case 'grade5-up-intdivdec':
+                        a = Math.floor(Math.random() * 100);
+                        b = (Math.floor(Math.random() * 90) / 10 + 0.1).toFixed(1);
+                        question = `${a} ÷ ${b} = `;
+                        answer = (a / parseFloat(b)).toFixed(2);
+                        break;
+                    case 'grade5-down-intdivfrac':
+                        a = Math.floor(Math.random() * 10) + 1;
+                        b = Math.floor(Math.random() * 10) + 1;
+                        question = `${a} ÷ ${b} = `;
+                        answer = (a / b).toFixed(2);
+                        break;
+                    case 'grade5-down-fracadd':
+                    case 'grade5-down-fracsub':
+                        [a, b] = generateProperFraction();
+                        [c, d] = generateProperFraction();
+                        const op = Math.random() < 0.5 ? '+' : '-';
+                        question = `<span class="fraction"><span class="numerator">${a}</span><span class="denominator">${b}</span></span> ${op} <span class="fraction"><span class="numerator">${c}</span><span class="denominator">${d}</span></span> = `;
+                        answer = op === '+' ? (a/b + c/d) : (a/b - c/d);
+                        answer = formatMixedFraction(answer);
+                        break;
+                    case 'grade5-down-fracmix':
+                        [a, b] = generateProperFraction();
+                        [c, d] = generateProperFraction();
+                        [e, f] = generateProperFraction();
+                        question = `<span class="fraction"><span class="numerator">${a}</span><span class="denominator">${b}</span></span> + <span class="fraction"><span class="numerator">${c}</span><span class="denominator">${d}</span></span> - <span class="fraction"><span class="numerator">${e}</span><span class="denominator">${f}</span></span> = `;
+                        answer = ((a/b) + (c/d) - (e/f));
+                        answer = formatMixedFraction(answer);
+                        break;
+
+                    // 六年级
+                    case 'grade6-up-fracmulint':
+                        [a, b] = generateProperFraction();
+                        c = Math.floor(Math.random() * 10) + 1;
+                        question = `<span class="fraction"><span class="numerator">${a}</span><span class="denominator">${b}</span></span> × ${c} = `;
+                        answer = (a/b) * c;
+                        answer = formatMixedFraction(answer);
+                        break;
+                    case 'grade6-up-fracmulfrac':
+                        [a, b] = generateProperFraction();
+                        [c, d] = generateProperFraction();
+                        question = `<span class="fraction"><span class="numerator">${a}</span><span class="denominator">${b}</span></span> × <span class="fraction"><span class="numerator">${c}</span><span class="denominator">${d}</span></span> = `;
+                        answer = (a/b) * (c/d);
+                        answer = formatMixedFraction(answer);
+                        break;
+                    case 'grade6-up-fracmuldec':
+                        [a, b] = generateProperFraction();
+                        c = (Math.floor(Math.random() * 100) / 10).toFixed(1);
+                        question = `<span class="fraction"><span class="numerator">${a}</span><span class="denominator">${b}</span></span> × ${c} = `;
+                        answer = (a/b) * parseFloat(c);
+                        answer = formatMixedFraction(answer);
+                        break;
+                    case 'grade6-up-fracdivint':
+                        [a, b] = generateProperFraction();
+                        c = Math.floor(Math.random() * 10) + 1;
+                        question = `<span class="fraction"><span class="numerator">${a}</span><span class="denominator">${b}</span></span> ÷ ${c} = `;
+                        answer = (a/b) / c;
+                        answer = formatMixedFraction(answer);
+                        break;
+                    case 'grade6-up-fracdivfrac':
+                        [a, b] = generateProperFraction();
+                        [c, d] = generateProperFraction();
+                        question = `<span class="fraction"><span class="numerator">${a}</span><span class="denominator">${b}</span></span> ÷ <span class="fraction"><span class="numerator">${c}</span><span class="denominator">${d}</span></span> = `;
+                        answer = (a/b) / (c/d);
+                        answer = formatMixedFraction(answer);
+                        break;
+                    case 'grade6-up-fracdivdec':
+                        [a, b] = generateProperFraction();
+                        c = (Math.floor(Math.random() * 100) / 10).toFixed(1);
+                        question = `<span class="fraction"><span class="numerator">${a}</span><span class="denominator">${b}</span></span> ÷ ${c} = `;
+                        answer = (a/b) / parseFloat(c);
+                        answer = formatMixedFraction(answer);
+                        break;
+                    case 'grade6-up-fracmixop':
+                        [a, b] = generateProperFraction();
+                        [c, d] = generateProperFraction();
+                        [e, f] = generateProperFraction();
+                        question = `<span class="fraction"><span class="numerator">${a}</span><span class="denominator">${b}</span></span> × <span class="fraction"><span class="numerator">${c}</span><span class="denominator">${d}</span></span> ÷ <span class="fraction"><span class="numerator">${e}</span><span class="denominator">${f}</span></span> = `;
+                        answer = ((a/b) * (c/d) / (e/f));
+                        answer = formatMixedFraction(answer);
+                        break;
+                }
+                return { question, answer };
+            }
+
+            function generateProperFraction() {
+                const denominators = [2, 3, 4, 5, 6, 8, 10];
+                const denominator = denominators[Math.floor(Math.random() * denominators.length)];
+                const numerator = Math.floor(Math.random() * (denominator - 1)) + 1;
+                return [numerator, denominator];
+            }
+
+            function formatMixedFraction(number) {
+                const integerPart = Math.floor(number);
+                let fractionalPart = number - integerPart;
+                if (fractionalPart === 0) {
+                    return integerPart.toString();
+                }
+                
+                // 将小数部分四舍五入到两位小数
+                fractionalPart = Math.round(fractionalPart * 100) / 100;
+                
+                // 如果四舍五入后小数部分为0,只返回整数部分
+                if (fractionalPart === 0) {
+                    return integerPart.toString();
+                }
+                
+                // 返回保留两位小数的结果
+                return (integerPart + fractionalPart).toFixed(2);
+            }
+
+            function createQuestionElement(questionObj, index) {
+                const div = document.createElement('div');
+                div.className = 'question-item';
+                div.innerHTML = `
+                    <span class="question-number">${index}.</span>
+                    <span class="question-text">${questionObj.question}<span class="answer">${questionObj.answer}</span></span>
+                `;
+                return div;
+            }
+
+            function showAnswers() {
+                const answers = document.querySelectorAll('.answer');
+                answers.forEach(answer => {
+                    answer.style.display = 'inline';
+                });
+                showAnswersButton.disabled = true;
+            }
+
+            function saveAsImage() {
+                const resultArea = document.querySelector(".result-area");
+                const title = document.querySelector(".result-title").textContent;
+                const fileName = title.replace(/\s+/g, '_') + '.png'; // 将空格替换为下划线
+
+                html2canvas(resultArea, {
+                    scale: 2, // 提高图片清晰度
+                    backgroundColor: '#ffffff'
+                }).then(canvas => {
+                    const link = document.createElement('a');
+                    link.download = fileName;
+                    link.href = canvas.toDataURL('image/png', 1.0); // 使用最高质量
+                    link.click();
+                });
+            }
+        });
+    </script>
+    <style>
+        .settings-area {
+            background-color: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+
+        .fixed-width {
+            width: 80px !important;
+        }
+
+        .question-text {
+            font-size: 1.4em;
+            margin-bottom: 0.3em;
+        }
+
+        .answer-space {
+            display: inline-block;
+            width: 60px;
+            margin: 0 30px;
+            border-bottom: 1px solid #000;
+        }
+
+        .result-area {
+            background-color: #ffffff;
+        }
+
+        .fraction {
+            display: inline-block;
+            text-align: center;
+            vertical-align: middle;
+            margin: 0 0.2em;
+        }
+        .fraction > span {
+            display: block;
+        }
+        .fraction .numerator {
+            border-bottom: 1px solid black;
+        }
+        .fraction .denominator {
+            border-top: 1px solid black;
+        }
+
+        .answer {
+            color: #D3D3D3;
+            display: none;
+        }
+    </style>
+</body>
+</html>

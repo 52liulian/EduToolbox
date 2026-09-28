@@ -1,0 +1,167 @@
+/* ============================================================
+ * EduToolbox · 电子奖状生成器 award-generator.css
+ * 依赖公共底座 tool-common.css（本文件应在其后加载，以便覆盖）
+ * ============================================================ */
+
+/* ---------- 主题变量（JS 通过 body[data-theme] 轮换主色） ---------- */
+body{ --acc:#3b6ef6; --acc-soft:#e8edff; --acc-2:#5a8dff; }
+body[data-theme="sky"]   { --primary:#0ea5e9; --primary-soft:#e0f2fe; --primary-soft-2:#ccecfc; --primary-grad:linear-gradient(135deg,#38bdf8,#0ea5e9,#0284c7); }
+body[data-theme="violet"]{ --primary:#7c3aed; --primary-soft:#f0e9fe; --primary-soft-2:#e2d5fc; --primary-grad:linear-gradient(135deg,#8b5cf6,#7c3aed,#6d28d9); }
+body[data-theme="green"]{ --primary:#16a34a; --primary-soft:#e7f6ec; --primary-soft-2:#d3f0dc; --primary-grad:linear-gradient(135deg,#22c55e,#16a34a,#15803d); }
+body[data-theme="gold"] { --primary:#d97706; --primary-soft:#fdf1dc; --primary-soft-2:#fbe3bc; --primary-grad:linear-gradient(135deg,#f59e0b,#d97706,#b45309); }
+body[data-theme="orange"]{ --primary:#ea580c; --primary-soft:#ffefe4; --primary-soft-2:#ffdec9; --primary-grad:linear-gradient(135deg,#fb923c,#ea580c,#c2410c); }
+body[data-theme="pink"] { --primary:#db2777; --primary-soft:#fce7f0; --primary-soft-2:#f9cfe1; --primary-grad:linear-gradient(135deg,#f472b6,#db2777,#be185d); }
+
+/* ---------- 工作台两栏布局 ---------- */
+.workbench{
+  display:grid; grid-template-columns:minmax(280px,340px) minmax(0,1fr);
+  gap:18px; margin-top:18px; align-items:start;
+}
+/* position:relative —— 舞台右上角 .stage-toolbar 的绝对定位基准 */
+.stage-panel{
+  position:relative;
+  background:var(--card-bg); border:1px solid var(--border);
+  border-radius:var(--r-lg); box-shadow:var(--shadow); padding:20px;
+  min-width:0;
+}
+.stage-head{ display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:14px; padding-right:96px; }
+.stage-head .panel-title{ margin-bottom:0; }
+.stage-ok{ font-size:12px; color:var(--text-3); }
+
+/* ---------- 设置面板细节 ---------- */
+.text-input{
+  width:100%; font-family:inherit; font-size:14px; padding:9px 12px;
+  border:1.5px solid var(--border); border-radius:10px;
+  background:#fafbfe; color:var(--text-1); margin-bottom:8px; transition:.15s;
+}
+.text-input:focus{ outline:none; border-color:var(--primary); box-shadow:0 0 0 3px var(--primary-soft); }
+textarea.text-input{ resize:vertical; line-height:1.6; }
+.field label{ display:block; font-size:12.5px; color:var(--text-3); margin:8px 0 4px; font-weight:600; }
+.code{ font-family:ui-monospace,Consolas,monospace; background:var(--primary-soft); padding:0 5px; border-radius:6px; }
+.chips-mini{ margin-top:8px; }
+.chips-mini .chip{ font-size:12px; padding:6px 12px; }
+.setup-panel .actions{ margin-top:16px; flex-direction:row; flex-wrap:wrap; }
+.setup-panel .actions .btn{ flex:1 1 auto; }
+
+/* ---------- 奖状样式（模板基座） ---------- */
+.cert-sheet{
+  padding:18px; background:#f3f5fa; border:1px solid var(--border);
+  border-radius:14px; display:flex; justify-content:center;
+}
+.certificate{
+  position:relative; width:min(100%,860px); aspect-ratio:21/14.02;
+  background:#fff8ec; border-radius:6px; overflow:hidden;
+  box-shadow:0 8px 30px rgba(30,30,60,.16);
+  padding:clamp(16px,3vw,36px);
+}
+.cert-inner{
+  position:relative; width:100%; height:100%;
+  border:3px solid var(--tpl-line,#c1902f); border-radius:4px;
+  display:flex; flex-direction:column; align-items:center; justify-content:space-between;
+  padding:clamp(14px,3vw,30px) clamp(18px,4vw,44px); text-align:center;
+  background:
+    radial-gradient(120% 120% at 50% 0%, var(--tpl-bg2,rgba(255,255,255,.6)), transparent 60%),
+    var(--tpl-bg,#fffdf6);
+}
+/* 四角装饰 */
+.corner{ position:absolute; width:52px; height:52px; border:4px solid var(--tpl-corner,#c1902f); z-index:2; }
+.corner.tl{ top:8px; left:8px; border-right:none; border-bottom:none; border-top-left-radius:6px; }
+.corner.tr{ top:8px; right:8px; border-left:none; border-bottom:none; border-top-right-radius:6px; }
+.corner.bl{ bottom:8px; left:8px; border-right:none; border-top:none; border-bottom-left-radius:6px; }
+.corner.br{ bottom:8px; right:8px; border-left:none; border-top:none; border-bottom-right-radius:6px; }
+@media (max-width:560px){ .corner{ width:34px; height:34px; border-width:3px; } }
+
+/* 标题（模板名称） */
+.cert-title{
+  margin:0; font-size:clamp(26px,5.6vw,54px); font-weight:900;
+  letter-spacing:.42em; text-indent:.42em; color:var(--tpl-title,#b4451c);
+  font-family:"Kaiti SC","STKaiti","KaiTi","SimSun",serif;
+}
+.cert-ribbon{
+  width:clamp(90px,22vw,200px); height:6px; margin:10px auto 0;
+  background:var(--tpl-line,#c1902f); border-radius:99px; opacity:.9;
+}
+/* 称号大字 */
+.cert-award{
+  font-size:clamp(26px,5.2vw,48px); font-weight:900; color:var(--tpl-acc,#c0392b);
+  margin:14px 0 6px; line-height:1.15; letter-spacing:.08em;
+  font-family:"Kaiti SC","STKaiti","KaiTi","SimSun",serif;
+  text-shadow:0 2px 0 rgba(0,0,0,.04);
+}
+/* 称呼行 */
+.cert-line{ font-size:clamp(14px,2.2vw,20px); color:var(--text-1,#3a3328); font-weight:600; }
+.cert-line .hl{ color:var(--tpl-acc,#c0392b); font-weight:800; border-bottom:2px solid var(--tpl-line,#c1902f); padding:0 6px; }
+/* 正文 */
+.cert-body{ font-size:clamp(12px,1.9vw,17px); color:#5b5343; line-height:1.9; margin:4px 0 0; max-width:92%; }
+/* 落款 */
+.cert-foot{ display:flex; flex-direction:column; align-items:flex-end; gap:3px; width:100%; padding-top:8px; }
+.cert-school{ font-size:clamp(13px,2vw,19px); font-weight:700; color:var(--tpl-acc,#c0392b); }
+.cert-date{ font-size:clamp(11px,1.6vw,15px); color:#8a8171; }
+
+.stage-tip{ margin-top:12px; font-size:12.5px; color:var(--text-3); text-align:center; }
+
+/* ---------- 四种模板配色 ---------- */
+/* 奖状：中国红 */
+.certificate.tpl-award{ --tpl-line:#c0392b; --tpl-title:#9b1c0e; --tpl-acc:#c0392b; --tpl-corner:#b23a2a; --tpl-bg:#fff6ec; }
+/* 荣誉证书：金黄蓝 */
+.certificate.tpl-cert{ --tpl-line:#c1902f; --tpl-title:#1e4a8a; --tpl-acc:#1e4a8a; --tpl-corner:#b58a2f; --tpl-bg:#fbfaf6; }
+/* 表扬信：清新绿 */
+.certificate.tpl-praise{ --tpl-line:#2e8b57; --tpl-title:#1f6b3f; --tpl-acc:#20784a; --tpl-corner:#2e8b57; --tpl-bg:#f6fbf6; }
+/* 喜报：喜庆渐变 */
+.certificate.tpl-happy{
+  --tpl-line:#e0a32b; --tpl-title:#c1121f; --tpl-acc:#c1121f; --tpl-corner:#d98e1f;
+  --tpl-bg:#fff1e0;
+}
+.certificate.tpl-happy .cert-inner{
+  background:
+    radial-gradient(130% 130% at 50% 0%, #ffe9c9, transparent 58%),
+    linear-gradient(180deg,#fff7ec,#fff0dc);
+}
+
+/* ---------- 响应式 ---------- */
+@media (max-width:880px){ .workbench{ grid-template-columns:1fr; } }
+@media (max-width:560px){
+  .cert-sheet{ padding:10px; }
+  .certificate{ padding:12px; }
+  .cert-inner{ padding:12px; }
+}
+
+/* ---------- 打印：仅输出奖状（A4 横向） ---------- */
+@media print{
+  html,body{ background:#fff !important; }
+  .setup-panel,.stage-head,.stage-tip,.toast{ display:none !important; }
+  .workbench{ display:block; margin:0; }
+  .stage-panel{ box-shadow:none; border:none; padding:0; }
+  .cert-sheet{ padding:0; background:#fff; border:none; }
+  .certificate{
+    width:282mm; height:188mm; aspect-ratio:auto;
+    box-shadow:none; border-radius:0; padding:8mm;
+  }
+  .cert-inner{ border-width:3px; }
+  @page{ size:A4 landscape; margin:0; }
+}
+
+/* ---------- 隐藏设置栏（⚙）：双栏 → 单栏，与 random-call 同构 ---------- */
+.workbench.setup-hidden{ grid-template-columns:minmax(0,1fr); }
+.workbench.setup-hidden .setup-panel{ display:none; }
+
+/* ---------- 舞台全屏（⛶）：全屏目标是 .stage-panel 自身，不是整页 ---------- */
+.stage-panel:fullscreen,
+.stage-panel:-webkit-full-screen,
+.stage-panel.edutf-solo{
+  display:flex; flex-direction:column; justify-content:center; align-items:stretch;
+  min-height:100vh; padding:36px 30px;
+  border-radius:0; border-color:transparent; box-shadow:none;
+  background:var(--card-bg); overflow:auto;
+}
+/* 全屏下工具栏仍可见：贴边 + 半透明，hover 恢复不透明 */
+.stage-panel:fullscreen .stage-toolbar,
+.stage-panel:-webkit-full-screen .stage-toolbar,
+.stage-panel.edutf-solo .stage-toolbar{
+  position:fixed; top:18px; right:22px; z-index:30;
+  opacity:.55; transition:opacity .18s var(--ease);
+}
+.stage-panel:fullscreen .stage-toolbar:hover,
+.stage-panel:-webkit-full-screen .stage-toolbar:hover,
+.stage-panel.edutf-solo .stage-toolbar:hover{ opacity:1; }
+@media print{ .stage-toolbar{ display:none; } }

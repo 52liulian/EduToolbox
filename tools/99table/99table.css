@@ -1,0 +1,340 @@
+/* ============================================================================
+ * 99table.css · 九九乘法表（专属样式）
+ * ----------------------------------------------------------------------------
+ * 依赖底座：../../assets/css/tool-common.css（后加载，同特异性底座胜出，
+ *           本文件使用 #id / [data-*] / :fullscreen 提高特异性）
+ * 内容分区：
+ *   1. 控制条（布局 / 字号 / 主题分段选择 + 全屏 / 打印）
+ *   2. 乘法表网格（9×9，单元格 / 对角线 / 三角形留白）
+ *   3. 字号档位 s / m / l / xl（data-size 驱动）
+ *   4. 颜色主题（米黄 / 蓝白 / 绿白：作用于表格；暗黑仅作用于表格区域，
+ *      整页保持浅色；全屏时暗黑铺满视口）
+ *   5. 全屏投影模式
+ *   6. 页脚 / 响应式 / 打印
+ * 高度策略：网格自然撑高，无固定高度、无内部滚动条。
+ * ========================================================================== */
+
+/* ---------------------------------------------------------------------------
+ * 1. 控制条（底座 .controls 是无底色居中 flex，本页升级为卡片工具栏）
+ * ------------------------------------------------------------------------- */
+#controls {
+  justify-content: center;
+  gap: 14px 22px;
+  margin: 0 auto 22px;
+  padding: 14px 18px;
+  max-width: 1100px;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  box-shadow: var(--shadow-sm);
+}
+
+/* 「隐藏设置」（舞台右上角工具栏的 ⚙）：隐藏上方控制条，只留乘法表 */
+#controls.setup-hidden { display: none; }
+
+.ctrl-group {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  flex-wrap: wrap;
+}
+
+.ctrl-group .ctrl-label {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-2);
+}
+
+/* 本页 .seg 是按钮容器（底座 .seg 默认是 label 单选结构，这里覆盖） */
+.seg[data-name] {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  padding: 4px;
+  background: var(--bg-soft);
+  border: 1px solid var(--border);
+  border-radius: var(--r-pill);
+  cursor: default;
+}
+
+.seg[data-name] .seg-btn {
+  padding: 6px 14px;
+  font-size: 13px;
+  border-color: transparent;
+  background: transparent;
+}
+
+.ctrl-actions { margin-left: auto; }
+
+/* ---------------------------------------------------------------------------
+ * 2. 乘法表网格
+ * ------------------------------------------------------------------------- */
+.table-area {
+  position: relative;             /* 舞台右上角工具栏 .stage-toolbar 的定位基准 */
+  width: 100%;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 58px clamp(14px, 2.4vw, 30px) clamp(14px, 2.4vw, 30px); /* 顶部留出工具栏条带 */
+  background: #fdf8ea;                 /* 默认米黄纸面，主题区可覆盖 */
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow);
+  transition: background var(--t) var(--ease), border-color var(--t) var(--ease);
+}
+
+.table-grid {
+  display: grid;
+  grid-template-columns: repeat(9, minmax(0, 1fr));
+  gap: 8px;
+}
+
+/* 单元格 */
+.table-grid .cell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  min-height: 0;
+  padding: 10px 4px;
+  aspect-ratio: 1.12 / 1;
+  text-align: center;
+  background: #fffdf6;
+  border: 1px solid #ecdfba;
+  border-radius: var(--r-sm);
+  transition: transform var(--t-fast) var(--ease), box-shadow var(--t-fast) var(--ease);
+}
+
+.table-grid .cell:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 14px rgba(160, 120, 40, 0.16);
+  z-index: 2;
+}
+
+.table-grid .eq {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: #9a8a68;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+.table-grid .res {
+  font-size: 22px;
+  font-weight: 900;
+  line-height: 1.1;
+  color: #b3741a;
+  font-variant-numeric: tabular-nums;
+}
+
+/* 对角线（c === r）：醒目渐变实块 */
+.table-grid .cell.diag {
+  background: linear-gradient(135deg, #ffd766, #f0a417);
+  border-color: #e39a12;
+  box-shadow: 0 4px 12px rgba(240, 164, 23, 0.32);
+}
+.table-grid .cell.diag .eq,
+.table-grid .cell.diag .res { color: #fff; }
+.table-grid .cell.diag .res { text-shadow: 0 1px 2px rgba(140, 90, 0, 0.35); }
+
+/* 三角形布局：对角线上方的格子隐藏但保留占位，维持整齐三角 */
+.table-grid .cell.hide {
+  visibility: hidden;
+}
+.table-grid[data-layout="triangle"] .cell:hover { transform: none; box-shadow: none; }
+.table-grid[data-layout="triangle"] .cell.diag:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(240, 164, 23, 0.4);
+}
+
+/* ---------------------------------------------------------------------------
+ * 3. 字号档位（data-size：s 紧凑 / m 标准 / l 大号 / xl 超大）
+ * ------------------------------------------------------------------------- */
+#table-grid[data-size="s"] { gap: 5px; }
+#table-grid[data-size="s"] .cell { padding: 5px 2px; border-radius: 6px; }
+#table-grid[data-size="s"] .eq { font-size: 10.5px; }
+#table-grid[data-size="s"] .res { font-size: 16px; }
+
+#table-grid[data-size="m"] { gap: 8px; }
+#table-grid[data-size="m"] .cell { padding: 10px 4px; }
+#table-grid[data-size="m"] .eq { font-size: 12.5px; }
+#table-grid[data-size="m"] .res { font-size: 22px; }
+
+#table-grid[data-size="l"] { gap: 10px; }
+#table-grid[data-size="l"] .cell { padding: 14px 4px; border-radius: var(--r); }
+#table-grid[data-size="l"] .eq { font-size: 14px; }
+#table-grid[data-size="l"] .res { font-size: 28px; }
+
+#table-grid[data-size="xl"] { gap: 12px; }
+#table-grid[data-size="xl"] .cell {
+  padding: 18px 6px;
+  border-radius: var(--r);
+  aspect-ratio: 1.05 / 1;
+}
+#table-grid[data-size="xl"] .eq { font-size: 16px; }
+#table-grid[data-size="xl"] .res { font-size: 36px; }
+
+/* ---------------------------------------------------------------------------
+ * 4. 颜色主题（data-skin 写在工具自身舞台 #table-area 上，
+ *    不占用站点全局 data-theme 令牌空间；站点配色只由顶栏 🎨 切换）
+ * ------------------------------------------------------------------------- */
+
+/* 米黄（默认） —— 上方基础样式即米黄，此处无需重复 */
+
+/* 显式声明 amber（data-skin 与 CSS 类同源，防基础样式调整后漂移） */
+#table-area[data-skin="amber"] .table-area {
+  background: #fdf8ea;
+  border-color: #f0e4c0;
+}
+
+/* 蓝白 */
+#table-area[data-skin="sky"] .table-area {
+  background: #eef4ff;
+  border-color: #d4e1ff;
+}
+#table-area[data-skin="sky"] .table-grid .cell {
+  background: #ffffff;
+  border-color: #d3e0fb;
+}
+#table-area[data-skin="sky"] .table-grid .eq { color: #7e8bab; }
+#table-area[data-skin="sky"] .table-grid .res { color: var(--primary); }
+#table-area[data-skin="sky"] .table-grid .cell:hover {
+  box-shadow: 0 6px 14px rgba(59, 110, 246, 0.18);
+}
+#table-area[data-skin="sky"] .table-grid .cell.diag {
+  background: var(--primary-grad);
+  border-color: var(--primary-active);
+  box-shadow: 0 4px 12px rgba(59, 110, 246, 0.35);
+}
+
+/* 绿白 */
+#table-area[data-skin="green"] .table-area {
+  background: #eef8f1;
+  border-color: #cfe8d9;
+}
+#table-area[data-skin="green"] .table-grid .cell {
+  background: #ffffff;
+  border-color: #c9e4d3;
+}
+#table-area[data-skin="green"] .table-grid .eq { color: #7f9e8a; }
+#table-area[data-skin="green"] .table-grid .res { color: #1c8a4d; }
+#table-area[data-skin="green"] .table-grid .cell:hover {
+  box-shadow: 0 6px 14px rgba(34, 179, 106, 0.18);
+}
+#table-area[data-skin="green"] .table-grid .cell.diag {
+  background: linear-gradient(135deg, #43d487, #17a05d);
+  border-color: #129154;
+  box-shadow: 0 4px 12px rgba(34, 179, 106, 0.35);
+}
+
+/* 暗黑：仅表格区域深色，页面其余部分保持浅色 */
+#table-area[data-skin="dark"] .table-area {
+  background: #141a23;
+  border-color: #28313f;
+  box-shadow: 0 18px 44px rgba(10, 16, 26, 0.35);
+}
+#table-area[data-skin="dark"] .table-grid .cell {
+  background: #1c2431;
+  border-color: #2d3748;
+}
+#table-area[data-skin="dark"] .table-grid .eq { color: #8494ac; }
+#table-area[data-skin="dark"] .table-grid .res { color: #e6edf9; }
+#table-area[data-skin="dark"] .table-grid .cell:hover {
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.5);
+}
+#table-area[data-skin="dark"] .table-grid .cell.diag {
+  background: linear-gradient(135deg, #5a8dff, #3b6ef6);
+  border-color: #5a8dff;
+  box-shadow: 0 4px 14px rgba(59, 110, 246, 0.5);
+}
+
+/* ---------------------------------------------------------------------------
+ * 5. 页脚
+ * ------------------------------------------------------------------------- */
+.footer {
+  margin-top: 22px;
+  padding-bottom: 30px;
+  text-align: center;
+  font-size: 12.5px;
+  color: var(--text-3);
+}
+
+/* ---------------------------------------------------------------------------
+ * 6. 响应式
+ * ------------------------------------------------------------------------- */
+@media (max-width: 720px) {
+  #controls {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+  .ctrl-group { justify-content: center; }
+  .ctrl-actions { margin-left: 0; justify-content: center; }
+  .table-area { padding: 58px 12px 12px; }   /* 顶部工具栏条带保持不变 */
+  .table-grid { gap: 4px; }
+  .table-grid .cell { padding: 6px 2px; border-radius: 6px; gap: 0; }
+  .table-grid .eq { font-size: 10px !important; }
+  .table-grid .res { font-size: 15px !important; }
+}
+
+/* ---------------------------------------------------------------------------
+ * 7. 全屏投影模式：舞台 .table-area 自身进入全屏，表格水平垂直居中
+ * ------------------------------------------------------------------------- */
+#table-area:fullscreen,
+#table-area:-webkit-full-screen,
+#table-area.edutf-solo{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  max-width: none;
+  margin: 0;
+  padding: 66px clamp(18px, 3vw, 46px);   /* 顶部留出工具栏条带 */
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+  overflow: auto;                 /* 内容超高时允许滚动，不裁切 */
+}
+
+#table-area:fullscreen #table-grid,
+#table-area:-webkit-full-screen #table-grid,
+#table-area.edutf-solo #table-grid{
+  width: min(96vw, 1500px);
+  margin: auto;
+}
+
+/* 暗黑主题全屏：舞台深底铺满 */
+#table-area[data-skin="dark"] #table-area:fullscreen,
+#table-area[data-skin="dark"] #table-area:-webkit-full-screen,
+#table-area[data-skin="dark"] #table-area.edutf-solo{
+  background: #0f141c;
+}
+
+/* ---------------------------------------------------------------------------
+ * 8. 打印：保留完整口诀内容，去除交互控件与阴影
+ * ------------------------------------------------------------------------- */
+@media print {
+  .hero, .footer, #controls { display: none !important; }
+  .table-area {
+    max-width: none;
+    padding: 0;
+    border: none;
+    box-shadow: none;
+    background: #fff !important;
+  }
+  .table-grid .cell,
+  #table-area[data-skin="dark"] .table-grid .cell,
+  #table-area[data-skin="sky"] .table-grid .cell,
+  #table-area[data-skin="green"] .table-grid .cell {
+    background: #fff !important;
+    border-color: #bbb !important;
+    box-shadow: none !important;
+  }
+  .table-grid .res,
+  .table-grid .eq { color: #000 !important; }
+  .table-grid .cell.diag {
+    background: #f0f0f0 !important;
+    border-color: #999 !important;
+  }
+  .table-grid .cell.diag .eq,
+  .table-grid .cell.diag .res { color: #000 !important; text-shadow: none !important; }
+}

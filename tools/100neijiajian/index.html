@@ -1,0 +1,411 @@
+<html>
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>100以内两位加减法</title>
+	<style>
+		body {
+			/* 屏幕显示：模拟 A4 宽度并水平居中，四周留白更像一张纸 */
+			width: 190mm;
+			max-width: 100%;
+			margin: 0 auto;
+			padding: 16px 12px 40px 12px;
+			background: #f0f2f5;
+
+			font-family: Arial, "Microsoft YaHei", sans-serif;
+			font-size: 24px;
+			text-align: center;
+		}
+		/* 屏幕下的"纸张"效果，打印时去掉背景与边框 */
+		.paper {
+			background: #fff;
+			padding: 10mm 8mm;
+			border-radius: 4px;
+			box-shadow: 0 2px 12px rgba(0,0,0,0.12);
+		}
+		/* ===== 工具栏（仅屏幕显示，打印时隐藏）===== */
+		.toolbar {
+			position: sticky;
+			top: 0;
+			z-index: 999;
+			display: flex;
+			align-items: center;
+			gap: 12px;
+			flex-wrap: wrap;
+			padding: 10px 16px;
+			margin: 0 0 12px 0;
+			background: #fff;
+			border-bottom: 2px solid #4a90d9;
+			box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+			text-align: left;
+		}
+		.toolbar label {
+			font-size: 16px;
+			color: #333;
+			display: flex;
+			align-items: center;
+			gap: 4px;
+		}
+		.toolbar input[type=number] {
+			width: 56px;
+			font-size: 16px;
+			padding: 2px 4px;
+			text-align: center;
+		}
+		.btn {
+			font-size: 16px;
+			padding: 6px 16px;
+			border: none;
+			border-radius: 4px;
+			cursor: pointer;
+			color: #fff;
+			background: #4a90d9;
+			transition: background .15s;
+		}
+		.btn:hover { background: #357ab8; }
+		.btn.primary { background: #e8862c; }
+		.btn.primary:hover { background: #c96d18; }
+		.hint { font-size: 14px; color: #888; margin-left: auto; }
+
+		.paper {
+			display: grid;
+			grid-template-columns: repeat(4, 1fr); /* 4列 */
+			grid-auto-rows: 1fr;                    /* 行高平分，保证一页装完 */
+			box-sizing: border-box;
+		}
+		.question {
+			display: flex;
+			align-items: center;
+			text-align: left;
+			line-height: 1.4;
+			overflow: hidden;                       /* 防止个别长算式撑破行 */
+			white-space: nowrap;
+		}
+		
+		.page-break { display: none; }
+
+		/* ===== 打印 / PDF 导出专用样式 ===== */
+		@media print {
+			/* 隐藏工具栏 */
+			.toolbar { display: none !important; }
+			/* A4 纵向：边距越小，可用高度越大，越不容易溢出到第二页 */
+			@page { size: A4 portrait; margin: 8mm 8mm; }
+			html, body {
+				width: auto;
+				height: auto;
+				margin: 0;
+				padding: 0;
+				background: #fff;
+				font-size: 20px;        /* 打印时字号略收，防止换行 */
+				-webkit-print-color-adjust: exact;
+				print-color-adjust: exact;
+			}
+			/* 每页容器固定为 A4 可用高度，题目在其中纵向平均分布，保证一页装完 */
+			.paper {
+				display: grid;
+				grid-template-columns: repeat(4, 1fr);
+				grid-auto-rows: 1fr;     /* 行高平分剩余空间 */
+				height: 281mm;           /* A4 297mm - 上下边距 16mm */
+				box-sizing: border-box;
+				padding: 0;
+				background: transparent;
+				padding: 0;
+				border-radius: 0;
+				box-shadow: none;
+			}
+			.question { line-height: 2; }
+			.page-break {
+				display: block;
+				page-break-before: always;
+			}
+		}
+	</style>
+<style>
+/* ============================================================================
+ * EduToolbox 组件化挂载兜底（自动追加）
+ * ----------------------------------------------------------------------------
+ * 本工具未引入 assets/css/tool-common.css，挂载进站点（Shadow DOM）后会缺少：
+ *   1) 六色主题变量 --primary / --primary-soft / --primary-grad
+ *   2) .container 的宽度约束（否则内容铺满并贴边）
+ * 这里补齐最小等价集，保证「独立打开」与「站点内组件化挂载」视觉一致。
+ * ========================================================================== */
+
+:root,
+:host,
+body[data-theme="sky"]   { --primary:#0ea5e9; --primary-soft:#e0f2fe; --primary-soft-2:#ccecfc; --primary-grad:linear-gradient(135deg,#38bdf8,#0ea5e9,#0284c7); }
+body[data-theme="violet"]{ --primary:#7c3aed; --primary-soft:#f0e9fe; --primary-soft-2:#e2d5fc; --primary-grad:linear-gradient(135deg,#8b5cf6,#7c3aed,#6d28d9); }
+body[data-theme="green"] { --primary:#16a34a; --primary-soft:#e7f6ec; --primary-soft-2:#d3f0dc; --primary-grad:linear-gradient(135deg,#22c55e,#16a34a,#15803d); }
+body[data-theme="gold"]  { --primary:#d97706; --primary-soft:#fdf1dc; --primary-soft-2:#fbe3bc; --primary-grad:linear-gradient(135deg,#f59e0b,#d97706,#b45309); }
+body[data-theme="orange"]{ --primary:#ea580c; --primary-soft:#ffefe4; --primary-soft-2:#ffdec9; --primary-grad:linear-gradient(135deg,#fb923c,#ea580c,#c2410c); }
+body[data-theme="pink"]  { --primary:#db2777; --primary-soft:#fce7f0; --primary-soft-2:#f9cfe1; --primary-grad:linear-gradient(135deg,#f472b6,#db2777,#be185d); }
+
+/* 容器宽度兜底：仅在工具自身未声明时生效（不覆盖已有 .container 规则） */
+.container:not([data-no-fallback]) {
+  width: 100%;
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 28px 24px 56px;
+  box-sizing: border-box;
+}
+</style>
+</head>
+<body>
+	<div class="toolbar">
+		<label>页数
+			<input type="number" id="pageCount" value="1" min="1" max="20">
+		</label>
+		<label>每页题数
+			<input type="number" id="perPage" value="100" min="20" max="200" step="20">
+		</label>
+		<button class="btn" id="btnRegenerate">换一批</button>
+		<button class="btn" id="btnPrint">打印 / 另存为PDF</button>
+		<span class="hint">提示：打印时目标打印机选"另存为PDF"即可导出PDF；Ctrl+P 也可快速打印</span>
+	</div>
+	<div id="Papers"></div>
+	<script src="../../assets/js/frame-bridge.js"></script>
+<script>
+		//辅助函数：计算[min,max)随机数
+		function getRandMinMax(min,max) {  
+			return Math.floor(Math.random() * (max-min) + min);
+		}
+		//辅助函数：随机获取一个数组元素
+		function getRandInArray(array) {
+			let pos = getRandMinMax(0, array.length)
+			return array[pos];
+		}
+		
+		//二元算式(加法)
+		class MathExprAdd {
+			constructor(x, y) { this.op='+'; this.x = x; this.y = y; }
+			result(){ return this.x + this.y; }
+			toStr() { return `${this.x} + ${this.y}`; }
+		}
+		//二元算式(减法)
+		class MathExprSub {
+			constructor(x, y) { this.op='-'; this.x = x; this.y = y; }
+			result(){ return this.x - this.y; }
+			toStr() { return `${this.x} - ${this.y}`; }
+		}
+		
+		// 以结果为key的Map题库（用于替换二元算式为三元算式）
+		class MathExprMap {
+			constructor() { this.map = new Map(); }
+			push(expr) {
+				if (this.map.has(expr.result())){
+					let array = this.map.get(expr.result());
+					array.push(expr);
+				} else {
+					let array = [];
+					array.push(expr);
+					this.map.set(expr.result(), array);
+				}
+			}
+			rand(ret){
+				if (this.map.has(ret)){
+					return getRandInArray(this.map.get(ret));
+				}
+				return null;
+			}
+		}
+		
+		var arrayAdd = [];		// 普通加法题库
+		var arrayAddCarry = [];	// 进位加法题库
+		var arrayAddTen = [];	// 包含整十数加法题库
+		var arraySub = [];		// 普通减法题库
+		var arraySubBorrow = [];// 退位减法题库
+		var arraySubTen = [];	// 包含整十数减法题库
+		
+		var mapRet = new MathExprMap();// 以结果为key的题库(不含整十数加减法)
+		var mapGen = new Map();	// 记录生成的算式，防止重复
+		
+		// 生成题库：两位数加两位数(包含进位加) (a*10+b)+(c*10+d)
+		for (let a = 1; a < 10; a++) {
+			for (let b = 0; b < 10; b++) {
+				for (let c = 1; c < 10; c++) {
+					for (let d = 0; d < 10; d++) {
+						if (b == 0 && d == 0) continue;//过滤整十相加
+						let ret = (a*10+b)+(c*10+d);
+						if (ret < 100){//结果小于100
+							let expr = new MathExprAdd(a*10+b, c*10+d);
+							if (b == 0 || d == 0) {//含整十数
+								arrayAddTen.push(expr);
+								//三元运算替换时不使用整十数加法
+								//mapRet.push(expt);
+							} else if (b + d >= 10) {//进位加
+								arrayAddCarry.push(expr);
+								mapRet.push(expr);
+							} else {
+								arrayAdd.push(expr);
+								mapRet.push(expr);
+							}
+						}
+					}
+				}
+			}
+		}
+		// 生成题库：两位数减两位数(包含退位减) (a*10+b)-(c*10+d)
+		for (let a = 1; a < 10; a++) {
+			for (let b = 0; b < 10; b++) {
+				for (let c = 1; c < 10; c++) {
+					for (let d = 0; d < 10; d++) {
+						if (b == 0 && d == 0) continue;//过滤整十相减
+						if (b == d) continue;//过滤个位相等（太简单）
+						let ret = (a*10+b)-(c*10+d);
+						if (ret > 0) {
+							let expr = new MathExprSub(a*10+b, c*10+d);
+							if (d == 0) {//这里只包含减整十数，整十数减放在退位减
+								arraySubTen.push(expr);
+								//三元运算替换时不使用整十数加法
+								//mapRet.push(expt);
+							} else if (b < d){//退位减
+								arraySubBorrow.push(expr);
+								mapRet.push(expr);
+							} else {
+								arraySub.push(expr);
+								mapRet.push(expr);
+							}
+						}
+					}
+				}
+			}
+		}
+		
+		const RATE_NORMAL = 0.05	// 普通比率
+		const RATE_TEN = 0.05		// 含整十数比率
+		//const RATE_DIGITAL = 0.90	// 进位加和退位减比率
+		
+		const RATE_THREE = 0.20		// 转化三元算式比率
+		
+		// 随机生成1个算式
+		function generateQuestion() {
+			let expr;
+			//50%加法 50%减法
+			if (Math.random() < 0.5) {
+				let rate = Math.random()
+				if (rate < RATE_NORMAL) {
+					expr = getRandInArray(arrayAdd);
+				} else if (rate < RATE_NORMAL+RATE_TEN) {
+					expr = getRandInArray(arrayAddTen); //整十数
+				} else {
+					expr = getRandInArray(arrayAddCarry); //进位加
+				}
+			} else {
+				let rate = Math.random()
+				if (rate < RATE_NORMAL) {
+					expr = getRandInArray(arraySub);
+				} else if (rate < RATE_NORMAL+RATE_TEN) {
+					expr = getRandInArray(arraySubTen); //整十数
+				} else {
+					expr = getRandInArray(arraySubBorrow); //退位减
+				}
+			}
+			
+			// 20%出现三元运算
+			if (Math.random() < RATE_THREE) {
+				if (Math.random() < 0.2) {//20%对第二个数转换算式（后括号）
+					let expr2 = mapRet.rand(expr.y);
+					if(expr2!=null) {
+						if (expr.op == '+' && Math.random() < 0.5) { //加法有50%几率交换加数位置
+							if (Math.random() < 0.5) {//50%几率去掉前括号
+								return `${expr2.toStr()} + ${expr.x} =`;
+							} else {
+								return `(${expr2.toStr()}) + ${expr.x} =`;
+							}
+						}
+						return `${expr.x} ${expr.op} (${expr2.toStr()}) =`;
+					}
+				} else { //80%对第一个数转换算式（前括号）
+					let expr2 = mapRet.rand(expr.x);
+					if (expr2!=null) {
+						if (expr.op == '+' && Math.random() < 0.5) { //加法有50%几率交换加数位置
+							return `${expr.y} + (${expr2.toStr()})  =`;
+						}
+						if (Math.random() < 0.5) {//50%几率去掉前括号
+							return `${expr2.toStr()} ${expr.op} ${expr.y} =`;
+						} else {
+							return `(${expr2.toStr()}) ${expr.op} ${expr.y} =`;
+						}
+					}
+				}
+			}
+			return expr.toStr() + ' =';
+		}
+		
+		// 随机生成1个不重复算式
+		function generateUniqueQuestion() {
+			var expr = generateQuestion();
+			while(mapGen.has(expr))
+				expr = generateQuestion();
+			mapGen.set(expr, 1);
+			return expr;
+		}
+		
+		// 按页生成算式
+		function generateMathExpression() {
+			const Papers = document.getElementById('Papers');
+			while (Papers.firstChild) {
+				Papers.removeChild(Papers.firstChild);
+			}
+			// 清空去重记录，保证跨页也不重复
+			mapGen.clear();
+			let page_num = parseInt(document.getElementById('pageCount').value, 10) || 1;
+			let per_page = parseInt(document.getElementById('perPage').value, 10) || 100;
+			for (let p = 0; p < page_num; p++) {
+				const paper = document.createElement('div');
+				paper.className = 'paper';
+				Papers.appendChild(paper);
+				for (let i = 0; i < per_page; i++) {
+					const question = document.createElement('div');
+					question.className = 'question';
+					question.textContent = generateUniqueQuestion();
+					question.addEventListener('click', function() {
+						this.textContent = generateUniqueQuestion();
+					});
+					paper.appendChild(question);
+				}
+				// 非尾页插入分页符
+				if (p < page_num - 1) {
+					const page_break = document.createElement('div');
+					page_break.className = 'page-break';
+					Papers.appendChild(page_break);
+				}
+			}
+		}
+
+		// ===== 工具栏交互 =====
+		document.getElementById('btnRegenerate').addEventListener('click', generateMathExpression);
+		document.getElementById('pageCount').addEventListener('change', generateMathExpression);
+		document.getElementById('perPage').addEventListener('change', generateMathExpression);
+		// 导出 PDF / 打印：直接调用浏览器打印，目标选"另存为PDF"
+		document.getElementById('btnPrint').addEventListener('click', function () {
+			fitPapersToPage();
+			window.print();
+		});
+		// 在打印前把每页高度设为"一页可用高度"，确保内容恰好装满一页不溢出
+		function fitPapersToPage() {
+			const papers = document.querySelectorAll('.paper');
+			if (!papers.length) return;
+			// A4 高度 297mm，减去 @page 上下边距 16mm，得 281mm 可用高度
+			papers.forEach(p => { p.style.height = '281mm'; });
+		}
+		// Ctrl+P / Cmd+P 也能用（浏览器默认即触发打印）
+		// Ctrl+P / Cmd+P 打印前同样重排，保证一页装完
+		window.addEventListener('beforeprint', fitPapersToPage);
+		generateMathExpression();
+		/*
+		console.log(arrayAdd.length);
+		console.log(arrayAddCarry.length);
+		console.log(arrayAddTen.length);
+		console.log(arraySub.length);
+		console.log(arraySubBorrow.length);
+		console.log(arraySubTen.length);
+		for (let [key, value] of mapRet.map) {
+			console.log(key, value.length);
+			for (let i = 0; i < value.length; i++) {
+			  console.log('\t',value[i].toStr());
+			}
+		}
+		console.log('end');*/
+	</script>
+</body>
+</html>

@@ -1,0 +1,100 @@
+/* ============================================================
+ * EduToolbox · 组内角色分配 group-roles.css
+ * 依赖公共底座 tool-common.css（本文件应在其后加载）
+ * ============================================================ */
+
+/* ---------- 主题变量（JS 轮换主色） ---------- */
+body[data-theme="sky"]   { --primary:#0ea5e9; --primary-soft:#e0f2fe; --primary-soft-2:#ccecfc; --primary-grad:linear-gradient(135deg,#38bdf8,#0ea5e9,#0284c7); }
+body[data-theme="violet"]{ --primary:#7c3aed; --primary-soft:#f0e9fe; --primary-soft-2:#e2d5fc; --primary-grad:linear-gradient(135deg,#8b5cf6,#7c3aed,#6d28d9); }
+body[data-theme="green"]{ --primary:#16a34a; --primary-soft:#e7f6ec; --primary-soft-2:#d3f0dc; --primary-grad:linear-gradient(135deg,#22c55e,#16a34a,#15803d); }
+body[data-theme="gold"] { --primary:#d97706; --primary-soft:#fdf1dc; --primary-soft-2:#fbe3bc; --primary-grad:linear-gradient(135deg,#f59e0b,#d97706,#b45309); }
+body[data-theme="orange"]{ --primary:#ea580c; --primary-soft:#ffefe4; --primary-soft-2:#ffdec9; --primary-grad:linear-gradient(135deg,#fb923c,#ea580c,#c2410c); }
+body[data-theme="pink"] { --primary:#db2777; --primary-soft:#fce7f0; --primary-soft-2:#f9cfe1; --primary-grad:linear-gradient(135deg,#f472b6,#db2777,#be185d); }
+
+/* ---------- 工作台两栏 ---------- */
+.workbench{ display:grid; grid-template-columns:minmax(280px,340px) minmax(0,1fr); gap:18px; margin-top:18px; align-items:start; }
+/* position:relative —— 舞台右上角 .stage-toolbar 的绝对定位基准 */
+.stage-panel{
+  position:relative;
+  background:var(--card-bg); border:1px solid var(--border);
+  border-radius:var(--r-lg); box-shadow:var(--shadow); padding:20px; min-width:0;
+}
+.stage-head{ display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:14px; flex-wrap:wrap; padding-right:96px; }
+.stage-head .panel-title{ margin-bottom:0; }
+.stage-ok{ font-size:12px; padding:3px 12px; border-radius:99px; background:var(--primary-soft); color:var(--primary); font-weight:600; }
+
+/* ---------- 面板细节 ---------- */
+.text-input{
+  width:100%; font-family:inherit; font-size:14px; padding:9px 12px;
+  border:1.5px solid var(--border); border-radius:10px;
+  background:#fafbfe; color:var(--text-1); margin-bottom:8px; transition:.15s;
+}
+.text-input:focus{ outline:none; border-color:var(--primary); box-shadow:0 0 0 3px var(--primary-soft); }
+textarea.text-input{ resize:vertical; line-height:1.6; font-family:inherit; }
+.chips-mini{ margin-bottom:8px; }
+.chips-mini .chip{ font-size:12px; padding:6px 12px; }
+.check{ display:flex; align-items:flex-start; gap:8px; font-size:13px; color:var(--text-2); margin-top:8px; cursor:pointer; line-height:1.5; }
+.check input{ margin-top:3px; accent-color:var(--primary); width:16px; height:16px; }
+.setup-panel .actions{ margin-top:16px; flex-direction:row; flex-wrap:wrap; }
+.setup-panel .actions .btn{ flex:1 1 auto; }
+.setup-panel .actions .btn-primary{ flex-basis:100%; }
+
+/* ---------- 空态 ---------- */
+.stage-ready{ text-align:center; padding:50px 20px; }
+.ready-icon{ font-size:52px; }
+.ready-title{ font-size:22px; font-weight:800; margin:10px 0 4px; }
+.ready-desc{ font-size:14px; color:var(--text-3); }
+
+/* ---------- 角色卡片 ---------- */
+.cards-grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); gap:12px; }
+.role-card{
+  border:1px solid var(--border); border-radius:16px; padding:16px 12px; text-align:center;
+  background:var(--card-bg); transition:.25s var(--ease); position:relative; overflow:hidden;
+}
+.role-card::before{ content:""; position:absolute; left:0; top:0; right:0; height:5px; background:var(--primary-grad); }
+.role-card .r-ico{ font-size:30px; }
+.role-card .r-name{ font-size:14px; color:var(--text-3); margin-top:4px; }
+.role-card .person{ font-size:20px; font-weight:900; color:var(--text-1); margin-top:4px; }
+.role-card .person.p-empty{ color:#cbd5e1; font-weight:600; }
+.role-card.pop{ animation:pop .35s var(--ease); }
+@keyframes pop{ 0%{ transform:scale(.6); opacity:0;} 70%{ transform:scale(1.08);} 100%{ transform:scale(1); opacity:1;} }
+
+/* ---------- 逐个抽取 ---------- */
+.draw-area{
+  margin-top:22px; text-align:center; border:2px dashed var(--border-2);
+  border-radius:16px; padding:24px 16px; background:var(--line-2,#f6f8fc);
+}
+.draw-roll{
+  font-size:clamp(34px,6vw,58px); font-weight:900; color:var(--primary);
+  min-height:1.2em; line-height:1.1; letter-spacing:.02em;
+}
+.draw-tip{ font-size:14px; color:var(--text-2); margin-top:6px; min-height:1.4em; }
+.draw-rest{ font-size:12.5px; color:var(--text-3); margin-top:8px; }
+
+/* ---------- 响应式 ---------- */
+@media (max-width:880px){ .workbench{ grid-template-columns:1fr; } }
+
+/* ---------- 隐藏设置栏（⚙）：双栏 → 单栏，与 random-call 同构 ---------- */
+.workbench.setup-hidden{ grid-template-columns:minmax(0,1fr); }
+.workbench.setup-hidden .setup-panel{ display:none; }
+
+/* ---------- 舞台全屏（⛶）：全屏目标是 .stage-panel 自身，不是整页 ---------- */
+.stage-panel:fullscreen,
+.stage-panel:-webkit-full-screen,
+.stage-panel.edutf-solo{
+  display:flex; flex-direction:column; justify-content:center; align-items:stretch;
+  min-height:100vh; padding:36px 30px;
+  border-radius:0; border-color:transparent; box-shadow:none;
+  background:var(--card-bg); overflow:auto;
+}
+/* 全屏下工具栏仍可见：贴边 + 半透明，hover 恢复不透明 */
+.stage-panel:fullscreen .stage-toolbar,
+.stage-panel:-webkit-full-screen .stage-toolbar,
+.stage-panel.edutf-solo .stage-toolbar{
+  position:fixed; top:18px; right:22px; z-index:30;
+  opacity:.55; transition:opacity .18s var(--ease);
+}
+.stage-panel:fullscreen .stage-toolbar:hover,
+.stage-panel:-webkit-full-screen .stage-toolbar:hover,
+.stage-panel.edutf-solo .stage-toolbar:hover{ opacity:1; }
+@media print{ .stage-toolbar{ display:none; } }

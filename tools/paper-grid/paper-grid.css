@@ -1,0 +1,73 @@
+/* ============================================================
+ * EduToolbox · 备课本/方格纸生成 paper-grid.css
+ * 依赖公共底座 tool-common.css（本文件应在其后加载）
+ * ============================================================ */
+
+body[data-theme="sky"]   { --primary:#0ea5e9; --primary-soft:#e0f2fe; --primary-soft-2:#ccecfc; --primary-grad:linear-gradient(135deg,#38bdf8,#0ea5e9,#0284c7); }
+body[data-theme="violet"]{ --primary:#7c3aed; --primary-soft:#f0e9fe; --primary-soft-2:#e2d5fc; --primary-grad:linear-gradient(135deg,#8b5cf6,#7c3aed,#6d28d9); }
+body[data-theme="green"] { --primary:#16a34a; --primary-soft:#e7f6ec; --primary-soft-2:#d3f0dc; --primary-grad:linear-gradient(135deg,#22c55e,#16a34a,#15803d); }
+body[data-theme="gold"]  { --primary:#d97706; --primary-soft:#fdf1dc; --primary-soft-2:#fbe3bc; --primary-grad:linear-gradient(135deg,#f59e0b,#d97706,#b45309); }
+body[data-theme="orange"]{ --primary:#ea580c; --primary-soft:#ffefe4; --primary-soft-2:#ffdec9; --primary-grad:linear-gradient(135deg,#fb923c,#ea580c,#c2410c); }
+body[data-theme="pink"]  { --primary:#db2777; --primary-soft:#fce7f0; --primary-soft-2:#f9cfe1; --primary-grad:linear-gradient(135deg,#f472b6,#db2777,#be185d); }
+
+.workbench { display:grid; grid-template-columns:330px minmax(0,1fr); gap:20px; align-items:start; }
+
+.pg-stats { grid-template-columns:repeat(2,minmax(0,1fr)); }
+.pg-stats .stat-num { font-size:18px; }
+
+/* ---------- 预览 ---------- */
+/* position:relative —— 舞台右上角 .stage-toolbar 的绝对定位基准 */
+.stage-panel { position:relative; min-width:0; }
+/* padding-right 为右上角 ⛶⚙ 工具栏（40+8+40=88px）留出避让空间 */
+.stage-head { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:14px; padding-right:96px; }
+.stage-head .panel-title { margin-bottom:0; }
+.stage-ok { font-size:13px; font-weight:600; color:var(--primary); }
+
+.paper-wrap {
+  display:flex; justify-content:center; padding:18px;
+  background:var(--card-bg-2); border:1px solid var(--border); border-radius:var(--r);
+  box-shadow:var(--shadow-sm); overflow:auto;
+}
+.paper-wrap svg {
+  width:min(100%, 620px); height:auto; background:#fff;
+  border:1px solid var(--border); border-radius:4px;
+  box-shadow:0 6px 18px rgba(30,42,80,.12);
+}
+
+@media (max-width:900px){ .workbench { grid-template-columns:1fr; } }
+
+@media print {
+  .setup-panel, .stage-head, .toast { display:none !important; }
+  body, :host { background:#fff; }
+  /* 打印态重置：必须留在 @media print 内。适配器已做媒体查询感知的重定位，
+     本块不会再泄漏到常规作用域，因此无需 !important。 */
+  .container { padding:0; margin:0; max-width:none; }
+  .workbench { display:block; }
+  .paper-wrap { padding:0; border:none; box-shadow:none; overflow:visible; background:#fff; }
+  .paper-wrap svg { width:100%; border:none; box-shadow:none; border-radius:0; }
+}
+
+/* ---------- 隐藏设置栏（⚙）：双栏 → 单栏，与 random-call 同构 ---------- */
+.workbench.setup-hidden { grid-template-columns:minmax(0,1fr); }
+.workbench.setup-hidden .setup-panel { display:none; }
+
+/* ---------- 舞台全屏（⛶）：全屏目标是 .stage-panel 自身，不是整页 ---------- */
+.stage-panel:fullscreen,
+.stage-panel:-webkit-full-screen,
+.stage-panel.edutf-solo{
+  display:flex; flex-direction:column; justify-content:center; align-items:stretch;
+  min-height:100vh; padding:36px 30px;
+  border-radius:0; border-color:transparent; box-shadow:none;
+  background:var(--bg); overflow:auto;
+}
+/* 全屏下工具栏仍可见：贴边 + 半透明，hover 恢复不透明 */
+.stage-panel:fullscreen .stage-toolbar,
+.stage-panel:-webkit-full-screen .stage-toolbar,
+.stage-panel.edutf-solo .stage-toolbar{
+  position:fixed; top:18px; right:22px; z-index:30;
+  opacity:.55; transition:opacity .18s var(--ease);
+}
+.stage-panel:fullscreen .stage-toolbar:hover,
+.stage-panel:-webkit-full-screen .stage-toolbar:hover,
+.stage-panel.edutf-solo .stage-toolbar:hover{ opacity:1; }
+@media print { .stage-toolbar { display:none; } }

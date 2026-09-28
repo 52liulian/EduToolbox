@@ -1,0 +1,199 @@
+/* ============================================================================
+ * 生字田字格练习 · stroke-order.css
+ * 仅包含本工具特有样式：控制条 / 田字格网格 / 示范字
+ * 公共底座（容器、按钮、textarea、卡片）见 tool-common.css
+ * 高度策略：所有容器高度自动撑开，仅 body 主滚动条
+ * ========================================================================== */
+
+/* ---------------------------------------------------------------------------
+ * 一、控制条：标题 + 文本框 + 选项 + 按钮组纵向堆叠
+ * ------------------------------------------------------------------------- */
+.container {
+  max-width: 1080px;
+}
+
+.ctrl {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 18px 20px;
+  margin-bottom: 18px;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  box-shadow: var(--shadow-sm);
+}
+
+/* 汉字输入框 */
+#chars {
+  min-height: 80px;
+  font-size: 15px;
+  line-height: 1.7;
+  resize: vertical;
+}
+
+/* 选项行：横向排列 */
+.opts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 18px;
+  font-size: 13.5px;
+  color: var(--text-2);
+}
+
+.opts label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.opts input[type="number"] {
+  width: 64px;
+  padding: 6px 10px;
+  text-align: center;
+  font-weight: 600;
+}
+
+.opts input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--primary);
+  cursor: pointer;
+}
+
+/* 按钮行 */
+.ctrl .btns {
+  justify-content: flex-end;
+}
+
+/* 「.btn.ghost」变体：与公共 .btn-ghost 等价的次要样式 */
+.btn.ghost {
+  color: var(--text-2);
+  background: var(--card-bg);
+  border: 1.5px solid var(--border);
+}
+
+.btn.ghost:hover {
+  color: var(--primary);
+  border-color: var(--primary-soft-2);
+  background: var(--primary-soft);
+}
+
+/* ---------------------------------------------------------------------------
+ * 二、田字格练习纸（生成在 #sheet 中）
+ * ------------------------------------------------------------------------- */
+.sheet {
+  padding: 24px;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  box-shadow: var(--shadow-sm);
+}
+
+/* 单个汉字行：左侧标签 + 右侧田字格网格 */
+.char-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 18px;
+}
+
+.char-row:last-child { margin-bottom: 0; }
+
+.char-label {
+  flex-shrink: 0;
+  width: 60px;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--primary);
+  text-align: center;
+}
+
+/* 格子容器（gridTemplateColumns 由 JS inline 设置） */
+.cells {
+  display: grid;
+  gap: 8px;
+  flex: 1;
+  min-width: 0;
+}
+
+/* 单个田字格：方形 + 十字虚线辅助 */
+.cell {
+  position: relative;
+  aspect-ratio: 1 / 1;
+  min-height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: clamp(20px, 3vw, 32px);
+  font-weight: 600;
+  color: var(--text-1);
+  background: var(--card-bg);
+  border: 1.5px solid var(--border-2);
+  border-radius: var(--r-sm);
+}
+
+/* 十字辅助线：用 ::before / ::after 画两条虚线 */
+.cell::before,
+.cell::after {
+  content: "";
+  position: absolute;
+  background: transparent;
+  border-top: 1px dashed var(--border-2);
+  border-left: 1px dashed var(--border-2);
+  pointer-events: none;
+}
+
+.cell::before {
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: 0;
+  border-left: none;
+  border-top: 1px dashed var(--border-2);
+}
+
+.cell::after {
+  left: 50%;
+  top: 0;
+  bottom: 0;
+  width: 0;
+  border-top: none;
+  border-left: 1px dashed var(--border-2);
+}
+
+/* 示范字（每行第一格中的浅色汉字） */
+.cell .ref {
+  font-size: 1em;
+  font-weight: 700;
+  color: var(--primary);
+  opacity: 0.55;
+}
+
+/* ---------------------------------------------------------------------------
+ * 三、打印样式：仅保留田字格纸
+ * ------------------------------------------------------------------------- */
+@media print {
+  body { background: #fff !important; }
+  .ctrl { display: none !important; }
+  .sheet {
+    border: none;
+    box-shadow: none;
+    padding: 0;
+  }
+  .char-label { color: #000; }
+  .cell { break-inside: avoid; border-color: #ccc; }
+  .cell::before, .cell::after { border-color: #ccc; }
+}
+
+/* ---------------------------------------------------------------------------
+ * 四、小屏微调
+ * ------------------------------------------------------------------------- */
+@media (max-width: 640px) {
+  .char-row { gap: 10px; }
+  .char-label { width: 44px; font-size: 12px; }
+  .cells { gap: 6px; }
+  .cell { min-height: 48px; }
+}

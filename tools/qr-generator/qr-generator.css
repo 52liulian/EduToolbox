@@ -1,0 +1,105 @@
+/* ============================================================================
+ * 二维码生成器 · qr-generator.css
+ * 仅包含本工具特有样式：表单列 / 预览面板 / 二维码画布容器
+ * 公共底座（container、tool-title、tool-sub、layout、row、field、actions、btn、
+ *   textarea、select、input[color/number/file]、tip 等）见 tool-common.css
+ * 高度策略：双栏随内容自然增高，textarea 可纵向拖拽，仅 body 主滚动条
+ * ========================================================================== */
+
+/* ---------------------------------------------------------------------------
+ * 一、标题间距
+ * ------------------------------------------------------------------------- */
+.container .tool-title { margin-bottom: 4px; }
+.container .tool-sub { margin-bottom: 22px; }
+
+/* ---------------------------------------------------------------------------
+ * 二、双栏布局：左表单 / 右预览（覆盖公共 .layout 的单列与外边距）
+ * ------------------------------------------------------------------------- */
+.container .layout {
+  grid-template-columns: minmax(0, 1fr) 360px;
+  gap: 22px;
+  padding: 0;
+  max-width: none;
+  margin: 0;
+}
+
+/* ---------------------------------------------------------------------------
+ * 三、表单列
+ * ------------------------------------------------------------------------- */
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.form > label {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--text-1);
+}
+.form textarea { min-height: 120px; resize: vertical; }
+
+/* 表单内字段无下边距，由 .form 的 gap 控制 */
+.form .field { margin-bottom: 0; }
+.form .row { margin-bottom: 0; }
+.form .field > label {
+  display: block;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--text-2);
+  margin-bottom: 6px;
+}
+
+/* 颜色选择器在字段内撑满 */
+.form input[type="color"] {
+  width: 100%;
+  height: 40px;
+  padding: 3px;
+}
+/* 文件选择框 */
+.form input[type="file"] {
+  font-size: 12.5px;
+  padding: 9px 10px;
+}
+
+/* ---------------------------------------------------------------------------
+ * 四、右侧预览面板
+ * ------------------------------------------------------------------------- */
+.preview {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  min-height: 320px;
+  padding: 28px 24px;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  box-shadow: var(--shadow-sm);
+}
+
+/* 二维码画布容器（qrcode.js 在此注入 canvas / img） */
+.qrcode {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 200px;
+}
+.qrcode canvas,
+.qrcode img {
+  max-width: 100%;
+  height: auto;
+  border-radius: var(--r-sm);
+  box-shadow: var(--shadow-sm);
+}
+
+.preview .tip { margin-top: 4px; }
+
+/* ---------------------------------------------------------------------------
+ * 五、小屏回落单栏
+ * ------------------------------------------------------------------------- */
+@media (max-width: 820px) {
+  .container .layout { grid-template-columns: 1fr; }
+  .preview { min-height: 260px; }
+}

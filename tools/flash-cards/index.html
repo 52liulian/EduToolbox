@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>单词闪卡记忆 | EduToolbox · 翻转记忆·艾宾浩斯复习</title>
+<meta name="description" content="正反面翻转单词闪卡，按艾宾浩斯遗忘曲线安排复习，支持认识/模糊/忘记三档反馈、词库导入与进度持久化。">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%A7%A0%3C/text%3E%3C/svg%3E">
+<link rel="stylesheet" href="../../assets/css/tool-common.css">
+<link rel="stylesheet" href="flash-cards.css">
+</head>
+<body>
+
+<div class="tool-topbar">
+  <button type="button" class="tool-btn" id="btnSound" title="朗读开关">🔊 朗读</button>
+</div>
+
+<div class="container">
+  <div class="workbench">
+    <!-- ======================= 左侧设置面板 ======================= -->
+    <aside class="panel setup-panel">
+      <div class="block">
+        <h2 class="block-title">① 词库</h2>
+        <p class="block-hint">每行一条，格式：<code>单词 = 释义</code>；也支持逗号 / Tab 分隔</p>
+        <textarea id="deckInput" class="text-input" rows="7" placeholder="apple = 苹果&#10;book = 书&#10;teacher = 老师"></textarea>
+        <div class="chips chips-mini" id="presetChips"></div>
+        <div class="btn-row">
+          <button type="button" class="btn btn-small" id="btnLoadDeck">📥 载入词库</button>
+          <button type="button" class="btn btn-small btn-ghost" id="btnResetProgress">♻️ 清空进度</button>
+        </div>
+      </div>
+
+      <div class="block">
+        <h2 class="block-title">② 学习模式</h2>
+        <div class="chips" id="modeChips">
+          <button type="button" class="chip active" data-mode="due">📅 待复习优先</button>
+          <button type="button" class="chip" data-mode="all">🔁 全部循环</button>
+          <button type="button" class="chip" data-mode="new">✨ 仅新词</button>
+        </div>
+        <label class="check">
+          <input type="checkbox" id="chkJ2C" checked>
+          <span>正面显示单词（英 → 中）</span>
+        </label>
+        <label class="check">
+          <input type="checkbox" id="chkAutoFlip">
+          <span>自动翻面（3 秒）</span>
+        </label>
+      </div>
+
+      <div class="block">
+        <h2 class="block-title">③ 今日进度</h2>
+        <div class="stat-grid">
+          <div class="stat-card"><span class="stat-num" id="statTotal">0</span><span class="stat-label">总词数</span></div>
+          <div class="stat-card"><span class="stat-num" id="statDue">0</span><span class="stat-label">待复习</span></div>
+          <div class="stat-card"><span class="stat-num" id="statNew">0</span><span class="stat-label">未学习</span></div>
+          <div class="stat-card"><span class="stat-num" id="statDone">0</span><span class="stat-label">今日已练</span></div>
+        </div>
+        <div class="progress-line"><div class="progress-fill" id="progressFill"></div></div>
+        <div class="progress-text" id="progressText">掌握度 0%</div>
+      </div>
+    </aside>
+
+    <!-- ======================= 右侧卡片舞台 ======================= -->
+    <main class="stage-panel">
+      <!-- 舞台右上角工具栏：⛶ 舞台全屏（自动隐藏设置栏） / ⚙ 切换设置栏显隐 -->
+      <div class="stage-toolbar">
+        <button type="button" class="icon-btn" id="fullscreenBtn" title="全屏">⛶</button>
+        <button type="button" class="icon-btn" id="hideSetupBtn" title="隐藏设置">⚙</button>
+      </div>
+      <div class="stage-head">
+        <h2 class="panel-title">🃏 闪卡</h2>
+        <span class="stage-ok" id="stageOk">等待载入词库</span>
+      </div>
+
+      <!-- 空态 -->
+      <div class="state state--empty" id="emptyState">
+        <div class="state-icon">📚</div>
+        <div class="state-title">还没有词库</div>
+        <div class="state-desc">在左侧填写单词表后点「载入词库」，或选择一个内置预设即可开始记忆</div>
+      </div>
+
+      <!-- 卡片 -->
+      <div class="card-area" id="cardArea" hidden>
+        <div class="flip-card" id="flipCard">
+          <div class="flip-inner" id="flipInner">
+            <div class="flip-face flip-front">
+              <div class="face-tag" id="frontTag">单词</div>
+              <div class="face-word" id="frontWord">—</div>
+              <div class="face-hint">点击卡片翻面</div>
+            </div>
+            <div class="flip-face flip-back">
+              <div class="face-tag" id="backTag">释义</div>
+              <div class="face-word back-word" id="backWord">—</div>
+              <div class="face-hint">点击卡片翻回</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card-meta" id="cardMeta"></div>
+
+        <div class="feedback-row" id="feedbackRow">
+          <button type="button" class="btn fb-btn fb-again" id="btnAgain">😵 忘记<span class="fb-sub">明天再来</span></button>
+          <button type="button" class="btn fb-btn fb-hard" id="btnHard">🤔 模糊<span class="fb-sub">2 天后</span></button>
+          <button type="button" class="btn fb-btn fb-good" id="btnGood">😃 认识<span class="fb-sub">递进复习</span></button>
+        </div>
+
+        <div class="card-nav">
+          <button type="button" class="btn btn-small btn-ghost" id="btnSkip">⏭ 跳过</button>
+          <button type="button" class="btn btn-small btn-ghost" id="btnSpeak">🔊 朗读</button>
+          <button type="button" class="btn btn-small btn-ghost" id="btnPrev">↩ 上一张</button>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="../../assets/js/frame-bridge.js"></script>
+<script src="../../assets/js/tool-stage-toolbar.js"></script>
+<script src="flash-cards.js"></script>
+</body>
+</html>

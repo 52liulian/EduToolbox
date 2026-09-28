@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>噪音计 | EduToolbox · 课堂音量检测</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%8E%93%3C/text%3E%3C/svg%3E">
+<link rel="stylesheet" href="noise-meter.css">
+<link rel="stylesheet" href="../../assets/css/tool-common.css">
+</head>
+<body>
+
+<main class="container">
+  <!-- 主显示区：圆环 + 分贝大字 -->
+  <section class="meter-panel" id="meterPanel" aria-label="音量检测主显示区">
+    <div class="stage-toolbar">
+      <button type="button" class="icon-btn" id="fullscreenBtn" title="全屏">⛶</button>
+    </div>
+    <div class="ring-wrap">
+      <!-- 圆形进度环：通过 SVG stroke-dasharray 实现进度可视化 -->
+      <svg class="ring" viewBox="0 0 220 220" aria-hidden="true">
+        <circle class="ring-bg" cx="110" cy="110" r="100"></circle>
+        <circle class="ring-fg" id="ringFg" cx="110" cy="110" r="100"></circle>
+      </svg>
+      <div class="ring-center">
+        <div class="db-value" id="dbValue">0</div>
+        <div class="db-unit">dB</div>
+        <div class="db-label" id="dbLabel">00-100</div>
+      </div>
+    </div>
+
+    <!-- 状态提示文字（太吵了 / 正常） -->
+    <div class="status" id="status" role="status" aria-live="polite">点击「开始监测」启用麦克风</div>
+
+    <!-- 控制按钮区 -->
+    <div class="ctrls">
+      <button type="button" class="btn btn-primary" id="startBtn">▶ 开始监测</button>
+    </div>
+
+    <!-- 阈值滑块 -->
+    <div class="threshold">
+      <label class="threshold-label" for="threshold">报警阈值</label>
+      <input type="range" id="threshold" min="30" max="100" value="80" aria-label="报警阈值">
+      <span class="threshold-value"><span id="thresholdValue">80</span> dB</span>
+    </div>
+  </section>
+
+  <!-- 麦克风权限被拒绝时的友好提示（默认隐藏） -->
+  <section class="permission-tip" id="permissionTip" hidden>
+    <div class="tip-card">
+      <div class="tip-icon">🎤</div>
+      <h3>麦克风不可用</h3>
+      <p>请确认浏览器已授予麦克风权限，或更换 Chrome / Edge 浏览器后重试。</p>
+      <p class="tip-sub">若曾拒绝权限，可在浏览器地址栏左侧 🔒 图标中重新允许。</p>
+    </div>
+  </section>
+
+  <!-- 超标记录区 -->
+  <section class="records" aria-label="超标噪音记录">
+    <div class="records-head">
+      <h2>超标记录</h2>
+      <button type="button" class="btn btn-mini" id="clearRecords">清空</button>
+    </div>
+    <div class="records-list" id="recordsList">
+      <div class="state state--compact state--empty"><div class="state-icon">🔊</div><div class="state-title">暂无超标记录</div></div>
+    </div>
+  </section>
+
+  <!-- 使用说明 -->
+  <section class="usage" aria-label="使用说明">
+    <h2>使用说明</h2>
+    <ol>
+      <li>点击「开始监测」并在浏览器弹窗中允许使用麦克风。</li>
+      <li>拖动「报警阈值」滑块设置报警分贝线（建议自习课 40-50dB，讨论课 60-80dB）。</li>
+      <li>点击「全屏显示」投屏到白板，全班可见实时音量反馈。</li>
+      <li>下方自动记录每次超标事件，便于课后回顾纪律波动。</li>
+    </ol>
+  </section>
+</main>
+
+<script src="../../assets/js/frame-bridge.js"></script>
+<script src="../../assets/js/tool-stage-toolbar.js"></script>
+<script src="noise-meter.js"></script>
+</body>
+</html>

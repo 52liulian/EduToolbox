@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>英语单词听写 | EduToolbox · 英文报读·拼写判分</title>
+<meta name="description" content="导入单词库，英文报读听写；拼写模式自动判分（大小写不敏感），统计正确率。Web Speech API 合成本地朗读。">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%94%A4%3C/text%3E%3C/svg%3E">
+<link rel="stylesheet" href="../../assets/css/tool-common.css">
+<link rel="stylesheet" href="dictation-english.css">
+</head>
+<body>
+
+<div class="container">
+  <div class="workbench">
+    <!-- ======================= 左侧设置面板 ======================= -->
+    <aside class="panel setup-panel">
+      <div class="block">
+        <h2 class="block-title">① 单词库</h2>
+        <p class="block-hint">每行「单词 + 空格 + 中文释义」；也可只写单词</p>
+        <textarea id="words" class="text-input" rows="6" placeholder="例如：&#10;apple 苹果&#10;banana 香蕉&#10;teacher 老师"></textarea>
+        <div class="chips chips-mini" id="libChips"></div>
+      </div>
+
+      <div class="block">
+        <h2 class="block-title">② 模式</h2>
+        <div class="chips" id="modeChips">
+          <button type="button" class="chip active" data-mode="listen">✍️ 听写模式</button>
+          <button type="button" class="chip" data-mode="spell">✅ 拼写判分</button>
+        </div>
+        <p class="block-hint" id="modeHint">听写模式：仅报读英文单词，学生默写。</p>
+      </div>
+
+      <div class="block">
+        <h2 class="block-title">③ 报读设置</h2>
+        <div class="field row">
+          <label for="repeatCount">每词报读次数</label>
+          <select id="repeatCount" class="text-input sel">
+            <option value="1">1 次</option>
+            <option value="2" selected>2 次</option>
+            <option value="3">3 次</option>
+          </select>
+        </div>
+        <div class="field row">
+          <label for="gapSec">词间间隔（秒）</label>
+          <select id="gapSec" class="text-input sel">
+            <option value="3">3 秒</option>
+            <option value="5" selected>5 秒</option>
+            <option value="8">8 秒</option>
+          </select>
+        </div>
+        <div class="field row">
+          <label for="rate">朗读语速</label>
+          <select id="rate" class="text-input sel">
+            <option value="0.7">较慢</option>
+            <option value="0.9" selected>正常</option>
+            <option value="1.1">稍快</option>
+          </select>
+        </div>
+        <label class="check">
+          <input type="checkbox" id="withIndex" checked>
+          <span>报词前播报序号（“第 X 个”）</span>
+        </label>
+        <label class="check">
+          <input type="checkbox" id="readCn" checked>
+          <span>先报中文释义再报英文（如有）</span>
+        </label>
+      </div>
+
+      <div class="actions">
+        <button type="button" class="btn btn-primary" id="btnStart">▶ 开始听写</button>
+        <button type="button" class="btn btn-ghost btn-small" id="btnPause" disabled>⏸ 暂停</button>
+        <button type="button" class="btn btn-small" id="btnRepeat" disabled>↻ 重报</button>
+        <button type="button" class="btn btn-small" id="btnStop" disabled>■ 结束</button>
+      </div>
+    </aside>
+
+    <!-- ======================= 右侧展示舞台 ======================= -->
+    <main class="stage-panel">
+      <!-- 舞台右上角工具栏：⛶ 舞台全屏（自动隐藏设置栏） / ⚙ 切换设置栏显隐 -->
+      <div class="stage-toolbar">
+        <button type="button" class="icon-btn" id="fullscreenBtn" title="全屏">⛶</button>
+        <button type="button" class="icon-btn" id="hideSetupBtn" title="隐藏设置">⚙</button>
+      </div>
+      <div class="stage-head">
+        <h2 class="panel-title">🎧 听写进行中</h2>
+        <span class="stage-ok" id="stageOk">未开始</span>
+      </div>
+
+      <!-- 就绪态 -->
+      <div class="stage-ready" id="readyView">
+        <div class="ready-icon">📚</div>
+        <div class="ready-title">准备就绪</div>
+        <div class="ready-desc">共 <b id="wordCount">0</b> 个单词 · 点「开始听写」</div>
+      </div>
+
+      <!-- 听写态 -->
+      <div class="stage-running" id="runningView" style="display:none">
+        <div class="progress-line"><div class="progress-bar" id="progressBar"></div></div>
+        <div class="big-index" id="curIndex">1 / 10</div>
+
+        <!-- 听写模式：大字中文释义 + 隐藏英文 -->
+        <div class="listen-wrap" id="listenWrap">
+          <div class="big-hint" id="bigHint">苹果</div>
+          <div class="word-card" id="wordCards"></div>
+        </div>
+
+        <!-- 拼写模式：作答区 -->
+        <div class="spell-wrap" id="spellWrap" style="display:none">
+          <div class="spell-hint" id="spellHint">请拼写：苹果</div>
+          <div class="spell-box">
+            <input type="text" id="spellInput" class="text-input" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="输入英文单词，回车提交">
+            <button type="button" class="btn btn-primary" id="btnSubmit">提交</button>
+            <button type="button" class="btn btn-small" id="btnSkip">跳过 →</button>
+          </div>
+          <div class="judge" id="judgeBox"></div>
+        </div>
+
+        <div class="score-line" id="scoreLine">✅ <span id="correctCnt">0</span> · ❌ <span id="wrongCnt">0</span> · ⏱ <span id="elapsed">00:00</span></div>
+      </div>
+
+      <!-- 结束态 -->
+      <div class="stage-done" id="doneView" style="display:none">
+        <div class="done-icon">🎉</div>
+        <div class="done-title">听写完成</div>
+        <div class="done-desc" id="doneDesc">共 10 词 · 正确 8 · 正确率 80%</div>
+        <div class="done-list" id="doneList"></div>
+        <div class="done-actions">
+          <button type="button" class="btn btn-primary" id="btnReplay">↻ 从头重听</button>
+          <button type="button" class="btn btn-small" id="btnAgain">再写一轮</button>
+        </div>
+      </div>
+
+      <div class="stage-tip" id="tipLine">💡 拼写判分模式会等待学生作答；听写模式按间隔自动进行，可随时暂停。</div>
+    </main>
+  </div>
+</div>
+
+<!-- 提示条 -->
+<div class="toast" id="toast"></div>
+
+<script src="../../assets/js/frame-bridge.js"></script>
+<script src="../../assets/js/tool-stage-toolbar.js"></script>
+<script src="dictation-english.js"></script>
+</body>
+</html>

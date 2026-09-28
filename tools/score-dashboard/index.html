@@ -1,0 +1,799 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>成绩统计看板 | EduToolbox · 四率均分与分数段分析</title>
+<meta name="description" content="粘贴一张成绩表，自动统计平均分、最高/最低、四率、分数段分布、标准差，生成可打印的班级成绩报告。全本地处理，不上传任何数据。">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%93%8A%3C/text%3E%3C/svg%3E">
+<style>
+:root{
+  --primary:#4f46e5; --primary-soft:#eef2ff; --primary-2:#818cf8;
+  --accent:#0ea5e9; --accent-soft:#e0f2fe;
+  --good:#16a34a; --good-soft:#dcfce7;
+  --warn:#f59e0b; --warn-soft:#fef3c7;
+  --bad:#dc2626;  --bad-soft:#fee2e2;
+  --text-1:#0f172a; --text-2:#475569; --text-3:#94a3b8;
+  --bg:#f1f5f9; --card:#fff; --line:#e2e8f0; --line-2:#f1f5f9;
+  --ease:cubic-bezier(.22,.61,.36,1);
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;background:var(--bg);color:var(--text-1);font-size:14px;line-height:1.6}
+#app{max-width:1320px;margin:0 auto;padding:18px 16px 60px}
+
+/* 顶栏 */
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px;flex-wrap:wrap}
+.topbar h1{margin:0;font-size:22px;display:flex;align-items:center;gap:10px}
+.topbar .sub{font-size:13px;color:var(--text-3);font-weight:400;margin-top:2px}
+.toolbar{display:flex;gap:8px;flex-wrap:wrap}
+.btn{font-family:inherit;font-size:13.5px;font-weight:600;padding:9px 16px;border:1px solid var(--line);border-radius:9px;background:#fff;color:var(--text-2);cursor:pointer;transition:.15s}
+.btn:hover{background:var(--primary-soft);color:var(--primary);border-color:var(--primary)}
+.btn-primary{background:linear-gradient(135deg,#6366f1,#4f46e5);color:#fff;border:none;box-shadow:0 6px 16px rgba(79,70,229,.28)}
+.btn-primary:hover{color:#fff;filter:brightness(1.07);transform:translateY(-1px)}
+.btn-ghost{background:transparent}
+
+/* 布局 */
+.layout{display:grid;grid-template-columns:300px 1fr;gap:16px}
+@media(max-width:900px){.layout{grid-template-columns:1fr}}
+
+/* 面板 */
+.panel{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;box-shadow:0 1px 3px rgba(15,23,42,.05)}
+.block{margin-bottom:18px}
+.block:last-child{margin-bottom:0}
+.block-title{margin:0 0 8px;font-size:14.5px;font-weight:700;display:flex;align-items:center;gap:6px}
+.block-hint{margin:0 0 10px;font-size:12px;color:var(--text-3)}
+
+/* 导入区 */
+.drop{border:2px dashed var(--line);border-radius:12px;padding:20px 16px;text-align:center;cursor:pointer;transition:.2s;background:#fafbfc}
+.drop:hover,.drop.dragover{border-color:var(--primary);background:var(--primary-soft)}
+.drop .d-ico{font-size:32px;margin-bottom:6px}
+.drop .d-t{font-size:13.5px;font-weight:600}
+.drop .d-s{font-size:11.5px;color:var(--text-3);margin-top:4px}
+textarea#rawData{width:100%;height:120px;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12.5px;padding:10px;border:1px solid var(--line);border-radius:9px;resize:vertical;background:#fafbfc;color:var(--text-1);line-height:1.5}
+textarea#rawData:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 3px rgba(79,70,229,.1)}
+
+/* 选项 */
+.opt-row{display:flex;align-items:center;gap:8px;padding:6px 0;flex-wrap:wrap}
+.opt-row>label:first-child{font-size:13px;min-width:74px;color:var(--text-2)}
+select,input[type=number],input[type=text]{font-family:inherit;font-size:13px;padding:6px 9px;border:1px solid var(--line);border-radius:7px;background:#fafbfc;color:var(--text-1)}
+select:focus,input:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 3px rgba(79,70,229,.1)}
+select{cursor:pointer}
+input[type=number]{width:76px}
+.chip-row{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+.chip{font-size:12px;padding:4px 10px;border-radius:20px;background:var(--line-2);color:var(--text-2);cursor:pointer;user-select:none;border:1px solid transparent;transition:.15s}
+.chip:hover{border-color:var(--primary-2)}
+.chip.on{background:var(--primary-soft);color:var(--primary);font-weight:600}
+.chip.badge{background:var(--bad-soft);color:var(--bad)}
+.chip.warn{background:var(--warn-soft);color:#b45309}
+
+/* KPI 卡 */
+.kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:16px}
+.kpi{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px;box-shadow:0 1px 3px rgba(15,23,42,.04);position:relative;overflow:hidden}
+.kpi::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--primary)}
+.kpi.k-avg::before{background:var(--primary)}
+.kpi.k-best::before{background:var(--good)}
+.kpi.k-pass::before{background:var(--accent)}
+.kpi.k-warn::before{background:var(--warn)}
+.kpi.k-bad::before{background:var(--bad)}
+.kpi .k-label{font-size:12px;color:var(--text-3);display:flex;align-items:center;gap:4px}
+.kpi .k-val{font-size:26px;font-weight:800;font-variant-numeric:tabular-nums;letter-spacing:-.02em;margin-top:2px}
+.kpi .k-sub{font-size:11.5px;color:var(--text-3);margin-top:2px}
+
+/* 卡片区 */
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px;box-shadow:0 1px 3px rgba(15,23,42,.04);margin-bottom:16px}
+.card-h{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;gap:10px;flex-wrap:wrap}
+.card-h h3{margin:0;font-size:15px;font-weight:700}
+.card-h .h-r{font-size:12px;color:var(--text-3)}
+
+/* 表格 */
+table{width:100%;border-collapse:collapse;font-size:13px}
+th,td{text-align:left;padding:9px 10px;border-bottom:1px solid var(--line-2)}
+th{font-size:12px;color:var(--text-3);font-weight:600;background:#fafbfc;cursor:pointer;user-select:none;white-space:nowrap;position:sticky;top:0;z-index:2}
+th:hover{color:var(--primary)}
+th .arw{opacity:.35;font-size:10px;margin-left:2px}
+th.sorted .arw{opacity:1;color:var(--primary)}
+tbody tr:hover{background:var(--primary-soft)}
+td.num{text-align:right;font-variant-numeric:tabular-nums;font-weight:600}
+.rank-cell{display:inline-grid;place-items:center;width:22px;height:22px;border-radius:50%;font-size:11px;font-weight:700}
+.rank-top{background:var(--good-soft);color:#15803d}
+.rank-mid{background:var(--warn-soft);color:#b45309}
+.rank-low{background:var(--bad-soft);color:var(--bad)}
+.pill{display:inline-block;padding:1px 8px;border-radius:20px;font-size:11.5px;font-weight:600}
+.p-good{background:var(--good-soft);color:#15803d}
+.p-warn{background:var(--warn-soft);color:#b45309}
+.p-bad{background:var(--bad-soft);color:var(--bad)}
+.scroll{max-height:420px;overflow:auto;border:1px solid var(--line);border-radius:10px}
+
+/* 柱状图 */
+.bars{display:flex;align-items:flex-end;gap:10px;height:180px;padding:8px 4px 0;border-bottom:1px solid var(--line)}
+.bar-col{flex:1;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:6px;height:100%}
+.bar{width:100%;max-width:46px;border-radius:6px 6px 0 0;background:linear-gradient(180deg,var(--primary-2),var(--primary));transition:height .4s var(--ease);position:relative;min-height:2px}
+.bar .b-v{position:absolute;top:-18px;left:50%;transform:translateX(-50%);font-size:11px;font-weight:700;color:var(--text-2);white-space:nowrap}
+.bar.peak{background:linear-gradient(180deg,#fbbf24,#f59e0b)}
+.bar.low{background:linear-gradient(180deg,#fca5a5,#dc2626)}
+.x-axis{display:flex;gap:10px;margin-top:8px}
+.x-lab{flex:1;text-align:center;font-size:11.5px;color:var(--text-3)}
+
+/* 雷达图 */
+.radar-wrap{display:flex;justify-content:center}
+.radar-legend{display:flex;gap:14px;justify-content:center;margin-top:12px;font-size:12px;color:var(--text-2)}
+.legend-dot{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:5px;vertical-align:middle}
+
+/* 临界生 */
+.crit-list{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media(max-width:700px){.crit-list{grid-template-columns:1fr}}
+.crit-box h4{margin:0 0 8px;font-size:13px;display:flex;align-items:center;gap:6px}
+.crit-item{display:flex;justify-content:space-between;align-items:center;padding:7px 10px;border-radius:8px;font-size:13px;background:#fafbfc;margin-bottom:5px}
+.crit-item .c-name{font-weight:600}
+.crit-item .c-gap{font-size:11.5px;padding:2px 8px;border-radius:20px;font-weight:600}
+.crit-item .c-gap.tight{background:var(--bad-soft);color:var(--bad)}
+.crit-item .c-gap.near{background:var(--warn-soft);color:#b45309}
+.crit-item .c-gap.close{background:var(--accent-soft);color:#0369a1}
+
+/* 空状态 */
+.empty{text-align:center;padding:60px 20px;color:var(--text-3)}
+.empty .e-ico{font-size:44px;margin-bottom:10px}
+.empty .e-t{font-size:15px;color:var(--text-2);margin-bottom:4px}
+.empty .e-s{font-size:13px}
+
+/* 提示条 */
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);background:#0f172a;color:#fff;padding:10px 20px;border-radius:10px;font-size:13.5px;opacity:0;pointer-events:none;transition:.25s var(--ease);z-index:99;box-shadow:0 8px 30px rgba(0,0,0,.25);max-width:80vw;text-align:center}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* 打印 */
+@media print{
+  body{background:#fff;font-size:11px}
+  #app{max-width:none;padding:0}
+  .topbar,.panel,.card-h .btn,.toolbar,.no-print{display:none!important}
+  .layout{display:block}
+  .card{border:none;border-radius:0;box-shadow:none;padding:0 0 12px;margin-bottom:12px;break-inside:avoid}
+  .kpi-grid{grid-template-columns:repeat(4,1fr);gap:8px}
+  .kpi{padding:8px 10px;border-radius:8px}
+  .kpi .k-val{font-size:18px}
+  .scroll{max-height:none;overflow:visible;border:none}
+  th{position:static}
+  table{font-size:10.5px}
+  @page{size:A4 landscape;margin:10mm 8mm}
+}
+</style>
+<style>
+/* ============================================================================
+ * EduToolbox 组件化挂载兜底（自动追加）
+ * ----------------------------------------------------------------------------
+ * 本工具未引入 assets/css/tool-common.css，挂载进站点（Shadow DOM）后会缺少：
+ *   1) 六色主题变量 --primary / --primary-soft / --primary-grad
+ *   2) .container 的宽度约束（否则内容铺满并贴边）
+ * 这里补齐最小等价集，保证「独立打开」与「站点内组件化挂载」视觉一致。
+ * ========================================================================== */
+
+:root,
+:host,
+body[data-theme="sky"]   { --primary:#0ea5e9; --primary-soft:#e0f2fe; --primary-soft-2:#ccecfc; --primary-grad:linear-gradient(135deg,#38bdf8,#0ea5e9,#0284c7); }
+body[data-theme="violet"]{ --primary:#7c3aed; --primary-soft:#f0e9fe; --primary-soft-2:#e2d5fc; --primary-grad:linear-gradient(135deg,#8b5cf6,#7c3aed,#6d28d9); }
+body[data-theme="green"] { --primary:#16a34a; --primary-soft:#e7f6ec; --primary-soft-2:#d3f0dc; --primary-grad:linear-gradient(135deg,#22c55e,#16a34a,#15803d); }
+body[data-theme="gold"]  { --primary:#d97706; --primary-soft:#fdf1dc; --primary-soft-2:#fbe3bc; --primary-grad:linear-gradient(135deg,#f59e0b,#d97706,#b45309); }
+body[data-theme="orange"]{ --primary:#ea580c; --primary-soft:#ffefe4; --primary-soft-2:#ffdec9; --primary-grad:linear-gradient(135deg,#fb923c,#ea580c,#c2410c); }
+body[data-theme="pink"]  { --primary:#db2777; --primary-soft:#fce7f0; --primary-soft-2:#f9cfe1; --primary-grad:linear-gradient(135deg,#f472b6,#db2777,#be185d); }
+
+/* 容器宽度兜底：仅在工具自身未声明时生效（不覆盖已有 .container 规则） */
+.container:not([data-no-fallback]) {
+  width: 100%;
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 28px 24px 56px;
+  box-sizing: border-box;
+}
+</style>
+</head>
+<body>
+<div id="app">
+  <div class="topbar">
+    <div>
+      <h1>📊 成绩统计看板</h1>
+      <div class="sub">粘贴成绩表 → 自动统计四率、均分、分数段与临界生 · 全本地处理，不上传任何数据</div>
+    </div>
+    <div class="toolbar">
+      <button class="btn" id="btnDemo">🎲 载入示例</button>
+      <button class="btn" id="btnCsv">⬇ 导出明细CSV</button>
+      <button class="btn btn-primary" id="btnPrint">🖨 打印 / 导出PDF</button>
+    </div>
+  </div>
+
+  <div class="layout">
+    <!-- 设置 -->
+    <aside class="panel">
+      <div class="block">
+        <h2 class="block-title">① 导入成绩</h2>
+        <p class="block-hint">支持粘贴表格 / 拖拽文本文件</p>
+        <div class="drop" id="drop">
+          <div class="d-ico">📋</div>
+          <div class="d-t">点击选择文件 或 拖拽到此处</div>
+          <div class="d-s">支持 .txt / .csv，自动识别 GBK 与 UTF-8</div>
+        </div>
+        <input type="file" id="fileInput" accept=".txt,.csv,.tsv" hidden>
+        <p class="block-hint" style="margin-top:10px">或直接在下方粘贴原始数据（首行为表头）</p>
+        <textarea id="rawData" placeholder="姓名&#9;语文&#9;数学&#9;英语&#10;张三&#9;92&#9;88&#9;85&#10;李四&#9;76&#9;81&#9;90"></textarea>
+        <div class="button-group" style="margin-top:8px">
+          <button class="btn btn-primary" id="btnParse" style="width:100%;padding:10px">解析数据</button>
+        </div>
+      </div>
+
+      <div class="block">
+        <h2 class="block-title">② 科目选择</h2>
+        <p class="block-hint">选择要统计的科目（可多选，自动汇总总分）</p>
+        <div class="chip-row" id="subjChips"></div>
+      </div>
+
+      <div class="block">
+        <h2 class="block-title">③ 阈值设置</h2>
+        <div class="opt-row">
+          <label>满分</label>
+          <input type="number" id="fullScore" value="100" min="1" max="1000">
+        </div>
+        <div class="opt-row">
+          <label>优秀线</label>
+          <input type="number" id="excellent" value="85"> <span style="font-size:12px;color:var(--text-3)">%</span>
+        </div>
+        <div class="opt-row">
+          <label>及格线</label>
+          <input type="number" id="passLine" value="60"> <span style="font-size:12px;color:var(--text-3)">%</span>
+        </div>
+        <div class="opt-row">
+          <label>低分线</label>
+          <input type="number" id="lowLine" value="40"> <span style="font-size:12px;color:var(--text-3)">%</span>
+        </div>
+      </div>
+
+      <div class="block">
+        <h2 class="block-title">④ 排名规则</h2>
+        <p class="block-hint">仅内部诊断用，符合不公开排名要求</p>
+        <div class="chip-row">
+          <div class="chip on" data-rank="avg">按平均分</div>
+          <div class="chip" data-rank="total">按总分</div>
+          <div class="chip" data-rank="first">按第一科目</div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- 主区 -->
+    <main>
+      <div id="welcome">
+        <div class="empty">
+          <div class="e-ico">📈</div>
+          <div class="e-t">还没有数据</div>
+          <div class="e-s">点「载入示例」快速体验，或粘贴你自己的成绩表后点「解析数据」</div>
+        </div>
+      </div>
+      <div id="dashboard" style="display:none">
+        <!-- KPI -->
+        <div class="kpi-grid" id="kpiGrid"></div>
+
+        <!-- 概览 + 分数段 -->
+        <div class="card">
+          <div class="card-h">
+            <h3>📊 分数段分布</h3>
+            <span class="h-r" id="distNote"></span>
+          </div>
+          <div class="bars" id="bars"></div>
+          <div class="x-axis" id="xAxis"></div>
+        </div>
+
+        <!-- 雷达对比 -->
+        <div class="card">
+          <div class="card-h">
+            <h3>🎯 多维对比雷达图</h3>
+            <span class="h-r">以所有选中数据均值归一化</span>
+          </div>
+          <div class="radar-wrap">
+            <svg id="radar" width="360" height="320" viewBox="0 0 360 320"></svg>
+          </div>
+          <div class="radar-legend" id="radarLegend"></div>
+        </div>
+
+        <!-- 明细表 -->
+        <div class="card">
+          <div class="card-h">
+            <h3>📋 成绩明细（点击表头排序）</h3>
+            <div style="display:flex;gap:8px;align-items:center">
+              <span class="h-r" id="rowCount"></span>
+              <button class="btn btn-ghost no-print" id="btnCopy">📋 复制表格</button>
+            </div>
+          </div>
+          <div class="scroll">
+            <table id="detailTable"></table>
+          </div>
+        </div>
+
+        <!-- 临界生 -->
+        <div class="card">
+          <div class="card-h">
+            <h3>🎯 临界生清单</h3>
+            <span class="h-r">距及格/优秀线 ≤ 5 分的同学，按差距从小到大</span>
+          </div>
+          <div class="crit-list" id="critList"></div>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script src="../../assets/js/frame-bridge.js"></script>
+<script>
+/* EduToolbox · 成绩统计看板
+ * 纯前端 IIFE，无后端、无外链、不上传数据，file:// 可离线运行
+ */
+(function(){
+  "use strict";
+  const $=s=>document.querySelector(s);
+  const $$=s=>document.querySelectorAll(s);
+
+  /* ========== 状态 ========== */
+  const state={
+    raw:"",
+    headers:[],       // 表头
+    rows:[],          // [{c1:..,c2:..}]
+    subjects:[],      // 选中的数值列名
+    rankBy:"avg",
+  };
+
+  /* ========== 工具 ========== */
+  const isNum=v=>v!==""&&v!==null&&!isNaN(v)&&isFinite(v);
+  const num=v=>parseFloat(v);
+  const round=(v,d=1)=>Math.round(v*Math.pow(10,d))/Math.pow(10,d);
+  const sum=a=>a.reduce((s,x)=>s+x,0);
+  const avg=a=>a.length?sum(a)/a.length:0;
+  function percentile(arr,p){
+    if(!arr.length)return 0;
+    const a=[...arr].sort((x,y)=>x-y);
+    const i=(a.length-1)*p;
+    const lo=Math.floor(i),hi=Math.ceil(i);
+    return lo===hi?a[lo]:a[lo]+(a[hi]-a[lo])*(i-lo);
+  }
+  function stddev(a){
+    if(a.length<2)return 0;
+    const m=avg(a);
+    return Math.sqrt(avg(a.map(x=>(x-m)**2)));
+  }
+  function mode(a){
+    if(!a.length)return 0;
+    const f={};a.forEach(x=>f[x]=(f[x]||0)+1);
+    return +Object.keys(f).reduce((a,b)=>f[a]>f[b]?a:b);
+  }
+  const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+  /* ========== 文件读取（支持 GBK） ========== */
+  function readFile(file){
+    const fr=new FileReader();
+    fr.onload=e=>tryDecode(new Uint8Array(e.target.result));
+    fr.onerror=()=>toast("文件读取失败");
+    fr.readAsArrayBuffer(file);
+  }
+  function tryDecode(bytes){
+    // 先按 UTF-8 尝试，若含替换字符则回退 GBK
+    let text=new TextDecoder('utf-8',{fatal:false}).decode(bytes);
+    if(text.includes('\uFFFD')){
+      try{
+        // 用 TextDecoder 的 gb18030 作为 GBK 兼容
+        text=new TextDecoder('gb18030',{fatal:false}).decode(bytes);
+      }catch(e){ /* 忽略 */ }
+    }
+    $("#rawData").value=text;
+    parseData();
+  }
+
+  /* ========== 解析数据 ==========
+   * 支持 tab / 逗号 / 多空格 分隔，首行为表头
+   * 自动识别各列是否为数值型
+   */
+  function parseData(){
+    const raw=$("#rawData").value.replace(/\r/g,'');
+    if(!raw.trim()){toast("请先粘贴或导入数据");return;}
+    const lines=raw.split("\n").map(s=>s.trim()).filter(Boolean);
+    if(lines.length<2){toast("数据至少需要两行（表头 + 一条记录）");return;}
+
+    // 检测分隔符：优先 tab，其次逗号，其次连续空格
+    const first=lines[0];
+    let sep=/\t/.test(first)?'\t':/,/.test(first)?',':/\s{2,}/.test(first)?'  ':' ';
+    if(sep===' '){ // 单个空格需按字段数对齐
+      const heads=first.split(' ').filter(Boolean);
+      const header=heads;
+      const rows=lines.slice(1).map(ln=>{
+        const vals=ln.split(' ').filter(Boolean);
+        const o={};
+        header.forEach((h,i)=>o[h]=vals[i]!==undefined?vals[i]:'');
+        return o;
+      });
+      finishParse(header,rows);
+      return;
+    }
+    const re=sep==='  '?/\s{2,}/:sep;
+    const header=first.split(re).map(s=>s.trim());
+    const rows=lines.slice(1).map(ln=>{
+      const vals=ln.split(re).map(s=>s.trim());
+      const o={};
+      header.forEach((h,i)=>o[h]=vals[i]!==undefined?vals[i]:'');
+      return o;
+    });
+    finishParse(header,rows);
+  }
+
+  function finishParse(header,rows){
+    // 自动识别数值列（至少 70% 的值可解析为数字）
+    const numCols=header.filter(h=>{
+      const valid=rows.map(r=>r[h]).filter(v=>isNum(v)).length;
+      return rows.length>0&&valid/rows.length>=0.7;
+    });
+    state.headers=header;
+    state.rows=rows;
+    // 默认选中前 3 个数值列
+    state.subjects=numCols.slice(0,Math.max(1,Math.min(3,numCols.length)));
+    if(state.subjects.length===0){
+      toast("未检测到数值列，请检查数据格式");
+      return;
+    }
+    renderSubjectChips(header,numCols);
+    toast(`已解析 ${rows.length} 条记录，${numCols.length} 个数值列`);
+    analyze();
+  }
+
+  function renderSubjectChips(header,numCols){
+    const all=numCols.length>0?numCols:header;
+    $("#subjChips").innerHTML=all.map(h=>
+      `<div class="chip ${state.subjects.includes(h)?'on':''}" data-subj="${esc(h)}">${esc(h)}</div>`
+    ).join('')+`<div class="chip ${state.subjects.length===0?'on':''}" data-subj="__total" style="background:var(--good-soft);color:#15803d">📊 总分</div>`;
+    $$("#subjChips .chip").forEach(el=>{
+      el.onclick=()=>{
+        const s=el.dataset.subj;
+        if(s==="__total"){
+          // 总分模式：清空其他选择
+          if(state.subjects.length===0){state.subjects=[...allSubjects()];}
+          else{state.subjects=[];}
+        }else{
+          const i=state.subjects.indexOf(s);
+          if(i>=0)state.subjects.splice(i,1);else state.subjects.push(s);
+          if(state.subjects.length===0)state.subjects=[];
+        }
+        renderSubjectChips(header,numCols);
+        analyze();
+      };
+    });
+  }
+  function allSubjects(){return state.headers.filter(h=>state.rows.some(r=>isNum(r[h])));}
+
+  /* ========== 计算衍生列 ========== */
+  function buildRows(){
+    const full=+$("#fullScore").value||100;
+    return state.rows.map((r,i)=>{
+      const o={__idx:i,__name:''};
+      // 找姓名列（首个非数值列，或叫"姓名/name/学生"的）
+      const nameKey=state.headers.find(h=>/姓名|学生|名字|name/i.test(h))||state.headers.find(h=>!state.rows.some(r=>isNum(r[h])));
+      if(nameKey)o.__name=r[nameKey];
+      state.headers.forEach(h=>o[h]=r[h]);
+      const vals=state.subjects.filter(s=>isNum(r[s])).map(s=>num(r[s]));
+      o.__total=sum(vals);
+      o.__avg=vals.length?round(o.__total/vals.length,1):null;
+      o.__cnt=vals.length;
+      o.__rate=vals.length?round(o.__total/(vals.length*full)*100,1):0;
+      return o;
+    }).filter(r=>r.__cnt>0);
+  }
+
+  /* ========== 分析主流程 ========== */
+  function analyze(){
+    if(!state.rows.length)return;
+    const data=buildRows();
+    if(!data.length){$("#welcome").style.display="block";$("#dashboard").style.display="none";return;}
+    $("#welcome").style.display="none";
+    $("#dashboard").style.display="block";
+
+    const full=+$("#fullScore").value||100;
+    const exc=(+$("#excellent").value||85)/100*full;
+    const pas=(+$("#passLine").value||60)/100*full;
+    const low=(+$("#lowLine").value||40)/100*full;
+
+    // 各科统计
+    const stats={};
+    state.subjects.forEach(s=>{
+      const vals=data.map(r=>num(r[s])).filter(isNum);
+      stats[s]={
+        avg:round(avg(vals),1),
+        max:Math.max(...vals),
+        min:Math.min(...vals),
+        med:round(percentile(vals,0.5),1),
+        mode:mode(vals),
+        std:round(stddev(vals),1),
+        cnt:vals.length,
+        exc:round(vals.filter(v=>v>=exc).length/vals.length*100,1),
+        pass:round(vals.filter(v=>v>=pas).length/vals.length*100,1),
+        fail:round(vals.filter(v=>v<pas&&v>=0).length/vals.length*100,1),
+        lowr:round(vals.filter(v=>v<low&&v>=0).length/vals.length*100,1),
+      };
+    });
+    // 总分/均分统计
+    const key=state.subjects.length>1?"__avg":"__total";
+    const allKey=state.subjects[0];
+    const overallKey=state.subjects.length>1?"__avg":"__total";
+    const oVals=state.subjects.length>1
+      ? data.map(r=>r.__avg).filter(v=>v!==null&&!isNaN(v))
+      : data.map(r=>num(r[allKey])).filter(isNum);
+    const overall={
+      avg:round(avg(oVals),1),
+      max:Math.max(...oVals),
+      min:Math.min(...oVals),
+      med:round(percentile(oVals,0.5),1),
+      std:round(stddev(oVals),1),
+      cnt:data.length,
+      exc:round(oVals.filter(v=>v>=exc).length/oVals.length*100,1),
+      pass:round(oVals.filter(v=>v>=pas).length/oVals.length*100,1),
+      fail:round(oVals.filter(v=>v<pas&&v>=0).length/oVals.length*100,1),
+      lowr:round(oVals.filter(v=>v<low&&v>=0).length/oVals.length*100,1),
+    };
+
+    renderKPI(overall,full,exc,pas,low);
+    renderDistribution(data,full,pas,exc);
+    renderRadar(stats);
+    renderTable(data,full,exc,pas,low);
+    renderCritical(data,full,pas,exc);
+  }
+
+  /* ========== KPI 卡 ========== */
+  function renderKPI(o,full,exc,pas,low){
+    const cards=[
+      {cls:"k-avg",label:"参考人数",val:o.cnt,sub:"条有效记录"},
+      {cls:"k-avg",label:`平均${state.subjects.length>1?"分":"成绩"}`,val:o.avg,sub:`最高 ${o.max} · 最低 ${o.min}`},
+      {cls:"k-avg",label:"中位数",val:o.med,sub:`标准差 ${o.std}`},
+      {cls:"k-best",label:"优秀率",val:o.exc+"%",sub:`≥ ${round(exc,0)} 分`},
+      {cls:"k-pass",label:"及格率",val:o.pass+"%",sub:`≥ ${round(pas,0)} 分`},
+      {cls:"k-warn",label:"不及格率",val:o.fail+"%",sub:`< ${round(pas,0)} 分`},
+      {cls:"k-bad",label:"低分率",val:o.lowr+"%",sub:`< ${round(low,0)} 分`},
+    ];
+    $("#kpiGrid").innerHTML=cards.map(c=>
+      `<div class="kpi ${c.cls}"><div class="k-label">${c.label}</div><div class="k-val">${c.val}</div><div class="k-sub">${c.sub}</div></div>`
+    ).join('');
+  }
+
+  /* ========== 分数段分布 ========== */
+  function renderDistribution(data,full,pas,exc){
+    const segs=10;
+    const size=full/segs;
+    const counts=new Array(segs).fill(0);
+    const src=state.subjects.length>1?data.map(r=>r.__avg):data.map(r=>num(r[state.subjects[0]]));
+    src.forEach(v=>{
+      if(isNaN(v))return;
+      let i=Math.floor(v/size);
+      if(i>=segs)i=segs-1;
+      if(i<0)i=0;
+      counts[i]++;
+    });
+    const max=Math.max(...counts,1);
+    const peak=Math.max(...counts);
+    $("#bars").innerHTML=counts.map((c,i)=>{
+      const lo=round(i*size,0),hi=round((i+1)*size,0);
+      const cls=(lo>=exc&&hi<=full)?'peak':(hi<=pas?'low':'');
+      return `<div class="bar-col"><div class="bar ${cls}" style="height:${c/max*150}px"><span class="b-v">${c>0?c:''}</span></div></div>`;
+    }).join('');
+    $("#xAxis").innerHTML=counts.map((c,i)=>{
+      const lo=round(i*size,0),hi=round((i+1)*size,0);
+      return `<div class="x-lab">${lo}–${hi}</div>`;
+    }).join('');
+    $("#distNote").textContent=`${data.length} 人 · 满分 ${full} 分 · 每段 ${(+size).toFixed(size<10?0:0)} 分`;
+  }
+
+  /* ========== 雷达图 ========== */
+  function renderRadar(stats){
+    const svg=$("#radar");
+    const cx=180,cy=160,R=120;
+    const axes=Object.keys(stats);
+    const n=axes.length;
+    if(n===0){svg.innerHTML='';$("#radarLegend").innerHTML='';return;}
+    // 归一化指标：及格率、优秀率、平均分(归一)、满分人数比
+    const metrics=["及格率","优秀率","平均分","最高分"];
+    const m=n; // 用科目数作为轴数，每个科目一个轴，指标：及格率
+    const points=axes.map(s=>({name:s,pass:stats[s].pass,exc:stats[s].exc,avg:stats[s].avg,max:stats[s].max}));
+    const maxPass=Math.max(...points.map(p=>p.pass),1);
+    const maxAvg=Math.max(...points.map(p=>p.avg),1);
+
+    let g='';
+    // 同心网格
+    for(let ring=1;ring<=4;ring++){
+      const rr=R*ring/4;
+      const pts=axes.map((_,i)=>{
+        const a=-Math.PI/2+i*2*Math.PI/axes.length;
+        return [cx+rr*Math.cos(a),cy+rr*Math.sin(a)];
+      }).map(p=>p.join(',')).join(' ');
+      g+=`<polygon points="${pts}" fill="none" stroke="#e2e8f0" stroke-width="1"/>`;
+    }
+    // 轴线 + 标签
+    axes.forEach((s,i)=>{
+      const a=-Math.PI/2+i*2*Math.PI/axes.length;
+      const x=cx+R*Math.cos(a),y=cy+R*Math.sin(a);
+      g+=`<line x1="${cx}" y1="${cy}" x2="${x}" y2="${y}" stroke="#cbd5e1" stroke-width="1"/>`;
+      const lx=cx+(R+22)*Math.cos(a),ly=cy+(R+22)*Math.sin(a);
+      g+=`<text x="${lx}" y="${ly}" font-size="12" fill="#475569" text-anchor="middle" dominant-baseline="middle">${esc(s)}</text>`;
+    });
+    // 数据多边形
+    const dpts=points.map((p,i)=>{
+      const a=-Math.PI/2+i*2*Math.PI/axes.length;
+      const rr=R*(p.pass/maxPass);
+      return [cx+rr*Math.cos(a),cy+rr*Math.sin(a)];
+    });
+    g+=`<polygon points="${dpts.map(p=>p.join(',')).join(' ')}" fill="rgba(79,70,229,.18)" stroke="#4f46e5" stroke-width="2"/>`;
+    dpts.forEach((p,i)=>{
+      g+=`<circle cx="${p[0]}" cy="${p[1]}" r="4" fill="#4f46e5"/>`;
+      g+=`<text x="${p[0]+8}" y="${p[1]-8}" font-size="10" fill="#4f46e5" font-weight="700">${points[i].pass}%</text>`;
+    });
+    svg.innerHTML=g;
+    $("#radarLegend").innerHTML=`<span><span class="legend-dot" style="background:#4f46e5"></span>及格率（各科目）· 满分 100%</span>`;
+  }
+
+  /* ========== 明细表 ========== */
+  let tableState={key:null,dir:1,sortKey:null,sortDir:1};
+  function renderTable(data,full,exc,pas,low){
+    const cols=state.subjects.length>1
+      ? [["__name","姓名"],["__total","总分"],["__avg","平均分"],...state.subjects.map(s=>[s,s])]
+      : [["__name","姓名"],...state.subjects.map(s=>[s,s])];
+    const sorted=[...data].sort((a,b)=>{
+      const k=tableState.sortKey||"__avg";
+      let va=a[k],vb=b[k];
+      if(va===undefined||va==='')va=-9999;if(vb===undefined||vb==='')vb=-9999;
+      return tableState.sortDir*(va>vb?1:va<vb?-1:0);
+    });
+    // 排名
+    const rankKey=state.rankBy==="total"?"__total":state.rankBy==="avg"?"__avg":state.subjects[0];
+    const ranked=[...data].sort((a,b)=>(b[rankKey]||0)-(a[rankKey]||0));
+    const rankOf={};
+    ranked.forEach((r,i)=>rankOf[r.__idx]=i+1);
+
+    const rankSorted=[...sorted].map(r=>({...r,_rk:rankOf[r.__idx]}));
+
+    let h=`<thead><tr><th data-k="_rk" class="${tableState.sortKey==='_rk'?'sorted':''}">排名<span class="arw">${tableState.sortKey==='_rk'?(tableState.sortDir>0?'▲':'▼'):'⇅'}</span></th>`;
+    cols.forEach(([k,n])=>{
+      h+=`<th data-k="${k}" class="${tableState.sortKey===k?'sorted':''}">${n}<span class="arw">${tableState.sortKey===k?(tableState.sortDir>0?'▲':'▼'):'⇅'}</span></th>`;
+    });
+    h+='</tr></thead><tbody>';
+
+    const maxV=Math.max(...data.map(r=>r.__avg||0),1);
+    rankSorted.forEach(r=>{
+      const rkCls=r._rk<=3?'rank-top':r._rk<=Math.ceil(data.length*0.3)?'rank-mid':'rank-low';
+      h+=`<tr><td class="num"><span class="rank-cell ${rkCls}">${r._rk}</span></td>`;
+      cols.forEach(([k,n])=>{
+        let v=r[k];
+        if(k==="__name"){h+=`<td>${esc(v)||'<span style="color:#94a3b8">—</span>'}</td>`;return;}
+        const nv=num(v);
+        const cls=nv>=exc?'p-good':nv>=pas?'':nv>=low?'p-warn':'p-bad';
+        const pill=nv>=exc?'good':nv>=pas?'':nv>=low?'warn':'bad';
+        h+=`<td class="num"><span class="pill ${cls}">${isNaN(nv)?esc(v):nv}</span></td>`;
+      });
+      h+='</tr>';
+    });
+    h+='</tbody>';
+    $("#detailTable").innerHTML=h;
+    $("#rowCount").textContent=`共 ${data.length} 条`;
+
+    $$("#detailTable th").forEach(th=>{
+      th.onclick=()=>{
+        const k=th.dataset.k;
+        if(tableState.sortKey===k)tableState.sortDir*=-1;
+        else{tableState.sortKey=k;tableState.sortDir=1;}
+        renderTable(data,full,exc,pas,low);
+      };
+    });
+  }
+
+  /* ========== 临界生 ========== */
+  function renderCritical(data,full,pas,exc){
+    const items=[];
+    data.forEach(r=>{
+      state.subjects.forEach(s=>{
+        const v=num(r[s]);
+        if(isNaN(v))return;
+        const gp=round(pas-v,1);
+        if(gp>0&&gp<=5)items.push({name:r.__name||'—',subj:s,val:v,gap:gp,line:round(pas,0),type:'及格线',cls:gp<=1?'tight':gp<=3?'near':'close'});
+        const ge=round(exc-v,1);
+        if(ge>0&&ge<=5)items.push({name:r.__name||'—',subj:s,val:v,gap:ge,line:round(exc,0),type:'优秀线',cls:ge<=1?'tight':ge<=3?'near':'close'});
+      });
+    });
+    items.sort((a,b)=>a.gap-b.gap);
+    const passItems=items.filter(i=>i.type==='及格线');
+    const excItems=items.filter(i=>i.type==='优秀线');
+    const box=(title,arr,color)=>{
+      if(!arr.length)return `<div class="crit-box"><h4>${title}</h4><div style="font-size:12.5px;color:var(--text-3);padding:10px 0">暂无（距离 ${title.match(/\d+/)[0]} 分的同学）</div></div>`;
+      return `<div class="crit-box"><h4>${title} <span style="font-size:11.5px;color:var(--text-3);font-weight:400">${arr.length} 人</span></h4>${
+        arr.slice(0,12).map(i=>`<div class="crit-item"><span class="c-name">${esc(i.name)}</span><span style="font-size:12px;color:var(--text-3)">${esc(i.subj)} ${i.val}</span><span class="c-gap ${i.cls}">差 ${i.gap} 分</span></div>`).join('')
+      }</div>`;
+    };
+    $("#critList").innerHTML=box(`🟡 距及格线（${round(pas,0)} 分）`,passItems)+box(`🔵 距优秀线（${round(exc,0)} 分）`,excItems);
+  }
+
+  /* ========== 示例数据 ========== */
+  function loadDemo(){
+    const names=["陈宇轩","王梓涵","李欣怡","张浩然","刘子涵","陈思远","杨语桐","赵俊杰","黄诗涵","周宇航","吴梦洁","郑博文","孙雅琪","马天佑","朱梓萱","胡晨曦","林俊豪","何欣妍","罗志强","高梓睿","宋佳琪","谢雨泽","唐婉清","韩明哲","曹馨月","邓嘉怡","冯子墨","蒋欣悦","沈嘉豪","韩雪","卢靖瑶","袁博超"];
+    const subs=["语文","数学","英语"];
+    let t="姓名\t"+subs.join("\t")+"\n";
+    // 确定性伪随机，保证演示可复现
+    let seed=20240101;
+    const rnd=()=>{seed=(seed*9301+49297)%233280;return seed/233280;};
+    names.forEach(n=>{
+      t+=n+"\t"+subs.map(()=>Math.floor(rnd()*45+55)).join("\t")+"\n";
+    });
+    $("#rawData").value=t.trim();
+    parseData();
+  }
+
+  /* ========== 导出 CSV ========== */
+  function exportCSV(){
+    if(!state.rows.length){toast("暂无数据可导出");return;}
+    const data=buildRows();
+    const cols=state.subjects.length>1?["__name","__total","__avg",...state.subjects]:["__name",...state.subjects];
+    const head=cols.map(c=>({__name:"姓名",__total:"总分",__avg:"平均分"}[c]||c)).join(",");
+    const body=data.map(r=>cols.map(c=>{
+      const v=r[c];
+      return (v===undefined||v==='')?'':(/[",\n]/.test(String(v))?'"'+v+'"':v);
+    }).join(",")).join("\n");
+    const blob=new Blob(["\uFEFF"+head+"\n"+body],{type:"text/csv;charset=utf-8"});
+    const a=document.createElement("a");
+    a.href=URL.createObjectURL(blob);
+    a.download="成绩明细.csv";
+    a.click();
+    URL.revokeObjectURL(a.href);
+    toast("已导出成绩明细 CSV");
+  }
+
+  /* ========== 提示 ========== */
+  let toastTimer;
+  function toast(msg){
+    const t=$("#toast");t.textContent=msg;t.classList.add("show");
+    clearTimeout(toastTimer);toastTimer=setTimeout(()=>t.classList.remove("show"),2000);
+  }
+
+  /* ========== 事件 ========== */
+  function bind(){
+    $("#btnParse").onclick=parseData;
+    $("#btnDemo").onclick=loadDemo;
+    $("#btnCsv").onclick=exportCSV;
+    $("#btnPrint").onclick=()=>{
+      // 打印前确保排序状态保留
+      window.print();
+    };
+    $("#btnCopy").onclick=()=>{
+      const tbl=$("#detailTable");
+      if(!tbl.rows.length){toast("暂无表格可复制");return;}
+      let t="";
+      [...tbl.rows].forEach(tr=>{
+        t+=[...tr.cells].map(td=>td.textContent.trim()).join("\t")+"\n";
+      });
+      navigator.clipboard?.writeText(t).then(()=>toast("已复制表格到剪贴板"),()=>{
+        const ta=document.createElement("textarea");ta.value=t;document.body.appendChild(ta);ta.select();
+        try{document.execCommand("copy");toast("已复制");}catch(e){toast("复制失败，请手动选择");}
+        document.body.removeChild(ta);
+      });
+    };
+    $("#drop").onclick=()=>$("#fileInput").click();
+    $("#fileInput").onchange=e=>{const f=e.target.files[0];if(f)readFile(f);e.target.value='';};
+    // 拖拽
+    const drop=$("#drop");
+    ["dragenter","dragover"].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.add("dragover");}));
+    ["dragleave","drop"].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.remove("dragover");}));
+    drop.addEventListener("drop",e=>{const f=e.dataTransfer.files[0];if(f)readFile(f);});
+    // 阈值/排名变化重算
+    ["fullScore","excellent","passLine","lowLine"].forEach(id=>{
+      $(id).addEventListener("input",()=>{if(state.rows.length)analyze();});
+    });
+    $$(".chip[data-rank]").forEach(el=>{
+      el.onclick=()=>{
+        state.rankBy=el.dataset.rank;
+        $$(".chip[data-rank]").forEach(c=>c.classList.remove("on"));
+        el.classList.add("on");
+        if(state.rows.length)analyze();
+      };
+    });
+  }
+
+  function init(){bind();}
+  document.addEventListener("DOMContentLoaded",init);
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>转盘抽选 | EduToolbox · 随机抽选工具</title>
+<meta name="description" content="转盘形式随机抽选学生或选项，动画展示直观，提升课堂参与感与趣味性。支持自定义选项、本地保存、全屏投影，本地运行离线可用。">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%8E%93%3C/text%3E%3C/svg%3E">
+<link rel="stylesheet" href="turntable.css">
+<link rel="stylesheet" href="../../assets/css/tool-common.css">
+</head>
+<body>
+<div id="app">
+
+  <main class="main">
+    <!-- 左侧：选项设置 -->
+    <section class="setup-panel">
+      <div class="block">
+        <h2 class="block-title">🎟️ 选项列表</h2>
+        <p class="block-hint">每行一个选项，建议 2-20 个</p>
+        <textarea id="opts" placeholder="一等奖&#10;二等奖&#10;三等奖&#10;谢谢参与">一等奖
+二等奖
+三等奖
+谢谢参与
+再来一次
+超级大奖</textarea>
+        <div class="count-bar">
+          共 <span id="optCount">6</span> 个选项
+          <button class="btn-mini" id="resetBtn">↺ 重置默认</button>
+        </div>
+      </div>
+
+      <div class="block">
+        <h2 class="block-title">⚙️ 抽选设置</h2>
+        <label class="check-line">
+          <input type="checkbox" id="removeAfter">
+          <span>抽中后移除</span>
+        </label>
+        <label class="check-line">
+          <input type="checkbox" id="autoSave" checked>
+          <span>自动保存选项（localStorage）</span>
+        </label>
+      </div>
+
+      <div class="block">
+        <h2 class="block-title">🏆 中奖记录 (<span id="recordCount">0</span>)</h2>
+        <ul id="recordList" class="record-list">
+          <li class="state state--list-item state--empty"><div class="state-icon">🎯</div><div class="state-title">暂无记录</div></li>
+        </ul>
+        <div class="button-group">
+          <button class="btn-mini" id="copyRecord">📋 复制</button>
+          <button class="btn-mini" id="clearRecord">🗑 清空</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- 右侧：转盘舞台 -->
+    <section class="stage" id="stage">
+      <div class="stage-toolbar">
+        <button class="icon-btn" id="fullscreenBtn" title="全屏">⛶</button>
+        <button class="icon-btn" id="hideSetupBtn" title="隐藏设置">⚙</button>
+      </div>
+
+      <div class="wheel-area">
+        <div class="wheel-wrap">
+          <canvas id="wheel" width="440" height="440"></canvas>
+          <div class="pointer"></div>
+          <button class="spin-btn" id="spin">GO</button>
+        </div>
+        <div class="result-display" id="result">点击 GO 开始抽选</div>
+        <p class="key-hint">按 <kbd>Space</kbd> 开始抽选</p>
+      </div>
+    </section>
+  </main>
+</div>
+
+<script src="../../assets/js/frame-bridge.js"></script>
+<script src="../../assets/js/tool-stage-toolbar.js"></script>
+<script src="turntable.js"></script>
+</body>
+</html>

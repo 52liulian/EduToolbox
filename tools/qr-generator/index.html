@@ -1,0 +1,73 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>二维码生成器</title>
+<link rel="stylesheet" href="qr-generator.css">
+<link rel="stylesheet" href="../../assets/css/tool-common.css">
+</head>
+<body>
+<div class="container">
+  <div class="layout">
+    <div class="form">
+      <label>文本 / 链接</label>
+      <textarea id="text" placeholder="输入文字或网址，如 https://www.example.com"></textarea>
+
+      <div class="row">
+        <div class="field">
+          <label>前景色</label>
+          <input type="color" id="fg" value="#000000">
+        </div>
+        <div class="field">
+          <label>背景色</label>
+          <input type="color" id="bg" value="#ffffff">
+        </div>
+        <div class="field">
+          <label>尺寸</label>
+          <select id="size">
+            <option value="200">200px</option>
+            <option value="300" selected>300px</option>
+            <option value="400">400px</option>
+            <option value="512">512px</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="field">
+          <label>容错级别</label>
+          <select id="ec">
+            <option value="L">L (7%)</option>
+            <option value="M" selected>M (15%)</option>
+            <option value="Q">Q (25%)</option>
+            <option value="H">H (30%)</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>边距</label>
+          <input type="number" id="margin" min="0" max="10" value="2">
+        </div>
+        <div class="field">
+          <label>Logo (可选)</label>
+          <input type="file" id="logo" accept="image/*">
+        </div>
+      </div>
+
+      <div class="actions">
+        <button class="btn btn-primary" id="gen">生成二维码</button>
+        <button class="btn btn-ghost" id="download">下载 PNG</button>
+      </div>
+    </div>
+
+    <div class="preview">
+      <div id="qrcode" class="qrcode"></div>
+      <p class="tip">扫码预览将显示在此处</p>
+    </div>
+  </div>
+</div>
+<script src="../../assets/js/frame-bridge.js"></script>
+<script src="../../assets/vendor/qrcode.min.js"></script>
+<script src="qr-generator.js"></script>
+</body>
+</html>
