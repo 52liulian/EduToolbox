@@ -27,6 +27,8 @@ const DB = {
         {name:"国家智慧教育平台", desc:"教育部最新上线，课程全覆盖，教师成长必备", tags:["公开课"], url:"https://basic.smartedu.cn/"},
         {name:"研直播", desc:"全国各地大型赛课、教育讲座直播+回看", tags:["公开课", "直播"], url:"https://live.yanxiu.com/lv2/home"},
         {name:"部优精品课", desc:"基础教育部级精品课", tags:["公开课"], url:"https://jpk.basic.smartedu.cn/"},
+        {name:"中国微课", desc:"中国微课平台，提供免费的微课资源", tags:["公开课"], url:"http://dasai.cnweike.cn/"},
+        {name:"人教社公开课", desc:"人教社公开课直播平台", tags:["公开课"], url:"https://appti1qd2s44049.h5.xet.pomoho.com/p/decorate/homepage"},
         {name:"网易公开课", desc:"教育类公开课视频", tags:["公开课", "视频"], url:"https://open.163.com"},
         {name:"职业教育智慧平台", desc:"教育部专门针对职业教育的平台", tags:["公开课"], url:"https://vocational.smartedu.cn/"},
         {name:"深圳教育云", desc:"各学段各学科教学视频", tags:["公开课", "视频"], url:"https://zy.szedu.cn/?ivk_sa=1024320u"},
@@ -38,33 +40,17 @@ const DB = {
       ]
     },
     {
-      id: "live", name: "录课直播", icon: "📹", desc: "直播课堂、录屏制作、视频会议、在线教学",
-      tools: [
-        {name:"钉钉直播", desc:"企业级直播，教育直播与在线课堂", tags:["直播", "课堂"], url:"https://www.dingtalk.com"},
-        {name:"腾讯会议", desc:"视频会议，广泛用于在线教学", tags:["会议", "教学"], url:"https://meeting.tencent.com", featured:true},
-        {name:"飞书会议", desc:"视频会议，屏幕共享与课程录制", tags:["会议", "录制"], url:"https://www.feishu.cn"},
-        {name:"小鹅通直播助手", desc:"在线直播与录播，互动式网络授课", tags:["直播", "录播"], url:"https://www.xiaoe-tech.com"},
-        {name:"OBS Studio", desc:"免费开源录屏与直播软件，屏、直播神器，可抠绿幕、真人出镜", tags:["录屏软件", "录屏", "直播"], url:"https://obsproject.com/zh-cn", featured:true},
-        {name:"Zoom", desc:"视频会议，远程教育与在线授课", tags:["会议", "远程"], url:"https://zoom.us"},
-        {name:"网易云课堂", desc:"在线课程直播与录制", tags:["课程", "在线"], url:"https://study.163.com"},
-        {name:"oCam", desc:"小巧的录屏软件，只能录屏幕，不能录真人", tags:["录屏软件", "录屏"], url:"https://pan.baidu.com/share/init?surl=YV5htp7RT0ErG2m3S70JxQ&pwd=cfve"},
-        {name:"剪辑师", desc:"希沃出品的录屏软件，可以剪辑，做微课方便", tags:["录屏软件", "视频", "录屏"], url:"https://e.seewo.com/product/JJS"},
-        {name:"OBS美颜插件", desc:"一个拓展obs的插件中心，可以让你录课、直播变得美美的", tags:["录屏软件", "录屏", "直播"], url:"https://www.aliyundrive.com/s/PVKU9Eif4Yh"},
-        {name:"在线屏幕录制", desc:"在线屏幕录制", tags:["录屏软件", "录屏", "在线"], url:"https://toolwa.com/record/"},
-        {name:"抖音直播伴侣", desc:"抖音直播软件，也可用于录屏", tags:["录屏软件", "录屏", "直播"], url:"https://streamingtool.douyin.com/"},
-        {name:"PixPin", desc:"免费的截图工具，可以截长图、录Gif", tags:["录屏软件", "免费", "录屏"], url:"https://pixpin.cn/"},
-        {name:"XSnip", desc:"免费的截图工具", tags:["截图工具", "免费", "录屏"], url:"https://xsnip.cn/"},
-        {name:"Snap Camera", desc:"电脑摄像头美颜、虚拟化，真人出镜神器", tags:["录屏软件", "录屏"], url:"https://www.aliyundrive.com/s/cPcKMdKwjUJ"},
-      ]
-    },
-    {
       id: "resource", name: "教学资源", icon: "📚", desc: "教案课件、电子教材、学科资源、题库组卷与考试测评",
       subCategories: [
         {
           id: "chinese", name: "语文", icon: "📝", desc: "古诗、作文、拼音、生字",
           tools: [
-            {name: "古文岛", desc: "古诗词学习，注释、翻译、赏析", tags: ["语文", "古诗"], url: "https://www.guwendao.net/", featured: true},
-            {name: "汉语拼音网", desc: "拼音教学、声调练习", tags: ["语文", "拼音"], url: "http://www.hanyupinyin.cn"},
+            {name:"语文报", desc:"语文报社被誉为“中华语文第一报”，认定为“中国驰名商标”，是全国中语会、小语会会报。报社创建于1978年，是国内创办最早、规模最大、影响最广的语文报刊社，拥有《语文报》、《语文教学通讯》及语文报官网三大优秀文化品牌。", tags:["语文", "古诗"], url:"https://www.zhyww.cn/"},
+            {name:"古文岛", desc: "古诗词学习，注释、翻译、赏析", tags: ["语文", "古诗"], url: "https://www.guwendao.net/", featured: true},
+            {name:"语文迷", desc:"语文迷是专业的语文学习网站，开设汉字、词语、成语、 句子、段落、作文、古诗、故事、国学、文章阅读等栏目，致力于提升广大语文爱好者听、说、读、写、思等能力，提升中华民族的语文水平。", tags:["语文", "作文"], url:"https://www.yuwenmi.com/index.html"},
+            {name:"汉语拼音网", desc: "拼音教学、声调练习", tags: ["语文", "拼音"], url: "http://www.hanyupinyin.cn"},
+            {name:"无忧无虑中学语文网", desc:"无忧无虑中学语文网", tags:["语文", "资源"], url:"https://www.5156edu.com"},
+            {name:"作文网", desc:"作文网，提供各年级作文范文、写作技巧", tags:["语文", "作文"], url:"https://www.zuowen.com"},
             {name:"汉典", desc:"权威汉语字典词典，汉字查询、成语典故", tags:["语文", "字典"], url:"https://www.zdic.net"},
             {name:"汉语国学", desc:"国学经典、传统文化教学资源", tags:["语文", "国学"], url:"https://www.hanyuguoxue.com/"},
             {name:"中小学生作文网", desc:"各年级作文范文、写作技巧", tags:["语文", "作文"], url:"https://www.zuowen.com"},
@@ -82,6 +68,7 @@ const DB = {
             {name:"洋葱学园", desc:"趣味数学，动画视频讲解概念", tags:["数学", "趣味"], url:"https://yangcongxueyuan.com/applications/"},
             {name:"数学公式编辑器", desc:"在线公式编辑，支持 LaTeX", tags:["数学", "公式"], url:"https://www.latexlive.com"},
             {name:"Wolfram Alpha", desc:"数学计算知识引擎，方程求解、数据可视化", tags:["数学", "计算"], url:"https://www.wolframalpha.com"},
+            {name:"PhET 互动仿真实验模拟", desc:"科罗拉多大学免费物理/化学/生物仿真实验", tags:["物理", "化学", "生物", "仿真"], url:"https://phet.colorado.edu/zh_CN"},
           ]
         },
         {
@@ -96,7 +83,51 @@ const DB = {
             {name:"英语语法网", desc:"语法规则、例句、练习题", tags:["英语", "语法"], url:"http://www.yygrammar.com"},
             {name:"英语听力室", desc:"各类听力材料与听力技巧", tags:["英语", "听力"], url:"http://www.tingroom.com"},
           ]
-        }
+        },
+        {
+          id: "physics", name: "物理", icon: "⚛️", desc: "力学、实验、原理",
+          tools: [
+            {name:"PhET 互动仿真实验模拟", desc:"科罗拉多大学免费物理/化学/生物仿真实验", tags:["物理", "化学", "生物", "仿真"], url:"https://phet.colorado.edu/zh_CN"},
+            {name:"学科网物理", desc:"物理课件、试题、教案、实验视频", tags:["物理", "资源"], url:"https://wl.zxxk.com"},
+            {name:"物理公式助手", desc:"基于 Wolfram Alpha 的物理公式查询与计算", tags:["物理", "计算"], url:"https://www.wolframalpha.com"},
+          ]
+        },
+        {
+          id: "chemistry", name: "化学", icon: "🧪", desc: "化学、实验、原理",
+          tools: [
+            {name:"化学加", desc:"化学方程式、实验视频、知识点", tags:["化学", "方程"], url:"https://www.huaxuejia.cn"},
+            {name:"学科网化学", desc:"化学课件、试题、教案、实验指导", tags:["化学", "资源"], url:"https://hx.zxxk.com"},
+            {name:"化学元素周期表", desc:"互动元素周期表，元素性质查询", tags:["化学", "元素"], url:"https://www.ptable.com/?lang=zh"},
+            {name:"PhET 互动仿真实验模拟", desc:"科罗拉多大学免费物理/化学/生物仿真实验", tags:["物理", "化学", "生物", "仿真"], url:"https://phet.colorado.edu/zh_CN"},
+          ]
+        },
+        {
+          id: "biology", name: "生物", icon: "🧬", desc: "生物、实验、原理",
+          tools: [
+            {name:"学科网生物", desc:"生物课件、试题、教案、实验视频", tags:["生物", "资源"], url:"https://sw.zxxk.com"},
+            {name:"PhET 互动仿真实验模拟", desc:"科罗拉多大学免费物理/化学/生物仿真实验", tags:["物理", "化学", "生物", "仿真"], url:"https://phet.colorado.edu/zh_CN"},
+          ]
+        },
+        {
+          id: "politics", name: "政治", icon: "⚖️", desc: "政治、实验、原理",
+          tools: [
+            {name:"学科网政治", desc:"政治课件、试题、教案、时政资料", tags:["政治", "资源"], url:"https://zz.zxxk.com"},
+          ]
+        },
+        {
+          id: "history", name: "历史", icon: "🏛️", desc: "历史、实验、原理",
+          tools: [
+            {name:"学科网历史", desc:"历史课件、试题、教案、史料分析", tags:["历史", "资源"], url:"https://ls.zxxk.com"},
+            {name:"全历史", desc:"全球历史", tags:["历史资源"], url:"https://www.allhistory.com/"},
+            {name:"中学历史教学园地", desc:"高质量的中学历史资源平台", tags:["历史资源", "试卷", "课程"], url:"https://www.zxls.com/index.html"},
+          ]
+        },
+        {
+          id: "geo", name: "地理", icon: "🌏", desc: "地理、实验、原理",
+          tools: [
+            {name:"学科网地理", desc:"地理课件、试题、教案、地图资料", tags:["地理", "资源"], url:"https://dl.zxxk.com"},
+          ]
+        },
       ],
       tools: [
         {name:"国家中小学智慧教育平台", desc:"国家级平台，覆盖各学科教学资源", tags:["国家", "资源"], url:"https://basic.smartedu.cn", featured:true},
@@ -123,17 +154,6 @@ const DB = {
         {name:"学科网组卷中心", desc:"学科网旗下专业组卷平台，海量优质试题资源，支持精准检索和快速组卷。覆盖K12全学段全学科，提供Word格式导出。", tags:["组卷网", "题库"], url:"https://zujuan.xkw.com/"},
         {name:"教习网组卷系统", desc:"为教师提供海量试题库和便捷的组卷工具。支持多种组卷方式，可按年级、学科、知识点快速组卷，自动生成答案解析。", tags:["组卷网", "题库"], url:"https://www.51jiaoxi.com/"},
         {name:"21世纪教育网组卷", desc:"21世纪教育网组卷系统", tags:["组卷", "题库"], url:"https://zujuan.21cnjy.com/"},
-        {name:"PhET 互动仿真实验模拟", desc:"科罗拉多大学免费物理/化学/生物仿真实验", tags:["物理", "化学", "生物", "仿真"], url:"https://phet.colorado.edu/zh_CN"},
-        {name:"学科网物理", desc:"物理课件、试题、教案、实验视频", tags:["物理", "资源"], url:"https://wl.zxxk.com"},
-        {name:"物理公式助手", desc:"基于 Wolfram Alpha 的物理公式查询与计算", tags:["物理", "计算"], url:"https://www.wolframalpha.com"},
-        {name:"化学加", desc:"化学方程式、实验视频、知识点", tags:["化学", "方程"], url:"https://www.huaxuejia.cn"},
-        {name:"学科网化学", desc:"化学课件、试题、教案、实验指导", tags:["化学", "资源"], url:"https://hx.zxxk.com"},
-        {name:"化学元素周期表", desc:"互动元素周期表，元素性质查询", tags:["化学", "元素"], url:"https://www.ptable.com/?lang=zh"},
-        {name:"学科网地理", desc:"地理课件、试题、教案、地图资料", tags:["地理", "资源"], url:"https://dl.zxxk.com"},
-        {name:"学科网历史", desc:"历史课件、试题、教案、史料分析", tags:["历史", "资源"], url:"https://ls.zxxk.com"},
-        {name:"中学历史教学园地", desc:"高质量的中学历史资源平台", tags:["历史资源", "试卷", "课程"], url:"https://www.zxls.com/index.html"},
-        {name:"学科网生物", desc:"生物课件、试题、教案、实验视频", tags:["生物", "资源"], url:"https://sw.zxxk.com"},
-        {name:"学科网政治", desc:"政治课件、试题、教案、时政资料", tags:["政治", "资源"], url:"https://zz.zxxk.com"},
       ]
     },
     {
@@ -143,6 +163,7 @@ const DB = {
         {name:"小盒老师", desc:"AI 教学管理，智能批改与学情分析", tags:["AI", "管理"], url:"https://teacher.knowbox.cn"},
         {name:"希沃班级优化大师", desc:"班级管理神器，实时给学生打分与评价", tags:["教学管理"], url:"https://care.seewo.com/app/activity/download"},
         {name:"易查分", desc:"给学生一对一发放成绩，保护学生隐私", tags:["教学管理", "成绩查询"], url:"https://www.yichafen.com/"},
+        {name:"爱查分", desc:"爱查分面向中小学教师，提供成绩发布与查询、学情分析、学生评语和家校沟通工具。", tags:["教学管理", "成绩查询"], url:"https://www.aichafen.com/"},
         {name:"声波球", desc:"根据环境声音大小跳动的小球", tags:["教学管理", "声音监测"], url:"https://html5.44886.com/ball/"},
         {name:"ClassIsland", desc:"可以在一体机大屏顶部，显示一个条状的课表的小工具", tags:["教学管理", "课表显示"], url:"https://www.classisland.tech/"},
       ]
@@ -150,6 +171,8 @@ const DB = {
     {
       id: "growth", name: "教师成长", icon: "🌱", desc: "教师培训、知识服务、专业成长、教研提升",
       tools: [
+        {name:"终身教育平台", desc:"终身教育平台，提供教师专业发展课程", tags:["教师成长", "课程"], url:"https://le.ouchn.cn/home"},
+        {name:"教视网", desc:"教师成长平台，提供教师专业发展课程", tags:["教师成长", "课程"], url:"https://www.sp910.com/"},
         {name:"得到 APP", desc:"知识服务，教育课程与职业发展", tags:["知识", "职业"], url:"https://www.igetget.com"},
         {name:"樊登读书", desc:"读书分享，教育书籍解读与成长", tags:["读书", "成长"], url:"https://www.dushu365.com"},
         {name:"混沌大学", desc:"创新教育，前沿教育理念培训", tags:["创新", "理念"], url:"https://www.hundun.cn"},
@@ -168,10 +191,12 @@ const DB = {
       id: "assist", name: "教育辅助", icon: "🧰", desc: "公式编辑、思维导图、笔记管理、PPT课件制作与效率工具",
       tools: [
         {name:"Notion", desc:"笔记、任务管理、数据库，组织工作内容", tags:["笔记", "管理"], url:"https://www.notion.com/zh-cn", featured:true},
+        {name:"企鹅教师助手", desc:"智能教学助手，提供课程、作业、成绩查询等功能", tags:["教学", "助手"], url:"https://aiteach.qq.com/"},
         {name:"Canva", desc:"图形设计工具，丰富模板制作课件、海报", tags:["设计", "课件"], url:"https://www.canva.cn", featured:true},
         {name:"Wolfram Alpha", desc:"知识计算引擎，数学与科学查询", tags:["计算", "科学"], url:"https://www.wolframalpha.com"},
         {name:"Quizlet", desc:"学习卡片与测验，多种学习模式", tags:["卡片", "测验"], url:"https://quizlet.com"},
         {name:"简明字帖", desc:"一键生成字帖", tags:["教学资源", "多字体", "在线生成"], url:"https://www.babawar.com/"},
+        {name:"兔小乖字帖", desc:"一键生成字帖", tags:["教学资源", "多字体", "在线生成"], url:"https://www.tuxiaoguai.com/"},
         {name:"音乐打谱", desc:"在线制作音乐简谱的平台", tags:["教学资源", "音频", "在线"], url:"http://www.jianpu99.net/"},
         {name:"BoardMix 博思白板", desc:"在线白板，实时协作互动教学", tags:["白板", "协作"], url:"https://www.boardmix.cn"},
         {name:"优品 PPT", desc:"丰富 PPT 模板，涵盖各学科教学场景", tags:["PPT", "模板"], url:"https://www.ypppt.com"},
@@ -201,19 +226,28 @@ const DB = {
 //      ]
 //    },
     {
-      id: "materials", name: "素材资源", icon: "🎨", desc: "视频素材、商用字体、纸张定制等创作素材",
-      tools: [
-        {name:"黑罐头", desc:"抖音推出的视频剪辑素材平台，素材丰富", tags:["素材资源", "视频"], url:"https://www.heycan.com/material#all"},
-        {name:"免费商用字体", desc:"免费可商用的字体一键下载", tags:["素材资源", "免费", "下载"], url:"https://font.sucai999.com/"},
-        {name:"凹凸",desc:"一款专业的在线生成模拟手写稿件工具",tags:["手写模拟"],url:"https://www.autohanding.com/"},
-        {name:"纸由我", desc:"打造一个人人都能轻松使用的纸张定制平台，让创意不再受限于现成的模板。无论你是学生、教师、设计师还是办公人士，都能找到或创建最适合自己需求的纸张。", tags:["素材资源", "图片", "模板"], url:"https://paperme.toolooz.com/"},
-      ]
-    },
-
-//    
-    {
       id: "media", name: "多媒体处理", icon: "🎬", desc: "音频、图像、视频的处理、剪辑、转换与创作工具",
       subCategories: [
+        {
+          id: "live", name: "录课直播", icon: "📹", desc: "直播课堂、录屏制作、视频会议、在线教学",
+          tools: [
+            {name:"钉钉直播", desc:"企业级直播，教育直播与在线课堂", tags:["直播", "课堂"], url:"https://www.dingtalk.com"},
+            {name:"腾讯会议", desc:"视频会议，广泛用于在线教学", tags:["会议", "教学"], url:"https://meeting.tencent.com", featured:true},
+            {name:"飞书会议", desc:"视频会议，屏幕共享与课程录制", tags:["会议", "录制"], url:"https://www.feishu.cn"},
+            {name:"小鹅通直播助手", desc:"在线直播与录播，互动式网络授课", tags:["直播", "录播"], url:"https://www.xiaoe-tech.com"},
+            {name:"OBS Studio", desc:"免费开源录屏与直播软件，屏、直播神器，可抠绿幕、真人出镜", tags:["录屏软件", "录屏", "直播"], url:"https://obsproject.com/zh-cn", featured:true},
+            {name:"Zoom", desc:"视频会议，远程教育与在线授课", tags:["会议", "远程"], url:"https://zoom.us"},
+            {name:"网易云课堂", desc:"在线课程直播与录制", tags:["课程", "在线"], url:"https://study.163.com"},
+            {name:"oCam", desc:"小巧的录屏软件，只能录屏幕，不能录真人", tags:["录屏软件", "录屏"], url:"https://pan.baidu.com/share/init?surl=YV5htp7RT0ErG2m3S70JxQ&pwd=cfve"},
+            {name:"剪辑师", desc:"希沃出品的录屏软件，可以剪辑，做微课方便", tags:["录屏软件", "视频", "录屏"], url:"https://e.seewo.com/product/JJS"},
+            {name:"OBS美颜插件", desc:"一个拓展obs的插件中心，可以让你录课、直播变得美美的", tags:["录屏软件", "录屏", "直播"], url:"https://www.aliyundrive.com/s/PVKU9Eif4Yh"},
+            {name:"在线屏幕录制", desc:"在线屏幕录制", tags:["录屏软件", "录屏", "在线"], url:"https://toolwa.com/record/"},
+            {name:"抖音直播伴侣", desc:"抖音直播软件，也可用于录屏", tags:["录屏软件", "录屏", "直播"], url:"https://streamingtool.douyin.com/"},
+            {name:"PixPin", desc:"免费的截图工具，可以截长图、录Gif", tags:["录屏软件", "免费", "录屏"], url:"https://pixpin.cn/"},
+            {name:"XSnip", desc:"免费的截图工具", tags:["截图工具", "免费", "录屏"], url:"https://xsnip.cn/"},
+            {name:"Snap Camera", desc:"电脑摄像头美颜、虚拟化，真人出镜神器", tags:["录屏软件", "录屏"], url:"https://www.aliyundrive.com/s/cPcKMdKwjUJ"},
+          ]
+        },
         {
          id: "audio", name: "音频处理", icon: "🎵", desc: "文字转语音、音频剪辑、人声分离与音效下载",
           tools: [
@@ -230,6 +264,7 @@ const DB = {
             {name:"ACE Studio", desc:"AI歌声合成工具，输入歌词与旋律即可生成宛如真人的歌声", tags:["音频处理", "AI", "音频"], url:"https://acestudio.cn/"},
             {name:"BGM猫", desc:"灵动音科技推出的AI智能生成BGM音乐", tags:["音频处理", "AI", "音频"], url:"http://bgmcat.com/"},
             {name:"音效下载", desc:"制作ppt或微课时可以下载上面的各种声音效果", tags:["音频处理", "PPT", "视频"], url:"https://sc.chinaz.com/yinxiao/"},
+            {name:"音乐直链搜索", desc:"音音乐下载便捷工具，教学音频素材获取助手", tags:["音频处理", "音频", "下载"], url:"https://music.liuzhijin.cn"},
             {name:"音乐解密", desc:"音乐软件下载后加密的音乐，一键解密", tags:["音频处理", "音频", "下载"], url:"https://unlock-music.liumingye.cn/"},
             {name:"在线音频编辑", desc:"在线音频编辑神器,音频伴奏提取、变调变速、合成", tags:["音频处理", "在线", "免费"], url:"https://vocalremover.org/zh/"},
           ]
@@ -268,49 +303,18 @@ const DB = {
             {name:"万彩动画大师", desc:"拖动鼠标就能制作卡通动画，入门简单", tags:["动画制作"], url:"http://www.animiz.cn/download/"},
           ]
         },
+        {
+          id: "materials", name: "素材资源", icon: "🎨", desc: "视频素材、商用字体、纸张定制等创作素材",
+          tools: [
+            {name:"黑罐头", desc:"抖音推出的视频剪辑素材平台，素材丰富", tags:["素材资源", "视频"], url:"https://www.heycan.com/material#all"},
+            {name:"免费商用字体", desc:"免费可商用的字体一键下载", tags:["素材资源", "免费", "下载"], url:"https://font.sucai999.com/"},
+            {name:"凹凸",desc:"一款专业的在线生成模拟手写稿件工具",tags:["手写模拟"],url:"https://www.autohanding.com/"},
+            {name:"纸由我", desc:"打造一个人人都能轻松使用的纸张定制平台，让创意不再受限于现成的模板。无论你是学生、教师、设计师还是办公人士，都能找到或创建最适合自己需求的纸张。", tags:["素材资源", "图片", "模板"], url:"https://paperme.toolooz.com/"},
+            {name:"音效下载", desc:"免费的音效下载平台，提供丰富的音效资源", tags:["素材资源", "音效", "下载"], url:"https://sc.chinaz.com/yinxiao"},
+          ]
+        }, 
       ],
       tools: [],
-    },
-    {
-      id: "security", name: "安全软件", icon: "🛡️", desc: "杀毒拦截弹窗、系统重装与电脑维护",
-      tools: [
-        {name:"火绒安全", desc:"目前比较良心的杀毒软件，有效拦截弹窗", tags:["安全软件"], url:"https://www.huorong.cn/person5.html", featured:true},
-        {name:"装个机", desc:"重装系统全流程，教程+工具", tags:["安全软件"], url:"https://zhuangit.ababtools.com/"},
-      ]
-    },
-    {
-      id: "mindmap", name: "思维与创作", icon: "🧠", desc: "思维导图、流程图、知识库与内容创作",
-      tools: [
-        {name:"GitMind 思维导图", desc:"免费思维导图，组织教学内容、规划课程", tags:["思维导图", "课程"], url:"https://gitmind.cn"},
-        {name:"ZhiMap", desc:"免费思维导图，比收费的还好用", tags:["思维与创作", "免费", "思维导图"], url:"https://zhimap.com/"},
-        {name:"ProcessOn", desc:"免费在线流程图思维导图，功能较全", tags:["思维与创作", "免费", "思维导图"], url:"https://www.processon.com/", featured:true},
-        {name:"百度脑图", desc:"百度公司的在线版思维导图，界面清爽", tags:["思维与创作", "思维导图", "在线"], url:"https://naotu.baidu.com/"},
-        {name:"知犀思维导图", desc:"思维创造，积累每一个灵感的瞬间", tags:["思维与创作", "思维导图"], url:"https://www.zhixi.com/"},
-        {name:"树图", desc:"拥有超多模板的思维导图、知识库", tags:["思维导图", "模板"], url:"https://shutu.cn/"},
-      ]
-    },
-    {
-      id: "office", name: "实用办公工具", icon: "🧰", desc: "PDF 转换、文件处理、格式转换等办公效率神器",
-      tools: [
-        {name:"Office最新版", desc:"一键部署任何版本的Office套件", tags:["实用办公工具"], url:"https://otp.landian.vip/zh-cn/download.html"},
-        {name:"wps政府版", desc:"政府没有广告版的wps，很纯净", tags:["实用办公工具", "图片"], url:"https://www.aliyundrive.com/s/n6nNW24n72J"},
-        {name:"微能力工具箱", desc:"提升工程2.0三十个能力点必备的工具集合", tags:["实用办公工具"], url:"https://www.aliyundrive.com/s/TfdwLKUFGAJ"},
-        {name:"光速搜索", desc:"飞快的速度搜索电脑中的文件，秒出结果", tags:["实用办公工具"], url:"https://www.aliyundrive.com/s/FVUaSDcjwtk"},
-        {name:"文件批量改名", desc:"一键给目录下的文件改名，可自定义编号", tags:["实用办公工具"], url:"https://www.aliyundrive.com/s/3mLv5Rd4sLH"},
-        {name:"Datavrap", desc:"数据可视化工具，制作数据变动视频", tags:["实用办公工具", "视频"], url:"https://www.datavrap.com/"},
-        {name:"视频连线", desc:"在线视频聊天（会议），一键开启", tags:["实用办公工具", "视频", "在线"], url:"https://brie.fi/ng"},
-        {name:"文本处理", desc:"文字也能变出花样来，很多对文字处理的小工具", tags:["实用办公工具"], url:"https://www.txttool.com/"},
-        {name:"Pdf转换", desc:"PDF转word、PPT或其它格式", tags:["实用办公工具", "PPT", "PDF"], url:"https://www.aconvert.com/pdf/"},
-        {name:"文档免费下载", desc:"免费下载百度文库、道客巴巴、豆丁网文档", tags:["实用办公工具", "免费", "下载"], url:"https://imwcr.cn/api/GetDocumentText/"},
-        {name:"Utools", desc:"一个汇集了无数小工具插件的软件，一键启动", tags:["实用办公工具"], url:"https://www.u-tools.cn/index.html"},
-        {name:"HelloWindows", desc:"下载正版系统，办公软件，带激活工具", tags:["实用办公工具", "下载"], url:"https://hellowindows.cn/"},
-        {name:"各种转换", desc:"PDF转Word等各种常见格式转换，办公小工具", tags:["实用办公工具", "PDF"], url:"https://www.alltoall.net/"},
-        {name:"XLSX转VCF", desc:"电子表格转通讯录文件", tags:["实用办公工具"], url:"https://xlsx2vcf.kefuxx.com/"},
-        {name:"打字、单词练习站", desc:"开源、免费的练习单词和练习打字的网站", tags:["实用办公工具", "免费"], url:"https://qwerty.kaiyi.cool/"},
-        {name:"坚果云收集箱", desc:"轻松收集别人发来的文件", tags:["实用办公工具"], url:"https://workspace.jianguoyun.com/inbox/"},
-        {name:"文叔叔", desc:"不限速发文件、收文件", tags:["实用办公工具"], url:"https://www.wenshushu.cn/"},
-        {name:"PDF去文字水印", desc:"去除PPT中嵌入图片上的文字水印~", tags:["实用办公工具", "PPT", "PDF"], url:"http://www.pdfdo.com/pdf-delete-text.aspx"},
-      ]
     },
     {
       id: "AItool", name: "人工智能", icon: "🎓", desc: "人工智能大模型工具",
@@ -371,15 +375,63 @@ const DB = {
       tools: [],
     },
     {
-      id: "plugin", name: "Office插件", icon: "🔌", desc: "Word/PPT 插件，自动排版与智能设计",
-      tools: [
-        {name:"不坑盒子", desc:"强大的Office插件，自动排版、智能写作", tags:["Office插件"], url:"https://www.bukenghezi.com/", featured:true},
-        {name:"ok插件", desc:"非常强大的ppt设计类插件", tags:["Office插件", "PPT", "图片"], url:"http://oktools.xyz/"},
-        {name:"Eastar", desc:"新生的强大PPT插件，专业制作PPT", tags:["Office插件", "PPT"], url:"https://44886.lanzouw.com/iYon41shofyf"},
-        {name:"方方格子", desc:"一个基于Excel的方方格子插件，用于创建和管理方方格子", tags:["Office插件", "方方格子"], url:"http://www.ffcell.com/home/ffcell.aspx"},
-        {name:"iSlide", desc:"PPT插件工具,高效创建专业演示文档。", tags:["Office插件", "PPT", "iSlide"], url:"https://www.islide.cc/", featured:true},
-        {name:"MotionGo", desc:"原PPT动画插件口袋动画_免费商用PPT插件", tags:["Office插件", "PPT", "口袋动画"], url:"https://motion.yoo-ai.com/"},
-      ]
+      id: "Tools", name: "实用工具", icon: "🧰", desc: "教师必备常用软件合集，涵盖办公套件、浏览器、输入法、网盘和安全工具等装机必备。",
+      subCategories: [
+        {
+          id: "office", name: "办公软件", icon: "🧰", desc: "办公套件、浏览器、输入法、网盘等办公软件",
+          tools: [
+            {name:"Office最新版", desc:"一键部署任何版本的Office套件", tags:["实用办公工具"], url:"https://otp.landian.vip/zh-cn/download.html"},
+            {name:"wps政府版", desc:"政府没有广告版的wps，很纯净", tags:["实用办公工具", "图片"], url:"https://www.aliyundrive.com/s/n6nNW24n72J"},
+            {name:"微能力工具箱", desc:"提升工程2.0三十个能力点必备的工具集合", tags:["实用办公工具"], url:"https://www.aliyundrive.com/s/TfdwLKUFGAJ"},
+            {name:"光速搜索", desc:"飞快的速度搜索电脑中的文件，秒出结果", tags:["实用办公工具"], url:"https://www.aliyundrive.com/s/FVUaSDcjwtk"},
+            {name:"Everything", desc:"文件搜索工具，支持模糊搜索、文件类型搜索等", tags:["实用办公工具"], url:"https://www.voidtools.com/zh-cn/"},
+            {name:"文件批量改名", desc:"一键给目录下的文件改名，可自定义编号", tags:["实用办公工具"], url:"https://www.aliyundrive.com/s/3mLv5Rd4sLH"},
+            {name:"Datavrap", desc:"数据可视化工具，制作数据变动视频", tags:["实用办公工具", "视频"], url:"https://www.datavrap.com/"},
+            {name:"视频连线", desc:"在线视频聊天（会议），一键开启", tags:["实用办公工具", "视频", "在线"], url:"https://brie.fi/ng"},
+            {name:"文本处理", desc:"文字也能变出花样来，很多对文字处理的小工具", tags:["实用办公工具"], url:"https://www.txttool.com/"},
+            {name:"Pdf转换", desc:"PDF转word、PPT或其它格式", tags:["实用办公工具", "PPT", "PDF"], url:"https://www.aconvert.com/pdf/"},
+            {name:"文档免费下载", desc:"免费下载百度文库、道客巴巴、豆丁网文档", tags:["实用办公工具", "免费", "下载"], url:"https://imwcr.cn/api/GetDocumentText/"},
+            {name:"Utools", desc:"一个汇集了无数小工具插件的软件，一键启动", tags:["实用办公工具"], url:"https://www.u-tools.cn/index.html"},
+            {name:"HelloWindows", desc:"下载正版系统，办公软件，带激活工具", tags:["实用办公工具", "下载"], url:"https://hellowindows.cn/"},
+            {name:"各种转换", desc:"PDF转Word等各种常见格式转换，办公小工具", tags:["实用办公工具", "PDF"], url:"https://www.alltoall.net/"},
+            {name:"XLSX转VCF", desc:"电子表格转通讯录文件", tags:["实用办公工具"], url:"https://xlsx2vcf.kefuxx.com/"},
+            {name:"打字、单词练习站", desc:"开源、免费的练习单词和练习打字的网站", tags:["实用办公工具", "免费"], url:"https://qwerty.kaiyi.cool/"},
+            {name:"坚果云收集箱", desc:"轻松收集别人发来的文件", tags:["实用办公工具"], url:"https://workspace.jianguoyun.com/inbox/"},
+            {name:"文叔叔", desc:"不限速发文件、收文件", tags:["实用办公工具"], url:"https://www.wenshushu.cn/"},
+            {name:"PDF去文字水印", desc:"去除PPT中嵌入图片上的文字水印~", tags:["实用办公工具", "PPT", "PDF"], url:"http://www.pdfdo.com/pdf-delete-text.aspx"},
+          ]
+        },
+        {
+          id: "mindmap", name: "思维与创作", icon: "🧠", desc: "思维导图、流程图、知识库与内容创作",
+          tools: [
+            {name:"GitMind 思维导图", desc:"免费思维导图，组织教学内容、规划课程", tags:["思维导图", "课程"], url:"https://gitmind.cn"},
+            {name:"ZhiMap", desc:"免费思维导图，比收费的还好用", tags:["思维与创作", "免费", "思维导图"], url:"https://zhimap.com/"},
+            {name:"ProcessOn", desc:"免费在线流程图思维导图，功能较全", tags:["思维与创作", "免费", "思维导图"], url:"https://www.processon.com/", featured:true},
+            {name:"百度脑图", desc:"百度公司的在线版思维导图，界面清爽", tags:["思维与创作", "思维导图", "在线"], url:"https://naotu.baidu.com/"},
+            {name:"知犀思维导图", desc:"思维创造，积累每一个灵感的瞬间", tags:["思维与创作", "思维导图"], url:"https://www.zhixi.com/"},
+            {name:"树图", desc:"拥有超多模板的思维导图、知识库", tags:["思维导图", "模板"], url:"https://shutu.cn/"},
+          ]
+        },
+        {
+          id: "security", name: "安全软件", icon: "🛡️", desc: "杀毒拦截弹窗、系统重装与电脑维护",
+          tools: [
+            {name:"火绒安全", desc:"目前比较良心的杀毒软件，有效拦截弹窗", tags:["安全软件"], url:"https://www.huorong.cn/person5.html", featured:true},
+            {name:"装个机", desc:"重装系统全流程，教程+工具", tags:["安全软件"], url:"https://zhuangit.ababtools.com/"},
+          ]
+        },
+        {
+          id: "plugin", name: "Office插件", icon: "🔌", desc: "Word/PPT 插件，自动排版与智能设计",
+          tools: [
+            {name:"不坑盒子", desc:"强大的Office插件，自动排版、智能写作", tags:["Office插件"], url:"https://www.bukenghezi.com/", featured:true},
+            {name:"ok插件", desc:"非常强大的ppt设计类插件", tags:["Office插件", "PPT", "图片"], url:"http://oktools.xyz/"},
+            {name:"Eastar", desc:"新生的强大PPT插件，专业制作PPT", tags:["Office插件", "PPT"], url:"https://44886.lanzouw.com/iYon41shofyf"},
+            {name:"方方格子", desc:"一个基于Excel的方方格子插件，用于创建和管理方方格子", tags:["Office插件", "方方格子"], url:"http://www.ffcell.com/home/ffcell.aspx"},
+            {name:"iSlide", desc:"PPT插件工具,高效创建专业演示文档。", tags:["Office插件", "PPT", "iSlide"], url:"https://www.islide.cc/", featured:true},
+            {name:"MotionGo", desc:"原PPT动画插件口袋动画_免费商用PPT插件", tags:["Office插件", "PPT", "口袋动画"], url:"https://motion.yoo-ai.com/"},
+          ]
+        },
+      ],
+      tools: []
     },
   ],
 
