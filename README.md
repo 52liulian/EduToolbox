@@ -133,7 +133,7 @@ tools/<slug>/
 在 `assets/js/data.js` 的 `selfTools` 数组追加条目：
 
 ```js
-{id: "my-tool", slug: "my-tool", name: "我的工具", icon: "🛠️", desc: "描述...", features: ["✨ 特性1", "✨ 特性2"]},
+{id:"my-tool", slug:"my-tool", name:"我的工具", icon:"🛠️", desc:"描述...",tags:["标签1","标签2"], mount:"adapter", features:["✨ 特性1","✨ 特性2"]},
 ```
 
 slug 必须与目录名完全一致。
