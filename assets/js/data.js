@@ -53,6 +53,7 @@ const DB = {
         {name:"在线屏幕录制", desc:"在线屏幕录制", tags:["录屏软件", "录屏", "在线"], url:"https://toolwa.com/record/"},
         {name:"抖音直播伴侣", desc:"抖音直播软件，也可用于录屏", tags:["录屏软件", "录屏", "直播"], url:"https://streamingtool.douyin.com/"},
         {name:"PixPin", desc:"免费的截图工具，可以截长图、录Gif", tags:["录屏软件", "免费", "录屏"], url:"https://pixpin.cn/"},
+        {name:"XSnip", desc:"免费的截图工具", tags:["截图工具", "免费", "录屏"], url:"https://xsnip.cn/"},
         {name:"Snap Camera", desc:"电脑摄像头美颜、虚拟化，真人出镜神器", tags:["录屏软件", "录屏"], url:"https://www.aliyundrive.com/s/cPcKMdKwjUJ"},
       ]
     },
@@ -140,7 +141,6 @@ const DB = {
       tools: [
         {name:"雨课堂", desc:"智慧教学，课前课中课后全流程", tags:["智慧", "流程"], url:"https://www.yuketang.cn"},
         {name:"小盒老师", desc:"AI 教学管理，智能批改与学情分析", tags:["AI", "管理"], url:"https://teacher.knowbox.cn"},
-        {name:"校宝在线", desc:"一站式教育信息化，招生教务管理", tags:["教务", "招生"], url:"https://www.xiaobaoonline.com"},
         {name:"希沃班级优化大师", desc:"班级管理神器，实时给学生打分与评价", tags:["教学管理"], url:"https://care.seewo.com/app/activity/download"},
         {name:"易查分", desc:"给学生一对一发放成绩，保护学生隐私", tags:["教学管理", "成绩查询"], url:"https://www.yichafen.com/"},
         {name:"声波球", desc:"根据环境声音大小跳动的小球", tags:["教学管理", "声音监测"], url:"https://html5.44886.com/ball/"},
@@ -242,12 +242,10 @@ const DB = {
             {name:"稿定拼图", desc:"电脑在线拼图，无需下载软件", tags:["图像处理", "图片", "下载"], url:"https://www.gaoding.com/editor/design?mode=open_external_file&from=local&action_extension=create_puzzle&action_extension_params=%7B%22command%22:%22open%22%7D"},
             {name:"改图鸭", desc:"图片压缩编辑改大小", tags:["图像处理", "图片"], url:"https://www.gaituya.com/"},
             {name:"在线抠图", desc:"自动去除图片背景", tags:["图像处理", "图片", "在线"], url:"https://www.remove.bg/zh", featured:true},
-            {name:"图压", desc:"mac上强大的图片压缩软件", tags:["图像处理", "图片"], url:"https://tuya.xinxiao.tech/"},
             {name:"佐糖AI抠图", desc:"一键抠图, 更换背景,移除水印等. 另外还提供图片裁剪, 压缩,高清修复", tags:["图像处理", "AI", "图片"], url:"https://picwish.cn/?apptype=aps-pin"},
             {name:"美术字", desc:"免费字体设计", tags:["图像处理", "免费", "图片"], url:"http://www.meishuzi.cn/"},
             {name:"图片去背景", desc:"一键去除图片中的背景", tags:["图像处理", "图片"], url:"https://www.fococlipping.com/"},
             {name:"AI人工智能图片放大", desc:"清晰化图片", tags:["图像处理", "AI", "图片"], url:"https://bigjpg.com/"},
-            {name:"Hama", desc:"一键涂抹掉图片上不要的内容", tags:["图像处理", "图片"], url:"https://www.hama.app/"},
             {name:"一键抠图", desc:"免费的一键抠图", tags:["图像处理", "免费", "图片"], url:"https://koukoukou.cn/"},
             {name:"稿定设计", desc:"一站式在线作图神器", tags:["图像处理", "图片", "在线"], url:"https://www.gaoding.com/"},
             {name:"稿定PS", desc:"在线ps工具，无需下载也能ps图片", tags:["图像处理", "图片", "下载"], url:"https://ps.gaoding.com/"},
@@ -288,7 +286,6 @@ const DB = {
         {name:"ProcessOn", desc:"免费在线流程图思维导图，功能较全", tags:["思维与创作", "免费", "思维导图"], url:"https://www.processon.com/", featured:true},
         {name:"百度脑图", desc:"百度公司的在线版思维导图，界面清爽", tags:["思维与创作", "思维导图", "在线"], url:"https://naotu.baidu.com/"},
         {name:"知犀思维导图", desc:"思维创造，积累每一个灵感的瞬间", tags:["思维与创作", "思维导图"], url:"https://www.zhixi.com/"},
-        {name:"Draw.io", desc:"免费开源的流程图工具，非常强大", tags:["思维与创作", "免费", "思维导图"], url:"https://app.diagrams.net/"},
         {name:"树图", desc:"拥有超多模板的思维导图、知识库", tags:["思维导图", "模板"], url:"https://shutu.cn/"},
       ]
     },
